@@ -1,10 +1,16 @@
 -- =============================================================================
 -- Migration 001: Initial Schema
--- Creates all core tables and enables the pgvector extension.
+-- Creates all core tables and enables vector embeddings.
 -- =============================================================================
 
--- Enable vector extension for embeddings
-CREATE EXTENSION IF NOT EXISTS vector;
+-- Attempt to enable vector extension if available on the PostgreSQL server
+DO $$
+BEGIN
+    CREATE EXTENSION IF NOT EXISTS vector;
+EXCEPTION
+    WHEN OTHERS THEN
+        NULL; -- Ignore if C-extension is not installed on Windows PostgreSQL
+END $$;
 
 -- Admin users
 CREATE TABLE IF NOT EXISTS admin (
@@ -41,7 +47,7 @@ CREATE TABLE IF NOT EXISTS jd_description (
     id UUID PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    embedding VECTOR(384),
+    embedding FLOAT[],
     org_id UUID REFERENCES organization(id) ON DELETE CASCADE,
     hr_id UUID REFERENCES hr(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -74,7 +80,7 @@ CREATE TABLE IF NOT EXISTS candidates (
     org_id UUID REFERENCES organization(id) ON DELETE CASCADE,
     hr_id UUID REFERENCES hr(id) ON DELETE SET NULL,
     filename VARCHAR(500),
-    embedding VECTOR(384),
+    embedding FLOAT[],
     match_percentage INTEGER,
     match_explanation TEXT,
     reached BOOLEAN DEFAULT FALSE,

@@ -4,393 +4,537 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Recruitment System - Login</title>
-    <meta name="description" content="Secure login for the AI-powered Recruitment Platform" />
+    <title>Sign In - AI HR Assistant</title>
+    <meta name="description" content="Sign in to AI HR Assistant" />
     <link rel="stylesheet" href="css/main.css" />
     <style>
-        /* ── Login Page Specific ── */
-        .login-page {
-            min-height: 100vh;
-            display: grid;
-            grid-template-columns: 1fr 1fr;
+        /* ── Seamless Single Canvas Dark Theme Login ── */
+        body {
+            background-color: #080614 !important;
+            color: #ffffff !important;
+            overflow-x: hidden;
         }
 
-        /* Left Panel */
+        .login-container {
+            min-height: 100vh;
+            width: 100vw;
+            display: grid;
+            grid-template-columns: 1.1fr 0.9fr;
+            position: relative;
+            background: #080614;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 40% 60%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
+                radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.22) 0%, transparent 50%);
+        }
+
+        /* ── Left Hero Side ── */
         .login-hero {
-            background: linear-gradient(145deg, #0d1223 0%, #111827 50%, #0a0e1a 100%);
             display: flex;
             flex-direction: column;
+            justify-content: space-between;
+            padding: 48px 60px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .brand-logo-wrap img {
+            max-height: 44px;
+            max-width: 220px;
+            filter: brightness(0) invert(1);
+            object-fit: contain;
+        }
+
+        /* Center AI HR Showcase Card Graphic */
+        .visual-graphic-container {
+            position: relative;
+            width: 100%;
+            height: 340px;
+            display: flex;
+            align-items: center;
             justify-content: center;
-            padding: 60px;
+            margin: 24px 0;
+        }
+
+        .ai-showcase-card {
+            width: 100%;
+            max-width: 380px;
+            background: rgba(23, 19, 46, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 20px;
+            padding: 24px;
+            backdrop-filter: blur(20px);
+            box-shadow: 
+                0 20px 50px rgba(0, 0, 0, 0.5),
+                0 0 40px rgba(99, 102, 241, 0.18);
             position: relative;
-            overflow: hidden;
+            animation: floatCard 6s ease-in-out infinite;
         }
 
-        .login-hero::before {
-            content: '';
-            position: absolute;
-            width: 500px;
-            height: 500px;
+        @keyframes floatCard {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .card-glass-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .ai-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 14px;
+            border-radius: 99px;
+            background: rgba(99, 102, 241, 0.18);
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            color: #a5b4fc;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .ai-pulse-dot {
+            width: 8px;
+            height: 8px;
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, transparent 70%);
-            top: -100px;
-            left: -100px;
+            background: #10b981;
+            box-shadow: 0 0 10px #10b981;
+            animation: pulse 2s infinite;
         }
 
-        .login-hero::after {
-            content: '';
-            position: absolute;
-            width: 350px;
-            height: 350px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.1) 0%, transparent 70%);
-            bottom: -50px;
-            right: -50px;
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
         }
 
-        .hero-content {
-            position: relative;
-            z-index: 1;
+        .score-ring {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: #fff;
+            font-weight: 800;
+            font-size: 0.85rem;
+            padding: 6px 14px;
+            border-radius: 99px;
+            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
 
-        .hero-brand {
+        .candidate-preview-box {
             display: flex;
             align-items: center;
             gap: 14px;
-            margin-bottom: 48px;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 14px;
+            margin-bottom: 16px;
         }
 
-        .hero-brand .brand-icon {
+        .candidate-avatar {
             width: 44px;
             height: 44px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            border-radius: var(--radius-sm);
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.4rem;
-            color: white;
-            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
-        }
-
-        .hero-brand .brand-name {
             font-size: 1.2rem;
-            font-weight: 800;
-            line-height: 1.2;
+            color: #fff;
+            flex-shrink: 0;
         }
 
-        .hero-brand .brand-tag {
-            font-size: 0.72rem;
-            color: var(--text-muted);
-            font-weight: 400;
+        .cand-name {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: #ffffff;
         }
 
-        .hero-title {
-            font-size: 2.6rem;
-            font-weight: 800;
-            line-height: 1.2;
-            margin-bottom: 16px;
-            background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
+        .cand-status {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.55);
+            margin-top: 2px;
+        }
+
+        .skills-tags-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .skill-pill {
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.78rem;
+            font-weight: 500;
+        }
+
+        .floating-badge {
+            position: absolute;
+            padding: 8px 16px;
+            border-radius: 12px;
+            background: rgba(15, 12, 34, 0.92);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #fff;
+            font-size: 0.8rem;
+            font-weight: 600;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-top-right {
+            top: -18px;
+            right: -16px;
+            animation: floatBadge1 5s ease-in-out infinite;
+        }
+
+        .badge-bottom-left {
+            bottom: -18px;
+            left: -16px;
+            animation: floatBadge2 5s ease-in-out infinite 0.5s;
+        }
+
+        @keyframes floatBadge1 {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes floatBadge2 {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(6px); }
+        }
+
+        .hero-title-group {
+            margin-top: auto;
+        }
+
+        .hero-main-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            line-height: 1.15;
+            letter-spacing: 0.02em;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+
+        .hero-main-title .gradient-text {
+            background: linear-gradient(90deg, #a5b4fc 0%, #c084fc 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
 
         .hero-subtitle {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            line-height: 1.7;
-            max-width: 400px;
-            margin-bottom: 48px;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.65);
+            margin-top: 12px;
+            max-width: 440px;
+            line-height: 1.6;
         }
 
-        .feature-list {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-        }
-
-        .feature-item {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .feature-item .feat-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: rgba(99, 102, 241, 0.12);
+        /* ── Right Form Side ── */
+        .login-form-side {
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
-            flex-shrink: 0;
+            padding: 48px;
+            position: relative;
+            z-index: 2;
         }
 
-        /* Right Panel */
-        .login-form-panel {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px;
-            background: var(--bg-primary);
-        }
-
-        .login-box {
+        .form-card {
             width: 100%;
-            max-width: 420px;
+            max-width: 400px;
         }
 
-        .login-box-header {
-            text-align: center;
-            margin-bottom: 36px;
-        }
-
-        .login-box-header h2 {
-            font-size: 1.8rem;
+        .form-title {
+            font-size: 2.8rem;
+            font-weight: 900;
+            letter-spacing: 0.04em;
+            color: #ffffff;
+            text-transform: uppercase;
             margin-bottom: 8px;
         }
 
-        .login-box-header p {
-            color: var(--text-secondary);
-            font-size: 0.92rem;
+        .form-subtitle {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 32px;
         }
 
-        .role-tabs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-            margin-bottom: 28px;
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid var(--border);
-            padding: 5px;
-            border-radius: var(--radius-sm);
+        .input-group-custom {
+            margin-bottom: 22px;
         }
 
-        .role-tab {
-            padding: 9px;
-            border: none;
-            border-radius: calc(var(--radius-sm) - 2px);
-            background: none;
-            color: var(--text-secondary);
-            font-family: inherit;
-            font-size: 0.88rem;
+        .input-label-custom {
+            display: block;
+            font-size: 0.8rem;
             font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 7px;
-            transition: var(--transition);
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        .role-tab.active {
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            color: #fff;
-            box-shadow: 0 2px 8px var(--accent-glow);
-        }
-
-        .input-icon-wrap {
+        .input-field-wrap {
             position: relative;
         }
 
-        .input-icon-wrap .input-icon {
+        .input-field-wrap .field-icon {
             position: absolute;
-            left: 14px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            color: var(--text-muted);
+            color: rgba(255, 255, 255, 0.4);
             font-size: 1rem;
             pointer-events: none;
         }
 
-        .input-icon-wrap .form-control {
-            padding-left: 42px;
+        .input-field-wrap .form-control-custom {
+            width: 100%;
+            height: 52px;
+            padding: 0 46px 0 46px;
+            background: #15112e;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 12px;
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 0.95rem;
+            outline: none;
+            transition: all 0.2s ease;
         }
 
-        .input-icon-wrap .toggle-pwd {
+        .input-field-wrap .form-control-custom:focus {
+            border-color: #6366f1;
+            background: #1c173b;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+        }
+
+        .input-field-wrap .form-control-custom::placeholder {
+            color: rgba(255, 255, 255, 0.35);
+        }
+
+        .input-field-wrap .pwd-toggle-btn {
             position: absolute;
-            right: 14px;
+            right: 16px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
+            color: rgba(255, 255, 255, 0.4);
             cursor: pointer;
-            color: var(--text-muted);
             font-size: 1rem;
-            transition: var(--transition);
+            transition: color 0.2s ease;
         }
 
-        .input-icon-wrap .toggle-pwd:hover {
-            color: var(--accent-light);
+        .input-field-wrap .pwd-toggle-btn:hover {
+            color: #a5b4fc;
         }
 
-        .login-footer {
+        .btn-signin-custom {
+            width: 100%;
+            height: 52px;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(90deg, #4f46e5 0%, #3b82f6 100%);
+            color: #ffffff;
+            font-family: inherit;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 20px rgba(79, 70, 229, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 28px;
+        }
+
+        .btn-signin-custom:hover {
+            background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.45);
+        }
+
+        .btn-signin-custom:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-alert {
+            background: rgba(239, 68, 68, 0.12);
+            border: 1px solid rgba(239, 68, 68, 0.35);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 0.85rem;
+            color: #fca5a5;
+            margin-bottom: 16px;
+        }
+
+        .form-footer-custom {
             text-align: center;
-            margin-top: 24px;
-            font-size: 0.82rem;
-            color: var(--text-muted);
+            margin-top: 28px;
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.5);
         }
 
-        .btn-login {
-            position: relative;
-            overflow: hidden;
+        .form-footer-custom a {
+            color: #a5b4fc;
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s ease;
         }
 
-        .btn-login .spinner {
+        .form-footer-custom a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+
+        .spinner-custom {
             display: none;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             border: 2px solid rgba(255, 255, 255, 0.3);
             border-top-color: #fff;
             border-radius: 50%;
             animation: spin 0.7s linear infinite;
         }
 
-        .btn-login.loading .spinner {
+        .btn-signin-custom.loading .spinner-custom {
             display: block;
         }
 
-        .btn-login.loading .btn-text {
-            opacity: 0.6;
+        .btn-signin-custom.loading .btn-text-custom {
+            display: none;
         }
 
         @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
+            to { transform: rotate(360deg); }
         }
 
         @media (max-width: 900px) {
-            .login-page {
+            .login-container {
                 grid-template-columns: 1fr;
             }
-
             .login-hero {
                 display: none;
+            }
+            .login-form-side {
+                padding: 32px 24px;
             }
         }
     </style>
 </head>
 
 <body>
-    <!-- Theme Toggle -->
-    <div class="theme-toggle-float">
-        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">
-            <span class="toggle-icon">🌙</span>
-            <span class="toggle-label">Dark</span>
-        </button>
-    </div>
 
-    <div class="login-page">
-        <!-- Left Hero -->
+    <div class="login-container">
+        <!-- Left Side: Branding & AI HR Showcase Card -->
         <div class="login-hero">
-            <div class="hero-content">
-                <div class="hero-brand">
-                    <div class="brand-icon"><i class="fa-solid fa-robot"></i></div>
-                    <div>
-                        <div class="brand-name">RecruitAI</div>
+            <div class="brand-logo-wrap">
+                <img src="https://media.excellentwebworld.com/wp-content/uploads/2025/07/08084450/excellentWebworldLogoheader.svg"
+                    alt="Excellent Webworld Logo" />
+            </div>
+
+            <!-- AI HR Feature Showcase Card Graphic -->
+            <div class="visual-graphic-container">
+                <div class="ai-showcase-card">
+                    <div class="card-glass-header">
+                        <div class="ai-badge">
+                            <span class="ai-pulse-dot"></span>
+                            <span>AI Matching Engine</span>
+                        </div>
+                        <div class="score-ring">98% Match</div>
                     </div>
-                </div>
-                <h1 class="hero-title">Hire Smarter,<br>Not Harder</h1>
-                <p class="hero-subtitle">
-                    AI-powered recruitment platform that automates resume screening,
-                    generates job descriptions, and surfaces the best candidates instantly.
-                </p>
-                <div class="feature-list">
-                    <div class="feature-item">
-                        <div class="feat-icon"><i class="fa-solid fa-bolt"></i></div>
-                        <span>AI-generated job descriptions in seconds</span>
+
+                    <div class="candidate-preview-box">
+                        <div class="candidate-avatar"><i class="fa-solid fa-user-tie"></i></div>
+                        <div class="candidate-info">
+                            <div class="cand-name">Senior Full Stack Engineer</div>
+                            <div class="cand-status">Recommended Candidate</div>
+                        </div>
                     </div>
-                    <div class="feature-item">
-                        <div class="feat-icon"><i class="fa-solid fa-file-lines"></i></div>
-                        <span>Automatic resume parsing & data extraction</span>
+
+                    <div class="skills-tags-row">
+                        <span class="skill-pill">Python</span>
+                        <span class="skill-pill">FastAPI</span>
+                        <span class="skill-pill">PostgreSQL</span>
+                        <span class="skill-pill">+AI Vector Search</span>
                     </div>
-                    <div class="feature-item">
-                        <div class="feat-icon"><i class="fa-solid fa-building"></i></div>
-                        <span>Multi-organization management for admins</span>
+
+                    <div class="floating-badge badge-top-right">
+                        <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> AI JD Generated
                     </div>
-                    <div class="feature-item">
-                        <div class="feat-icon"><i class="fa-solid fa-bullseye"></i></div>
-                        <span>Skills, experience & candidate profiling</span>
+                    <div class="floating-badge badge-bottom-left">
+                        <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Resume Parsed
                     </div>
                 </div>
             </div>
+
+            <div class="hero-title-group">
+                <h1 class="hero-main-title">
+                    SIGN IN TO YOUR <br>
+                    <span class="gradient-text">AI HR ASSISTANT!</span>
+                </h1>
+                <p class="hero-subtitle">
+                    Automate candidate screening, generate job descriptions, and manage recruitment seamlessly in one workspace.
+                </p>
+            </div>
         </div>
 
-        <!-- Right Form -->
-        <div class="login-form-panel">
-            <div class="login-box">
-                <div class="login-box-header">
-                    <h2>Welcome Back</h2>
-                    <p>Sign in to continue to your dashboard</p>
-                </div>
-
-                <div class="role-tabs">
-                    <button class="role-tab active" id="tab-admin" onclick="setRole('admin')">
-                        <i class="fa-solid fa-shield"></i> Admin
-                    </button>
-                    <button class="role-tab" id="tab-hr" onclick="setRole('hr')">
-                        <i class="fa-solid fa-users"></i> HR
-                    </button>
-                </div>
+        <!-- Right Side: Unified Sign In Form -->
+        <div class="login-form-side">
+            <div class="form-card">
+                <h1 class="form-title">SIGN IN</h1>
+                <p class="form-subtitle">Sign in to continue to your workspace dashboard</p>
 
                 <form id="login-form" onsubmit="handleLogin(event)">
-                    <div class="form-group">
-                        <label class="form-label" for="username">Username</label>
-                        <div class="input-icon-wrap">
-                            <span class="input-icon"><i class="fa-solid fa-user"></i></span>
-                            <input type="text" id="username" class="form-control" placeholder="Enter your username"
-                                autocomplete="username" required />
+                    <div class="input-group-custom">
+                        <label class="input-label-custom" for="username">Username</label>
+                        <div class="input-field-wrap">
+                            <span class="field-icon"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" id="username" class="form-control-custom"
+                                placeholder="Enter your username" autocomplete="username" required />
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" for="password">Password</label>
-                        <div class="input-icon-wrap">
-                            <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
-                            <input type="password" id="password" class="form-control" placeholder="Enter your password"
-                                autocomplete="current-password" required />
-                            <button type="button" class="toggle-pwd" onclick="togglePassword()" id="pwd-toggle"><i
-                                    class="fa-solid fa-eye"></i></button>
+                    <div class="input-group-custom">
+                        <label class="input-label-custom" for="password">Password</label>
+                        <div class="input-field-wrap">
+                            <span class="field-icon"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" id="password" class="form-control-custom"
+                                placeholder="Enter your password" autocomplete="current-password" required />
+                            <button type="button" class="pwd-toggle-btn" onclick="togglePassword()" id="pwd-toggle"
+                                title="Show/Hide password">
+                                <i class="fa-solid fa-eye"></i>
+                            </button>
                         </div>
                     </div>
 
-                    <div id="error-msg" class="hidden" style="
-            background:rgba(239,68,68,0.1);
-            border:1px solid rgba(239,68,68,0.3);
-            border-radius:8px;
-            padding:10px 14px;
-            font-size:0.85rem;
-            color:#ef4444;
-            margin-bottom:16px;
-          "></div>
+                    <div id="error-msg" class="error-alert hidden"></div>
 
-                    <button type="submit" class="btn btn-primary btn-block btn-lg btn-login" id="login-btn">
-                        <div class="spinner"></div>
-                        <span class="btn-text">Sign In</span>
+                    <button type="submit" class="btn-signin-custom" id="login-btn">
+                        <div class="spinner-custom"></div>
+                        <span class="btn-text-custom">Sign in</span>
                     </button>
                 </form>
 
-                <div class="login-footer">
-                    AI Recruitment System &copy; 2025 · All rights reserved
-                </div>
-                <div style="text-align:center; margin-top:16px; font-size:0.88rem;">
-                    <span style="color: var(--text-muted);">New admin?</span>&nbsp;
-                    <a href="register.html"
-                        style="color: var(--accent-light); text-decoration:none; font-weight:600; transition: var(--transition);"
-                        onmouseover="this.style.color='#fff'" onmouseout="this.style.color='var(--accent-light)'">
-                        Create an Admin Account →
-                    </a>
+                <div class="form-footer-custom">
+                    <span>New admin?</span>&nbsp;
+                    <a href="register.html">Create an Admin Account →</a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Toast -->
+    <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
 
     <script src="js/utils.js"></script>

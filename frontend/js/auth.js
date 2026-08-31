@@ -1,8 +1,6 @@
 /* ========================================================
-   auth.js – Login page logic
+   auth.js – Unified Login Page Logic for AI HR Assistant
    ======================================================== */
-
-let selectedRole = 'admin';
 
 /* Redirect if already logged in */
 window.addEventListener('DOMContentLoaded', () => {
@@ -10,27 +8,6 @@ window.addEventListener('DOMContentLoaded', () => {
     if (session?.role === 'admin') location.href = '/admin/dashboard.html';
     else if (session?.role === 'hr') location.href = '/hr/dashboard.html';
 });
-
-/* Role tab switcher */
-function setRole(role) {
-    selectedRole = role;
-    document.getElementById('tab-admin').classList.toggle('active', role === 'admin');
-    document.getElementById('tab-hr').classList.toggle('active', role === 'hr');
-
-    const hint = document.getElementById('cred-hint');
-    if (role === 'admin') {
-        hint.innerHTML = '<strong>Admin Default:</strong> username: <strong>admin</strong> / password: <strong>admin123</strong>';
-        hint.classList.remove('hidden');
-    } else {
-        hint.innerHTML = '<i class="fa-solid fa-key"></i> Use the HR credentials created by your Admin.';
-        hint.classList.remove('hidden');
-    }
-
-    // Clear inputs
-    document.getElementById('username').value = '';
-    document.getElementById('password').value = '';
-    hideError();
-}
 
 /* Password visibility toggle */
 function togglePassword() {
@@ -47,11 +24,13 @@ function showError(msg) {
     el.textContent = msg;
     el.classList.remove('hidden');
 }
+
 function hideError() {
-    document.getElementById('error-msg').classList.add('hidden');
+    const el = document.getElementById('error-msg');
+    if (el) el.classList.add('hidden');
 }
 
-/* Login submit */
+/* Unified Login submit */
 async function handleLogin(e) {
     e.preventDefault();
     hideError();
@@ -61,7 +40,7 @@ async function handleLogin(e) {
     const btn = document.getElementById('login-btn');
 
     if (!username || !password) {
-        showError('Please enter username and password.');
+        showError('Please enter both username and password.');
         return;
     }
 
@@ -71,13 +50,6 @@ async function handleLogin(e) {
         const data = await apiRequest('POST', '/api/auth/login', { username, password });
 
         if (data.success) {
-            // Validate role matches tab selection
-            if (data.role !== selectedRole) {
-                showError(`This account is not an ${selectedRole.toUpperCase()} account.`);
-                setLoading(btn, false);
-                return;
-            }
-
             Session.set({
                 user_id: data.user_id,
                 username: data.username,
@@ -85,7 +57,7 @@ async function handleLogin(e) {
                 org_id: data.org_id || '',
             });
 
-            showToast(`Welcome, ${data.username}! `, 'success');
+            showToast(`Welcome back, ${data.username}!`, 'success');
 
             setTimeout(() => {
                 if (data.role === 'admin') {
@@ -93,10 +65,10 @@ async function handleLogin(e) {
                 } else {
                     location.href = '/hr/dashboard.html';
                 }
-            }, 800);
+            }, 600);
         }
     } catch (err) {
-        showError(err.message || 'Login failed. Check credentials and try again.');
+        showError(err.message || 'Invalid username or password.');
         setLoading(btn, false);
     }
 }

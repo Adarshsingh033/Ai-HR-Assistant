@@ -34,12 +34,16 @@ except psycopg2.OperationalError as e:
 
 @contextmanager
 def get_db_connection():
-    """Yields a database connection from the pool with pgvector registered."""
+    """Yields a database connection from the pool with pgvector registered if available."""
     if not db_pool:
         raise RuntimeError("Database connection pool is not initialized.")
     conn = db_pool.getconn()
     try:
-        register_vector(conn)
+        try:
+            register_vector(conn)
+        except Exception:
+            # Safely ignore if 'vector' extension hasn't been created yet (e.g. before initial migration)
+            pass
         yield conn
     finally:
         db_pool.putconn(conn)

@@ -101,7 +101,19 @@ def get_schema() -> str:
     return "\n".join(schema_lines)
 
 
-schema = get_schema()
+_cached_schema = None
+
+
+def get_cached_schema() -> str:
+    """Return cached DB schema string, introspecting lazily on first call."""
+    global _cached_schema
+    if _cached_schema is None:
+        try:
+            _cached_schema = get_schema()
+        except Exception as e:
+            logger.warning("Could not introspect DB schema for chatbot yet: %s", e)
+            return "Tables: candidates, jd_description, jd_details"
+    return _cached_schema
 
 
 # ── State ────────────────────────────────────────────────────────────────────
@@ -156,7 +168,7 @@ Add:
 # ── Node 3: Database Query ──────────────────────────────────────────────────
 
 def db_node(state: ChatState):
-    database_schema = schema
+    database_schema = get_cached_schema()
     hr_id = state.get("hr_id", "Unknown")
     prompt = ChatPromptTemplate.from_template("""
 You are an expert PostgreSQL query generator for a recruitment AI assistant.

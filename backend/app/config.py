@@ -9,7 +9,13 @@ import os
 from urllib.parse import quote_plus
 from dotenv import load_dotenv
 
-load_dotenv()
+# Ensure .env is loaded from backend/.env regardless of current working directory
+_BACKEND_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
+_ENV_FILE = os.path.join(_BACKEND_DIR, ".env")
+if os.path.exists(_ENV_FILE):
+    load_dotenv(_ENV_FILE)
+else:
+    load_dotenv()
 
 # ── Database ─────────────────────────────────────────────────────────────────
 DB_NAME = os.getenv("DB_NAME", "hrms")

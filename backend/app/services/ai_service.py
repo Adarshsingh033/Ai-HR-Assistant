@@ -4,7 +4,10 @@ AI service — LLM-powered functions for job descriptions, resume extraction, an
 Uses Ollama (via LangChain) with structured output schemas.
 """
 
-from langchain_ollama import ChatOllama
+try:
+    from langchain_ollama import ChatOllama
+except ModuleNotFoundError:
+    from langchain_community.chat_models import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from typing import Optional
