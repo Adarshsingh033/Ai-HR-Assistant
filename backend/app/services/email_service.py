@@ -1,29 +1,45 @@
+"""
+Email service — AI-powered email drafting, SMTP sending, and email record management.
+"""
+
 import smtplib
+import uuid
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-import os
-import uuid
 from typing import Optional, List
+
+from langchain_core.prompts import ChatPromptTemplate
 
 from app.database import get_db_connection
 from app.services.ai_service import ollama_client
-from langchain_core.prompts import ChatPromptTemplate
+from app.config import SMTP_SERVER, SMTP_PORT, SMTP_USER, SMTP_PASSWORD
+from app.logger import get_logger
+
+logger = get_logger(__name__)
+
 
 def get_candidate_context(candidate_id: str) -> str:
-    """Fetches candidate details for context."""
+    """Fetches candidate details for email context."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
                 "SELECT name, email, phone, skills, total_experience FROM candidates WHERE id = %s",
-                (candidate_id,)
+                (candidate_id,),
             )
             candidate = cur.fetchone()
             if candidate:
-                return f"Candidate Name: {candidate[0]}\nEmail: {candidate[1]}\nPhone: {candidate[2]}\nSkills: {candidate[3]}\nExperience: {candidate[4]}"
+                return (
+                    f"Candidate Name: {candidate[0]}\n"
+                    f"Email: {candidate[1]}\n"
+                    f"Phone: {candidate[2]}\n"
+                    f"Skills: {candidate[3]}\n"
+                    f"Experience: {candidate[4]}"
+                )
     return "No specific candidate context provided."
 
+
 def get_hr_and_org_context(hr_id: str) -> dict:
-    """Fetches HR Name and Organization Name to use in the signature."""
+    """Fetches HR name and organization name for email signatures."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -37,14 +53,17 @@ def get_hr_and_org_context(hr_id: str) -> dict:
                 return {
                     "hr_name": result[0],
                     "org_name": result[1],
-                    "org_id": result[2]
+                    "org_id": result[2],
                 }
     return {"hr_name": "HR Professional", "org_name": "Our Company", "org_id": None}
 
-def draft_email_content(hr_id: str, prompt: str, candidate_id: Optional[str] = None) -> str:
-    """Uses LLM to draft an email based on prompt and context, including a static signature."""
+
+def draft_email_content(
+    hr_id: str, prompt: str, candidate_id: Optional[str] = None
+) -> str:
+    """Uses LLM to draft an email based on prompt and context."""
     hr_info = get_hr_and_org_context(hr_id)
-    
+
     system_prompt = ChatPromptTemplate.from_messages([
         ("system", """
             You are an expert HR Assistant. Your task is to write a professional email based on the user's instructions.
@@ -64,80 +83,93 @@ def draft_email_content(hr_id: str, prompt: str, candidate_id: Optional[str] = N
             BODY:
             <the body>
         """),
-        ("human", "{prompt}")
+        ("human", "{prompt}"),
     ])
-    
-    chain = system_prompt | ollama_client
-    response = chain.invoke(input={
-        "hr_name": hr_info["hr_name"],
-        "org_name": hr_info["org_name"],
-        "prompt": prompt
-    })
-    
-    return response.content
 
-def send_and_save_email(hr_id: str, to_email: str, subject: str, body: str, candidate_id: Optional[str] = None, cc_emails: Optional[str] = None, bcc_emails: Optional[str] = None) -> bool:
-    """Sends email via SMTP (if configured) and saves to database."""
-    
-    # 1. Simulate Sending / Attempt SMTP
-    smtp_server = os.environ.get("SMTP_SERVER")
-    smtp_port = os.environ.get("SMTP_PORT", 587)
-    smtp_user = os.environ.get("SMTP_USER")
-    smtp_pass = os.environ.get("SMTP_PASSWORD")
-    
+    try:
+        logger.info("Drafting email for HR '%s'.", hr_id)
+        chain = system_prompt | ollama_client
+        response = chain.invoke(input={
+            "hr_name": hr_info["hr_name"],
+            "org_name": hr_info["org_name"],
+            "prompt": prompt,
+        })
+        return response.content
+    except Exception as e:
+        logger.error("Failed to draft email: %s", e, exc_info=True)
+        raise
+
+
+def send_and_save_email(
+    hr_id: str,
+    to_email: str,
+    subject: str,
+    body: str,
+    candidate_id: Optional[str] = None,
+    cc_emails: Optional[str] = None,
+    bcc_emails: Optional[str] = None,
+) -> bool:
+    """Sends email via SMTP (if configured) and saves the record to the database."""
     sent_successfully = False
-    
-    if smtp_server and smtp_user and smtp_pass:
+
+    if SMTP_SERVER and SMTP_USER and SMTP_PASSWORD:
         try:
             msg = MIMEMultipart()
-            msg['From'] = smtp_user
-            msg['To'] = to_email
-            msg['Subject'] = subject
+            msg["From"] = SMTP_USER
+            msg["To"] = to_email
+            msg["Subject"] = subject
             if cc_emails:
-                msg['Cc'] = cc_emails
+                msg["Cc"] = cc_emails
             if bcc_emails:
-                msg['Bcc'] = bcc_emails
-                
-            msg.attach(MIMEText(body, 'plain'))
-            
+                msg["Bcc"] = bcc_emails
+
+            msg.attach(MIMEText(body, "plain"))
+
             all_recipients = [to_email]
             if cc_emails:
-                all_recipients.extend([e.strip() for e in cc_emails.split(',') if e.strip()])
+                all_recipients.extend([e.strip() for e in cc_emails.split(",") if e.strip()])
             if bcc_emails:
-                all_recipients.extend([e.strip() for e in bcc_emails.split(',') if e.strip()])
-                
-            server = smtplib.SMTP(smtp_server, int(smtp_port))
+                all_recipients.extend([e.strip() for e in bcc_emails.split(",") if e.strip()])
+
+            server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
             server.starttls()
-            server.login(smtp_user, smtp_pass)
-            server.sendmail(smtp_user, all_recipients, msg.as_string())
+            server.login(SMTP_USER, SMTP_PASSWORD)
+            server.sendmail(SMTP_USER, all_recipients, msg.as_string())
             server.quit()
             sent_successfully = True
+            logger.info("Email sent via SMTP to %s.", to_email)
         except Exception as e:
-            print(f"Failed to send email via SMTP: {e}")
-            # Even if it fails to send (due to bad credentials), we might just log it and still save for testing purposes.
+            logger.error("Failed to send email via SMTP to %s: %s", to_email, e, exc_info=True)
     else:
-        print("No SMTP credentials configured. Simulating email send locally.")
-        print(f"--- FAKE EMAIL SENT ---\nTO: {to_email}\nSUBJECT: {subject}\nBODY: {body}\n-----------------------")
-        sent_successfully = True # Assume success in simulation
-        
-    # 2. Save to database
+        logger.info(
+            "No SMTP credentials configured — simulating email send. TO: %s | SUBJECT: %s",
+            to_email, subject,
+        )
+        sent_successfully = True  # Assume success in simulation
+
+    # Save email record to database
     hr_info = get_hr_and_org_context(hr_id)
     org_id = hr_info.get("org_id")
-    
+
     if org_id:
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                email_id = str(uuid.uuid4())
-                cur.execute("""
-                    INSERT INTO sent_emails (id, hr_id, org_id, candidate_id, to_email, cc_emails, bcc_emails, subject, body)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
-                """, (email_id, hr_id, org_id, candidate_id, to_email, cc_emails, bcc_emails, subject, body))
-            conn.commit()
-            
+        try:
+            with get_db_connection() as conn:
+                with conn.cursor() as cur:
+                    email_id = str(uuid.uuid4())
+                    cur.execute("""
+                        INSERT INTO sent_emails (id, hr_id, org_id, candidate_id, to_email, cc_emails, bcc_emails, subject, body)
+                        VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                    """, (email_id, hr_id, org_id, candidate_id, to_email, cc_emails, bcc_emails, subject, body))
+                conn.commit()
+                logger.info("Email record saved to database (id=%s).", email_id)
+        except Exception as e:
+            logger.error("Failed to save email record: %s", e, exc_info=True)
+
     return sent_successfully
 
+
 def get_sent_emails(hr_id: str) -> List[dict]:
-    """Retrieves emails sent by a specific HR."""
+    """Retrieves all emails sent by a specific HR user."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("""
@@ -147,7 +179,7 @@ def get_sent_emails(hr_id: str) -> List[dict]:
                 ORDER BY sent_at DESC
             """, (hr_id,))
             rows = cur.fetchall()
-            
+
             emails = []
             for row in rows:
                 emails.append({
@@ -160,6 +192,6 @@ def get_sent_emails(hr_id: str) -> List[dict]:
                     "bcc_emails": row[6],
                     "subject": row[7],
                     "body": row[8],
-                    "sent_at": row[9].isoformat() if row[9] else None
+                    "sent_at": row[9].isoformat() if row[9] else None,
                 })
             return emails

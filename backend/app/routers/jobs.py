@@ -1,21 +1,28 @@
+"""Router: Jobs — CRUD operations and AI-powered job description generation."""
+
 import uuid
 from datetime import datetime, timezone
+
 from fastapi import APIRouter, HTTPException
+
 from app.models.schemas import CreateJobRequest, JobResponse, GenerateJDRequest
 from app.database import get_db_connection
 from app.services.ai_service import generate_job_description
 from app.services.embedding_service import get_embedding
+from app.logger import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/jobs", tags=["jobs"])
 
 
 @router.post("", response_model=JobResponse)
 def create_job(payload: CreateJobRequest):
-    print(payload.hr_id)
+    """Create a new job posting with auto-generated embedding."""
     job_id = str(uuid.uuid4())
     now = datetime.now(timezone.utc).isoformat()
     skills_str = ",".join(payload.skills_required)
-    
+
     embedding = get_embedding(payload.description)
 
     with get_db_connection() as conn:
@@ -25,19 +32,20 @@ def create_job(payload: CreateJobRequest):
                 INSERT INTO jd_description (id, title, description, embedding, org_id, hr_id, created_at)
                 VALUES (%s, %s, %s, %s, %s, %s, %s)
                 """,
-                (job_id, payload.title, payload.description, embedding, payload.org_id, payload.hr_id, now)
+                (job_id, payload.title, payload.description, embedding, payload.org_id, payload.hr_id, now),
             )
-            
+
             detail_id = str(uuid.uuid4())
             cur.execute(
                 """
                 INSERT INTO jd_details (id, description_id, title, department, location, job_type, experience, skills, hr_id)
                 VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
                 """,
-                (detail_id, job_id, payload.title, payload.department, payload.location, payload.job_type, payload.experience_required, skills_str, payload.hr_id)
+                (detail_id, job_id, payload.title, payload.department, payload.location, payload.job_type, payload.experience_required, skills_str, payload.hr_id),
             )
             conn.commit()
 
+    logger.info("Job created: %s (id=%s, hr=%s)", payload.title, job_id, payload.hr_id)
     return JobResponse(
         job_id=job_id,
         title=payload.title,
@@ -55,6 +63,7 @@ def create_job(payload: CreateJobRequest):
 
 @router.get("")
 def list_jobs(org_id: str):
+    """List all job postings for an organization."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -66,10 +75,10 @@ def list_jobs(org_id: str):
                 WHERE jd.org_id = %s
                 ORDER BY jd.created_at DESC
                 """,
-                (org_id,)
+                (org_id,),
             )
             rows = cur.fetchall()
-            
+
             jobs = []
             for r in rows:
                 jobs.append({
@@ -90,6 +99,7 @@ def list_jobs(org_id: str):
 
 @router.get("/{job_id}")
 def get_job(job_id: str):
+    """Get a single job posting by ID."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -100,7 +110,7 @@ def get_job(job_id: str):
                 JOIN jd_details det ON jd.id = det.description_id
                 WHERE jd.id = %s
                 """,
-                (job_id,)
+                (job_id,),
             )
             r = cur.fetchone()
             if not r:
@@ -123,15 +133,18 @@ def get_job(job_id: str):
 
 @router.delete("/{job_id}")
 def delete_job(job_id: str):
+    """Delete a job posting."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute("DELETE FROM jd_description WHERE id = %s", (job_id,))
             conn.commit()
+    logger.info("Job deleted: %s", job_id)
     return {"message": "Job deleted successfully"}
 
 
 @router.post("/generate-jd")
 def generate_jd(payload: GenerateJDRequest):
+    """Generate a professional job description using AI."""
     jd = generate_job_description(
         title=payload.title,
         department=payload.department,

@@ -1,14 +1,21 @@
+"""Router: Authentication — login and admin registration."""
+
 import uuid
 from fastapi import APIRouter, HTTPException
-from app.models.schemas import LoginRequest, LoginResponse, RegisterAdminRequest, AdminRecord
-from app.services.chroma_service import authenticate_user
+
+from app.models.schemas import LoginRequest, LoginResponse, RegisterAdminRequest
+from app.services.auth_service import authenticate_user
 from app.database import get_db_connection
+from app.logger import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
 
 
 @router.post("/login", response_model=LoginResponse)
 def login(payload: LoginRequest):
+    """Authenticate a user and return session metadata."""
     user = authenticate_user(payload.username, payload.password)
     if not user:
         raise HTTPException(status_code=401, detail="Invalid username or password")
@@ -24,9 +31,7 @@ def login(payload: LoginRequest):
 
 @router.post("/register", status_code=201)
 def register_admin(payload: RegisterAdminRequest):
-    """
-    Register a new admin in PostgreSQL `admin` table.
-    """
+    """Register a new admin user."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             # Check unique username
@@ -46,11 +51,12 @@ def register_admin(payload: RegisterAdminRequest):
                 VALUES (%s, %s, %s, %s, %s)
                 RETURNING created_at
                 """,
-                (admin_id, payload.username, payload.email, payload.password, payload.full_name)
+                (admin_id, payload.username, payload.email, payload.password, payload.full_name),
             )
             created_at = cur.fetchone()[0]
             conn.commit()
 
+            logger.info("New admin registered: %s", payload.username)
             return {
                 "success": True,
                 "message": f"Admin '{payload.username}' registered successfully!",
@@ -59,10 +65,6 @@ def register_admin(payload: RegisterAdminRequest):
                     "username": payload.username,
                     "email": payload.email,
                     "full_name": payload.full_name,
-                    "created_at": str(created_at)
+                    "created_at": str(created_at),
                 },
             }
-
-
-# Removed list_admins as per requirement: "don't show the admin account in dashboard of admin"
-# Admins are created via /register only.

@@ -1,44 +1,45 @@
+"""
+Chatbot service — LangGraph-based conversational AI pipeline.
+
+Classifies user queries into GENERAL or HRMS categories, generates
+read-only SQL for HRMS queries, and reframes results into natural language.
+"""
+
 from typing import TypedDict, Literal
+
 from pydantic import Field, BaseModel
-from app.services.ai_service import ollama_client
 from langchain_core.prompts import ChatPromptTemplate
 from langgraph.graph import StateGraph, END
 from sqlalchemy import create_engine, text, inspect
 
+from app.config import DATABASE_URL
+from app.services.ai_service import ollama_client
+from app.logger import get_logger
 
-# ================================
-# LLM (Gemma 2:9B)
-# ================================
+logger = get_logger(__name__)
 
-
-# ================================
-# DATABASE
-# ================================
-
-DB_NAME = "hrms"
-DB_USER = "postgres"
-DB_PASSWORD = "EWW%40123"
-DB_HOST = "localhost"
-DB_PORT = "5432"
-
-DATABASE_URL = f"postgresql+psycopg2://{DB_USER}:{DB_PASSWORD}@{DB_HOST}:{DB_PORT}/{DB_NAME}"
+# ── Database Engine (for schema inspection and query execution) ──────────────
 engine = create_engine(DATABASE_URL)
+
+
+# ── LLM Structured Output Schemas ───────────────────────────────────────────
 
 class ClassifyOutput(BaseModel):
     classify_result: Literal["GENERAL", "HRMS"] = Field(
-        ...,
-        description="Classification result"
+        ..., description="Classification result"
     )
+
 
 class GeneralResponse(BaseModel):
     general_response: str = Field(..., description="Response as per the user query")
 
+
 class GenerateSQL(BaseModel):
     sql_query: str = Field(..., description="Valid PostgreSQL query")
 
+
 class ReframeResponse(BaseModel):
     reframe_response: str = Field(...)
-
 
 
 llm_classify = ollama_client.with_structured_output(schema=ClassifyOutput)
@@ -46,10 +47,11 @@ llm_general = ollama_client.with_structured_output(schema=GeneralResponse)
 llm_query_generate = ollama_client.with_structured_output(schema=GenerateSQL)
 llm_reframe = ollama_client.with_structured_output(schema=ReframeResponse)
 
-# ================================
-# SCHEMA
-# ================================
-def get_schema():
+
+# ── Schema Introspection ────────────────────────────────────────────────────
+
+def get_schema() -> str:
+    """Dynamically introspect the database schema for LLM context."""
     inspector = inspect(engine)
     schema_lines = []
 
@@ -61,7 +63,6 @@ def get_schema():
 
         schema_lines.append(f"\nTable: {table}")
 
-        # Columns with types
         columns = inspector.get_columns(table)
         for col in columns:
             col_name = col["name"]
@@ -69,14 +70,12 @@ def get_schema():
             nullable = "NULL" if col["nullable"] else "NOT NULL"
             schema_lines.append(f"- {col_name} ({col_type}, {nullable})")
 
-        # Primary Key
         pk = inspector.get_pk_constraint(table)
         if pk and pk.get("constrained_columns"):
             schema_lines.append(
                 f"Primary Key: {', '.join(pk['constrained_columns'])}"
             )
 
-        # Foreign Keys
         fks = inspector.get_foreign_keys(table)
         for fk in fks:
             local_cols = ", ".join(fk["constrained_columns"])
@@ -86,7 +85,7 @@ def get_schema():
                 f"Foreign Key: {local_cols} → {ref_table}({ref_cols})"
             )
 
-    # Add explicit relationship explanation (CRUCIAL for LLM)
+    # Explicit relationship hints for the LLM
     schema_lines.append("\nRELATIONSHIPS:")
     schema_lines.append("- candidates.job_id → jd_description.id")
     schema_lines.append("- jd_details.description_id → jd_description.id")
@@ -104,20 +103,18 @@ def get_schema():
 
 schema = get_schema()
 
-# ================================
-# STATE
-# ================================
+
+# ── State ────────────────────────────────────────────────────────────────────
 
 class ChatState(TypedDict):
-    question: str   
+    question: str
     hr_id: str
     category: Literal["GENERAL", "HRMS"]
     db_result: list
     final_answer: str
 
-# ================================
-# NODE 1: CLASSIFIER
-# ================================
+
+# ── Node 1: Classifier ──────────────────────────────────────────────────────
 
 def classify_node(state: ChatState):
     prompt = ChatPromptTemplate.from_template("""
@@ -133,20 +130,13 @@ Rules:
 """)
 
     chain = prompt | llm_classify
-
-    result = chain.invoke({
-        "question": state["question"]
-    })
-
+    result = chain.invoke({"question": state["question"]})
     category = result.classify_result
-
+    logger.info("Query classified as: %s", category)
     return {"category": category}
 
 
-
-# ================================
-# NODE 2: GENERAL RESPONSE
-# ================================
+# ── Node 2: General Response ────────────────────────────────────────────────
 
 def general_node(state: ChatState):
     prompt = ChatPromptTemplate.from_template("""
@@ -159,17 +149,11 @@ Add:
 "I can also help with HRMS tasks like candidates or job details."
 """)
     chain = prompt | llm_general
-    result = chain.invoke({
-        "question": state["question"]
-    })
-    response = result.general_response
-    return {"final_answer": response}
+    result = chain.invoke({"question": state["question"]})
+    return {"final_answer": result.general_response}
 
 
-# ================================
-# NODE 3: DATABASE QUERY
-# ================================
-
+# ── Node 3: Database Query ──────────────────────────────────────────────────
 
 def db_node(state: ChatState):
     database_schema = schema
@@ -210,16 +194,19 @@ OUTPUT RULES:
 Hr id to use:
 {hr_id}
 """)
-    chain =  prompt | llm_query_generate
+    chain = prompt | llm_query_generate
     response = chain.invoke({
         "schema": database_schema,
         "question": state["question"],
-        "hr_id": hr_id
+        "hr_id": hr_id,
     })
-    print(database_schema)
+
     query = response.sql_query
+
+    # Safety check: block destructive queries
     forbidden = ["DROP", "DELETE", "UPDATE", "INSERT", "ALTER"]
     if any(word in query.upper() for word in forbidden):
+        logger.warning("Blocked forbidden SQL operation in chatbot query: %s", query)
         return {"db_result": []}
 
     try:
@@ -231,28 +218,24 @@ Hr id to use:
             if lines[-1].startswith("```"):
                 lines = lines[:-1]
             query = "\n".join(lines).strip()
-            
-        print(f"Executing SQL: {query}", flush=True)
+
+        logger.info("Executing chatbot SQL: %s", query)
         with engine.connect() as conn:
             result = conn.execute(text(query))
             rows = result.fetchall()
             columns = result.keys()
-
             data = [dict(zip(columns, row)) for row in rows]
-            print(f"Rows fetched: {len(data)}", flush=True)
-
+            logger.info("Chatbot query returned %d rows.", len(data))
             return {"db_result": data}
 
     except Exception as e:
-        print(f"DB Error: {e}", flush=True)
+        logger.error("Chatbot DB query error: %s", e, exc_info=True)
         return {"db_result": []}
 
-# ================================
-# NODE 4: REFRAMER
-# ================================
+
+# ── Node 4: Reframer ────────────────────────────────────────────────────────
 
 def reframe_node(state: ChatState):
-
     if not state["db_result"]:
         return {"final_answer": "No records found."}
 
@@ -269,31 +252,30 @@ def reframe_node(state: ChatState):
     - Be professional
 """)
     chain = prompt | llm_reframe
-    response = chain.invoke({"user_input": state["question"],"db_result":state["db_result"]})
+    response = chain.invoke({
+        "user_input": state["question"],
+        "db_result": state["db_result"],
+    })
     return {"final_answer": response.reframe_response}
 
-# ================================
-# ROUTER
-# ================================
+
+# ── Router ───────────────────────────────────────────────────────────────────
 
 def router(state: ChatState):
     if state["category"] == "GENERAL":
         return "general"
     return "hrms"
 
-# ================================
-# GRAPH
-# ================================
+
+# ── Graph Compilation ────────────────────────────────────────────────────────
 
 graph = StateGraph(ChatState)
 
-# Nodes
 graph.add_node("classify", classify_node)
 graph.add_node("general", general_node)
 graph.add_node("db", db_node)
 graph.add_node("reframe", reframe_node)
 
-# Flow
 graph.set_entry_point("classify")
 
 graph.add_conditional_edges(
@@ -301,24 +283,24 @@ graph.add_conditional_edges(
     router,
     {
         "general": "general",
-        "hrms": "db"
-    }
+        "hrms": "db",
+    },
 )
 
 graph.add_edge("db", "reframe")
 graph.add_edge("general", END)
 graph.add_edge("reframe", END)
 
-app = graph.compile()
+chatbot_app = graph.compile()
 
-# ================================
-# MAIN FUNCTION
-# ================================
 
-def process_chat_query(question: str, hr_id: str):
-    print(hr_id)
-    result = app.invoke({
+# ── Public API ───────────────────────────────────────────────────────────────
+
+def process_chat_query(question: str, hr_id: str) -> str:
+    """Process a chatbot query and return the final answer."""
+    logger.info("Processing chat query from HR '%s': %s", hr_id, question)
+    result = chatbot_app.invoke({
         "question": question,
-        "hr_id": hr_id
+        "hr_id": hr_id,
     })
     return result["final_answer"]

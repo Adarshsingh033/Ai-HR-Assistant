@@ -2,7 +2,9 @@
    utils.js – Shared helpers used across all pages
    ======================================================== */
 
-const API = 'http://192.168.5.154:8000';
+const API = (window.location.protocol && window.location.protocol.startsWith('http'))
+    ? window.location.origin
+    : 'http://localhost:8000';
 
 /* ── Theme (Dark / Light) ─────────────────────────────── */
 function initTheme() {

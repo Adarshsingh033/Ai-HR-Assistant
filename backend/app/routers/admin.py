@@ -1,20 +1,32 @@
+"""Router: Admin — organization and HR user management."""
+
 import uuid
-from datetime import datetime
 from fastapi import APIRouter, HTTPException, Header
 from typing import Optional
-from app.models.schemas import CreateOrgRequest, OrganizationResponse, CreateHRRequest, AssignHRRequest, HRResponse
+
+from app.models.schemas import (
+    CreateOrgRequest, OrganizationResponse,
+    CreateHRRequest, AssignHRRequest, HRResponse,
+)
 from app.database import get_db_connection
+from app.logger import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 
 @router.post("/organizations", response_model=OrganizationResponse)
-def create_organization(payload: CreateOrgRequest, x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID")):
+def create_organization(
+    payload: CreateOrgRequest,
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Create a new organization under the current admin."""
     if not x_admin_id:
         raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
-    
+
     org_id = str(uuid.uuid4())
-    
+
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
@@ -23,11 +35,12 @@ def create_organization(payload: CreateOrgRequest, x_admin_id: Optional[str] = H
                 VALUES (%s, %s, %s)
                 RETURNING created_at
                 """,
-                (org_id, payload.company_name, x_admin_id)
+                (org_id, payload.company_name, x_admin_id),
             )
             created_at = cur.fetchone()[0]
             conn.commit()
-            
+
+    logger.info("Organization created: %s (id=%s)", payload.company_name, org_id)
     return OrganizationResponse(
         org_id=org_id,
         company_name=payload.company_name,
@@ -37,17 +50,21 @@ def create_organization(payload: CreateOrgRequest, x_admin_id: Optional[str] = H
 
 @router.get("/organizations")
 def list_organizations(x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID")):
+    """List all organizations belonging to the current admin."""
     if not x_admin_id:
         raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, company_name, created_at FROM organization WHERE admin_id = %s ORDER BY created_at DESC", (x_admin_id,))
+            cur.execute(
+                "SELECT id, company_name, created_at FROM organization WHERE admin_id = %s ORDER BY created_at DESC",
+                (x_admin_id,),
+            )
             rows = cur.fetchall()
             orgs = [
                 {
                     "org_id": str(r[0]),
                     "company_name": r[1],
-                    "created_at": str(r[2])
+                    "created_at": str(r[2]),
                 }
                 for r in rows
             ]
@@ -55,19 +72,23 @@ def list_organizations(x_admin_id: Optional[str] = Header(None, alias="X-Admin-I
 
 
 @router.post("/hrs", response_model=HRResponse)
-def create_hr(payload: CreateHRRequest, x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID")):
+def create_hr(
+    payload: CreateHRRequest,
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Create a new HR user under the current admin."""
     if not x_admin_id:
         raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
     hr_id = str(uuid.uuid4())
-    
+
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # unique username check
+            # Unique username check
             cur.execute("SELECT id FROM hr WHERE username = %s LIMIT 1", (payload.username,))
             if cur.fetchone():
                 raise HTTPException(status_code=400, detail="HR username already exists")
-                
-            # unique email check
+
+            # Unique email check
             cur.execute("SELECT id FROM hr WHERE email = %s LIMIT 1", (payload.email,))
             if cur.fetchone():
                 raise HTTPException(status_code=400, detail="HR email already exists")
@@ -78,11 +99,12 @@ def create_hr(payload: CreateHRRequest, x_admin_id: Optional[str] = Header(None,
                 VALUES (%s, %s, %s, %s, %s, %s)
                 RETURNING created_at
                 """,
-                (hr_id, payload.username, payload.email, payload.password, payload.full_name, x_admin_id)
+                (hr_id, payload.username, payload.email, payload.password, payload.full_name, x_admin_id),
             )
             created_at = cur.fetchone()[0]
             conn.commit()
 
+    logger.info("HR user created: %s (id=%s)", payload.username, hr_id)
     return HRResponse(
         hr_id=hr_id,
         username=payload.username,
@@ -95,11 +117,15 @@ def create_hr(payload: CreateHRRequest, x_admin_id: Optional[str] = Header(None,
 
 @router.get("/hrs")
 def list_hrs(x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID")):
+    """List all HR users belonging to the current admin."""
     if not x_admin_id:
         raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT id, username, email, full_name, org_id, created_at FROM hr WHERE admin_id = %s ORDER BY created_at DESC", (x_admin_id,))
+            cur.execute(
+                "SELECT id, username, email, full_name, org_id, created_at FROM hr WHERE admin_id = %s ORDER BY created_at DESC",
+                (x_admin_id,),
+            )
             rows = cur.fetchall()
             hrs = [
                 {
@@ -108,7 +134,7 @@ def list_hrs(x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID")):
                     "email": r[2],
                     "full_name": r[3],
                     "org_id": str(r[4]) if r[4] else "",
-                    "created_at": str(r[5])
+                    "created_at": str(r[5]),
                 }
                 for r in rows
             ]
@@ -116,41 +142,50 @@ def list_hrs(x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID")):
 
 
 @router.post("/assign-hr")
-def assign_hr(payload: AssignHRRequest, x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID")):
+def assign_hr(
+    payload: AssignHRRequest,
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Assign an HR user to an organization."""
     if not x_admin_id:
         raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # verify HR exists and belongs to this admin
+            # Verify HR exists and belongs to this admin
             cur.execute("SELECT username FROM hr WHERE id = %s AND admin_id = %s", (payload.hr_id, x_admin_id))
             hr_record = cur.fetchone()
             if not hr_record:
                 raise HTTPException(status_code=404, detail="HR user not found or access denied")
-                
-            # verify Org exists and belongs to this admin
+
+            # Verify Org exists and belongs to this admin
             cur.execute("SELECT company_name FROM organization WHERE id = %s AND admin_id = %s", (payload.org_id, x_admin_id))
             org_record = cur.fetchone()
             if not org_record:
                 raise HTTPException(status_code=404, detail="Organization not found or access denied")
-                
-            # assign
+
             cur.execute("UPDATE hr SET org_id = %s WHERE id = %s", (payload.org_id, payload.hr_id))
             conn.commit()
-            
+
+            logger.info("HR '%s' assigned to organization '%s'.", hr_record[0], org_record[0])
             return {"message": f"HR '{hr_record[0]}' assigned to '{org_record[0]}' successfully"}
 
 
 @router.delete("/organizations/{org_id}")
-def delete_organization(org_id: str, x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID")):
+def delete_organization(
+    org_id: str,
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Delete an organization and unassign linked HR users."""
     if not x_admin_id:
         raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # Check ownership
             cur.execute("SELECT id FROM organization WHERE id = %s AND admin_id = %s", (org_id, x_admin_id))
             if not cur.fetchone():
                 raise HTTPException(status_code=404, detail="Organization not found or access denied")
 
             cur.execute("DELETE FROM organization WHERE id = %s", (org_id,))
             conn.commit()
+
+    logger.info("Organization deleted: %s", org_id)
     return {"message": "Organization deleted successfully and linked HRs unassigned"}
