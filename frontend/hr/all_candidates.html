@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Candidates - RecruitAI</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <style>
+        .candidate-card {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .candidate-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 16px;
+        }
+
+        .candidate-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .candidate-role {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .candidate-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .candidate-meta {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+        }
+
+        .candidate-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .candidate-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .card-footer {
+            margin-top: auto;
+            padding-top: 16px;
+        }
+
+        .skill-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-light);
+            border-radius: 99px;
+        }
+
+        .resume-link {
+            font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: var(--radius-sm);
+            margin-top: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <div class="logo-text">RecruitAI</div>
+                    <div class="logo-sub">HR Portal</div>
+                </div>
+            </div>
+
+            <div class="nav-section-label">Main Menu</div>
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-chart-simple"></i></span>
+                Dashboard
+            </a>
+            <a href="jobs.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+                Job Vacancies
+            </a>
+            <a href="all_candidates.html" class="nav-item active" id="nav-candidates">
+                <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                Candidates
+            </a>
+            <a href="emails.html" class="nav-item" id="nav-emails">
+                <span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>
+                Mailing
+            </a>
+
+            <div class="sidebar-footer">
+                <div class="user-chip" onclick="logout()">
+                    <div class="user-avatar" id="sidebar-avatar">H</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-name">HR User</div>
+                        <div class="user-role" id="sidebar-org">Organization</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="flex items-center gap-3">
+                    <button id="toggle-top-10" class="btn btn-secondary btn-sm" onclick="toggleTop10()">
+                        <i class="fa-solid fa-star"></i> Top 10 Matches
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="btn-top-match-list" onclick="openTopMatchListModal()">
+                        <i class="fa-solid fa-list-check"></i> View Top Match List
+                    </button>
+                    <div class="topbar-title">Candidates: <span id="job-title-display">All Candidates</span></div>
+                </div>
+                <button class="btn btn-primary btn-sm" onclick="openUploadModal()">
+                    <i class="fa-solid fa-file-lines"></i> Upload Resume(s)
+                </button>
+            </header>
+
+            <div class="page-content">
+
+                <!-- Upload Status Bar (Hidden by default) -->
+                <div id="upload-status" class="card mb-4 hidden"
+                    style="background: rgba(99,102,241,0.05); border-color: var(--accent-active); padding: 16px;">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-3">
+                            <div class="spinner border-accent"></div>
+                            <span id="upload-status-text">Processing resumes with AI...</span>
+                        </div>
+                        <div class="text-sm font-bold" id="upload-progress">0/1</div>
+                    </div>
+                </div>
+
+                <div id="candidates-loader" class="flex-center py-4 hidden">
+                    <div class="skeleton" style="width: 100%; height: 200px;"></div>
+                </div>
+
+                <div id="candidates-empty" class="empty-state hidden">
+                    <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
+                    <div class="empty-title">No Candidates Yet</div>
+                    <div class="empty-desc">Upload candidate resumes (PDF) to automatically extract their profile,
+                        skills, and experience using AI.</div>
+                </div>
+
+                <div id="candidates-grid" class="grid-3">
+                    <!-- Candidates rendered here via JS -->
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div class="modal-overlay" id="upload-modal">
+        <div class="modal" style="width: 600px;">
+            <div class="modal-header">
+                <h3 class="card-title">Upload Candidate Resumes</h3>
+                <button class="modal-close" onclick="closeUploadModal()">×</button>
+            </div>
+
+            <div class="upload-zone" id="drop-zone">
+                <input type="file" id="file-input" accept="application/pdf" multiple />
+                <div class="upload-icon"><i class="fa-solid fa-file-lines"></i></div>
+                <div class="upload-text">Click to browse or drag and drop PDFs here</div>
+                <div class="upload-hint">Upload up to 10 resumes at once. The AI will automatically parse Name, Skills,
+                    Experience, and Contact Info.</div>
+            </div>
+
+            <div id="selected-files" class="mt-3 text-sm text-secondary" style="max-height: 100px; overflow-y: auto;">
+                <!-- Selected files list -->
+            </div>
+
+            <div class="mt-4 flex justify-between gap-3">
+                <button type="button" class="btn btn-secondary w-full" onclick="closeUploadModal()">Cancel</button>
+                <button type="button" class="btn btn-primary w-full" id="btn-upload" onclick="startUpload()"
+                    disabled>Upload & Parse</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Candidate Details Modal -->
+    <div class="modal-overlay" id="view-candidate-modal">
+        <div class="modal" style="width: 600px;">
+            <div class="modal-header mb-0">
+                <div class="flex items-center gap-3">
+                    <div class="candidate-avatar" id="vc-avatar">A</div>
+                    <div>
+                        <h3 class="card-title" id="vc-name" style="font-size: 1.4rem;">Name</h3>
+                        <div class="text-secondary text-sm mt-1" id="vc-role">Role</div>
+                    </div>
+                </div>
+                <button class="modal-close" onclick="closeViewCandidateModal()">×</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <div class="grid-2 mb-4">
+                <div>
+                    <div class="text-xs text-muted mb-1 text-uppercase">Contact Info</div>
+                    <div class="mb-1" id="vc-email"><i class="fa-solid fa-envelope"></i> email@example.com</div>
+                    <div id="vc-phone"><i class="fa-solid fa-mobile-screen"></i> +1 234 567 890</div>
+                </div>
+                <div>
+                    <div class="text-xs text-muted mb-1 text-uppercase">Profile summary</div>
+                    <div class="mb-1" id="vc-exp"><i class="fa-solid fa-hourglass-half"></i> 5+ Years Exp</div>
+                    <div id="vc-gender"><i class="fa-solid fa-user"></i> Male</div>
+                </div>
+            </div>
+
+            <div class="text-xs text-muted mb-2 text-uppercase">Extracted Skills</div>
+            <div class="job-skills mt-0 mb-4" id="vc-skills" style="border: none;"></div>
+
+            <div class="text-xs text-muted mb-2 text-uppercase">Uploaded Document</div>
+            <div class="resume-link" id="vc-file"><i class="fa-solid fa-file-lines"></i> filename.pdf</div>
+
+            <div class="mt-4 flex justify-end gap-2">
+                <button class="btn btn-secondary" onclick="closeViewCandidateModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Top Match List Modal -->
+    <div class="modal-overlay" id="top-match-modal">
+        <div class="modal" style="width: 1000px; max-width: 95vw;">
+            <div class="modal-header">
+                <div>
+                    <h3 class="card-title">Best Match Candidates List</h3>
+                    <p class="text-secondary text-sm">Ranked by similarity percentage across all jobs</p>
+                </div>
+                <button class="modal-close" onclick="closeTopMatchListModal()">×</button>
+            </div>
+
+            <div class="table-wrap mt-4">
+                <table class="w-full">
+                    <thead>
+                        <tr>
+                            <th style="width: 50px;">Rank</th>
+                            <th style="width: 70px;">Reached</th>
+                            <th style="width: 150px;">Candidate Name</th>
+                            <th style="width: 180px;">Contact Info</th>
+                            <th style="width: 80px;">Match %</th>
+                            <th>Remarks & Notes</th>
+                        </tr>
+                    </thead>
+                    <tbody id="top-match-table-body">
+                        <!-- Rows rendered via JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="mt-4 flex justify-end">
+                <button class="btn btn-secondary" onclick="closeTopMatchListModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/hr_candidates.js"></script>
+    <script src="../js/chatbot.js"></script>
+</body>
+
+</html>

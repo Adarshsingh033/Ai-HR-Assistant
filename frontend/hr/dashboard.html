@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>HR Dashboard - RecruitAI</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <style>
+        .welcome-banner {
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(79, 70, 229, 0.2) 100%);
+            border: 1px solid var(--border-active);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .welcome-text h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-text p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .dashboard-action-btn {
+            padding: 16px 32px;
+            font-size: 1.1rem;
+            border-radius: var(--radius-md);
+        }
+
+        .recent-activity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            padding: 16px 0;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .recent-activity-item:last-child {
+            border-bottom: none;
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: rgba(99, 102, 241, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            font-size: 0.95rem;
+            margin-bottom: 4px;
+        }
+
+        .activity-time {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <div class="logo-text">RecruitAI</div>
+                    <div class="logo-sub">HR Portal</div>
+                </div>
+            </div>
+
+            <div class="nav-section-label">Main Menu</div>
+            <a href="dashboard.html" class="nav-item active">
+                <span class="nav-icon"><i class="fa-solid fa-chart-simple"></i></span>
+                Dashboard
+            </a>
+            <a href="jobs.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+                Job Vacancy
+            </a>
+            <a href="all_candidates.html" class="nav-item" id="nav-candidates">
+                <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                Candidates
+            </a>
+            <a href="emails.html" class="nav-item" id="nav-emails">
+                <span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>
+                Mailing
+            </a>
+
+            <div class="sidebar-footer">
+                <div class="user-chip" onclick="logout()">
+                    <div class="user-avatar" id="sidebar-avatar">H</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-name">HR User</div>
+                        <div class="user-role" id="sidebar-org">Organization</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-title">Overview</div>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">
+                    <span class="toggle-icon">🌙</span>
+                    <span class="toggle-label">Dark</span>
+                </button>
+            </header>
+
+            <div class="page-content">
+
+                <div class="welcome-banner">
+                    <div class="welcome-text">
+                        <h2>Welcome back, <span id="welcome-name">HR</span>!</h2>
+                        <p>Manage your job postings and review candidate resumes seamlessly.</p>
+                    </div>
+                </div>
+
+                <!-- Stats -->
+                <div class="grid-3 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(59,130,246,0.15); color: var(--info);"><i
+                                class="fa-solid fa-briefcase"></i></div>
+                        <div class="stat-value" id="stat-jobs">0</div>
+                        <div class="stat-label">Active Job Postings</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(16,185,129,0.15); color: var(--success);"><i
+                                class="fa-solid fa-users"></i>
+                        </div>
+                        <div class="stat-value" id="stat-candidates">0</div>
+                        <div class="stat-label">Total Candidates</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background: rgba(245,158,11,0.15); color: var(--warning);"><i
+                                class="fa-solid fa-star"></i></div>
+                        <div class="stat-value" id="stat-shortlisted">0</div>
+                        <div class="stat-label">Shortlisted Profiles</div>
+                    </div>
+                </div>
+
+                <div class="grid-2">
+                    <!-- Recent Activity Mock -->
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Recent Activity</div>
+                        </div>
+                        <div class="empty-state hidden" id="activity-empty">
+                            <div class="empty-icon"><i class="fa-solid fa-file-pen"></i></div>
+                            <div class="empty-desc">No recent activity found.</div>
+                        </div>
+                        <div id="activity-list">
+                            <div class="recent-activity-item">
+                                <div class="activity-icon"><i class="fa-solid fa-rocket"></i></div>
+                                <div class="activity-content">
+                                    <div class="activity-title">HR Portal Initialized</div>
+                                    <div class="activity-time">Just now</div>
+                                </div>
+                            </div>
+                            <div class="recent-activity-item">
+                                <div class="activity-icon"><i class="fa-solid fa-building"></i></div>
+                                <div class="activity-content">
+                                    <div class="activity-title">Organization Account Setup Complete</div>
+                                    <div class="activity-time">Today</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Quick Tips -->
+                    <div class="card"
+                        style="background: linear-gradient(180deg, var(--bg-card) 0%, rgba(99,102,241,0.03) 100%);">
+                        <div class="card-header">
+                            <div class="card-title"><i class="fa-solid fa-lightbulb"></i> Quick Tips</div>
+                        </div>
+                        <ul
+                            style="list-style-type: none; padding: 0; display: flex; flex-direction: column; gap: 16px; color: var(--text-secondary); font-size: 0.95rem;">
+                            <li style="display: flex; gap: 12px;">
+                                <span><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                                <span>Use the <strong>AI JD Generator</strong> in the Job Vacancies tab to instantly
+                                    create professional job descriptions based on a few keywords.</span>
+                            </li>
+                            <li style="display: flex; gap: 12px;">
+                                <span><i class="fa-solid fa-file-lines"></i></span>
+                                <span>You can upload multiple resumes at once when adding candidates to a job
+                                    posting.</span>
+                            </li>
+                            <li style="display: flex; gap: 12px;">
+                                <span><i class="fa-solid fa-robot"></i></span>
+                                <span>The AI engine automatically extracts Name, Emails, Phone, Skills and Experience
+                                    from uploaded PDFs!</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/hr_dashboard.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', initTheme);</script>
+    <script src="../js/chatbot.js"></script>
+</body>
+
+</html>

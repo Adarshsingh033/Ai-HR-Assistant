@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Register Admin – RecruitAI</title>
+    <meta name="description" content="Create a new Admin account for the AI Recruitment Platform" />
+    <link rel="stylesheet" href="css/main.css" />
+    <style>
+        /* ── Register Page ── */
+        .register-page {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+        }
+
+        /* Left Hero */
+        .register-hero {
+            background: linear-gradient(145deg, #0a0e1a 0%, #0d1223 50%, #fdfdfd 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 60px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .register-hero::before {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.18) 0%, transparent 70%);
+            bottom: -150px;
+            left: -100px;
+        }
+
+        .register-hero::after {
+            content: '';
+            position: absolute;
+            width: 350px;
+            height: 350px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(79, 70, 229, 0.12) 0%, transparent 70%);
+            top: -80px;
+            right: -80px;
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 48px;
+        }
+
+        .hero-brand .brand-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            border-radius: var(--radius-sm);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .hero-brand .brand-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            line-height: 1.2;
+        }
+
+        .hero-brand .brand-tag {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 400;
+        }
+
+        .hero-title {
+            font-size: 2.4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 16px;
+            background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .hero-subtitle {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            max-width: 400px;
+            margin-bottom: 48px;
+        }
+
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .step-num {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px var(--accent-glow);
+        }
+
+        .step-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            padding-top: 5px;
+        }
+
+        .step-text strong {
+            color: var(--text-primary);
+        }
+
+        /* Right Form Panel */
+        .register-form-panel {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            background: var(--bg-primary);
+            overflow-y: auto;
+        }
+
+        .register-box {
+            width: 100%;
+            max-width: 460px;
+            padding: 8px 0;
+        }
+
+        .register-box-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .register-box-header .header-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 18px;
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 16px;
+            box-shadow: 0 8px 32px var(--accent-glow);
+        }
+
+        .register-box-header h2 {
+            font-size: 1.8rem;
+            margin-bottom: 8px;
+        }
+
+        .register-box-header p {
+            color: var(--text-secondary);
+            font-size: 0.92rem;
+        }
+
+        .input-icon-wrap {
+            position: relative;
+        }
+
+        .input-icon-wrap .input-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            font-size: 1rem;
+            pointer-events: none;
+        }
+
+        .input-icon-wrap .form-control {
+            padding-left: 42px;
+        }
+
+        .input-icon-wrap .toggle-pwd {
+            position: absolute;
+            right: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .input-icon-wrap .toggle-pwd:hover {
+            color: var(--accent-light);
+        }
+
+        .register-footer {
+            text-align: center;
+            margin-top: 24px;
+            font-size: 0.88rem;
+            color: var(--text-secondary);
+        }
+
+        .register-footer a {
+            color: var(--accent-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+        }
+
+        .register-footer a:hover {
+            color: #fff;
+        }
+
+        .divider-label {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin: 20px 0 16px;
+            position: relative;
+        }
+
+        .divider-label::before,
+        .divider-label::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            width: 38%;
+            height: 1px;
+            background: var(--border);
+        }
+
+        .divider-label::before {
+            left: 0;
+        }
+
+        .divider-label::after {
+            right: 0;
+        }
+
+        .field-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .strength-bar-wrap {
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin-top: 8px;
+            overflow: hidden;
+        }
+
+        .strength-bar {
+            height: 100%;
+            width: 0%;
+            border-radius: 2px;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
+
+        @media (max-width: 900px) {
+            .register-page {
+                grid-template-columns: 1fr;
+            }
+
+            .register-hero {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle-float">
+        <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">
+            <span class="toggle-icon">🌙</span>
+            <span class="toggle-label">Dark</span>
+        </button>
+    </div>
+
+    <div class="register-page">
+
+        <!-- Left Hero -->
+        <div class="register-hero">
+            <div class="hero-content">
+                <div class="hero-brand">
+                    <div class="brand-icon"><i class="fa-solid fa-robot"></i></div>
+                    <div>
+                        <div class="brand-name">RecruitAI</div>
+                    </div>
+                </div>
+                <h1 class="hero-title">Become an<br>Admin Today</h1>
+                <p class="hero-subtitle">
+                    Create your admin account to start managing organizations, HR users, and AI-powered recruitment
+                    workflows.
+                </p>
+                <div class="steps-list">
+                    <div class="step-item">
+                        <div class="step-num">1</div>
+                        <div class="step-text"><strong>Register</strong> — fill in your details to create an admin
+                            account</div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num">2</div>
+                        <div class="step-text"><strong>Log In</strong> — use your new credentials on the login page
+                        </div>
+                    </div>
+                    <div class="step-item">
+                        <div class="step-num">3</div>
+                        <div class="step-text"><strong>Manage</strong> — create organizations, HR accounts, and oversee
+                            recruitment</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Form -->
+        <div class="register-form-panel">
+            <div class="register-box">
+                <div class="register-box-header">
+                    <div class="header-icon"><i class="fa-solid fa-shield"></i></div>
+                    <h2>Create Admin Account</h2>
+                    <p>All fields are required. Your data is stored securely.</p>
+                </div>
+
+                <form id="register-form" onsubmit="handleRegister(event)" novalidate>
+
+                    <!-- Full Name -->
+                    <div class="form-group">
+                        <label class="form-label" for="full-name">Full Name</label>
+                        <div class="input-icon-wrap">
+                            <span class="input-icon"><i class="fa-solid fa-user"></i></span>
+                            <input type="text" id="full-name" class="form-control" placeholder="e.g. John Doe"
+                                autocomplete="name" required />
+                        </div>
+                    </div>
+
+                    <div class="divider-label">Account Details</div>
+
+                    <!-- Username -->
+                    <div class="form-group">
+                        <label class="form-label" for="username">Username</label>
+                        <div class="input-icon-wrap">
+                            <span class="input-icon">@</span>
+                            <input type="text" id="username" class="form-control" placeholder="e.g. john_admin"
+                                autocomplete="username" required />
+                        </div>
+                        <div class="field-hint">Min. 3 characters, letters, numbers, underscores only.</div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group">
+                        <label class="form-label" for="email">Email Address</label>
+                        <div class="input-icon-wrap">
+                            <span class="input-icon">✉️</span>
+                            <input type="email" id="email" class="form-control" placeholder="admin@company.com"
+                                autocomplete="email" required />
+                        </div>
+                    </div>
+
+                    <div class="divider-label">Security</div>
+
+                    <!-- Password -->
+                    <div class="form-group">
+                        <label class="form-label" for="password">Password</label>
+                        <div class="input-icon-wrap">
+                            <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" id="password" class="form-control" placeholder="Minimum 6 characters"
+                                autocomplete="new-password" required oninput="updateStrengthBar(this.value)" />
+                            <button type="button" class="toggle-pwd" onclick="togglePwd('password', 'tog1')"
+                                id="tog1"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                        <div class="strength-bar-wrap">
+                            <div class="strength-bar" id="strength-bar"></div>
+                        </div>
+                    </div>
+
+                    <!-- Confirm Password -->
+                    <div class="form-group">
+                        <label class="form-label" for="confirm-password">Confirm Password</label>
+                        <div class="input-icon-wrap">
+                            <span class="input-icon"><i class="fa-solid fa-lock"></i></span>
+                            <input type="password" id="confirm-password" class="form-control"
+                                placeholder="Re-enter your password" autocomplete="new-password" required />
+                            <button type="button" class="toggle-pwd" onclick="togglePwd('confirm-password', 'tog2')"
+                                id="tog2"><i class="fa-solid fa-eye"></i></button>
+                        </div>
+                    </div>
+
+                    <!-- Error -->
+                    <div id="error-msg" class="hidden" style="
+                        background: rgba(239,68,68,0.1);
+                        border: 1px solid rgba(239,68,68,0.3);
+                        border-radius: 8px;
+                        padding: 10px 14px;
+                        font-size: 0.85rem;
+                        color: #ef4444;
+                        margin-bottom: 16px;
+                    "></div>
+
+                    <button type="submit" class="btn btn-primary btn-block btn-lg" id="register-btn"
+                        style="position: relative; overflow: hidden;">
+                        <div class="spinner" style="display:none;" id="reg-spinner"></div>
+                        <span id="reg-btn-text"><i class="fa-solid fa-shield"></i> Create Admin Account</span>
+                    </button>
+                </form>
+
+                <div class="register-footer">
+                    Already have an account?&nbsp;
+                    <a href="index.html">Sign In →</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/register.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', initTheme);</script>
+</body>
+
+</html>

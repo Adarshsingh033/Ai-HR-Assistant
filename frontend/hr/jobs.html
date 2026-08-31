@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Job Vacancies - RecruitAI</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <style>
+        .job-card {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .job-actions {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            display: flex;
+            gap: 8px;
+        }
+
+        .job-details {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin: 16px 0;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .job-detail-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.03);
+            padding: 4px 10px;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+        }
+
+        .job-skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: auto;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .skill-badge {
+            font-size: 0.75rem;
+            padding: 2px 8px;
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-light);
+            border-radius: 99px;
+        }
+
+        /* JD Form Specifics */
+        .jd-generator {
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.05) 0%, transparent 100%);
+            border: 1px solid var(--border-active);
+            border-radius: var(--radius-md);
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+
+        .ai-sparkle {
+            color: #f59e0b;
+            margin-right: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <div class="logo-text">RecruitAI</div>
+                    <div class="logo-sub">HR Portal</div>
+                </div>
+            </div>
+
+            <div class="nav-section-label">Main Menu</div>
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-chart-simple"></i></span>
+                Dashboard
+            </a>
+            <a href="jobs.html" class="nav-item active">
+                <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+                Job Vacancies
+            </a>
+            <a href="all_candidates.html" class="nav-item" id="nav-candidates">
+                <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                Candidates
+            </a>
+            <a href="emails.html" class="nav-item" id="nav-emails">
+                <span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>
+                Mailing
+            </a>
+
+            <div class="sidebar-footer">
+                <div class="user-chip" onclick="logout()">
+                    <div class="user-avatar" id="sidebar-avatar">H</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-name">HR User</div>
+                        <div class="user-role" id="sidebar-org">Organization</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-title">Job Vacancies</div>
+                <button class="btn btn-primary btn-sm" onclick="openCreateJobModal()">
+                    <i class="fa-solid fa-plus"></i> Create New Job
+                </button>
+            </header>
+
+            <div class="page-content">
+
+                <div id="jobs-loader" class="flex-center py-4 hidden">
+                    <div class="skeleton" style="width: 100%; height: 200px;"></div>
+                </div>
+
+                <div id="jobs-empty" class="empty-state hidden">
+                    <div class="empty-icon"><i class="fa-solid fa-briefcase"></i></div>
+                    <div class="empty-title">No Job Postings Yet</div>
+                    <div class="empty-desc">Create your first job posting and let AI generate the perfect description
+                        for you.</div>
+                    <button class="btn btn-primary" onclick="openCreateJobModal()">Create Job Posting</button>
+                </div>
+
+                <div id="jobs-grid" class="grid-3">
+                    <!-- Jobs rendered here via JS -->
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Create Job Modal -->
+    <div class="modal-overlay" id="create-modal">
+        <div class="modal" style="width: 700px; max-height: 95vh;">
+            <div class="modal-header">
+                <h3 class="card-title">Create Job Posting</h3>
+                <button class="modal-close" onclick="closeCreateJobModal()">×</button>
+            </div>
+
+            <form id="create-job-form" onsubmit="handleCreateJob(event)">
+
+                <div class="grid-2">
+                    <div class="form-group">
+                        <label class="form-label">Job Title</label>
+                        <input type="text" id="job-title" class="form-control"
+                            placeholder="e.g. Senior Frontend Developer" required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Department</label>
+                        <input type="text" id="job-dept" class="form-control" placeholder="e.g. Engineering" required />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">Location</label>
+                        <input type="text" id="job-location" class="form-control" placeholder="e.g. Remote / New York"
+                            required />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Job Type</label>
+                        <select id="job-type" class="form-control" required>
+                            <option value="Full-time">Full-time</option>
+                            <option value="Part-time">Part-time</option>
+                            <option value="Contract">Contract</option>
+                            <option value="Internship">Internship</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Experience Required</label>
+                    <input type="text" id="job-exp" class="form-control" placeholder="e.g. 5+ years" required />
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Required Skills</label>
+                    <div class="tag-input-wrap" id="skills-wrap">
+                        <!-- Tags rendered here -->
+                        <input type="text" id="skill-input" placeholder="Type skill and press Enter..." />
+                    </div>
+                    <div class="text-xs text-muted mt-1">Press Enter to add multiple skills. These are critical for
+                        matching resumes.</div>
+                </div>
+
+                <div class="jd-generator mt-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <label class="form-label mb-0" style="color: var(--accent-light);">
+                            <span class="ai-sparkle"><i class="fa-solid fa-wand-magic-sparkles"></i></span> Job
+                            Description
+                        </label>
+                        <button type="button" class="btn btn-sm btn-secondary" id="btn-generate-jd"
+                            onclick="generateJD()">
+                            <div class="spinner"></div>
+                            <span class="btn-text"><span class="ai-sparkle"><i
+                                        class="fa-solid fa-wand-magic-sparkles"></i></span> Auto-Generate with AI</span>
+                        </button>
+                    </div>
+                    <textarea id="job-desc" class="form-control"
+                        style="min-height: 200px; font-family: monospace; font-size: 0.85rem;"
+                        placeholder="Enter job description or use the AI generator..." required></textarea>
+                </div>
+
+                <div class="mt-4 flex justify-between gap-3">
+                    <button type="button" class="btn btn-secondary w-full"
+                        onclick="closeCreateJobModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary w-full" id="btn-submit-job">Publish Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Job Details Modal (View Only) -->
+    <div class="modal-overlay" id="view-modal">
+        <div class="modal" style="width: 700px;">
+            <div class="modal-header mb-0">
+                <div>
+                    <h3 class="card-title" id="view-title" style="font-size: 1.5rem;">Job Title</h3>
+                    <div class="text-secondary mt-1" id="view-subtitle">Department • Location</div>
+                </div>
+                <button class="modal-close" onclick="closeViewModal()">×</button>
+            </div>
+
+            <div class="job-details"
+                style="margin: 20px 0; border-bottom: 1px solid var(--border); padding-bottom: 20px;">
+                <div class="job-detail-item">
+                    <span><i class="fa-solid fa-briefcase"></i></span> <span id="view-type">Type</span>
+                </div>
+                <div class="job-detail-item">
+                    <span><i class="fa-solid fa-hourglass-half"></i></span> <span id="view-exp">Experience</span>
+                </div>
+                <div class="job-detail-item">
+                    <span><i class="fa-solid fa-calendar"></i></span> <span id="view-date">Date</span>
+                </div>
+            </div>
+
+            <div class="form-label">Required Skills</div>
+            <div class="job-skills mt-0 mb-4" id="view-skills" style="border: none;"></div>
+
+            <div class="form-label">Job Description</div>
+            <div class="card"
+                style="background: rgba(255,255,255,0.02); padding: 20px; font-size: 0.9rem; white-space: pre-wrap; color: var(--text-secondary); max-height: 300px; overflow-y: auto;"
+                id="view-desc">
+            </div>
+
+            <div class="mt-4 flex justify-end">
+                <button class="btn btn-secondary" onclick="closeViewModal()">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/hr_jobs.js"></script>
+    <script src="../js/chatbot.js"></script>
+</body>
+
+</html>

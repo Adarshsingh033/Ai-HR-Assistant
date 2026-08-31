@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - RecruitAI</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <style>
+        /* Admin Dashboard Specific Styles */
+        .org-card {
+            position: relative;
+        }
+
+        .org-actions {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+        }
+
+        .org-meta {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        .org-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .org-meta-icon {
+            color: var(--accent-light);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <div class="logo-text">RecruitAI</div>
+                    <div class="logo-sub">Admin Portal</div>
+                </div>
+            </div>
+
+            <div class="nav-section-label">Main Menu</div>
+            <a href="#" class="nav-item active" id="nav-orgs" onclick="switchTab('orgs')">
+                <span class="nav-icon"><i class="fa-solid fa-building"></i></span>
+                Organizations
+            </a>
+            <a href="#" class="nav-item" id="nav-hrs" onclick="switchTab('hrs')">
+                <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                HR Managers
+            </a>
+
+            <div class="sidebar-footer">
+                <div class="user-chip" onclick="logout()">
+                    <div class="user-avatar" id="sidebar-avatar">A</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-name">Admin</div>
+                        <div class="user-role">Administrator · Logout</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-title" id="page-title">Organizations</div>
+                <div class="flex gap-2">
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">
+                        <span class="toggle-icon">🌙</span>
+                        <span class="toggle-label">Dark</span>
+                    </button>
+                    <button class="btn btn-secondary btn-sm" onclick="openAssignModal()">
+                        <i class="fa-solid fa-link"></i> Assign HR
+                    </button>
+                    <button class="btn btn-primary btn-sm" id="btn-new-item" onclick="handleNewItem()">
+                        <i class="fa-solid fa-plus"></i> New Organization
+                    </button>
+                </div>
+            </header>
+
+            <div class="page-content">
+
+                <!-- Stats -->
+                <div class="grid-3 mb-4">
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-building"></i></div>
+                        <div class="stat-value" id="stat-orgs">0</div>
+                        <div class="stat-label">Total Organizations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+                        <div class="stat-value" id="stat-hr">0</div>
+                        <div class="stat-label">Active HR Accounts</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+                        <div class="stat-value" id="stat-recent">0</div>
+                        <div class="stat-label">Added This Week</div>
+                    </div>
+                </div>
+
+                <!-- Organizations Section -->
+                <div id="section-orgs">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">Registered Organizations</div>
+                        </div>
+
+                        <div id="orgs-loader" class="flex-center py-4 hidden">
+                            <div class="skeleton" style="width: 100%; height: 200px;"></div>
+                        </div>
+
+                        <div id="orgs-empty" class="empty-state hidden">
+                            <div class="empty-icon"><i class="fa-solid fa-building"></i></div>
+                            <div class="empty-title">No Organizations Found</div>
+                            <div class="empty-desc">Get started by creating your first organization.</div>
+                            <button class="btn btn-primary" onclick="openCreateOrgModal()">Create Organization</button>
+                        </div>
+
+                        <div id="orgs-grid" class="grid-3">
+                            <!-- Rendered via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- HR Managers Section -->
+                <div id="section-hrs" class="hidden">
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="card-title">HR Managers</div>
+                            <button class="btn btn-primary btn-sm" onclick="openCreateHRModal()"><i
+                                    class="fa-solid fa-plus"></i> New HR</button>
+                        </div>
+
+                        <div id="hrs-loader" class="flex-center py-4 hidden">
+                            <div class="skeleton" style="width: 100%; height: 200px;"></div>
+                        </div>
+
+                        <div id="hrs-empty" class="empty-state hidden">
+                            <div class="empty-icon"><i class="fa-solid fa-users"></i></div>
+                            <div class="empty-title">No HR Managers Found</div>
+                            <div class="empty-desc">Create HR accounts to manage recruitment for organizations.</div>
+                            <button class="btn btn-primary" onclick="openCreateHRModal()">Create HR Account</button>
+                        </div>
+
+                        <div id="hrs-grid" class="grid-3">
+                            <!-- Rendered via JS -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Admin Accounts Section -->
+                <!-- <div class="card mt-4">
+                    <div class="card-header">
+                        <div class="card-title"><i class="fa-solid fa-shield"></i> Admin Accounts</div>
+                        <a href="../register.html" class="btn btn-primary btn-sm"><i class="fa-solid fa-plus"></i> Add Admin</a>
+                    </div>
+
+                    <div id="admins-loader" class="flex-center py-4 hidden">
+                        <div class="skeleton" style="width: 100%; height: 100px;"></div>
+                    </div>
+
+                    <div id="admins-empty" class="hidden"
+                        style="text-align:center; padding: 24px; color: var(--text-muted); font-size: 0.9rem;">
+                        No additional admin accounts found. <a href="../register.html"
+                            style="color: var(--accent-light);">Register one →</a>
+                    </div>
+
+                    <div id="admins-table-wrap" class="hidden">
+                        <table style="width:100%; border-collapse:collapse; font-size:0.88rem;">
+                            <thead>
+                                <tr style="border-bottom: 1px solid var(--border);">
+                                    <th
+                                        style="padding: 10px 12px; text-align:left; color: var(--text-muted); font-weight:600; text-transform:uppercase; font-size:0.75rem;">
+                                        Full Name</th>
+                                    <th
+                                        style="padding: 10px 12px; text-align:left; color: var(--text-muted); font-weight:600; text-transform:uppercase; font-size:0.75rem;">
+                                        Username</th>
+                                    <th
+                                        style="padding: 10px 12px; text-align:left; color: var(--text-muted); font-weight:600; text-transform:uppercase; font-size:0.75rem;">
+                                        Email</th>
+                                    <th
+                                        style="padding: 10px 12px; text-align:left; color: var(--text-muted); font-weight:600; text-transform:uppercase; font-size:0.75rem;">
+                                        Registered</th>
+                                </tr>
+                            </thead>
+                            <tbody id="admins-tbody">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div> -->
+
+                <!-- Create Organization Modal -->
+                <div class="modal-overlay" id="create-org-modal">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3 class="card-title">Create New Organization</h3>
+                            <button class="modal-close" onclick="closeModal('create-org-modal')">×</button>
+                        </div>
+
+                        <form id="create-org-form" onsubmit="handleCreateOrg(event)">
+                            <div class="form-group">
+                                <label class="form-label">Company / Organization Name</label>
+                                <input type="text" id="org-name" class="form-control" placeholder="e.g. Acme Corp"
+                                    required />
+                            </div>
+
+                            <div class="mt-4 flex justify-between gap-3">
+                                <button type="button" class="btn btn-secondary w-full"
+                                    onclick="closeModal('create-org-modal')">Cancel</button>
+                                <button type="submit" class="btn btn-primary w-full" id="btn-submit-org">Create
+                                    Organization</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Create HR Modal -->
+                <div class="modal-overlay" id="create-hr-modal">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3 class="card-title">Create New HR Manager</h3>
+                            <button class="modal-close" onclick="closeModal('create-hr-modal')">×</button>
+                        </div>
+
+                        <form id="create-hr-form" onsubmit="handleCreateHR(event)">
+                            <div class="form-group">
+                                <label class="form-label">Full Name</label>
+                                <input type="text" id="hr-fullname" class="form-control" placeholder="John Doe"
+                                    required />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" id="hr-username" class="form-control" placeholder="johndoe_hr"
+                                    required />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" id="hr-email" class="form-control" placeholder="john@company.com"
+                                    required />
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="text" id="hr-password" class="form-control" placeholder="Min 6 characters"
+                                    required minlength="6" />
+                            </div>
+
+                            <div class="mt-4 flex justify-between gap-3">
+                                <button type="button" class="btn btn-secondary w-full"
+                                    onclick="closeModal('create-hr-modal')">Cancel</button>
+                                <button type="submit" class="btn btn-primary w-full" id="btn-submit-hr">Create HR
+                                    Account</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Assign HR Modal -->
+                <div class="modal-overlay" id="assign-modal">
+                    <div class="modal">
+                        <div class="modal-header">
+                            <h3 class="card-title">Assign HR to Organization</h3>
+                            <button class="modal-close" onclick="closeModal('assign-modal')">×</button>
+                        </div>
+
+                        <form id="assign-form" onsubmit="handleAssignHR(event)">
+                            <div class="form-group">
+                                <label class="form-label">Select HR Manager</label>
+                                <select id="assign-hr-id" class="form-control" required>
+                                    <option value="">-- Choose HR --</option>
+                                </select>
+                            </div>
+
+                            <div class="form-group">
+                                <label class="form-label">Select Organization</label>
+                                <select id="assign-org-id" class="form-control" required>
+                                    <option value="">-- Choose Organization --</option>
+                                </select>
+                            </div>
+
+                            <div class="mt-4 flex justify-between gap-3">
+                                <button type="button" class="btn btn-secondary w-full"
+                                    onclick="closeModal('assign-modal')">Cancel</button>
+                                <button type="submit" class="btn btn-primary w-full" id="btn-submit-assign">Confirm
+                                    Assignment</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Toast -->
+                <div class="toast-container" id="toast-container"></div>
+
+                <script src="../js/utils.js"></script>
+                <script src="../js/admin.js"></script>
+                <script>document.addEventListener('DOMContentLoaded', initTheme);</script>
+</body>
+
+</html>
