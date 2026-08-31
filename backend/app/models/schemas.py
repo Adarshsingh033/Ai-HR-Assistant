@@ -46,14 +46,6 @@ class RegisterAdminRequest(BaseModel):
         return v
 
 
-class AdminRecord(BaseModel):
-    id: str
-    username: str
-    email: str
-    full_name: str
-    created_at: str
-
-
 class LoginResponse(BaseModel):
     success: bool
     role: Optional[str] = None
@@ -172,6 +164,11 @@ class ChatResponse(BaseModel):
 class GenerateEmailRequest(BaseModel):
     candidate_id: Optional[str] = None
     prompt: str
+
+
+class DraftResponse(BaseModel):
+    subject: str
+    body: str
 
 
 class SendEmailRequest(BaseModel):

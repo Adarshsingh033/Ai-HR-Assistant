@@ -1,16 +1,16 @@
-from fastapi import APIRouter, HTTPException, Depends
-from pydantic import BaseModel
-from typing import List
+"""Router: Emails — AI email drafting, sending, and sent email logs."""
+
 import re
-from app.models.schemas import GenerateEmailRequest, SendEmailRequest, SentEmailResponse
+from typing import List
+from fastapi import APIRouter, HTTPException
+
+from app.models.schemas import GenerateEmailRequest, SendEmailRequest, SentEmailResponse, DraftResponse
 from app.services.email_service import draft_email_content, send_and_save_email, get_sent_emails
+from app.logger import get_logger
+
+logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/emails", tags=["Emails"])
-
-
-class DraftResponse(BaseModel):
-    subject: str
-    body: str
 
 
 @router.post("/draft", response_model=DraftResponse)
@@ -21,21 +21,17 @@ def draft_email(request: GenerateEmailRequest, hr_id: str):
     
     raw_draft = draft_email_content(hr_id, request.prompt, request.candidate_id)
     
-    # Parse subject and body with case-insensitive and flexible matching
     subject = "No Subject"
     body = raw_draft
     
-    # Improved subject regex: handle SUBJECT: or Subject: etc.
     subject_match = re.search(r'SUBJECT:\s*(.*)', raw_draft, re.IGNORECASE)
     if subject_match:
         subject = subject_match.group(1).strip()
     
-    # Improved body regex: handle BODY: or Body: etc. and strip properly
     body_match = re.search(r'BODY:\s*(.*)', raw_draft, re.IGNORECASE | re.DOTALL)
     if body_match:
         body = body_match.group(1).strip()
     elif "BODY:" in raw_draft.upper():
-        # Fallback for split if regex fails but marker exists
         parts = re.split(r'BODY:', raw_draft, flags=re.IGNORECASE)
         if len(parts) > 1:
             body = parts[1].strip()
@@ -62,6 +58,7 @@ def send_email(request: SendEmailRequest, hr_id: str):
     if success:
         return {"success": True, "message": "Email sent and recorded successfully."}
     else:
+        logger.error("Failed to send email to %s", request.to_email)
         raise HTTPException(status_code=500, detail="Failed to send email.")
 
 
