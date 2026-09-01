@@ -52,6 +52,7 @@ async function loadOrganizations(page = currentOrgPage) {
     const search = document.getElementById('org-search-input')?.value.trim() || '';
     const industry = document.getElementById('org-filter-industry')?.value || '';
     const companySize = document.getElementById('org-filter-size')?.value || '';
+    const status = document.getElementById('org-filter-status')?.value || '';
 
     const params = new URLSearchParams();
     params.append('page', currentOrgPage);
@@ -59,6 +60,7 @@ async function loadOrganizations(page = currentOrgPage) {
     if (search) params.append('search', search);
     if (industry) params.append('industry', industry);
     if (companySize) params.append('company_size', companySize);
+    if (status) params.append('status', status);
 
     try {
         const data = await apiRequest('GET', `/api/admin/organizations?${params.toString()}`);
@@ -71,7 +73,7 @@ async function loadOrganizations(page = currentOrgPage) {
         console.error('Failed to load organizations:', err);
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; color: #ef4444; padding: 24px;">
+                <td colspan="7" style="text-align: center; color: #ef4444; padding: 24px;">
                     Failed to load organizations: ${escapeHtml(err.message || 'Request failed')}
                 </td>
             </tr>
@@ -87,7 +89,7 @@ function renderOrganizationsTable(orgs) {
     if (!orgs || orgs.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px; font-weight: 500;">
+                <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 40px; font-weight: 500;">
                     No organizations created yet
                 </td>
             </tr>
@@ -99,11 +101,17 @@ function renderOrganizationsTable(orgs) {
         const indLabel = INDUSTRY_LABELS[org.industry] || org.industry;
         const sizeLabel = COMPANY_SIZE_LABELS[org.company_size] || org.company_size;
         const formattedDate = org.created_at ? new Date(org.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
+        const isInactive = org.status === 'inactive';
         
         // Logo Column (Dedicated Column)
         const logoContent = org.image
             ? `<img src="${org.image}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.15);" />`
             : `<div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 1.5px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;"><i class="fa-solid fa-building"></i></div>`;
+
+        // Status Badge Column (Clickable Toggle Pill with Custom Tooltip)
+        const statusBadge = isInactive
+            ? `<button type="button" onclick="toggleOrgStatus('${org.org_id}', 'active')" data-tooltip="Click to set Active" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'"><i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Inactive</button>`
+            : `<button type="button" onclick="toggleOrgStatus('${org.org_id}', 'inactive')" data-tooltip="Click to set Inactive" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(16, 185, 129, 0.25)'" onmouseout="this.style.background='rgba(16, 185, 129, 0.12)'"><i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Active</button>`;
 
         return `
             <tr style="position: relative;">
@@ -133,16 +141,21 @@ function renderOrganizationsTable(orgs) {
                     </span>
                 </td>
 
-                <!-- 5. Created At Column -->
+                <!-- 5. Status Column -->
+                <td>
+                    ${statusBadge}
+                </td>
+
+                <!-- 6. Created At Column -->
                 <td style="color: var(--text-muted); font-size: 0.85rem;">${formattedDate}</td>
 
-                <!-- 6. Actions Column (Horizontal 3-Dot Menu) -->
+                <!-- 7. Actions Column (Horizontal 3-Dot Menu) -->
                 <td style="text-align: right; position: relative;">
-                    <button type="button" onclick="toggleOrgActionMenu(event, '${org.org_id}')" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s ease;" title="Actions">
+                    <button type="button" onclick="toggleOrgActionMenu(event, '${org.org_id}')" data-tooltip="Actions" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s ease;">
                         <i class="fa-solid fa-ellipsis"></i>
                     </button>
 
-                    <!-- Popover Dropdown Menu -->
+                    <!-- Popover Dropdown Menu (View, Edit, Delete Only) -->
                     <div id="org-action-menu-${org.org_id}" class="org-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; width: 140px; background: #0f172a; border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
                         <button type="button" onclick="openViewOrgModal('${org.org_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #fff; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">
                             <i class="fa-solid fa-eye" style="color: #60a5fa; width: 14px;"></i> View
@@ -159,6 +172,33 @@ function renderOrganizationsTable(orgs) {
         `;
     }).join('');
 }
+
+/* Quick Toggle Active / Inactive Status */
+async function toggleOrgStatus(orgId, newStatus) {
+    const menu = document.getElementById(`org-action-menu-${orgId}`);
+    if (menu) menu.classList.add('hidden');
+
+    try {
+        await apiRequest('PUT', `/api/admin/organizations/${orgId}`, { status: newStatus });
+        showToast(`Organization status updated to ${newStatus}!`, 'success');
+        await loadOrganizations();
+    } catch (err) {
+        showToast(err.message || 'Failed to update status', 'error');
+    }
+}
+window.toggleOrgStatus = toggleOrgStatus;
+
+/* Helper to sync status toggle UI in Create / Edit Modal */
+function updateOrgStatusToggleUI(isActive) {
+    const toggle = document.getElementById('org-status-toggle');
+    const text = document.getElementById('org-status-text');
+    if (toggle) toggle.checked = isActive;
+    if (text) {
+        text.textContent = isActive ? 'Active' : 'Inactive';
+        text.style.color = isActive ? '#10b981' : '#ef4444';
+    }
+}
+window.updateOrgStatusToggleUI = updateOrgStatusToggleUI;
 
 function onOrgPageSizeChange(newSize) {
     orgPageSize = parseInt(newSize, 10) || 10;
@@ -306,6 +346,7 @@ function openCreateOrgModal() {
     document.getElementById('org-name-input').value = '';
     document.getElementById('org-industry-select').value = '';
     document.getElementById('org-size-select').value = '';
+    updateOrgStatusToggleUI(true);
     document.getElementById('org-logo-file').value = '';
     orgLogoBase64 = null;
 
@@ -332,6 +373,7 @@ async function openEditOrgModal(orgId) {
         document.getElementById('org-name-input').value = org.organization_name;
         document.getElementById('org-industry-select').value = org.industry;
         document.getElementById('org-size-select').value = org.company_size;
+        updateOrgStatusToggleUI(org.status !== 'inactive');
         orgLogoBase64 = org.image || null;
 
         const circlePreview = document.getElementById('org-circle-preview');
@@ -385,6 +427,7 @@ async function handleSaveOrganization(e) {
     const name = document.getElementById('org-name-input').value.trim();
     const industry = document.getElementById('org-industry-select').value;
     const companySize = document.getElementById('org-size-select').value;
+    const status = document.getElementById('org-status-toggle')?.checked ? 'active' : 'inactive';
 
     if (!name || !industry || !companySize) {
         showToast('Please fill in all required fields (Organization Name, Industry, Company Size).', 'error');
@@ -402,6 +445,7 @@ async function handleSaveOrganization(e) {
             organization_name: name,
             industry: industry,
             company_size: companySize,
+            status: status,
             image: orgLogoBase64
         };
 

@@ -96,10 +96,16 @@ class CompanySizeEnum(str, Enum):
     size_1000_plus = "1000+"
 
 
+class OrgStatusEnum(str, Enum):
+    active = "active"
+    inactive = "inactive"
+
+
 class CreateOrgRequest(BaseModel):
     organization_name: str
     industry: IndustryEnum
     company_size: CompanySizeEnum
+    status: Optional[OrgStatusEnum] = OrgStatusEnum.active
     image: Optional[str] = None
 
 
@@ -107,6 +113,7 @@ class UpdateOrgRequest(BaseModel):
     organization_name: Optional[str] = None
     industry: Optional[IndustryEnum] = None
     company_size: Optional[CompanySizeEnum] = None
+    status: Optional[OrgStatusEnum] = None
     image: Optional[str] = None
 
 
@@ -115,8 +122,41 @@ class OrganizationResponse(BaseModel):
     organization_name: str
     industry: str
     company_size: str
+    status: str = "active"
     image: Optional[str] = None
     created_at: str
+
+
+# ── Branch Management ────────────────────────────────────────────────────────
+class CreateBranchRequest(BaseModel):
+    organization_id: str
+    branch_name: str
+    branch_code: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+
+
+class UpdateBranchRequest(BaseModel):
+    organization_id: Optional[str] = None
+    branch_name: Optional[str] = None
+    branch_code: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+
+
+class BranchResponse(BaseModel):
+    branch_id: str
+    organization_id: str
+    organization_name: Optional[str] = None
+    branch_name: str
+    branch_code: Optional[str] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    country: Optional[str] = None
+    created_at: str
+    updated_at: str
 
 
 # ── HR Management ────────────────────────────────────────────────────────────

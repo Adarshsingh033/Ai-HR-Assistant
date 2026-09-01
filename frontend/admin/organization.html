@@ -414,6 +414,16 @@
                                 <option value="1000+" style="background: #0f172a; color: #fff;">1000+ employees</option>
                             </select>
                         </div>
+
+                        <!-- 4. Status Dropdown Box -->
+                        <div style="min-width: 150px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; height: 46px;">
+                            <span style="font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
+                            <select id="org-filter-status" onchange="onOrgFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 6px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
+                                <option value="" style="background: #0f172a; color: #fff;">All</option>
+                                <option value="active" style="background: #0f172a; color: #fff;">Active</option>
+                                <option value="inactive" style="background: #0f172a; color: #fff;">Inactive</option>
+                            </select>
+                        </div>
                     </div>
 
                     <!-- Organization List Table -->
@@ -425,13 +435,14 @@
                                     <th>Organization</th>
                                     <th>Industry</th>
                                     <th>Company Size</th>
+                                    <th>Status</th>
                                     <th>Created At</th>
                                     <th style="text-align: right; width: 100px;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="org-table-body">
                                 <tr>
-                                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 32px;">
                                         Loading organizations...
                                     </td>
                                 </tr>
@@ -472,7 +483,7 @@
 
                 <!-- Circular Logo Uploader at Top Center -->
                 <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 32px;">
-                    <div class="profile-circle-uploader" onclick="document.getElementById('org-logo-file').click()" title="Click to upload logo" style="width: 90px; height: 90px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="org-circle-preview">
+                    <div class="profile-circle-uploader" onclick="document.getElementById('org-logo-file').click()" data-tooltip="Click to upload logo" style="width: 90px; height: 90px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="org-circle-preview">
                         <i class="fa-solid fa-building"></i>
                     </div>
                     <span style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.55); margin-top: 10px; font-weight: 500;">Upload organization logo</span>
@@ -515,6 +526,19 @@
                             <option value="1000+">1000+ employees</option>
                         </select>
                     </div>
+
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 6px; display: block;">
+                            Status
+                        </label>
+                        <div style="display: inline-flex; align-items: center; gap: 12px; padding: 4px 0;">
+                            <label style="position: relative; display: inline-block; width: 48px; height: 26px; margin: 0; cursor: pointer;">
+                                <input type="checkbox" id="org-status-toggle" checked onchange="updateOrgStatusToggleUI(this.checked)" style="opacity: 0; width: 0; height: 0;" />
+                                <span class="status-toggle-slider"></span>
+                            </label>
+                            <span id="org-status-text" style="font-size: 0.95rem; font-weight: 700; color: #10b981;">Active</span>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex justify-end gap-3" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
@@ -548,6 +572,10 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
                     <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Company Size:</span>
                     <span id="view-org-size" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.8rem; font-weight: 700;">—</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
+                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Status:</span>
+                    <span id="view-org-status" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 0.8rem; font-weight: 700;">Active</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px;">
                     <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Created Date:</span>

@@ -7,6 +7,7 @@ from typing import Optional
 
 from app.models.schemas import (
     CreateOrgRequest, UpdateOrgRequest, OrganizationResponse,
+    CreateBranchRequest, UpdateBranchRequest, BranchResponse,
     CreateHRRequest, AssignHRRequest, HRResponse,
     AdminProfileResponse, UpdateAdminProfileRequest,
 )
@@ -116,13 +117,14 @@ def create_organization(
         raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
 
     org_id = str(uuid.uuid4())
+    status_val = payload.status.value if payload.status else "active"
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
-                INSERT INTO organization (id, company_name, organization_name, industry, company_size, image, admin_id)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO organization (id, company_name, organization_name, industry, company_size, status, image, admin_id)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
                 RETURNING created_at
                 """,
                 (
@@ -131,6 +133,7 @@ def create_organization(
                     payload.organization_name,
                     payload.industry.value,
                     payload.company_size.value,
+                    status_val,
                     payload.image,
                     x_admin_id,
                 ),
@@ -138,12 +141,13 @@ def create_organization(
             created_at = cur.fetchone()[0]
             conn.commit()
 
-    logger.info("Organization created: %s (id=%s)", payload.organization_name, org_id)
+    logger.info("Organization created: %s (id=%s, status=%s)", payload.organization_name, org_id, status_val)
     return OrganizationResponse(
         org_id=org_id,
         organization_name=payload.organization_name,
         industry=payload.industry.value,
         company_size=payload.company_size.value,
+        status=status_val,
         image=payload.image or "",
         created_at=str(created_at),
     )
@@ -154,6 +158,7 @@ def list_organizations(
     search: Optional[str] = Query(None),
     industry: Optional[str] = Query(None),
     company_size: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
     limit: int = Query(10, ge=1, le=100),
     x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
@@ -178,6 +183,10 @@ def list_organizations(
         where_clause += " AND company_size = %s"
         params.append(company_size.strip())
 
+    if status and status.strip():
+        where_clause += " AND status = %s"
+        params.append(status.strip().lower())
+
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             # 1. Count Total Rows
@@ -188,7 +197,7 @@ def list_organizations(
             # 2. Paginated Data Query
             offset = (page - 1) * limit
             data_sql = """
-                SELECT id, COALESCE(organization_name, company_name, ''), COALESCE(industry, 'information_technology'), COALESCE(company_size, '1-10'), image, created_at
+                SELECT id, COALESCE(organization_name, company_name, ''), COALESCE(industry, 'information_technology'), COALESCE(company_size, '1-10'), COALESCE(status, 'active'), image, created_at
                 FROM organization
             """ + where_clause + " ORDER BY created_at DESC LIMIT %s OFFSET %s"
 
@@ -202,8 +211,9 @@ def list_organizations(
                     "organization_name": r[1],
                     "industry": r[2],
                     "company_size": r[3],
-                    "image": r[4] or "",
-                    "created_at": str(r[5]),
+                    "status": r[4],
+                    "image": r[5] or "",
+                    "created_at": str(r[6]),
                 }
                 for r in rows
             ]
@@ -231,7 +241,7 @@ def get_organization(
         with conn.cursor() as cur:
             cur.execute(
                 """
-                SELECT id, COALESCE(organization_name, company_name, ''), COALESCE(industry, 'information_technology'), COALESCE(company_size, '1-10'), image, created_at
+                SELECT id, COALESCE(organization_name, company_name, ''), COALESCE(industry, 'information_technology'), COALESCE(company_size, '1-10'), COALESCE(status, 'active'), image, created_at
                 FROM organization
                 WHERE id = %s AND admin_id = %s
                 """,
@@ -245,8 +255,9 @@ def get_organization(
                 organization_name=r[1],
                 industry=r[2],
                 company_size=r[3],
-                image=r[4] or "",
-                created_at=str(r[5]),
+                status=r[4],
+                image=r[5] or "",
+                created_at=str(r[6]),
             )
 
 
@@ -262,7 +273,7 @@ def update_organization(
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             cur.execute(
-                "SELECT id, organization_name, industry, company_size, image, created_at FROM organization WHERE id = %s AND admin_id = %s LIMIT 1",
+                "SELECT id, organization_name, industry, company_size, status, image, created_at FROM organization WHERE id = %s AND admin_id = %s LIMIT 1",
                 (org_id, x_admin_id),
             )
             current = cur.fetchone()
@@ -272,15 +283,16 @@ def update_organization(
             new_name = payload.organization_name if payload.organization_name is not None else current[1]
             new_ind = payload.industry.value if payload.industry is not None else current[2]
             new_size = payload.company_size.value if payload.company_size is not None else current[3]
-            new_img = payload.image if payload.image is not None else current[4]
+            new_status = payload.status.value if payload.status is not None else current[4]
+            new_img = payload.image if payload.image is not None else current[5]
 
             cur.execute(
                 """
                 UPDATE organization
-                SET organization_name = %s, company_name = %s, industry = %s, company_size = %s, image = %s
+                SET organization_name = %s, company_name = %s, industry = %s, company_size = %s, status = %s, image = %s
                 WHERE id = %s AND admin_id = %s
                 """,
-                (new_name, new_name, new_ind, new_size, new_img, org_id, x_admin_id),
+                (new_name, new_name, new_ind, new_size, new_status, new_img, org_id, x_admin_id),
             )
             conn.commit()
 
@@ -289,8 +301,9 @@ def update_organization(
                 organization_name=new_name,
                 industry=new_ind,
                 company_size=new_size,
+                status=new_status,
                 image=new_img or "",
-                created_at=str(current[5]),
+                created_at=str(current[6]),
             )
 
 
@@ -412,3 +425,273 @@ def delete_organization(
 
     logger.info("Organization deleted: %s", org_id)
     return {"message": "Organization deleted successfully and linked HRs unassigned"}
+
+
+# ── Branch Management Endpoints ──────────────────────────────────────────────
+
+@router.post("/branches", response_model=BranchResponse)
+def create_branch(
+    payload: CreateBranchRequest,
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Create a new branch for an organization."""
+    if not x_admin_id:
+        raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
+
+    branch_id = str(uuid.uuid4())
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            # Verify Organization belongs to current admin
+            cur.execute("SELECT COALESCE(organization_name, company_name, '') FROM organization WHERE id = %s AND admin_id = %s", (payload.organization_id, x_admin_id))
+            org_row = cur.fetchone()
+            if not org_row:
+                raise HTTPException(status_code=404, detail="Organization not found or access denied")
+            org_name = org_row[0]
+
+            # Check unique branch_code per organization if provided
+            if payload.branch_code and payload.branch_code.strip():
+                cur.execute(
+                    "SELECT id FROM branches WHERE organization_id = %s AND branch_code = %s LIMIT 1",
+                    (payload.organization_id, payload.branch_code.strip()),
+                )
+                if cur.fetchone():
+                    raise HTTPException(status_code=400, detail="Branch code already exists for this organization")
+
+            cur.execute(
+                """
+                INSERT INTO branches (id, organization_id, created_by_admin_id, branch_name, branch_code, city, state, country)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                RETURNING created_at, updated_at
+                """,
+                (
+                    branch_id,
+                    payload.organization_id,
+                    x_admin_id,
+                    payload.branch_name.strip(),
+                    payload.branch_code.strip() if payload.branch_code else None,
+                    payload.city.strip() if payload.city else None,
+                    payload.state.strip() if payload.state else None,
+                    payload.country.strip() if payload.country else None,
+                ),
+            )
+            dates = cur.fetchone()
+            conn.commit()
+
+    logger.info("Branch created: %s (id=%s)", payload.branch_name, branch_id)
+    return BranchResponse(
+        branch_id=branch_id,
+        organization_id=payload.organization_id,
+        organization_name=org_name,
+        branch_name=payload.branch_name,
+        branch_code=payload.branch_code or "",
+        city=payload.city or "",
+        state=payload.state or "",
+        country=payload.country or "",
+        created_at=str(dates[0]),
+        updated_at=str(dates[1]),
+    )
+
+
+@router.get("/branches")
+def list_branches(
+    search: Optional[str] = Query(None),
+    organization_id: Optional[str] = Query(None),
+    page: int = Query(1, ge=1),
+    limit: int = Query(10, ge=1, le=100),
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """List all branches with search, filter by organization, and pagination."""
+    if not x_admin_id:
+        raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
+
+    where_clause = " WHERE b.created_by_admin_id = %s"
+    params = [x_admin_id]
+
+    if organization_id and organization_id.strip():
+        where_clause += " AND b.organization_id = %s"
+        params.append(organization_id.strip())
+
+    if search and search.strip():
+        where_clause += " AND (b.branch_name ILIKE %s OR b.branch_code ILIKE %s OR b.city ILIKE %s OR b.state ILIKE %s OR b.country ILIKE %s OR o.organization_name ILIKE %s)"
+        s = f"%{search.strip()}%"
+        params.extend([s, s, s, s, s, s])
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            count_sql = """
+                SELECT COUNT(*)
+                FROM branches b
+                LEFT JOIN organization o ON b.organization_id = o.id
+            """ + where_clause
+            cur.execute(count_sql, tuple(params))
+            total = cur.fetchone()[0]
+
+            offset = (page - 1) * limit
+            data_sql = """
+                SELECT b.id, b.organization_id, COALESCE(o.organization_name, o.company_name, ''),
+                       b.branch_name, COALESCE(b.branch_code, ''), COALESCE(b.city, ''),
+                       COALESCE(b.state, ''), COALESCE(b.country, ''), b.created_at, b.updated_at
+                FROM branches b
+                LEFT JOIN organization o ON b.organization_id = o.id
+            """ + where_clause + " ORDER BY b.created_at DESC LIMIT %s OFFSET %s"
+
+            data_params = list(params) + [limit, offset]
+            cur.execute(data_sql, tuple(data_params))
+            rows = cur.fetchall()
+
+            branches = [
+                {
+                    "branch_id": str(r[0]),
+                    "organization_id": str(r[1]),
+                    "organization_name": r[2],
+                    "branch_name": r[3],
+                    "branch_code": r[4],
+                    "city": r[5],
+                    "state": r[6],
+                    "country": r[7],
+                    "created_at": str(r[8]),
+                    "updated_at": str(r[9]),
+                }
+                for r in rows
+            ]
+
+            total_pages = math.ceil(total / limit) if total > 0 else 1
+
+    return {
+        "branches": branches,
+        "total": total,
+        "page": page,
+        "limit": limit,
+        "total_pages": total_pages,
+    }
+
+
+@router.get("/branches/{branch_id}", response_model=BranchResponse)
+def get_branch(
+    branch_id: str,
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Get details of a single branch."""
+    if not x_admin_id:
+        raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """
+                SELECT b.id, b.organization_id, COALESCE(o.organization_name, o.company_name, ''),
+                       b.branch_name, COALESCE(b.branch_code, ''), COALESCE(b.city, ''),
+                       COALESCE(b.state, ''), COALESCE(b.country, ''), b.created_at, b.updated_at
+                FROM branches b
+                LEFT JOIN organization o ON b.organization_id = o.id
+                WHERE b.id = %s AND b.created_by_admin_id = %s
+                LIMIT 1
+                """,
+                (branch_id, x_admin_id),
+            )
+            r = cur.fetchone()
+            if not r:
+                raise HTTPException(status_code=404, detail="Branch not found or access denied")
+
+            return BranchResponse(
+                branch_id=str(r[0]),
+                organization_id=str(r[1]),
+                organization_name=r[2],
+                branch_name=r[3],
+                branch_code=r[4],
+                city=r[5],
+                state=r[6],
+                country=r[7],
+                created_at=str(r[8]),
+                updated_at=str(r[9]),
+            )
+
+
+@router.put("/branches/{branch_id}", response_model=BranchResponse)
+def update_branch(
+    branch_id: str,
+    payload: UpdateBranchRequest,
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Update a branch."""
+    if not x_admin_id:
+        raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT id, organization_id, branch_name, branch_code, city, state, country FROM branches WHERE id = %s AND created_by_admin_id = %s LIMIT 1",
+                (branch_id, x_admin_id),
+            )
+            current = cur.fetchone()
+            if not current:
+                raise HTTPException(status_code=404, detail="Branch not found or access denied")
+
+            new_org_id = payload.organization_id or str(current[1])
+            new_name = payload.branch_name.strip() if payload.branch_name is not None else current[2]
+            new_code = payload.branch_code.strip() if payload.branch_code is not None else current[3]
+            new_city = payload.city.strip() if payload.city is not None else current[4]
+            new_state = payload.state.strip() if payload.state is not None else current[5]
+            new_country = payload.country.strip() if payload.country is not None else current[6]
+
+            # Check unique branch code per organization if changing
+            if new_code and new_code != current[3]:
+                cur.execute(
+                    "SELECT id FROM branches WHERE organization_id = %s AND branch_code = %s AND id != %s LIMIT 1",
+                    (new_org_id, new_code, branch_id),
+                )
+                if cur.fetchone():
+                    raise HTTPException(status_code=400, detail="Branch code already exists for this organization")
+
+            cur.execute(
+                """
+                UPDATE branches
+                SET organization_id = %s, branch_name = %s, branch_code = %s, city = %s, state = %s, country = %s, updated_at = NOW()
+                WHERE id = %s
+                RETURNING created_at, updated_at
+                """,
+                (new_org_id, new_name, new_code, new_city, new_state, new_country, branch_id),
+            )
+            dates = cur.fetchone()
+            conn.commit()
+
+            cur.execute("SELECT COALESCE(organization_name, company_name, '') FROM organization WHERE id = %s", (new_org_id,))
+            org_name = cur.fetchone()[0]
+
+            logger.info("Branch updated: %s (id=%s)", new_name, branch_id)
+            return BranchResponse(
+                branch_id=branch_id,
+                organization_id=new_org_id,
+                organization_name=org_name,
+                branch_name=new_name,
+                branch_code=new_code or "",
+                city=new_city or "",
+                state=new_state or "",
+                country=new_country or "",
+                created_at=str(dates[0]),
+                updated_at=str(dates[1]),
+            )
+
+
+@router.delete("/branches/{branch_id}")
+def delete_branch(
+    branch_id: str,
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Delete a branch."""
+    if not x_admin_id:
+        raise HTTPException(status_code=401, detail="Header X-Admin-ID is missing. Please re-login.")
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM branches WHERE id = %s AND created_by_admin_id = %s", (branch_id, x_admin_id))
+            if not cur.fetchone():
+                raise HTTPException(status_code=404, detail="Branch not found or access denied")
+
+            cur.execute("DELETE FROM branches WHERE id = %s", (branch_id,))
+            conn.commit()
+
+    logger.info("Branch deleted: %s", branch_id)
+    return {"message": "Branch deleted successfully"}
+
