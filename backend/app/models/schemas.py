@@ -159,7 +159,47 @@ class BranchResponse(BaseModel):
     updated_at: str
 
 
-# ── HR Management ────────────────────────────────────────────────────────────
+# ── HR / Organization Members Management ─────────────────────────────────────
+class CreateMemberRequest(BaseModel):
+    organization_id: str
+    branch_id: str
+    full_name: str
+    username: str
+    email: EmailStr
+    password: str
+    phone: Optional[str] = None
+    image: Optional[str] = None
+    status: Optional[str] = "active"
+
+
+class UpdateMemberRequest(BaseModel):
+    organization_id: Optional[str] = None
+    branch_id: Optional[str] = None
+    full_name: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+    phone: Optional[str] = None
+    image: Optional[str] = None
+    status: Optional[str] = None
+
+
+class MemberResponse(BaseModel):
+    member_id: str
+    organization_id: str
+    organization_name: Optional[str] = None
+    branch_id: str
+    branch_name: Optional[str] = None
+    full_name: str
+    username: str
+    email: str
+    phone: Optional[str] = ""
+    image: Optional[str] = None
+    status: str = "active"
+    created_at: str
+    updated_at: str
+
+
 class CreateHRRequest(BaseModel):
     username: str
     email: EmailStr

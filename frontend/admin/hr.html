@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HR - AI HR Assistant Admin</title>
     <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         /* Modern Clean Admin Dashboard Aesthetics */
         .module-section {
@@ -161,20 +162,246 @@
 
                 <!-- 1. HR MODULE -->
                 <div id="section-hr" class="module-section">
-                    <div class="flex items-center justify-between mb-4">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
                         <div>
-                            <h2 style="font-size: 1.5rem; font-weight: 800; color: #fff;">HR Managers</h2>
-                            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">Manage HR user accounts and assigned organizations.</p>
+                            <h2 style="font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0 0 4px 0;">HR Managers</h2>
+                            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin: 0;">Manage HR manager accounts, assigned organizations, and branch permissions.</p>
+                        </div>
+                        <button type="button" onclick="openCreateMemberModal()" class="btn-save-profile" style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; padding: 10px 20px;">
+                            <i class="fa-solid fa-plus"></i> Create HR
+                        </button>
+                    </div>
+
+                    <!-- Search & Filter Controls Bar -->
+                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
+                        <!-- Search Bar Input -->
+                        <div style="width: 260px; max-width: 100%; position: relative; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); overflow: hidden; display: flex; align-items: center; height: 46px;">
+                            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: rgba(255, 255, 255, 0.4); font-size: 0.88rem;"></i>
+                            <input type="text" id="member-search-input" placeholder="Search by org or branch..." oninput="onMemberFilterChange()" style="width: 100%; height: 44px; padding-left: 40px; padding-right: 12px; background: transparent; border: none; color: #fff; font-size: 0.88rem; outline: none;" />
+                        </div>
+
+                        <!-- Organization Filter Dropdown Box -->
+                        <div style="min-width: 180px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; height: 46px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">ORGANIZATION <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
+                            <select id="member-filter-org" onchange="onMemberFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 6px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
+                                <option value="" style="background: #0f172a; color: #fff;">All Organizations</option>
+                            </select>
+                        </div>
+
+                        <!-- Branch Filter Dropdown Box -->
+                        <div style="min-width: 170px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; height: 46px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">BRANCH <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
+                            <select id="member-filter-branch" onchange="onMemberFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 6px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
+                                <option value="" style="background: #0f172a; color: #fff;">All Branches</option>
+                            </select>
+                        </div>
+
+                        <!-- Status Filter Dropdown Box -->
+                        <div style="min-width: 140px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; height: 46px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
+                            <select id="member-filter-status" onchange="onMemberFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 6px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
+                                <option value="" style="background: #0f172a; color: #fff;">All</option>
+                                <option value="active" style="background: #0f172a; color: #fff;">Active</option>
+                                <option value="inactive" style="background: #0f172a; color: #fff;">Inactive</option>
+                            </select>
                         </div>
                     </div>
 
-                    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 40px; text-align: center; color: var(--text-muted);">
-                        HR module management & assignments
+                    <!-- Member List Table -->
+                    <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 12px; overflow: visible;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 55px; padding-left: 16px;">Photo</th>
+                                    <th>HR Member</th>
+                                    <th>Email & Phone</th>
+                                    <th>Organization</th>
+                                    <th>Branch</th>
+                                    <th>Status</th>
+                                    <th style="text-align: right; width: 100px;">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="member-table-body">
+                                <tr>
+                                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 32px;">
+                                        Loading members...
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
                     </div>
+
+                    <!-- Server-Side Pagination Controls -->
+                    <div id="member-pagination-container"></div>
                 </div>
 
             </div>
         </main>
+    </div>
+
+    <!-- Create / Edit Member Modal -->
+    <div class="modal-overlay" id="member-modal">
+        <div class="modal-card" style="max-width: 720px; width: 92%; padding: 36px 32px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 16px;">
+                <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin: 0;" id="member-modal-title">Create HR Member</h3>
+                <button type="button" onclick="closeMemberModal()" data-tooltip="Close" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer;">×</button>
+            </div>
+
+            <form id="member-form" onsubmit="handleSaveMember(event)">
+                <input type="hidden" id="member-id-hidden" />
+
+                <!-- Profile Photo Uploader -->
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px;">
+                    <div onclick="document.getElementById('member-photo-file').click()" data-tooltip="Click to upload profile photo" style="width: 86px; height: 86px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="member-circle-preview">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <span style="font-size: 0.78rem; color: rgba(255, 255, 255, 0.55); margin-top: 8px; font-weight: 500;">Upload HR photo</span>
+                    <input type="file" id="member-photo-file" accept="image/*" style="display: none;" onchange="onMemberPhotoChange(event)" />
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 20px;">
+                    <!-- Organization & Branch -->
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 6px; display: block; letter-spacing: 0.02em;">
+                            ORGANIZATION <span style="color: #ef4444;">*</span>
+                        </label>
+                        <select id="member-org-select" onchange="onModalOrgChange(this.value)" class="input-custom" required style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; cursor: pointer; padding: 0 14px; outline: none; width: 100%;">
+                            <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 6px; display: block; letter-spacing: 0.02em;">
+                            BRANCH <span style="color: #ef4444;">*</span>
+                        </label>
+                        <select id="member-branch-select" class="input-custom" required disabled style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; cursor: pointer; padding: 0 14px; outline: none; width: 100%;">
+                            <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization First</option>
+                        </select>
+                    </div>
+
+                    <!-- Full Name & Username -->
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 6px; display: block; letter-spacing: 0.02em;">
+                            FULL NAME <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="text" id="member-fullname-input" placeholder="e.g. John Doe" required style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; padding: 0 14px; outline: none; width: 100%;" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 6px; display: block; letter-spacing: 0.02em;">
+                            USERNAME <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="text" id="member-username-input" placeholder="e.g. johndoe" required style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; padding: 0 14px; outline: none; width: 100%;" />
+                    </div>
+
+                    <!-- Email & Phone -->
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 6px; display: block; letter-spacing: 0.02em;">
+                            EMAIL ADDRESS <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="email" id="member-email-input" placeholder="john@example.com" required style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; padding: 0 14px; outline: none; width: 100%;" />
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 6px; display: block; letter-spacing: 0.02em;">
+                            PHONE NUMBER
+                        </label>
+                        <input type="text" id="member-phone-input" placeholder="+1 555-0199" style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; padding: 0 14px; outline: none; width: 100%;" />
+                    </div>
+
+                    <!-- Password & Status -->
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 6px; display: block; letter-spacing: 0.02em;">
+                            PASSWORD <span id="member-password-req" style="color: #ef4444;">*</span>
+                        </label>
+                        <div style="position: relative; display: flex; align-items: center;">
+                            <input type="password" id="member-password-input" placeholder="Set password" style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; padding: 0 44px 0 14px; outline: none; width: 100%;" />
+                            <button type="button" onclick="toggleMemberPasswordVisibility()" data-tooltip="Show/Hide password" style="position: absolute; right: 12px; background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">
+                                <i class="fa-solid fa-eye" id="member-password-toggle-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.88rem; margin-bottom: 6px; display: block;">
+                            Status
+                        </label>
+                        <div style="display: inline-flex; align-items: center; gap: 12px; padding: 8px 0;">
+                            <label style="position: relative; display: inline-block; width: 48px; height: 26px; margin: 0; cursor: pointer;">
+                                <input type="checkbox" id="member-status-toggle" checked onchange="updateMemberStatusToggleUI(this.checked)" style="opacity: 0; width: 0; height: 0;" />
+                                <span class="status-toggle-slider"></span>
+                            </label>
+                            <span id="member-status-text" style="font-size: 0.95rem; font-weight: 700; color: #10b981;">Active</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
+                    <button type="button" onclick="closeMemberModal()" style="padding: 10px 24px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.9rem; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="btn-save-profile" id="member-submit-btn" style="padding: 10px 28px; border-radius: 10px; font-weight: 700; font-size: 0.9rem;">Save HR</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- View Member Modal -->
+    <div class="modal-overlay" id="view-member-modal">
+        <div class="modal-card" style="max-width: 520px; width: 92%; padding: 36px 32px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff;">HR Profile</h3>
+                <button type="button" onclick="closeViewMemberModal()" data-tooltip="Close" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;">×</button>
+            </div>
+
+            <div style="text-align: center; margin-bottom: 24px;">
+                <div id="view-member-avatar-box" style="width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 14px; background: rgba(99,102,241,0.15); border: 2px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #818cf8; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <h2 id="view-member-fullname" style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 2px;">—</h2>
+                <div id="view-member-username" style="font-size: 0.88rem; color: #818cf8; font-weight: 600;">@—</div>
+            </div>
+
+            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Email:</span>
+                    <span id="view-member-email" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Phone:</span>
+                    <span id="view-member-phone" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Organization:</span>
+                    <span id="view-member-org" style="font-size: 0.85rem; color: #a5b4fc; font-weight: 700;">—</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Branch:</span>
+                    <span id="view-member-branch" style="font-size: 0.85rem; color: #38bdf8; font-weight: 700;">—</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Status:</span>
+                    <span id="view-member-status" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 0.8rem; font-weight: 700;">Active</span>
+                </div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Created Date:</span>
+                    <span id="view-member-date" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Member Modal -->
+    <div class="modal-overlay" id="delete-member-modal">
+        <div class="modal-card" style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Delete Member</h3>
+            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px;">Are you sure you want to delete this organization member? This action cannot be undone.</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" onclick="closeDeleteMemberModal()" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; cursor: pointer;">Cancel</button>
+                <button type="button" id="confirm-delete-member-btn" onclick="confirmDeleteMemberAction()" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Delete</button>
+            </div>
+        </div>
     </div>
 
     <!-- Logout Confirmation Modal -->

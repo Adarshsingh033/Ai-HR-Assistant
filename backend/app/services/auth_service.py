@@ -41,7 +41,34 @@ def authenticate_user(username: str, password: str) -> dict | None:
                 logger.warning("Failed login attempt for admin '%s'.", username)
                 return None
 
-            # Check HR table
+            # Check Organization Members (HR) table
+            cur.execute(
+                "SELECT id, username, password, email, organization_id, branch_id, status, full_name, image, phone FROM organization_members WHERE username = %s OR email = %s LIMIT 1",
+                (username, username.lower()),
+            )
+            member = cur.fetchone()
+
+            if member:
+                if member[6] == 'inactive':
+                    logger.warning("Inactive HR member '%s' attempted login.", username)
+                    return None
+                if member[2] == password:
+                    logger.info("HR member '%s' authenticated successfully.", username)
+                    return {
+                        "user_id": str(member[0]),
+                        "username": member[1],
+                        "role": "hr",
+                        "org_id": str(member[4]),
+                        "branch_id": str(member[5]),
+                        "email": member[3],
+                        "full_name": member[7],
+                        "profile_image": member[8] or "",
+                        "phone": member[9] or "",
+                    }
+                logger.warning("Failed login attempt for HR member '%s'.", username)
+                return None
+
+            # Check legacy HR table fallback
             cur.execute(
                 "SELECT id, username, password, email, org_id FROM hr WHERE username = %s LIMIT 1",
                 (username,),
