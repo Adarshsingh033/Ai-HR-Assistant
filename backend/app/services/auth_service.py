@@ -21,7 +21,7 @@ def authenticate_user(username: str, password: str) -> dict | None:
         with conn.cursor() as cur:
             # Check Admin table
             cur.execute(
-                "SELECT id, username, password, email FROM admin WHERE username = %s LIMIT 1",
+                "SELECT id, username, password, email, phone, profile_image FROM admin WHERE username = %s LIMIT 1",
                 (username,),
             )
             admin = cur.fetchone()
@@ -35,6 +35,8 @@ def authenticate_user(username: str, password: str) -> dict | None:
                         "role": "admin",
                         "org_id": "",
                         "email": admin[3],
+                        "phone": admin[4] or "",
+                        "profile_image": admin[5] or "",
                     }
                 logger.warning("Failed login attempt for admin '%s'.", username)
                 return None

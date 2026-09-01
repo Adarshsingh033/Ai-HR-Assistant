@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Admin Portal - AI HR Assistant</title>
+    <title>Organization - AI HR Assistant Admin</title>
     <link rel="stylesheet" href="../css/main.css" />
     <style>
         /* Modern Clean Admin Dashboard Aesthetics */
@@ -105,26 +105,24 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            padding: 36px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            padding: 24px;
             text-align: center;
         }
 
         .profile-avatar-large {
-            width: 100px;
-            height: 100px;
+            width: 96px;
+            height: 96px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #6366f1, #3b82f6);
+            margin: 0 auto 16px;
+            background: var(--bg-subtle);
+            color: var(--text-primary);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 800;
-            color: #ffffff;
-            margin-bottom: 16px;
-            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+            border: 2px solid var(--border);
+            overflow: hidden;
         }
 
         .profile-card-name {
@@ -134,19 +132,29 @@
             margin-bottom: 4px;
         }
 
+        .profile-card-role {
+            font-size: 0.8rem;
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 12px;
+        }
+
         .profile-card-email {
-            font-size: 0.83rem;
+            font-size: 0.82rem;
             color: var(--text-muted);
         }
 
-        .role-badge-pill {
-            display: inline-block;
-            padding: 4px 14px;
-            border-radius: 99px;
-            background: rgba(249, 115, 22, 0.15);
-            border: 1px solid rgba(249, 115, 22, 0.35);
-            color: #f97316;
-            font-size: 0.75rem;
+        .profile-card-phone {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .profile-card-stat-label {
+            font-size: 0.72rem;
+            color: var(--text-muted);
             font-weight: 800;
             letter-spacing: 0.05em;
             text-transform: uppercase;
@@ -194,56 +202,28 @@
 
         .input-custom {
             width: 100%;
-            height: 44px;
-            padding: 0 14px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
+            padding: 10px 14px;
             border-radius: 10px;
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             color: var(--text-primary);
             font-family: inherit;
             font-size: 0.9rem;
             outline: none;
-            transition: var(--transition);
-        }
-
-        select.input-custom {
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding-right: 40px !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a5b4fc' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 14px center !important;
-            background-size: 16px !important;
-            cursor: pointer;
-        }
-
-        select.input-custom option {
-            background-color: #0f172a !important;
-            color: #ffffff !important;
-            padding: 12px;
-        }
-
-        select.input-custom option:disabled {
-            color: rgba(255, 255, 255, 0.4) !important;
-            background-color: #0f172a !important;
+            transition: border-color 0.2s ease;
         }
 
         .input-custom:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
+            border-color: #f97316;
         }
 
-        .input-custom[readonly] {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        .profile-img-preview-box {
+        .avatar-upload-row {
             display: flex;
-            flex-direction: column;
-            gap: 8px;
-            margin-top: 8px;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border);
         }
 
         .img-thumb-wrap {
@@ -334,11 +314,11 @@
             </div>
 
             <div class="nav-section-label">Main Menu</div>
-            <a href="dashboard.html" class="nav-item active" id="nav-dashboard">
+            <a href="dashboard.html" class="nav-item" id="nav-dashboard">
                 <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
                 Dashboard
             </a>
-            <a href="organization.html" class="nav-item" id="nav-org">
+            <a href="organization.html" class="nav-item active" id="nav-org">
                 <span class="nav-icon"><i class="fa-solid fa-building"></i></span>
                 Organization
             </a>
@@ -379,17 +359,17 @@
         <main class="main-content">
             <!-- Topbar -->
             <header class="topbar">
-                <div class="topbar-title" id="page-title">Dashboard</div>
+                <div class="topbar-title" id="page-title">Organization</div>
             </header>
 
             <div class="page-content">
 
                 <!-- 1. DASHBOARD MODULE -->
-                <div id="section-dashboard" class="module-section">
+                <div id="section-dashboard" class="module-section hidden">
                 </div>
 
                 <!-- 2. ORGANIZATION MODULE -->
-                <div id="section-org" class="module-section hidden">
+                <div id="section-org" class="module-section">
                     <div class="flex items-center justify-between mb-4">
                         <div>
                             <h2 style="font-size: 1.5rem; font-weight: 800; color: #fff;">Organizations</h2>
@@ -463,95 +443,16 @@
                     <div id="org-pagination-container"></div>
                 </div>
 
-                <!-- 2. BRANCH MODULE -->
+                <!-- 3. BRANCH MODULE -->
                 <div id="section-branch" class="module-section hidden">
                 </div>
 
-                <!-- 3. HR MODULE -->
+                <!-- 4. HR MODULE -->
                 <div id="section-hr" class="module-section hidden">
                 </div>
 
-                <!-- 4. PROFILE MODULE -->
+                <!-- 5. PROFILE MODULE -->
                 <div id="section-profile" class="module-section hidden">
-                    <p class="profile-header-sub">Manage your personal details and profile image.</p>
-
-                    <div class="profile-grid">
-                        <!-- Left Column: Avatar & Role -->
-                        <div class="profile-left-card">
-                            <div class="profile-avatar-large" id="profile-avatar-large">AD</div>
-                            <div class="profile-card-name" id="profile-card-name">Admin</div>
-                            <div class="profile-card-email" id="profile-card-email">admin@example.com</div>
-                        </div>
-
-                        <!-- Right Column: Personal Details Form -->
-                        <div class="profile-right-card">
-                            <div class="section-subtitle">Personal Details</div>
-
-                            <form id="profile-form" onsubmit="handleSaveProfile(event)">
-                                <div class="form-grid-2">
-                                    <div class="form-group-custom">
-                                        <label class="label-custom">Full Name <span
-                                                style="color:#ef4444;">*</span></label>
-                                        <input type="text" id="profile-full-name" class="input-custom"
-                                            placeholder="e.g. John Doe" required />
-                                    </div>
-                                    <div class="form-group-custom">
-                                        <label class="label-custom">Username <span
-                                                style="color:#ef4444;">*</span></label>
-                                        <input type="text" id="profile-username" class="input-custom"
-                                            placeholder="e.g. john_admin" required />
-                                    </div>
-                                </div>
-
-                                <div class="form-grid-2">
-                                    <div class="form-group-custom">
-                                        <label class="label-custom">Email Address <span
-                                                style="color:#ef4444;">*</span></label>
-                                        <input type="email" id="profile-email" class="input-custom"
-                                            placeholder="admin@company.com" required />
-                                    </div>
-                                    <div class="form-group-custom">
-                                        <label class="label-custom">Phone Number</label>
-                                        <input type="text" id="profile-phone" class="input-custom"
-                                            placeholder="+1 (555) 000-0000" />
-                                    </div>
-                                </div>
-
-                                <div class="form-group-custom" style="margin-top: 14px;">
-                                    <label class="label-custom">Profile Image</label>
-                                    <div class="flex items-center gap-4 mt-2">
-                                        <div class="avatar-upload-circle"
-                                            onclick="document.getElementById('profile-upload-file').click()"
-                                            title="Click circle to upload profile picture"
-                                            style="width: 82px; height: 82px; border-radius: 50%; background: #15112e; border: 2px dashed rgba(99, 102, 241, 0.5); position: relative; cursor: pointer; flex-shrink: 0; transition: all 0.2s ease;">
-                                            <div id="profile-circle-preview"
-                                                style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; color: #fff; background: linear-gradient(135deg, #6366f1, #3b82f6); overflow: hidden;">
-                                                AD
-                                            </div>
-                                            <div
-                                                style="position: absolute; bottom: 0; right: 0; width: 24px; height: 24px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid #0f172a;">
-                                                <i class="fa-solid fa-plus"></i>
-                                            </div>
-                                        </div>
-                                        <input type="file" id="profile-upload-file" accept="image/*" class="hidden"
-                                            onchange="onProfileImageFileChange(event)" />
-                                        <div>
-                                            <a href="#" class="change-img-link"
-                                                onclick="event.preventDefault(); document.getElementById('profile-upload-file').click();">Upload
-                                                new photo</a>
-                                            <div class="img-hint-text mt-1">Accepted: JPG, JPEG, PNG, WEBP (Max 2MB)
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="flex justify-end mt-4">
-                                    <button type="submit" class="btn-save-profile" id="save-profile-btn">Save
-                                        Changes</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
                 </div>
 
             </div>
@@ -560,59 +461,37 @@
 
     <!-- Create / Edit Organization Modal -->
     <div class="modal-overlay" id="org-modal">
-        <div class="modal-card"
-            style="max-width: 760px; width: 94%; padding: 40px 36px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
-            <div class="flex items-center justify-between mb-4">
-                <div>
-                    <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="org-modal-title">Create
-                        Organization</h3>
-                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 2px;">Fill in the
-                        organization details below to create a company profile.</p>
-                </div>
-                <button type="button" onclick="closeOrgModal()"
-                    style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; transition: all 0.2s ease;">×</button>
+        <div class="modal-card" style="max-width: 760px; width: 92%; padding: 40px 36px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
+            <div class="flex items-center justify-between pb-3 mb-6" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
+                <h3 style="font-size: 1.45rem; font-weight: 800; color: #fff;" id="org-modal-title">Create Organization</h3>
+                <button type="button" onclick="closeOrgModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;">×</button>
             </div>
 
-            <form id="org-form" onsubmit="handleSaveOrganization(event)" style="margin-top: 20px;">
-                <input type="hidden" id="org-id-hidden" value="" />
+            <form id="org-form" onsubmit="handleSaveOrganization(event)">
+                <input type="hidden" id="org-id-hidden" />
 
-                <!-- Circular Logo Upload Button at Top -->
-                <div class="avatar-upload-wrap"
-                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px;">
-                    <div class="avatar-upload-circle" onclick="document.getElementById('org-logo-file').click()"
-                        title="Upload organization logo"
-                        style="width: 90px; height: 90px; border-radius: 50%; background: #15112e; border: 2px dashed rgba(99, 102, 241, 0.5); position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.35); transition: all 0.2s ease;">
-                        <div id="org-circle-preview"
-                            style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: rgba(255,255,255,0.5); overflow: hidden;">
-                            <i class="fa-solid fa-building"></i>
-                        </div>
-                        <div
-                            style="position: absolute; bottom: 0; right: 0; width: 26px; height: 26px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 2px solid #080614;">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
+                <!-- Circular Logo Uploader at Top Center -->
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 32px;">
+                    <div class="profile-circle-uploader" onclick="document.getElementById('org-logo-file').click()" title="Click to upload logo" style="width: 90px; height: 90px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="org-circle-preview">
+                        <i class="fa-solid fa-building"></i>
                     </div>
-                    <input type="file" id="org-logo-file" accept="image/*" class="hidden"
-                        onchange="onOrgLogoFileChange(event)" />
-                    <div style="font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-top: 10px;">Upload organization logo</div>
+                    <span style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.55); margin-top: 10px; font-weight: 500;">Upload organization logo</span>
+                    <input type="file" id="org-logo-file" accept="image/*" style="display: none;" onchange="onOrgLogoFileChange(event)" />
                 </div>
 
-                <!-- Row 1: Organization Name & Industry -->
-                <div class="form-grid-2"
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px;">
-                    <div class="form-group-custom">
-                        <label class="label-custom"
-                            style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Organization
-                            Name <span style="color:#ef4444;">*</span></label>
-                        <input type="text" id="org-name-input" class="input-custom" placeholder="e.g. Acme Corporation"
-                            style="height: 46px; font-size: 0.92rem;" required />
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                    <div class="form-group" style="grid-column: span 2;">
+                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 8px; display: block;">
+                            Organization Name <span style="color: #ef4444;">*</span>
+                        </label>
+                        <input type="text" id="org-name-input" class="input-custom" placeholder="e.g. Acme Corporation" required style="height: 48px; font-size: 0.95rem;" />
                     </div>
 
-                    <div class="form-group-custom">
-                        <label class="label-custom"
-                            style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Industry
-                            <span style="color:#ef4444;">*</span></label>
-                        <select id="org-industry-select" class="input-custom"
-                            style="height: 46px; font-size: 0.92rem; cursor: pointer;" required>
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 8px; display: block;">
+                            Industry Type <span style="color: #ef4444;">*</span>
+                        </label>
+                        <select id="org-industry-select" class="input-custom" required style="height: 48px; font-size: 0.95rem; cursor: pointer;">
                             <option value="" disabled selected>Select Industry</option>
                             <option value="information_technology">Information Technology</option>
                             <option value="financial_services">Financial Services</option>
@@ -621,17 +500,12 @@
                             <option value="manufacturing">Manufacturing</option>
                         </select>
                     </div>
-                </div>
 
-                <!-- Row 2: Company Size -->
-                <div class="form-grid-2"
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
-                    <div class="form-group-custom">
-                        <label class="label-custom"
-                            style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Company
-                            Size <span style="color:#ef4444;">*</span></label>
-                        <select id="org-size-select" class="input-custom"
-                            style="height: 46px; font-size: 0.92rem; cursor: pointer;" required>
+                    <div class="form-group">
+                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 8px; display: block;">
+                            Company Size <span style="color: #ef4444;">*</span>
+                        </label>
+                        <select id="org-size-select" class="input-custom" required style="height: 48px; font-size: 0.95rem; cursor: pointer;">
                             <option value="" disabled selected>Select Company Size</option>
                             <option value="1-10">1-10 employees</option>
                             <option value="11-50">11-50 employees</option>
@@ -643,14 +517,9 @@
                     </div>
                 </div>
 
-                <!-- Footer Action Buttons -->
-                <div class="flex justify-end gap-3"
-                    style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
-                    <button type="button" onclick="closeOrgModal()"
-                        style="padding: 12px 26px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.92rem; cursor: pointer;">Cancel</button>
-                    <button type="submit" class="btn-save-profile" id="org-submit-btn"
-                        style="padding: 12px 32px; border-radius: 12px; font-weight: 700; font-size: 0.92rem;">Save
-                        Organization</button>
+                <div class="flex justify-end gap-3" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
+                    <button type="button" onclick="closeOrgModal()" style="padding: 12px 26px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.92rem; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="btn-save-profile" id="org-submit-btn" style="padding: 12px 32px; border-radius: 12px; font-weight: 700; font-size: 0.92rem;">Save Organization</button>
                 </div>
             </form>
         </div>
@@ -690,40 +559,30 @@
 
     <!-- Delete Organization Modal -->
     <div class="modal-overlay" id="delete-org-modal">
-        <div class="modal-card"
-            style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
-            <div
-                style="width: 56px; height: 56px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
+        <div class="modal-card" style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
                 <i class="fa-solid fa-trash-can"></i>
             </div>
             <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Delete Organization</h3>
-            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px;">Are you sure you want
-                to delete this organization? This action cannot be undone.</p>
+            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px;">Are you sure you want to delete this organization? This action cannot be undone.</p>
             <div style="display: flex; gap: 12px; justify-content: center;">
-                <button type="button" onclick="closeDeleteOrgModal()"
-                    style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; cursor: pointer;">Cancel</button>
-                <button type="button" id="confirm-delete-org-btn" onclick="confirmDeleteOrgAction()"
-                    style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Delete</button>
+                <button type="button" onclick="closeDeleteOrgModal()" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; cursor: pointer;">Cancel</button>
+                <button type="button" id="confirm-delete-org-btn" onclick="confirmDeleteOrgAction()" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Delete</button>
             </div>
         </div>
     </div>
 
-    <!-- Modern Website Logout Confirmation Modal -->
+    <!-- Logout Confirmation Modal -->
     <div class="modal-overlay" id="logout-confirm-modal">
-        <div class="modal-card"
-            style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; box-shadow: 0 20px 40px rgba(0,0,0,0.6);">
-            <div
-                style="width: 56px; height: 56px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
+        <div class="modal-card" style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </div>
             <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Confirm Logout</h3>
-            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px; line-height: 1.5;">Are
-                you sure you want to log out of AI HR Assistant?</p>
+            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px; line-height: 1.5;">Are you sure you want to log out of AI HR Assistant?</p>
             <div style="display: flex; gap: 12px; justify-content: center;">
-                <button type="button" onclick="closeLogoutModal()"
-                    style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
-                <button type="button" onclick="confirmLogoutAction()"
-                    style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Logout</button>
+                <button type="button" onclick="closeLogoutModal()" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
+                <button type="button" onclick="confirmLogoutAction()" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Logout</button>
             </div>
         </div>
     </div>
@@ -733,8 +592,6 @@
 
     <script src="../js/utils.js"></script>
     <script src="../js/admin/organization.js"></script>
-    <script src="../js/admin/profile.js"></script>
-    <script src="../js/admin/dashboard.js"></script>
     <script src="../js/admin/common.js"></script>
     <script>document.addEventListener('DOMContentLoaded', initTheme);</script>
 </body>

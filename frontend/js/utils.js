@@ -70,8 +70,11 @@ async function apiRequest(method, path, body = null, isFormData = false) {
     const headers = isFormData ? {} : { 'Content-Type': 'application/json' };
 
     // Inject user_id if logged in
-    if (s && s.user_id) {
-        headers['X-Admin-ID'] = s.user_id;
+    if (s) {
+        const adminId = s.user_id || s.id || s.admin_id;
+        if (adminId) {
+            headers['X-Admin-ID'] = adminId;
+        }
     }
 
     const opts = {
@@ -81,7 +84,19 @@ async function apiRequest(method, path, body = null, isFormData = false) {
     };
     const res = await fetch(`${API}${path}`, opts);
     const data = await res.json();
-    if (!res.ok) throw new Error(data.detail || 'Request failed');
+    if (!res.ok) {
+        let msg = 'Request failed';
+        if (typeof data.detail === 'string') {
+            msg = data.detail;
+        } else if (Array.isArray(data.detail)) {
+            msg = data.detail.map(d => d.msg || JSON.stringify(d)).join(', ');
+        } else if (data.detail && typeof data.detail === 'object') {
+            msg = data.detail.msg || JSON.stringify(data.detail);
+        } else if (data.message) {
+            msg = data.message;
+        }
+        throw new Error(msg);
+    }
     return data;
 }
 
@@ -142,10 +157,26 @@ function formatDate(iso) {
 
 /* ── Logout ──────────────────────────────────────────── */
 function logout() {
-    if (window.confirm('Are you sure you want to logout?')) {
-        Session.clear();
-        window.location.href = '../index.html';
+    const modal = document.getElementById('logout-confirm-modal');
+    if (modal) {
+        modal.classList.add('open');
+    } else {
+        confirmLogoutAction();
     }
+}
+
+function closeLogoutModal() {
+    const modal = document.getElementById('logout-confirm-modal');
+    if (modal) modal.classList.remove('open');
+}
+
+function confirmLogoutAction() {
+    closeLogoutModal();
+    showToast('<i class="fa-solid fa-right-from-bracket"></i> Logging out...', 'info', 1500);
+    Session.clear();
+    setTimeout(() => {
+        window.location.href = '/index.html';
+    }, 800);
 }
 
 /* ── Populate user chip in sidebar ────────────────────── */
@@ -163,5 +194,12 @@ function populateSidebarUser() {
 /* ── Highlight active nav item ─────────────────────────── */
 function setActiveNav(id) {
     document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
-    document.getElementById(id)?.classList.add('active');
+    const target = document.getElementById(id);
+    if (target) target.classList.add('active');
+}
+
+/* ── HTML Escaping Helper ───────────────────────────────── */
+function escapeHtml(str) {
+    if (!str && str !== 0) return '';
+    return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
 }

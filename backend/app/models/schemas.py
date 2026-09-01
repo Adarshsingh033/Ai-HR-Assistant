@@ -20,6 +20,8 @@ class RegisterAdminRequest(BaseModel):
     email: EmailStr
     password: str
     confirm_password: str
+    phone: Optional[str] = None
+    profile_image: Optional[str] = None
 
     @field_validator('username')
     @classmethod
@@ -52,17 +54,68 @@ class LoginResponse(BaseModel):
     user_id: Optional[str] = None
     username: Optional[str] = None
     org_id: Optional[str] = None
+    phone: Optional[str] = None
+    profile_image: Optional[str] = None
     message: Optional[str] = None
 
 
+class AdminProfileResponse(BaseModel):
+    user_id: str
+    username: str
+    email: str
+    full_name: str
+    phone: Optional[str] = None
+    profile_image: Optional[str] = None
+    role: str = "admin"
+    created_at: Optional[str] = None
+
+
+class UpdateAdminProfileRequest(BaseModel):
+    full_name: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    profile_image: Optional[str] = None
+
+
 # ── Organization ─────────────────────────────────────────────────────────────
+class IndustryEnum(str, Enum):
+    information_technology = "information_technology"
+    financial_services = "financial_services"
+    healthcare = "healthcare"
+    education = "education"
+    manufacturing = "manufacturing"
+
+
+class CompanySizeEnum(str, Enum):
+    size_1_10 = "1-10"
+    size_11_50 = "11-50"
+    size_51_200 = "51-200"
+    size_201_500 = "201-500"
+    size_501_1000 = "501-1000"
+    size_1000_plus = "1000+"
+
+
 class CreateOrgRequest(BaseModel):
-    company_name: str
+    organization_name: str
+    industry: IndustryEnum
+    company_size: CompanySizeEnum
+    image: Optional[str] = None
+
+
+class UpdateOrgRequest(BaseModel):
+    organization_name: Optional[str] = None
+    industry: Optional[IndustryEnum] = None
+    company_size: Optional[CompanySizeEnum] = None
+    image: Optional[str] = None
 
 
 class OrganizationResponse(BaseModel):
     org_id: str
-    company_name: str
+    organization_name: str
+    industry: str
+    company_size: str
+    image: Optional[str] = None
     created_at: str
 
 

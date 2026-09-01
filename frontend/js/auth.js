@@ -2,11 +2,19 @@
    auth.js – Unified Login Page Logic for AI HR Assistant
    ======================================================== */
 
-/* Redirect if already logged in */
+/* Redirect if already logged in or clear form inputs */
 window.addEventListener('DOMContentLoaded', () => {
     const session = Session.get();
     if (session?.role === 'admin') location.href = '/admin/dashboard.html';
     else if (session?.role === 'hr') location.href = '/hr/dashboard.html';
+
+    // Clear any browser pre-filled credentials
+    const form = document.getElementById('login-form');
+    if (form) form.reset();
+    const u = document.getElementById('username');
+    const p = document.getElementById('password');
+    if (u) u.value = '';
+    if (p) p.value = '';
 });
 
 /* Password visibility toggle */
@@ -18,11 +26,14 @@ function togglePassword() {
     btn.innerHTML = isHidden ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
 }
 
-/* Error display */
+/* Error & Success display */
 function showError(msg) {
+    hideSuccess();
     const el = document.getElementById('error-msg');
-    el.textContent = msg;
-    el.classList.remove('hidden');
+    if (el) {
+        el.textContent = msg;
+        el.classList.remove('hidden');
+    }
 }
 
 function hideError() {
@@ -30,10 +41,25 @@ function hideError() {
     if (el) el.classList.add('hidden');
 }
 
+function showSuccess(msgHtml) {
+    hideError();
+    const el = document.getElementById('success-msg');
+    if (el) {
+        el.innerHTML = msgHtml;
+        el.classList.remove('hidden');
+    }
+}
+
+function hideSuccess() {
+    const el = document.getElementById('success-msg');
+    if (el) el.classList.add('hidden');
+}
+
 /* Unified Login submit */
 async function handleLogin(e) {
     e.preventDefault();
     hideError();
+    hideSuccess();
 
     const username = document.getElementById('username').value.trim();
     const password = document.getElementById('password').value.trim();
@@ -55,9 +81,13 @@ async function handleLogin(e) {
                 username: data.username,
                 role: data.role,
                 org_id: data.org_id || '',
+                phone: data.phone || '',
+                profile_image: data.profile_image || ''
             });
 
-            showToast(`Welcome back, ${data.username}!`, 'success');
+            // Display green banner & toast notification with strictly "Login Successful!"
+            showSuccess(`<i class="fa-solid fa-circle-check" style="font-size: 1.2rem; color: #10b981;"></i> <span>Login Successful!</span>`);
+            showToast(`Login Successful!`, 'success', 3500);
 
             setTimeout(() => {
                 if (data.role === 'admin') {
@@ -65,7 +95,7 @@ async function handleLogin(e) {
                 } else {
                     location.href = '/hr/dashboard.html';
                 }
-            }, 600);
+            }, 1200);
         }
     } catch (err) {
         showError(err.message || 'Invalid username or password.');

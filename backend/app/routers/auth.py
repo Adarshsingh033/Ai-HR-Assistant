@@ -25,6 +25,8 @@ def login(payload: LoginRequest):
         user_id=user["user_id"],
         username=user["username"],
         org_id=user["org_id"],
+        phone=user.get("phone", ""),
+        profile_image=user.get("profile_image", ""),
         message="Login successful",
     )
 
@@ -47,11 +49,11 @@ def register_admin(payload: RegisterAdminRequest):
             admin_id = str(uuid.uuid4())
             cur.execute(
                 """
-                INSERT INTO admin (id, username, email, password, full_name)
-                VALUES (%s, %s, %s, %s, %s)
+                INSERT INTO admin (id, username, email, password, full_name, phone, profile_image)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
                 RETURNING created_at
                 """,
-                (admin_id, payload.username, payload.email, payload.password, payload.full_name),
+                (admin_id, payload.username, payload.email, payload.password, payload.full_name, payload.phone, payload.profile_image),
             )
             created_at = cur.fetchone()[0]
             conn.commit()
@@ -65,6 +67,8 @@ def register_admin(payload: RegisterAdminRequest):
                     "username": payload.username,
                     "email": payload.email,
                     "full_name": payload.full_name,
+                    "phone": payload.phone,
+                    "profile_image": payload.profile_image,
                     "created_at": str(created_at),
                 },
             }

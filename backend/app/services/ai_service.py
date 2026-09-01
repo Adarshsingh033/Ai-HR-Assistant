@@ -6,8 +6,11 @@ Uses Ollama (via LangChain) with structured output schemas.
 
 try:
     from langchain_ollama import ChatOllama
-except ModuleNotFoundError:
-    from langchain_community.chat_models import ChatOllama
+except (ModuleNotFoundError, ImportError):
+    try:
+        from langchain_community.chat_models.ollama import ChatOllama
+    except (ModuleNotFoundError, ImportError):
+        from langchain_community.chat_models import ChatOllama
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from typing import Optional

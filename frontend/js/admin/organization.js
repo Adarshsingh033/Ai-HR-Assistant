@@ -1,11 +1,14 @@
 /* ========================================================
-   admin.js – Dynamic Admin Portal Logic with Profile & Organization CRUD
+   admin/organization.js – Organization Module (CRUD, Pagination, Search & Filters)
    ======================================================== */
 
-let currentAdminProfile = null;
-let updatedProfileImageBase64 = null;
 let orgLogoBase64 = null;
 let deletingOrgId = null;
+let orgFilterTimeout = null;
+
+let currentOrgPage = 1;
+let orgPageSize = 10;
+let totalOrgPages = 1;
 
 const INDUSTRY_LABELS = {
     'information_technology': 'Information Technology',
@@ -24,222 +27,52 @@ const COMPANY_SIZE_LABELS = {
     '1000+': '1000+ employees'
 };
 
+window.loadOrganizations = loadOrganizations;
+
 window.addEventListener('DOMContentLoaded', async () => {
-    const session = Session.get();
-    if (!session || session.role !== 'admin') {
-        location.href = '../index.html';
-        return;
-    }
-
-    // Load admin profile dynamically from DB via API
-    await loadAdminProfile();
-
     // Initial load of organizations
     await loadOrganizations();
 });
 
-/* Fetch Admin Profile from Database */
-async function loadAdminProfile() {
-    try {
-        const data = await apiRequest('GET', '/api/admin/profile');
-        if (data) {
-            currentAdminProfile = data;
-            renderAdminProfile(data);
-        }
-    } catch (err) {
-        console.warn('Failed to load profile from API, fallback to session data:', err);
-        const session = Session.get();
-        if (session) {
-            renderAdminProfile({
-                full_name: session.username || 'Admin',
-                username: session.username || 'admin',
-                email: `${(session.username || 'admin').toLowerCase().replace(/\s+/g, '')}@example.com`,
-                phone: session.phone || '',
-                profile_image: session.profile_image || ''
-            });
-        }
-    }
-}
-
-/* Render Admin Profile Data onto UI */
-function renderAdminProfile(data) {
-    const fullName = data.full_name || data.username || 'Admin';
-    const username = data.username || 'admin';
-    const email = data.email || '';
-    const phone = data.phone || '';
-    const profileImg = data.profile_image || '';
-    const initials = fullName.substring(0, 2).toUpperCase();
-
-    // Sidebar User Chip
-    const sidebarName = document.getElementById('sidebar-name');
-    const sidebarRole = document.getElementById('sidebar-role');
-    const sidebarAvatar = document.getElementById('sidebar-avatar');
-
-    if (sidebarName) sidebarName.textContent = fullName;
-    if (sidebarRole) sidebarRole.textContent = 'Admin';
-    if (sidebarAvatar) {
-        if (profileImg) {
-            sidebarAvatar.innerHTML = `<img src="${profileImg}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
-        } else {
-            sidebarAvatar.textContent = initials;
-        }
-    }
-
-    // Profile Left Card
-    const cardName = document.getElementById('profile-card-name');
-    const cardEmail = document.getElementById('profile-card-email');
-    const avatarLarge = document.getElementById('profile-avatar-large');
-
-    if (cardName) cardName.textContent = fullName;
-    if (cardEmail) cardEmail.textContent = email;
-    if (avatarLarge) {
-        if (profileImg) {
-            avatarLarge.innerHTML = `<img src="${profileImg}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
-        } else {
-            avatarLarge.textContent = initials;
-        }
-    }
-
-    // Profile Form Inputs
-    const fullNameInput = document.getElementById('profile-full-name');
-    const usernameInput = document.getElementById('profile-username');
-    const emailInput = document.getElementById('profile-email');
-    const phoneInput = document.getElementById('profile-phone');
-
-    if (fullNameInput) fullNameInput.value = fullName;
-    if (usernameInput) usernameInput.value = username;
-    if (emailInput) emailInput.value = email;
-    if (phoneInput) phoneInput.value = phone;
-
-    // Profile Image Circle Preview
-    const circlePreview = document.getElementById('profile-circle-preview');
-    if (circlePreview) {
-        if (profileImg) {
-            circlePreview.innerHTML = `<img src="${profileImg}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
-        } else {
-            circlePreview.innerHTML = initials;
-        }
-    }
-}
-
-/* Handle Image File Selection in Profile */
-function onProfileImageFileChange(event) {
-    const file = event.target.files[0];
-    const circlePreview = document.getElementById('profile-circle-preview');
-    if (file) {
-        if (file.size > 2 * 1024 * 1024) {
-            showToast('Image size exceeds 2MB limit.', 'error');
-            event.target.value = '';
-            return;
-        }
-        const reader = new FileReader();
-        reader.onload = function (e) {
-            updatedProfileImageBase64 = e.target.result;
-            if (circlePreview) {
-                circlePreview.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; border-radius:50%; object-fit:cover;" />`;
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-/* Save Changes button handler */
-async function handleSaveProfile(e) {
-    e.preventDefault();
-
-    const fullName = document.getElementById('profile-full-name')?.value.trim();
-    const username = document.getElementById('profile-username')?.value.trim();
-    const email = document.getElementById('profile-email')?.value.trim();
-    const phone = document.getElementById('profile-phone')?.value.trim() || '';
-
-    if (!fullName || !username || !email) {
-        showToast('Full Name, Username, and Email Address are required.', 'error');
-        return;
-    }
-
-    const btn = document.getElementById('save-profile-btn');
-    if (btn) {
-        btn.disabled = true;
-        btn.textContent = 'Saving...';
-    }
-
-    try {
-        const payload = {
-            full_name: fullName,
-            username: username,
-            email: email,
-            phone: phone,
-        };
-
-        if (updatedProfileImageBase64 !== null) {
-            payload.profile_image = updatedProfileImageBase64;
-        }
-
-        const data = await apiRequest('PUT', '/api/admin/profile', payload);
-        if (data) {
-            currentAdminProfile = data;
-            renderAdminProfile(data);
-
-            // Update session data
-            Session.set({
-                user_id: data.user_id,
-                username: data.username,
-                role: data.role,
-                phone: data.phone,
-                profile_image: data.profile_image
-            });
-
-            showToast('Profile updated successfully!', 'success');
-        }
-    } catch (err) {
-        showToast(err.message || 'Failed to update profile.', 'error');
-    } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.textContent = 'Save Changes';
-        }
-    }
-}
-
-/* ========================================================
-   ORGANIZATION CRUD LOGIC WITH SEARCH & FILTERS
-   ======================================================== */
-
-let orgFilterTimeout = null;
-
 function onOrgFilterChange() {
     clearTimeout(orgFilterTimeout);
     orgFilterTimeout = setTimeout(() => {
+        currentOrgPage = 1; // Reset to page 1 on search/filter change
         loadOrganizations();
     }, 250);
 }
 
-/* Fetch and Render Organizations with Search & Filters */
-async function loadOrganizations() {
+/* Fetch and Render Organizations with Search, Filters & Server-Side Pagination */
+async function loadOrganizations(page = currentOrgPage) {
     const tbody = document.getElementById('org-table-body');
     if (!tbody) return;
+
+    currentOrgPage = page;
 
     const search = document.getElementById('org-search-input')?.value.trim() || '';
     const industry = document.getElementById('org-filter-industry')?.value || '';
     const companySize = document.getElementById('org-filter-size')?.value || '';
 
     const params = new URLSearchParams();
+    params.append('page', currentOrgPage);
+    params.append('limit', orgPageSize);
     if (search) params.append('search', search);
     if (industry) params.append('industry', industry);
     if (companySize) params.append('company_size', companySize);
 
-    const queryString = params.toString() ? `?${params.toString()}` : '';
-
     try {
-        const data = await apiRequest('GET', `/api/admin/organizations${queryString}`);
+        const data = await apiRequest('GET', `/api/admin/organizations?${params.toString()}`);
         const orgs = data.organizations || [];
+        totalOrgPages = data.total_pages || 1;
+
         renderOrganizationsTable(orgs);
+        renderOrgPagination(data);
     } catch (err) {
         console.error('Failed to load organizations:', err);
         tbody.innerHTML = `
             <tr>
                 <td colspan="6" style="text-align: center; color: #ef4444; padding: 24px;">
-                    Failed to load organizations. Please try again.
+                    Failed to load organizations: ${escapeHtml(err.message || 'Request failed')}
                 </td>
             </tr>
         `;
@@ -267,16 +100,16 @@ function renderOrganizationsTable(orgs) {
         const sizeLabel = COMPANY_SIZE_LABELS[org.company_size] || org.company_size;
         const formattedDate = org.created_at ? new Date(org.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
         
-        // Logo Column (Separate)
+        // Logo Column (Dedicated Column)
         const logoContent = org.image
-            ? `<img src="${org.image}" style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 1px solid rgba(255,255,255,0.15);" />`
-            : `<div style="width: 40px; height: 40px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.05rem;"><i class="fa-solid fa-building"></i></div>`;
+            ? `<img src="${org.image}" style="width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 1.5px solid rgba(255,255,255,0.15);" />`
+            : `<div style="width: 36px; height: 36px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 1.5px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 0.95rem;"><i class="fa-solid fa-building"></i></div>`;
 
         return `
-            <tr>
+            <tr style="position: relative;">
                 <!-- 1. Logo Column -->
-                <td style="text-align: center; width: 70px;">
-                    <div style="display: flex; justify-content: center;">
+                <td style="width: 65px; padding-left: 16px;">
+                    <div style="display: flex; align-items: center;">
                         ${logoContent}
                     </div>
                 </td>
@@ -310,7 +143,7 @@ function renderOrganizationsTable(orgs) {
                     </button>
 
                     <!-- Popover Dropdown Menu -->
-                    <div id="org-action-menu-${org.org_id}" class="org-action-dropdown hidden" style="position: absolute; right: 16px; top: 46px; width: 140px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.6); z-index: 100; overflow: hidden;">
+                    <div id="org-action-menu-${org.org_id}" class="org-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; width: 140px; background: #0f172a; border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
                         <button type="button" onclick="openViewOrgModal('${org.org_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #fff; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">
                             <i class="fa-solid fa-eye" style="color: #60a5fa; width: 14px;"></i> View
                         </button>
@@ -325,6 +158,80 @@ function renderOrganizationsTable(orgs) {
             </tr>
         `;
     }).join('');
+}
+
+function onOrgPageSizeChange(newSize) {
+    orgPageSize = parseInt(newSize, 10) || 10;
+    currentOrgPage = 1;
+    loadOrganizations(1);
+}
+
+/* Render Server-Side Pagination Bar */
+function renderOrgPagination(data) {
+    const container = document.getElementById('org-pagination-container');
+    if (!container) return;
+
+    const total = data.total || 0;
+    const page = data.page || 1;
+    const totalPages = data.total_pages || 1;
+    const limit = data.limit || orgPageSize;
+
+    if (total === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const startItem = (page - 1) * limit + 1;
+    const endItem = Math.min(page * limit, total);
+
+    let pageButtons = '';
+    for (let p = 1; p <= totalPages; p++) {
+        if (p === page) {
+            pageButtons += `<button class="pagination-btn active" style="padding: 6px 14px; border-radius: 8px; border: 1px solid #6366f1; background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; font-weight: 700; font-size: 0.85rem; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4); cursor: default;">${p}</button>`;
+        } else if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
+            pageButtons += `<button class="pagination-btn" onclick="loadOrganizations(${p})" style="padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease;">${p}</button>`;
+        } else if (p === page - 2 || p === page + 2) {
+            pageButtons += `<span style="color: rgba(255,255,255,0.4); padding: 0 4px; font-weight: 700;">...</span>`;
+        }
+    }
+
+    const isPrevDisabled = page <= 1;
+    const isNextDisabled = page >= totalPages;
+
+    container.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding: 14px 20px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; flex-wrap: wrap; gap: 16px; backdrop-filter: blur(10px);">
+            <!-- Left: Info & Rows per Page Select -->
+            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+                <span style="font-size: 0.86rem; color: rgba(255,255,255,0.65);">
+                    Showing <strong style="color: #fff;">${startItem}</strong>–<strong style="color: #fff;">${endItem}</strong> of <strong style="color: #fff;">${total}</strong> organizations
+                </span>
+                <div style="display: flex; align-items: center; gap: 8px; border-left: 1px solid rgba(255,255,255,0.12); padding-left: 16px;">
+                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.5); font-weight: 500;">Rows per page:</span>
+                    <select id="org-page-size-select" onchange="onOrgPageSizeChange(this.value)" class="input-custom" style="height: 34px; padding: 0 28px 0 10px; font-size: 0.82rem; width: 75px; background: #0f172a !important; color: #fff !important; cursor: pointer; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
+                        <option value="10" ${limit === 10 ? 'selected' : ''}>10</option>
+                        <option value="25" ${limit === 25 ? 'selected' : ''}>25</option>
+                        <option value="35" ${limit === 35 ? 'selected' : ''}>35</option>
+                        <option value="50" ${limit === 50 ? 'selected' : ''}>50</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Right: Arrow Buttons & Page Numbers -->
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <button onclick="loadOrganizations(${page - 1})" ${isPrevDisabled ? 'disabled' : ''} style="padding: 7px 14px; border-radius: 8px; border: 1px solid ${isPrevDisabled ? 'rgba(255,255,255,0.08)' : 'rgba(99, 102, 241, 0.4)'}; background: ${isPrevDisabled ? 'rgba(255,255,255,0.02)' : 'rgba(99, 102, 241, 0.15)'}; color: ${isPrevDisabled ? 'rgba(255,255,255,0.25)' : '#818cf8'}; font-size: 0.84rem; font-weight: 600; cursor: ${isPrevDisabled ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                    <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i> Previous
+                </button>
+
+                <div style="display: flex; gap: 5px; align-items: center;">
+                    ${pageButtons}
+                </div>
+
+                <button onclick="loadOrganizations(${page + 1})" ${isNextDisabled ? 'disabled' : ''} style="padding: 7px 14px; border-radius: 8px; border: 1px solid ${isNextDisabled ? 'rgba(255,255,255,0.08)' : 'rgba(99, 102, 241, 0.4)'}; background: ${isNextDisabled ? 'rgba(255,255,255,0.02)' : 'rgba(99, 102, 241, 0.15)'}; color: ${isNextDisabled ? 'rgba(255,255,255,0.25)' : '#818cf8'}; font-size: 0.84rem; font-weight: 600; cursor: ${isNextDisabled ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
+                    Next <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem;"></i>
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 /* Toggle Popover Dropdown Menu for Organization Action */
@@ -355,7 +262,6 @@ document.addEventListener('click', (e) => {
 
 /* Open View Organization Details Modal */
 async function openViewOrgModal(orgId) {
-    // Close popover menu
     const menu = document.getElementById(`org-action-menu-${orgId}`);
     if (menu) menu.classList.add('hidden');
 
@@ -368,7 +274,6 @@ async function openViewOrgModal(orgId) {
         const formattedDate = org.created_at ? new Date(org.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
 
         document.getElementById('view-org-name').textContent = org.organization_name;
-        document.getElementById('view-org-id').textContent = `ID: ${org.org_id}`;
         document.getElementById('view-org-industry').textContent = indLabel;
         document.getElementById('view-org-size').textContent = sizeLabel;
         document.getElementById('view-org-date').textContent = formattedDate;
@@ -394,12 +299,6 @@ function closeViewOrgModal() {
     if (modal) modal.classList.remove('open');
 }
 
-/* Helper to escape HTML characters */
-function escapeHtml(str) {
-    if (!str) return '';
-    return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
-}
-
 /* Open Create Organization Modal */
 function openCreateOrgModal() {
     document.getElementById('org-modal-title').textContent = 'Create Organization';
@@ -421,7 +320,6 @@ function openCreateOrgModal() {
 
 /* Open Edit Organization Modal */
 async function openEditOrgModal(orgId) {
-    // Close popover menu
     const menu = document.getElementById(`org-action-menu-${orgId}`);
     if (menu) menu.classList.add('hidden');
 
@@ -531,7 +429,6 @@ async function handleSaveOrganization(e) {
 
 /* Delete Organization Modals */
 function openDeleteOrgModal(orgId) {
-    // Close popover menu
     const menu = document.getElementById(`org-action-menu-${orgId}`);
     if (menu) menu.classList.add('hidden');
 
@@ -567,84 +464,5 @@ async function confirmDeleteOrgAction() {
             btn.disabled = false;
             btn.textContent = 'Delete';
         }
-    }
-}
-
-/* Toggle Sidebar User Menu Popover */
-function toggleUserMenu(e) {
-    if (e) e.stopPropagation();
-    const popover = document.getElementById('user-menu-popover');
-    if (popover) {
-        popover.classList.toggle('hidden');
-    }
-}
-
-/* Close User Popover Menu when clicking outside */
-document.addEventListener('click', (e) => {
-    const popover = document.getElementById('user-menu-popover');
-    const chip = document.getElementById('user-chip');
-    if (popover && !popover.classList.contains('hidden')) {
-        if (!popover.contains(e.target) && !chip?.contains(e.target)) {
-            popover.classList.add('hidden');
-        }
-    }
-});
-
-/* Open Profile View from Popover Menu */
-function openProfileView(e) {
-    if (e) e.preventDefault();
-    const popover = document.getElementById('user-menu-popover');
-    if (popover) popover.classList.add('hidden');
-    switchTab('profile');
-}
-
-/* Tab Switching Logic: Dashboard, Organization, Branch, HR, Profile */
-function switchTab(tab) {
-    const sections = {
-        'dashboard': document.getElementById('section-dashboard'),
-        'org': document.getElementById('section-org'),
-        'branch': document.getElementById('section-branch'),
-        'hr': document.getElementById('section-hr'),
-        'profile': document.getElementById('section-profile')
-    };
-
-    const navs = {
-        'dashboard': document.getElementById('nav-dashboard'),
-        'org': document.getElementById('nav-org'),
-        'branch': document.getElementById('nav-branch'),
-        'hr': document.getElementById('nav-hr')
-    };
-
-    const titles = {
-        'dashboard': 'Dashboard',
-        'org': 'Organization',
-        'branch': 'Branch',
-        'hr': 'HR',
-        'profile': 'Profile'
-    };
-
-    Object.keys(sections).forEach(k => {
-        if (k === tab) {
-            sections[k]?.classList.remove('hidden');
-        } else {
-            sections[k]?.classList.add('hidden');
-        }
-    });
-
-    Object.keys(navs).forEach(k => {
-        if (k === tab) {
-            navs[k]?.classList.add('active');
-        } else {
-            navs[k]?.classList.remove('active');
-        }
-    });
-
-    const pageTitle = document.getElementById('page-title');
-    if (pageTitle && titles[tab]) {
-        pageTitle.textContent = titles[tab];
-    }
-
-    if (tab === 'org') {
-        loadOrganizations();
     }
 }

@@ -60,7 +60,34 @@ function setRegLoading(loading) {
         btn.disabled = false;
         spinner.style.display = 'none';
         text.style.opacity = '1';
-        text.innerHTML = '<i class="fa-solid fa-shield"></i> Create Admin Account';
+        text.innerHTML = 'Register';
+    }
+}
+
+let profileImageBase64 = null;
+
+function previewRegisterAvatar(event) {
+    const file = event.target.files[0];
+    const previewEl = document.getElementById('avatar-circle-preview');
+    if (file) {
+        if (file.size > 2 * 1024 * 1024) {
+            showError('Image size exceeds 2MB limit.');
+            event.target.value = '';
+            profileImageBase64 = null;
+            if (previewEl) previewEl.innerHTML = '<i class="fa-solid fa-camera"></i>';
+            return;
+        }
+        const reader = new FileReader();
+        reader.onload = function (e) {
+            profileImageBase64 = e.target.result;
+            if (previewEl) {
+                previewEl.innerHTML = `<img src="${e.target.result}" style="width:100%; height:100%; object-fit:cover; border-radius:50%;" />`;
+            }
+        };
+        reader.readAsDataURL(file);
+    } else {
+        profileImageBase64 = null;
+        if (previewEl) previewEl.innerHTML = '<i class="fa-solid fa-camera"></i>';
     }
 }
 
@@ -72,12 +99,13 @@ async function handleRegister(e) {
     const fullName = document.getElementById('full-name').value.trim();
     const username = document.getElementById('username').value.trim();
     const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone')?.value.trim() || null;
     const password = document.getElementById('password').value;
     const confirmPassword = document.getElementById('confirm-password').value;
 
     // Client-side validation
     if (!fullName || !username || !email || !password || !confirmPassword) {
-        showError('Please fill in all fields.');
+        showError('Please fill in all required fields.');
         return;
     }
 
@@ -103,15 +131,27 @@ async function handleRegister(e) {
             full_name: fullName,
             username: username,
             email: email,
+            phone: phone,
+            profile_image: profileImageBase64,
             password: password,
             confirm_password: confirmPassword,
         });
 
         if (data.success) {
-            showToast(`<i class="fa-solid fa-circle-check"></i> Account created for "${data.admin.username}"! Redirecting to login...`, 'success', 3000);
+            // Store admin session metadata directly for auto-login
+            Session.set({
+                user_id: data.admin.id,
+                username: data.admin.username,
+                role: 'admin',
+                org_id: '',
+                phone: data.admin.phone || '',
+                profile_image: data.admin.profile_image || ''
+            });
+
+            showToast(`Registration Successful!`, 'success', 2500);
             setTimeout(() => {
-                location.href = '/index.html';
-            }, 2500);
+                location.href = '/admin/dashboard.html';
+            }, 1000);
         }
     } catch (err) {
         // Parse FastAPI validation errors

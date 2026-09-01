@@ -22,7 +22,10 @@ logger = get_logger(__name__)
 async def lifespan(app: FastAPI):
     """Startup and shutdown lifecycle manager."""
     try:
-        init_db()
+        # Run migrations on startup only if AUTO_MIGRATE is enabled.
+        # In production, migrations are executed explicitly via `python migrate.py`.
+        if os.getenv("AUTO_MIGRATE", "false").lower() == "true":
+            init_db()
         seed_admin()
         logger.info("Application startup complete — server ready.")
     except Exception as e:

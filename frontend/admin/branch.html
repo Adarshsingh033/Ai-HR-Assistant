@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Branch - AI HR Assistant Admin</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <style>
+        /* Modern Clean Admin Dashboard Aesthetics */
+        .module-section {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* User Menu Popover Above Sidebar Chip */
+        .user-menu-popover {
+            position: absolute;
+            bottom: 75px;
+            left: 16px;
+            right: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 8px 0;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+            z-index: 200;
+            animation: popoverUp 0.2s ease forwards;
+        }
+
+        @keyframes popoverUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .popover-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .popover-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .popover-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+
+        .btn-save-profile {
+            background: linear-gradient(90deg, #f97316, #ea580c);
+            color: #ffffff;
+            border: none;
+            padding: 11px 28px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.35);
+        }
+
+        .btn-save-profile:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div>
+                    <div class="logo-text">AI HR Assistant</div>
+                    <div class="logo-sub">Admin Portal</div>
+                </div>
+            </div>
+
+            <div class="nav-section-label">Main Menu</div>
+            <a href="dashboard.html" class="nav-item" id="nav-dashboard">
+                <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                Dashboard
+            </a>
+            <a href="organization.html" class="nav-item" id="nav-org">
+                <span class="nav-icon"><i class="fa-solid fa-building"></i></span>
+                Organization
+            </a>
+            <a href="branch.html" class="nav-item active" id="nav-branch">
+                <span class="nav-icon"><i class="fa-solid fa-code-branch"></i></span>
+                Branch
+            </a>
+            <a href="hr.html" class="nav-item" id="nav-hr">
+                <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                HR
+            </a>
+
+            <!-- Sidebar Footer User Chip & Menu -->
+            <div class="sidebar-footer" style="position: relative;">
+                <!-- Popover Menu (Profile & Logout) -->
+                <div class="user-menu-popover hidden" id="user-menu-popover">
+                    <a href="profile.html" class="popover-item">
+                        <i class="fa-solid fa-user" style="color: #f97316;"></i> Profile
+                    </a>
+                    <div class="popover-divider"></div>
+                    <a href="#" class="popover-item" onclick="logout()">
+                        <i class="fa-solid fa-right-from-bracket" style="color: #ef4444;"></i> Logout
+                    </a>
+                </div>
+
+                <!-- User Chip -->
+                <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">
+                    <div class="user-avatar" id="sidebar-avatar">AD</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-name">Admin</div>
+                        <div class="user-role" id="sidebar-role">Admin</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-title" id="page-title">Branch</div>
+            </header>
+
+            <div class="page-content">
+
+                <!-- 1. BRANCH MODULE -->
+                <div id="section-branch" class="module-section">
+                    <div class="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 style="font-size: 1.5rem; font-weight: 800; color: #fff;">Branches</h2>
+                            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6);">Manage office locations and regional branches.</p>
+                        </div>
+                    </div>
+
+                    <div style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 40px; text-align: center; color: var(--text-muted);">
+                        Branch module configuration & listing
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal-overlay" id="logout-confirm-modal">
+        <div class="modal-card" style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Confirm Logout</h3>
+            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px; line-height: 1.5;">Are you sure you want to log out of AI HR Assistant?</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" onclick="closeLogoutModal()" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
+                <button type="button" onclick="confirmLogoutAction()" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/admin/branch.js"></script>
+    <script src="../js/admin/common.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', initTheme);</script>
+</body>
+
+</html>

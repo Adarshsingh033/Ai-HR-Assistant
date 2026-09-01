@@ -16,16 +16,17 @@
         }
 
         .register-container {
-            min-height: 100vh;
+            height: 100vh;
             width: 100vw;
             display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
+            grid-template-columns: 1fr 1.1fr;
             position: relative;
             background: #080614;
             background-image: 
                 radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25) 0%, transparent 45%),
                 radial-gradient(circle at 40% 60%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
                 radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.22) 0%, transparent 50%);
+            overflow: hidden;
         }
 
         /* ── Left Hero Side ── */
@@ -33,14 +34,14 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 54px 64px;
+            padding: 44px 56px;
             position: relative;
             z-index: 2;
         }
 
         .brand-logo-wrap img {
-            max-height: 44px;
-            max-width: 220px;
+            max-height: 40px;
+            max-width: 200px;
             filter: brightness(0) invert(1);
             object-fit: contain;
         }
@@ -50,13 +51,13 @@
         }
 
         .hero-main-title {
-            font-size: 2.8rem;
+            font-size: 2.5rem;
             font-weight: 900;
             line-height: 1.15;
             letter-spacing: 0.02em;
             color: #ffffff;
             text-transform: uppercase;
-            margin-bottom: 12px;
+            margin-bottom: 10px;
         }
 
         .hero-main-title .gradient-text {
@@ -67,26 +68,26 @@
         }
 
         .hero-subtitle {
-            font-size: 0.98rem;
+            font-size: 0.92rem;
             color: rgba(255, 255, 255, 0.68);
-            max-width: 460px;
-            line-height: 1.6;
-            margin-bottom: 36px;
+            max-width: 440px;
+            line-height: 1.55;
+            margin-bottom: 28px;
         }
 
         /* Clean Useful Onboarding Step Cards */
         .useful-steps-container {
             display: flex;
             flex-direction: column;
-            gap: 16px;
-            max-width: 480px;
+            gap: 12px;
+            max-width: 460px;
         }
 
         .useful-step-card {
             display: flex;
             align-items: flex-start;
-            gap: 16px;
-            padding: 16px 20px;
+            gap: 14px;
+            padding: 14px 18px;
             background: rgba(23, 19, 46, 0.6);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 14px;
@@ -101,14 +102,14 @@
         }
 
         .step-icon-box {
-            width: 36px;
-            height: 36px;
+            width: 32px;
+            height: 32px;
             border-radius: 10px;
             background: linear-gradient(135deg, #4f46e5, #3b82f6);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 800;
             color: #ffffff;
             flex-shrink: 0;
@@ -116,24 +117,24 @@
         }
 
         .step-content-title {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             font-weight: 700;
             color: #ffffff;
-            margin-bottom: 3px;
+            margin-bottom: 2px;
         }
 
         .step-content-desc {
-            font-size: 0.83rem;
+            font-size: 0.8rem;
             color: rgba(255, 255, 255, 0.6);
-            line-height: 1.45;
+            line-height: 1.4;
         }
 
         .platform-features-bar {
             display: flex;
             align-items: center;
-            gap: 16px;
-            margin-top: 32px;
-            font-size: 0.8rem;
+            gap: 14px;
+            margin-top: 24px;
+            font-size: 0.78rem;
             color: rgba(255, 255, 255, 0.5);
         }
 
@@ -148,43 +149,117 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: 32px;
             position: relative;
             z-index: 2;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
         .form-card {
             width: 100%;
-            max-width: 420px;
-            padding: 10px 0;
+            max-width: 520px;
+            padding: 0;
         }
 
         .form-title {
-            font-size: 2.5rem;
+            font-size: 2.2rem;
             font-weight: 900;
             letter-spacing: 0.04em;
             color: #ffffff;
             text-transform: uppercase;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            text-align: center;
         }
 
         .form-subtitle {
-            font-size: 0.88rem;
+            font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 24px;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        /* Avatar Circle Upload at Top */
+        .avatar-upload-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 18px;
+        }
+
+        .avatar-upload-circle {
+            width: 86px;
+            height: 86px;
+            border-radius: 50%;
+            background: #15112e;
+            border: 2px dashed rgba(99, 102, 241, 0.5);
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+        }
+
+        .avatar-upload-circle:hover {
+            border-color: #6366f1;
+            background: #1c173b;
+            transform: scale(1.05);
+        }
+
+        .avatar-circle-preview {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            color: rgba(255, 255, 255, 0.5);
+            overflow: hidden;
+        }
+
+        .avatar-circle-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .avatar-camera-badge {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            border: 2px solid #080614;
+        }
+
+        /* 2-Column Form Row Layout */
+        .form-row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 14px;
+            margin-bottom: 14px;
         }
 
         .input-group-custom {
-            margin-bottom: 18px;
+            margin-bottom: 0;
         }
 
         .input-label-custom {
             display: block;
-            font-size: 0.78rem;
+            font-size: 0.74rem;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 6px;
+            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -195,24 +270,24 @@
 
         .input-field-wrap .field-icon {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: rgba(255, 255, 255, 0.4);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             pointer-events: none;
         }
 
         .input-field-wrap .form-control-custom {
             width: 100%;
-            height: 48px;
-            padding: 0 44px 0 44px;
+            height: 44px;
+            padding: 0 40px 0 40px;
             background: #15112e;
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 12px;
+            border-radius: 10px;
             color: #ffffff;
             font-family: inherit;
-            font-size: 0.92rem;
+            font-size: 0.88rem;
             outline: none;
             transition: all 0.2s ease;
         }
@@ -227,16 +302,27 @@
             color: rgba(255, 255, 255, 0.35);
         }
 
+        .input-field-wrap .form-control-custom:-webkit-autofill,
+        .input-field-wrap .form-control-custom:-webkit-autofill:hover,
+        .input-field-wrap .form-control-custom:-webkit-autofill:focus,
+        .input-field-wrap .form-control-custom:-webkit-autofill:active {
+            -webkit-box-shadow: 0 0 0px 1000px #15112e inset !important;
+            box-shadow: 0 0 0px 1000px #15112e inset !important;
+            -webkit-text-fill-color: #ffffff !important;
+            caret-color: #ffffff !important;
+            transition: background-color 5000s ease-in-out 0s;
+        }
+
         .input-field-wrap .pwd-toggle-btn {
             position: absolute;
-            right: 16px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             color: rgba(255, 255, 255, 0.4);
             cursor: pointer;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             transition: color 0.2s ease;
         }
 
@@ -245,10 +331,10 @@
         }
 
         .strength-bar-wrap {
-            height: 4px;
+            height: 3px;
             background: rgba(255, 255, 255, 0.1);
             border-radius: 2px;
-            margin-top: 6px;
+            margin-top: 4px;
             overflow: hidden;
         }
 
@@ -262,18 +348,17 @@
         .field-hint {
             font-size: 0.72rem;
             color: rgba(255, 255, 255, 0.45);
-            margin-top: 4px;
         }
 
         .btn-register-custom {
             width: 100%;
-            height: 50px;
+            height: 48px;
             border: none;
-            border-radius: 12px;
+            border-radius: 10px;
             background: linear-gradient(90deg, #4f46e5 0%, #3b82f6 100%);
             color: #ffffff;
             font-family: inherit;
-            font-size: 1rem;
+            font-size: 0.98rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -282,7 +367,7 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
-            margin-top: 24px;
+            margin-top: 16px;
         }
 
         .btn-register-custom:hover {
@@ -302,15 +387,15 @@
             border: 1px solid rgba(239, 68, 68, 0.35);
             border-radius: 10px;
             padding: 10px 14px;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             color: #fca5a5;
-            margin-bottom: 16px;
+            margin-top: 10px;
         }
 
         .form-footer-custom {
             text-align: center;
-            margin-top: 24px;
-            font-size: 0.88rem;
+            margin-top: 16px;
+            font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.5);
         }
 
@@ -343,12 +428,19 @@
         @media (max-width: 900px) {
             .register-container {
                 grid-template-columns: 1fr;
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
             }
             .register-hero {
                 display: none;
             }
             .register-form-side {
-                padding: 32px 24px;
+                padding: 24px 16px;
+            }
+            .form-row-2 {
+                grid-template-columns: 1fr;
+                gap: 12px;
             }
         }
     </style>
@@ -417,66 +509,91 @@
                 <p class="form-subtitle">Fill in your details to create an admin account</p>
 
                 <form id="register-form" onsubmit="handleRegister(event)" novalidate>
-                    <!-- Full Name -->
-                    <div class="input-group-custom">
-                        <label class="input-label-custom" for="full-name">Full Name</label>
-                        <div class="input-field-wrap">
-                            <span class="field-icon"><i class="fa-solid fa-user"></i></span>
-                            <input type="text" id="full-name" class="form-control-custom"
-                                placeholder="e.g. John Doe" autocomplete="name" required />
+                    
+                    <!-- Circular Avatar Upload Button at Top -->
+                    <div class="avatar-upload-wrap">
+                        <div class="avatar-upload-circle" onclick="document.getElementById('profile-image-file').click()" title="Click to upload profile image">
+                            <div class="avatar-circle-preview" id="avatar-circle-preview">
+                                <i class="fa-solid fa-camera"></i>
+                            </div>
+                            <div class="avatar-camera-badge"><i class="fa-solid fa-plus"></i></div>
+                        </div>
+                        <input type="file" id="profile-image-file" class="hidden" accept="image/*" onchange="previewRegisterAvatar(event)" />
+                        <div class="field-hint text-center" style="margin-top: 4px;">Click circle to upload profile picture</div>
+                    </div>
+
+                    <!-- Row 1: Full Name & Username -->
+                    <div class="form-row-2">
+                        <div class="input-group-custom">
+                            <label class="input-label-custom" for="full-name">Full Name <span style="color:#ef4444;">*</span></label>
+                            <div class="input-field-wrap">
+                                <span class="field-icon"><i class="fa-solid fa-user"></i></span>
+                                <input type="text" id="full-name" class="form-control-custom"
+                                    placeholder="e.g. John Doe" autocomplete="name" required />
+                            </div>
+                        </div>
+
+                        <div class="input-group-custom">
+                            <label class="input-label-custom" for="username">Username <span style="color:#ef4444;">*</span></label>
+                            <div class="input-field-wrap">
+                                <span class="field-icon">@</span>
+                                <input type="text" id="username" class="form-control-custom"
+                                    placeholder="e.g. john_admin" autocomplete="username" required />
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Username -->
-                    <div class="input-group-custom">
-                        <label class="input-label-custom" for="username">Username</label>
-                        <div class="input-field-wrap">
-                            <span class="field-icon">@</span>
-                            <input type="text" id="username" class="form-control-custom"
-                                placeholder="e.g. john_admin" autocomplete="username" required />
+                    <!-- Row 2: Email & Phone Number -->
+                    <div class="form-row-2">
+                        <div class="input-group-custom">
+                            <label class="input-label-custom" for="email">Email Address <span style="color:#ef4444;">*</span></label>
+                            <div class="input-field-wrap">
+                                <span class="field-icon"><i class="fa-solid fa-envelope"></i></span>
+                                <input type="email" id="email" class="form-control-custom"
+                                    placeholder="admin@company.com" autocomplete="email" required />
+                            </div>
                         </div>
-                        <div class="field-hint">Min. 3 characters, alphanumeric & underscores only.</div>
-                    </div>
 
-                    <!-- Email -->
-                    <div class="input-group-custom">
-                        <label class="input-label-custom" for="email">Email Address</label>
-                        <div class="input-field-wrap">
-                            <span class="field-icon"><i class="fa-solid fa-envelope"></i></span>
-                            <input type="email" id="email" class="form-control-custom"
-                                placeholder="admin@company.com" autocomplete="email" required />
-                        </div>
-                    </div>
-
-                    <!-- Password -->
-                    <div class="input-group-custom">
-                        <label class="input-label-custom" for="password">Password</label>
-                        <div class="input-field-wrap">
-                            <span class="field-icon"><i class="fa-solid fa-lock"></i></span>
-                            <input type="password" id="password" class="form-control-custom"
-                                placeholder="Minimum 6 characters" autocomplete="new-password" required
-                                oninput="updateStrengthBar(this.value)" />
-                            <button type="button" class="pwd-toggle-btn" onclick="togglePwd('password', 'tog1')" id="tog1"
-                                title="Show/Hide password">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
-                        </div>
-                        <div class="strength-bar-wrap">
-                            <div class="strength-bar" id="strength-bar"></div>
+                        <div class="input-group-custom">
+                            <label class="input-label-custom" for="phone">Phone Number</label>
+                            <div class="input-field-wrap">
+                                <span class="field-icon"><i class="fa-solid fa-phone"></i></span>
+                                <input type="text" id="phone" class="form-control-custom"
+                                    placeholder="+1 (555) 000-0000" autocomplete="tel" />
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Confirm Password -->
-                    <div class="input-group-custom">
-                        <label class="input-label-custom" for="confirm-password">Confirm Password</label>
-                        <div class="input-field-wrap">
-                            <span class="field-icon"><i class="fa-solid fa-lock"></i></span>
-                            <input type="password" id="confirm-password" class="form-control-custom"
-                                placeholder="Re-enter your password" autocomplete="new-password" required />
-                            <button type="button" class="pwd-toggle-btn" onclick="togglePwd('confirm-password', 'tog2')" id="tog2"
-                                title="Show/Hide password">
-                                <i class="fa-solid fa-eye"></i>
-                            </button>
+                    <!-- Row 3: Password & Confirm Password -->
+                    <div class="form-row-2">
+                        <div class="input-group-custom">
+                            <label class="input-label-custom" for="password">Password <span style="color:#ef4444;">*</span></label>
+                            <div class="input-field-wrap">
+                                <span class="field-icon"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" id="password" class="form-control-custom"
+                                    placeholder="Min. 6 characters" autocomplete="new-password" required
+                                    oninput="updateStrengthBar(this.value)" />
+                                <button type="button" class="pwd-toggle-btn" onclick="togglePwd('password', 'tog1')" id="tog1"
+                                    title="Show/Hide password">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
+                            <div class="strength-bar-wrap">
+                                <div class="strength-bar" id="strength-bar"></div>
+                            </div>
+                        </div>
+
+                        <div class="input-group-custom">
+                            <label class="input-label-custom" for="confirm-password">Confirm Password <span style="color:#ef4444;">*</span></label>
+                            <div class="input-field-wrap">
+                                <span class="field-icon"><i class="fa-solid fa-lock"></i></span>
+                                <input type="password" id="confirm-password" class="form-control-custom"
+                                    placeholder="Re-enter password" autocomplete="new-password" required />
+                                <button type="button" class="pwd-toggle-btn" onclick="togglePwd('confirm-password', 'tog2')" id="tog2"
+                                    title="Show/Hide password">
+                                    <i class="fa-solid fa-eye"></i>
+                                </button>
+                            </div>
                         </div>
                     </div>
 
@@ -485,7 +602,7 @@
 
                     <button type="submit" class="btn-register-custom" id="register-btn">
                         <div class="spinner-custom" id="reg-spinner"></div>
-                        <span id="reg-btn-text"><i class="fa-solid fa-shield"></i> Create Admin Account</span>
+                        <span id="reg-btn-text">Register</span>
                     </button>
                 </form>
 
