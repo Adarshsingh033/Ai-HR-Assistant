@@ -143,10 +143,10 @@ function renderJobsGrid(jobs) {
         const nextLabel  = statusMeta[nextStatus]?.label || 'Draft';
 
         return `
-        <div class="vacancy-card" style="display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;">
+        <div class="vacancy-card" style="display:flex;flex-direction:column;box-sizing:border-box;padding:22px;">
 
             <!-- ── Top Row: Status pill + action icons ── -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:10px;">
                 <span
                     class="status-pill ${sm.cls} clickable"
                     title="Click to change to ${nextLabel}"
@@ -155,48 +155,48 @@ function renderJobsGrid(jobs) {
                     <i class="fa-solid ${sm.icon}" style="font-size:0.55rem;"></i>
                     ${sm.label}
                 </span>
-                <div style="display:flex;gap:7px;">
-                    <button onclick="viewJobDetails('${jobId}')" title="View JD" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
-                        <i class="fa-solid fa-eye" style="font-size:0.8rem;"></i>
+                <div style="display:flex;gap:8px;">
+                    <button onclick="viewJobDetails('${jobId}')" title="View JD" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                        <i class="fa-solid fa-eye" style="font-size:0.82rem;"></i>
                     </button>
-                    <button onclick="openEditJobModal('${jobId}')" title="Edit" style="background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.3);color:#818cf8;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.28)'" onmouseout="this.style.background='rgba(99,102,241,0.14)'">
-                        <i class="fa-solid fa-pen-to-square" style="font-size:0.8rem;"></i>
+                    <button onclick="openEditJobModal('${jobId}')" title="Edit" style="background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.3);color:#818cf8;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.28)'" onmouseout="this.style.background='rgba(99,102,241,0.14)'">
+                        <i class="fa-solid fa-pen-to-square" style="font-size:0.82rem;"></i>
                     </button>
-                    <button onclick="deleteJobVacancy('${jobId}')" title="Delete" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">
-                        <i class="fa-solid fa-trash-can" style="font-size:0.8rem;"></i>
+                    <button onclick="deleteJobVacancy('${jobId}')" title="Delete" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">
+                        <i class="fa-solid fa-trash-can" style="font-size:0.82rem;"></i>
                     </button>
                 </div>
             </div>
 
             <!-- ── Title & Department ── -->
             <div style="margin-bottom:14px;">
-                <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin:0 0 4px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${title}">${title}</h3>
-                <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                <h3 style="font-size:1.18rem;font-weight:900;color:#fff;margin:0 0 4px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${title}">${title}</h3>
+                <div style="font-size:0.82rem;color:rgba(255,255,255,0.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                     ${dept}
                 </div>
             </div>
 
             <!-- ── Type Badges ── -->
-            <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;">
-                <span style="font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:7px;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);line-height:1.2;">${workMode}</span>
-                <span style="font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:7px;background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.25);line-height:1.2;">${empType}</span>
-                <span style="font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:7px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);line-height:1.2;">${openings} Opening${openings > 1 ? 's' : ''}</span>
+            <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
+                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${workMode}</span>
+                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${empType}</span>
+                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${openings} Opening${openings > 1 ? 's' : ''}</span>
             </div>
 
             <!-- ── Info Rows (Location & Experience only) ── -->
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:0;">
-                <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:8px 11px;overflow:hidden;">
-                    <i class="fa-solid fa-location-dot" style="color:#6366f1;font-size:0.78rem;flex-shrink:0;"></i>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;">
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:9px 12px;overflow:hidden;">
+                    <i class="fa-solid fa-location-dot" style="color:#6366f1;font-size:0.82rem;flex-shrink:0;"></i>
                     <div style="min-width:0;">
-                        <div style="font-size:0.62rem;color:rgba(255,255,255,0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Location</div>
-                        <div style="font-size:0.8rem;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${location}">${location}</div>
+                        <div style="font-size:0.64rem;color:rgba(255,255,255,0.45);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Location</div>
+                        <div style="font-size:0.82rem;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${location}">${location}</div>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:8px 11px;overflow:hidden;">
-                    <i class="fa-solid fa-hourglass-half" style="color:#fbbf24;font-size:0.78rem;flex-shrink:0;"></i>
+                <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:9px 12px;overflow:hidden;">
+                    <i class="fa-solid fa-hourglass-half" style="color:#fbbf24;font-size:0.82rem;flex-shrink:0;"></i>
                     <div style="min-width:0;">
-                        <div style="font-size:0.62rem;color:rgba(255,255,255,0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Experience</div>
-                        <div style="font-size:0.8rem;font-weight:700;color:#fbbf24;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${exp}">${exp}</div>
+                        <div style="font-size:0.64rem;color:rgba(255,255,255,0.45);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Experience</div>
+                        <div style="font-size:0.82rem;font-weight:700;color:#fbbf24;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${exp}">${exp}</div>
                     </div>
                 </div>
             </div>
@@ -442,16 +442,40 @@ async function changeJobStatus(jobId, newStatus) {
     }
 }
 
-/* Delete Job Vacancy */
-async function deleteJobVacancy(jobId) {
-    if (!confirm('Are you sure you want to delete this job vacancy? All linked records will be affected.')) return;
+/* Delete Job Vacancy Modal Handlers */
+let _deletingJobId = null;
+
+function deleteJobVacancy(jobId) {
+    _deletingJobId = jobId;
+    openModal('delete-job-modal');
+}
+
+function closeDeleteJobModal() {
+    closeModal('delete-job-modal');
+    _deletingJobId = null;
+}
+
+async function confirmDeleteJobAction() {
+    if (!_deletingJobId) return;
+
+    const btn = document.getElementById('confirm-delete-job-btn');
+    if (btn) {
+        btn.disabled = true;
+        btn.textContent = 'Deleting...';
+    }
 
     try {
-        await apiRequest('DELETE', `/api/jobs/${jobId}`);
+        await apiRequest('DELETE', `/api/jobs/${_deletingJobId}`);
         showToast('Job Vacancy deleted successfully.', 'success');
+        closeDeleteJobModal();
         await loadJobVacancies();
     } catch (err) {
         showToast(err.message || 'Failed to delete job vacancy.', 'error');
+    } finally {
+        if (btn) {
+            btn.disabled = false;
+            btn.textContent = 'Delete Vacancy';
+        }
     }
 }
 
