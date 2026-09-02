@@ -56,8 +56,8 @@ def create_job(
                 INSERT INTO job_vacancies 
                 (id, organization_id, branch_id, created_by_hr_id, job_title, department, 
                  employment_type, work_mode, location, openings, experience_required, 
-                 salary, skills_required, job_description, status, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                 qualification, salary, skills_required, job_description, status, created_at, updated_at)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
                 RETURNING created_at, updated_at
                 """,
                 (
@@ -72,6 +72,7 @@ def create_job(
                     payload.location.strip() if payload.location else "",
                     payload.openings if payload.openings > 0 else 1,
                     payload.experience_required.strip() if payload.experience_required else "",
+                    payload.qualification.strip() if payload.qualification else "",
                     payload.salary.strip() if payload.salary else "",
                     skills_str,
                     payload.job_description,
@@ -103,6 +104,7 @@ def create_job(
         location=payload.location or "",
         openings=payload.openings,
         experience_required=payload.experience_required or "",
+        qualification=payload.qualification or "",
         salary=payload.salary or "",
         skills_required=payload.skills_required or [],
         job_description=payload.job_description,
@@ -150,8 +152,8 @@ def list_jobs(
                 SELECT v.id, v.organization_id, v.branch_id, COALESCE(b.branch_name, ''), v.created_by_hr_id,
                        v.job_title, COALESCE(v.department, ''), v.employment_type, v.work_mode,
                        COALESCE(v.location, ''), v.openings, COALESCE(v.experience_required, ''),
-                       COALESCE(v.salary, ''), COALESCE(v.skills_required, ''), v.job_description,
-                       v.status, v.closed_at, v.created_at, v.updated_at
+                       COALESCE(v.qualification, ''), COALESCE(v.salary, ''), COALESCE(v.skills_required, ''),
+                       v.job_description, v.status, v.closed_at, v.created_at, v.updated_at
                 FROM job_vacancies v
                 LEFT JOIN branches b ON v.branch_id = b.id
                 {where_sql}
@@ -176,14 +178,15 @@ def list_jobs(
                     "location": r[9],
                     "openings": r[10],
                     "experience_required": r[11],
-                    "salary": r[12],
-                    "skills_required": r[13].split(",") if r[13] else [],
-                    "job_description": r[14],
-                    "description": r[14], # Legacy alias
-                    "status": r[15],
-                    "closed_at": str(r[16]) if r[16] else None,
-                    "created_at": str(r[17]),
-                    "updated_at": str(r[18]),
+                    "qualification": r[12],
+                    "salary": r[13],
+                    "skills_required": r[14].split(",") if r[14] else [],
+                    "job_description": r[15],
+                    "description": r[15], # Legacy alias
+                    "status": r[16],
+                    "closed_at": str(r[17]) if r[17] else None,
+                    "created_at": str(r[18]),
+                    "updated_at": str(r[19]),
                 })
     return {"jobs": jobs}
 
@@ -198,8 +201,8 @@ def get_job(job_id: str):
                 SELECT v.id, v.organization_id, v.branch_id, COALESCE(b.branch_name, ''), v.created_by_hr_id,
                        v.job_title, COALESCE(v.department, ''), v.employment_type, v.work_mode,
                        COALESCE(v.location, ''), v.openings, COALESCE(v.experience_required, ''),
-                       COALESCE(v.salary, ''), COALESCE(v.skills_required, ''), v.job_description,
-                       v.status, v.closed_at, v.created_at, v.updated_at
+                       COALESCE(v.qualification, ''), COALESCE(v.salary, ''), COALESCE(v.skills_required, ''),
+                       v.job_description, v.status, v.closed_at, v.created_at, v.updated_at
                 FROM job_vacancies v
                 LEFT JOIN branches b ON v.branch_id = b.id
                 WHERE v.id = %s
@@ -224,14 +227,15 @@ def get_job(job_id: str):
         "location": r[9],
         "openings": r[10],
         "experience_required": r[11],
-        "salary": r[12],
-        "skills_required": r[13].split(",") if r[13] else [],
-        "job_description": r[14],
-        "description": r[14],
-        "status": r[15],
-        "closed_at": str(r[16]) if r[16] else None,
-        "created_at": str(r[17]),
-        "updated_at": str(r[18]),
+        "qualification": r[12],
+        "salary": r[13],
+        "skills_required": r[14].split(",") if r[14] else [],
+        "job_description": r[15],
+        "description": r[15],
+        "status": r[16],
+        "closed_at": str(r[17]) if r[17] else None,
+        "created_at": str(r[18]),
+        "updated_at": str(r[19]),
     }
 
 
@@ -244,7 +248,7 @@ def update_job(job_id: str, payload: UpdateJobRequest):
                 """
                 SELECT id, organization_id, branch_id, created_by_hr_id, job_title, department,
                        employment_type, work_mode, location, openings, experience_required,
-                       salary, skills_required, job_description, status, closed_at, created_at
+                       qualification, salary, skills_required, job_description, status, closed_at, created_at
                 FROM job_vacancies
                 WHERE id = %s
                 LIMIT 1
@@ -255,6 +259,7 @@ def update_job(job_id: str, payload: UpdateJobRequest):
             if not curr:
                 raise HTTPException(status_code=404, detail="Job Vacancy not found")
 
+
             new_branch_id = payload.branch_id if payload.branch_id is not None else curr[2]
             new_title = payload.job_title.strip() if payload.job_title is not None else curr[4]
             new_dept = payload.department.strip() if payload.department is not None else curr[5]
@@ -263,18 +268,19 @@ def update_job(job_id: str, payload: UpdateJobRequest):
             new_location = payload.location.strip() if payload.location is not None else curr[8]
             new_openings = payload.openings if payload.openings is not None else curr[9]
             new_exp = payload.experience_required.strip() if payload.experience_required is not None else curr[10]
-            new_salary = payload.salary.strip() if payload.salary is not None else curr[11]
+            new_qualification = payload.qualification.strip() if payload.qualification is not None else curr[11]
+            new_salary = payload.salary.strip() if payload.salary is not None else curr[12]
 
             if payload.skills_required is not None:
                 new_skills = ",".join(payload.skills_required)
             else:
-                new_skills = curr[12] or ""
+                new_skills = curr[13] or ""
 
-            new_desc = payload.job_description if payload.job_description is not None else curr[13]
-            new_status = payload.status.lower().strip() if payload.status is not None else curr[14]
+            new_desc = payload.job_description if payload.job_description is not None else curr[14]
+            new_status = payload.status.lower().strip() if payload.status is not None else curr[15]
 
-            new_closed_at = curr[15]
-            if new_status == "closed" and curr[14] != "closed":
+            new_closed_at = curr[16]
+            if new_status == "closed" and curr[15] != "closed":
                 new_closed_at = datetime.now(timezone.utc)
             elif new_status != "closed":
                 new_closed_at = None
@@ -283,16 +289,16 @@ def update_job(job_id: str, payload: UpdateJobRequest):
                 """
                 UPDATE job_vacancies
                 SET branch_id = %s, job_title = %s, department = %s, employment_type = %s, 
-                    work_mode = %s, location = %s, openings = %s, experience_required = %s, 
-                    salary = %s, skills_required = %s, job_description = %s, status = %s, 
-                    closed_at = %s, updated_at = NOW()
+                    work_mode = %s, location = %s, openings = %s, experience_required = %s,
+                    qualification = %s, salary = %s, skills_required = %s, job_description = %s,
+                    status = %s, closed_at = %s, updated_at = NOW()
                 WHERE id = %s
                 RETURNING created_at, updated_at
                 """,
                 (
                     new_branch_id, new_title, new_dept, new_emp_type, new_work_mode,
-                    new_location, new_openings, new_exp, new_salary, new_skills,
-                    new_desc, new_status, new_closed_at, job_id,
+                    new_location, new_openings, new_exp, new_qualification, new_salary,
+                    new_skills, new_desc, new_status, new_closed_at, job_id,
                 ),
             )
             dates = cur.fetchone()
@@ -319,6 +325,7 @@ def update_job(job_id: str, payload: UpdateJobRequest):
         location=new_location,
         openings=new_openings,
         experience_required=new_exp,
+        qualification=new_qualification,
         salary=new_salary,
         skills_required=new_skills.split(",") if new_skills else [],
         job_description=new_desc,
@@ -346,14 +353,22 @@ def delete_job(job_id: str):
 
 @router.post("/generate-jd")
 def generate_jd(payload: GenerateJDRequest):
-    """Generate a professional job description using AI."""
-    title_to_use = payload.job_title
-    jd = generate_job_description(
-        title=title_to_use,
-        department=payload.department or "General",
-        location=payload.location or "Office",
-        job_type=payload.employment_type or "Full-time",
-        experience_required=payload.experience_required or "Entry-level",
-        skills_required=payload.skills_required or [],
-    )
-    return {"description": jd}
+    """Generate a professional job description using AI (Ollama with Groq fallback)."""
+    try:
+        jd = generate_job_description(
+            title=payload.job_title,
+            department=payload.department or "General",
+            location=payload.location or "Office",
+            job_type=payload.employment_type or "Full-time",
+            experience_required=payload.experience_required or "Entry-level",
+            qualification=payload.qualification or "Not specified",
+            salary=payload.salary or "Competitive",
+            skills_required=payload.skills_required or [],
+        )
+        return {"description": jd}
+    except Exception as e:
+        logger.error("AI job description generation error: %s", e, exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"AI generation failed: {str(e)}"
+        )

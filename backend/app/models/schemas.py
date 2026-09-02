@@ -260,6 +260,7 @@ class CreateJobRequest(BaseModel):
     location: Optional[str] = None
     openings: int = 1
     experience_required: Optional[str] = None
+    qualification: Optional[str] = None
     salary: Optional[str] = None
     skills_required: Optional[List[str]] = []
     job_description: str
@@ -275,6 +276,7 @@ class UpdateJobRequest(BaseModel):
     location: Optional[str] = None
     openings: Optional[int] = None
     experience_required: Optional[str] = None
+    qualification: Optional[str] = None
     salary: Optional[str] = None
     skills_required: Optional[List[str]] = None
     job_description: Optional[str] = None
@@ -295,6 +297,7 @@ class JobResponse(BaseModel):
     location: Optional[str] = None
     openings: int = 1
     experience_required: Optional[str] = None
+    qualification: Optional[str] = None
     salary: Optional[str] = None
     skills_required: List[str] = []
     job_description: str
@@ -311,6 +314,8 @@ class GenerateJDRequest(BaseModel):
     work_mode: Optional[str] = "On-site"
     location: Optional[str] = None
     experience_required: Optional[str] = None
+    qualification: Optional[str] = None
+    salary: Optional[str] = None
     skills_required: Optional[List[str]] = []
 
 

@@ -7,6 +7,7 @@
     <title>Job Vacancies - AI HR Assistant HR Portal</title>
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <style>
         .module-section {
             animation: fadeIn 0.3s ease;
@@ -79,12 +80,13 @@
             background: rgba(15, 23, 42, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 20px;
-            padding: 28px;
+            padding: 22px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
-            transition: transform 0.25 ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            box-sizing: border-box;
+            transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
         }
 
         .vacancy-card:hover {
@@ -276,29 +278,60 @@
         .modal-body::-webkit-scrollbar-thumb:hover {
             background: rgba(99, 102, 241, 0.75);
         }
-            font-size: 0.88rem;
-            outline: none;
-            transition: border-color 0.2s ease;
+        /* ── Markdown JD render styles ─────────────────────────────── */
+        .jd-markdown h1, .jd-markdown h2, .jd-markdown h3 {
+            color: #c7d2fe;
+            font-weight: 800;
+            margin: 18px 0 8px;
+            line-height: 1.3;
         }
+        .jd-markdown h1 { font-size: 1.15rem; border-bottom: 1px solid rgba(99,102,241,0.3); padding-bottom: 6px; }
+        .jd-markdown h2 { font-size: 1rem; color: #a5b4fc; }
+        .jd-markdown h3 { font-size: 0.92rem; color: #93c5fd; }
+        .jd-markdown p  { color: rgba(255,255,255,0.82); font-size: 0.88rem; line-height: 1.7; margin: 6px 0; }
+        .jd-markdown ul, .jd-markdown ol {
+            padding-left: 20px;
+            margin: 6px 0 10px;
+        }
+        .jd-markdown li {
+            color: rgba(255,255,255,0.82);
+            font-size: 0.875rem;
+            line-height: 1.7;
+            margin-bottom: 4px;
+        }
+        .jd-markdown li::marker { color: #6366f1; }
+        .jd-markdown strong { color: #fff; font-weight: 700; }
+        .jd-markdown em     { color: #a5b4fc; font-style: italic; }
+        .jd-markdown hr     { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 14px 0; }
+        .jd-markdown code   {
+            background: rgba(99,102,241,0.18);
+            color: #a5b4fc;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.82rem;
+        }
+        /* ── Status cycling tooltip ─────────────────────────────────── */
+        .status-pill.clickable { cursor: pointer; user-select: none; }
+        .status-pill.clickable:hover { filter: brightness(1.2); transform: scale(1.04); transition: 0.15s; }
 
-        select.input-custom {
-            appearance: none;
-            -webkit-appearance: none;
-            padding-right: 32px !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a5b4fc' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 12px center !important;
+        /* ── Primary Action Button Style ───────────────────────────── */
+        .btn-save-profile {
+            background: linear-gradient(90deg, #6366f1, #4f46e5);
+            color: #ffffff;
+            border: none;
+            padding: 11px 28px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
             cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
         }
 
-        select.input-custom option {
-            background: #0f172a !important;
-            color: #ffffff !important;
-        }
-
-        .input-custom:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        .btn-save-profile:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
         }
     </style>
 </head>
@@ -370,32 +403,15 @@
                         <p style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.6);">Manage job postings, positions, work modes, and status lifecycles.</p>
                     </div>
 
-                    <!-- Search & Filters -->
-                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <!-- Search Box -->
-                        <div style="width: 260px; position: relative; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; height: 42px;">
-                            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: rgba(255,255,255,0.4); font-size: 0.85rem;"></i>
-                            <input type="text" id="job-search-input" placeholder="Search vacancies..." oninput="onJobFilterChange()" style="width: 100%; height: 40px; padding-left: 38px; padding-right: 12px; background: transparent; border: none; color: #fff; font-size: 0.88rem; outline: none;" />
-                        </div>
-
-                        <!-- Branch Filter -->
-                        <div style="min-width: 170px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; padding-left: 12px; height: 42px;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase;">BRANCH •</span>
-                            <select id="job-filter-branch" onchange="onJobFilterChange()" class="input-custom" style="height: 40px; background: transparent; border: none; color: #fff; font-weight: 600; font-size: 0.85rem; padding-left: 6px;">
-                                <option value="">All Branches</option>
-                            </select>
-                        </div>
-
-                        <!-- Status Filter -->
-                        <div style="min-width: 150px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; padding-left: 12px; height: 42px;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase;">STATUS •</span>
-                            <select id="job-filter-status" onchange="onJobFilterChange()" class="input-custom" style="height: 40px; background: transparent; border: none; color: #fff; font-weight: 600; font-size: 0.85rem; padding-left: 6px;">
-                                <option value="">All Status</option>
-                                <option value="draft">Draft</option>
-                                <option value="active">Active</option>
-                                <option value="closed">Closed</option>
-                            </select>
-                        </div>
+                    <!-- Status Filter Only -->
+                    <div style="min-width: 160px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; padding-left: 12px; height: 42px;">
+                        <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS •</span>
+                        <select id="job-filter-status" onchange="onJobFilterChange()" class="input-custom" style="height: 40px; background: transparent; border: none; color: #fff; font-weight: 600; font-size: 0.85rem; padding-left: 6px; flex: 1;">
+                            <option value="">All Status</option>
+                            <option value="draft">Draft</option>
+                            <option value="active">Active</option>
+                            <option value="closed">Closed</option>
+                        </select>
                     </div>
                 </div>
 
@@ -485,17 +501,29 @@
                         </div>
                     </div>
 
-                    <!-- Row 4: Experience & Salary -->
+                    <!-- Row 4: Experience & Qualification -->
                     <div class="form-grid-2">
                         <div class="form-group-custom">
                             <label class="label-custom">Experience Required</label>
                             <input type="text" id="job-exp" class="input-custom" placeholder="e.g. 3-5 years" />
                         </div>
                         <div class="form-group-custom">
+                            <label class="label-custom">Minimum Qualification</label>
+                            <input type="text" id="job-qualification" class="input-custom" placeholder="e.g. B.Tech / B.Sc / MBA" />
+                        </div>
+                    </div>
+
+                    <!-- Row 5: Salary -->
+                    <div class="form-grid-2">
+                        <div class="form-group-custom">
                             <label class="label-custom">Salary / Range</label>
                             <input type="text" id="job-salary" class="input-custom" onkeydown="blockNonIntegerKeys(event)" oninput="validateSalaryInput(this)" placeholder="e.g. 90000" />
                         </div>
+                        <div class="form-group-custom">
+                            <!-- intentional spacer -->
+                        </div>
                     </div>
+
 
                     <!-- Required Skills Tag Input -->
                     <div class="form-group-custom" style="margin-bottom: 20px;">
@@ -539,44 +567,61 @@
     </div>
 
     <!-- Job Details Modal (View Only) -->
-    <div class="modal-overlay" id="view-job-modal">
-        <div class="modal-card" style="max-width: 680px; width: 94%; padding: 32px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px;">
-            <div style="display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 16px;">
-                <div>
-                    <span id="vj-status" class="status-pill active" style="margin-bottom: 8px;">Active</span>
-                    <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="vj-title">Job Title</h3>
-                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.6);" id="vj-sub">Department • Branch</div>
+    <div class="modal-overlay" id="view-job-modal" onclick="handleViewModalOverlayClick(event)">
+        <div class="modal-card" id="view-job-modal-card" style="max-width: 760px; width: 96%; max-height: 90vh; padding: 0; background: #0b1329; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 70px -10px rgba(0,0,0,0.9);">
+
+            <!-- Modal Header -->
+            <div style="padding: 24px 28px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; background: rgba(11,19,41,0.98);">
+                <div style="flex: 1; min-width: 0;">
+                    <!-- Status + Action Buttons Row -->
+                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
+                        <span id="vj-status" class="status-pill active clickable" title="Click to change status" onclick="cycleJobStatus()"></span>
+                        <span id="vj-work-mode-badge" style="font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3);"></span>
+                        <span id="vj-emp-badge" style="font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; background: rgba(56,189,248,0.12); color: #38bdf8; border: 1px solid rgba(56,189,248,0.25);"></span>
+                        <span id="vj-openings-badge" style="font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25);"></span>
+                    </div>
+                    <!-- Job Title -->
+                    <h2 style="font-size: 1.55rem; font-weight: 900; color: #fff; margin: 0 0 5px; line-height: 1.25;" id="vj-title">Job Title</h2>
+                    <div style="font-size: 0.84rem; color: rgba(255,255,255,0.55);" id="vj-sub">Department • Branch</div>
                 </div>
-                <button type="button" onclick="closeViewJobModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;">×</button>
+                <!-- X Close -->
+                <button type="button" onclick="closeViewJobModal()" style="margin-left: 16px; flex-shrink: 0; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">×</button>
             </div>
 
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 14px; margin-bottom: 20px;">
-                <div>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Work Mode</div>
-                    <div style="font-size: 0.88rem; font-weight: 700; color: #818cf8;" id="vj-work-mode">On-site</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Employment</div>
-                    <div style="font-size: 0.88rem; font-weight: 700; color: #38bdf8;" id="vj-emp-type">Full-time</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Openings</div>
-                    <div style="font-size: 0.88rem; font-weight: 700; color: #10b981;" id="vj-openings">1</div>
-                </div>
-                <div>
-                    <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Salary</div>
-                    <div style="font-size: 0.88rem; font-weight: 700; color: #fff;" id="vj-salary">—</div>
-                </div>
-            </div>
+            <!-- Scrollable Body -->
+            <div style="padding: 24px 28px; overflow-y: auto; flex: 1;">
 
-            <div class="label-custom">Required Skills</div>
-            <div id="vj-skills" style="display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px;"></div>
+                <!-- Info Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px;">
+                    <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;">
+                        <div style="font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-location-dot" style="margin-right:5px;"></i>Location</div>
+                        <div style="font-size: 0.9rem; font-weight: 700; color: #fff;" id="vj-location">—</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;">
+                        <div style="font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-hourglass-half" style="margin-right:5px;"></i>Experience</div>
+                        <div style="font-size: 0.9rem; font-weight: 700; color: #fbbf24;" id="vj-exp">—</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;">
+                        <div style="font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-graduation-cap" style="margin-right:5px;"></i>Qualification</div>
+                        <div style="font-size: 0.9rem; font-weight: 700; color: #a5b4fc;" id="vj-qualification">—</div>
+                    </div>
+                    <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;">
+                        <div style="font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-money-bill-wave" style="margin-right:5px;"></i>Salary</div>
+                        <div style="font-size: 0.9rem; font-weight: 700; color: #10b981;" id="vj-salary">—</div>
+                    </div>
+                </div>
 
-            <div class="label-custom">Job Description</div>
-            <div id="vj-desc" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); border-radius: 12px; padding: 16px; font-size: 0.88rem; line-height: 1.6; color: rgba(255,255,255,0.85); white-space: pre-wrap; max-height: 260px; overflow-y: auto;"></div>
+                <!-- Required Skills -->
+                <div style="margin-bottom: 22px;">
+                    <div style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;">Required Skills</div>
+                    <div id="vj-skills" style="display: flex; flex-wrap: wrap; gap: 7px;"></div>
+                </div>
 
-            <div style="display: flex; justify-content: flex-end; margin-top: 24px;">
-                <button type="button" onclick="closeViewJobModal()" style="padding: 10px 24px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600;">Close</button>
+                <!-- Job Description (Markdown Rendered) -->
+                <div>
+                    <div style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;">Job Description</div>
+                    <div id="vj-desc" class="jd-markdown" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px 22px; line-height: 1.7;"></div>
+                </div>
             </div>
         </div>
     </div>

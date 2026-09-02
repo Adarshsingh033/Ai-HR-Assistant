@@ -13,9 +13,9 @@ from dotenv import load_dotenv
 _BACKEND_DIR = os.path.normpath(os.path.join(os.path.dirname(__file__), ".."))
 _ENV_FILE = os.path.join(_BACKEND_DIR, ".env")
 if os.path.exists(_ENV_FILE):
-    load_dotenv(_ENV_FILE)
+    load_dotenv(_ENV_FILE, override=True)
 else:
-    load_dotenv()
+    load_dotenv(override=True)
 
 # ── Database ─────────────────────────────────────────────────────────────────
 DB_NAME = os.getenv("DB_NAME", "hrms")
@@ -42,6 +42,7 @@ DEFAULT_ADMIN_PASSWORD = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin123")
 # ── AI / LLM ────────────────────────────────────────────────────────────────
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma2:9b")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
+GROQ_MODEL = os.getenv("GROQ_MODEL", "groq/compound-mini")
 
 # ── SMTP Email (Optional) ───────────────────────────────────────────────────
 SMTP_SERVER = os.getenv("SMTP_SERVER", "")

@@ -3,6 +3,7 @@
    ======================================================== */
 
 let currentOrgId = null;
+let currentBranchId = null;
 let allJobs = [];
 let branchesList = [];
 let jobSkillsTags = [];
@@ -19,13 +20,16 @@ async function initJobVacancyModule() {
 
     try {
         const profile = await apiRequest('GET', '/api/hr/profile');
-        if (profile && profile.org_id) {
-            currentOrgId = profile.org_id;
+        if (profile) {
+            currentOrgId = profile.org_id || session.org_id || '';
+            currentBranchId = profile.branch_id || session.branch_id || '';
         } else {
             currentOrgId = session.org_id || '';
+            currentBranchId = session.branch_id || '';
         }
     } catch (err) {
         currentOrgId = session.org_id || '';
+        currentBranchId = session.branch_id || '';
     }
 
     if (currentOrgId) {
@@ -74,7 +78,12 @@ async function loadJobVacancies() {
     const emptyState = document.getElementById('jobs-empty');
 
     try {
-        const data = await apiRequest('GET', `/api/jobs?organization_id=${currentOrgId}`);
+        let endpoint = `/api/jobs?organization_id=${currentOrgId}`;
+        if (currentBranchId) {
+            endpoint += `&branch_id=${currentBranchId}`;
+        }
+
+        const data = await apiRequest('GET', endpoint);
         if (data && data.jobs) {
             allJobs = data.jobs;
             onJobFilterChange();
@@ -87,21 +96,11 @@ async function loadJobVacancies() {
 
 /* Filter and Render Job Vacancies Grid */
 function onJobFilterChange() {
-    const searchVal = document.getElementById('job-search-input')?.value.toLowerCase().trim() || '';
-    const branchVal = document.getElementById('job-filter-branch')?.value || '';
     const statusVal = document.getElementById('job-filter-status')?.value || '';
 
     const filtered = allJobs.filter(job => {
-        const title = (job.job_title || job.title || '').toLowerCase();
-        const dept = (job.department || '').toLowerCase();
-        const loc = (job.location || '').toLowerCase();
-        const skills = (job.skills_required || []).join(' ').toLowerCase();
-
-        const matchesSearch = !searchVal || title.includes(searchVal) || dept.includes(searchVal) || loc.includes(searchVal) || skills.includes(searchVal);
-        const matchesBranch = !branchVal || job.branch_id === branchVal;
         const matchesStatus = !statusVal || (job.status || 'draft').toLowerCase() === statusVal;
-
-        return matchesSearch && matchesBranch && matchesStatus;
+        return matchesStatus;
     });
 
     renderJobsGrid(filtered);
@@ -123,90 +122,86 @@ function renderJobsGrid(jobs) {
     if (emptyState) emptyState.classList.add('hidden');
 
     grid.innerHTML = jobs.map(job => {
-        const status = (job.status || 'draft').toLowerCase();
-        const jobId = job.job_id || job.id;
-        const title = escapeHtml(job.job_title || job.title || 'Untitled Vacancy');
-        const dept = escapeHtml(job.department || 'General');
-        const branchName = escapeHtml(job.branch_name || 'Main Branch');
-        const workMode = escapeHtml(job.work_mode || 'On-site');
-        const empType = escapeHtml(job.employment_type || 'Full-time');
-        const location = escapeHtml(job.location || 'Location Not Specified');
-        const openings = job.openings || 1;
-        const exp = escapeHtml(job.experience_required || 'N/A');
-        const salary = escapeHtml(job.salary || 'Competitive');
+        const status      = (job.status || 'draft').toLowerCase();
+        const jobId       = job.job_id || job.id;
+        const title       = escapeHtml(job.job_title || job.title || 'Untitled Vacancy');
+        const dept        = escapeHtml(job.department || 'General');
+        const workMode    = escapeHtml(job.work_mode || 'On-site');
+        const empType     = escapeHtml(job.employment_type || 'Full-time');
+        const location    = escapeHtml(job.location || 'Not specified');
+        const openings    = job.openings || 1;
+        const exp         = escapeHtml(job.experience_required || 'Not specified');
         const createdDate = formatDate(job.created_at);
 
-        const skillsHtml = (job.skills_required || []).slice(0, 5).map(s => `<span class="skill-badge">${escapeHtml(s)}</span>`).join('');
-
-        let statusClass = 'draft';
-        let statusLabel = 'Draft';
-        if (status === 'active') {
-            statusClass = 'active';
-            statusLabel = 'Active';
-        } else if (status === 'closed') {
-            statusClass = 'closed';
-            statusLabel = 'Closed';
-        }
+        const statusMeta = {
+            active: { cls: 'active', label: 'Active',  icon: 'fa-circle-check',     next: 'closed' },
+            draft:  { cls: 'draft',  label: 'Draft',   icon: 'fa-circle-half-stroke', next: 'active' },
+            closed: { cls: 'closed', label: 'Closed',  icon: 'fa-circle-xmark',     next: 'draft' },
+        };
+        const sm = statusMeta[status] || statusMeta.draft;
+        const nextStatus = sm.next;
+        const nextLabel  = statusMeta[nextStatus]?.label || 'Draft';
 
         return `
-            <div class="vacancy-card">
-                <div>
-                    <!-- Top Status & Actions Header -->
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
-                        <span class="status-pill ${statusClass}">
-                            <i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> ${statusLabel}
-                        </span>
-                        
-                        <!-- Status Toggle Selector -->
-                        <select onchange="changeJobStatus('${jobId}', this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); font-size: 0.75rem; border-radius: 8px; padding: 3px 8px; cursor: pointer; outline: none;">
-                            <option value="draft" ${status === 'draft' ? 'selected' : ''}>Draft</option>
-                            <option value="active" ${status === 'active' ? 'selected' : ''}>Active</option>
-                            <option value="closed" ${status === 'closed' ? 'selected' : ''}>Closed</option>
-                        </select>
-                    </div>
+        <div class="vacancy-card" style="display:flex;flex-direction:column;justify-content:space-between;box-sizing:border-box;">
 
-                    <!-- Title & Department -->
-                    <h3 style="font-size: 1.15rem; font-weight: 800; color: #fff; margin-bottom: 4px; line-height: 1.3;">${title}</h3>
-                    <div style="font-size: 0.82rem; color: rgba(255,255,255,0.6); margin-bottom: 12px;">
-                        ${dept} • <span style="color: #818cf8; font-weight: 600;">${branchName}</span>
-                    </div>
-
-                    <!-- Work Mode & Employment Type Badges -->
-                    <div style="display: flex; gap: 8px; margin-bottom: 14px;">
-                        <span class="work-mode-pill">${workMode}</span>
-                        <span class="emp-type-pill">${empType}</span>
-                        <span style="font-size: 0.75rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25);">${openings} Opening${openings > 1 ? 's' : ''}</span>
-                    </div>
-
-                    <!-- Vacancy Details Row -->
-                    <div class="vacancy-meta-row">
-                        <div class="vacancy-meta-item"><i class="fa-solid fa-location-dot" style="color: rgba(255,255,255,0.4);"></i> ${location}</div>
-                        <div class="vacancy-meta-item"><i class="fa-solid fa-hourglass-half" style="color: rgba(255,255,255,0.4);"></i> ${exp}</div>
-                        <div class="vacancy-meta-item"><i class="fa-solid fa-money-bill-wave" style="color: rgba(255,255,255,0.4);"></i> ${salary}</div>
-                    </div>
-
-                    <!-- Skills Badges -->
-                    ${skillsHtml ? `<div class="vacancy-skills">${skillsHtml}</div>` : ''}
+            <!-- ── Top Row: Status pill + action icons ── -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;gap:8px;">
+                <span
+                    class="status-pill ${sm.cls} clickable"
+                    title="Click to change to ${nextLabel}"
+                    onclick="changeJobStatus('${jobId}', '${nextStatus}')"
+                >
+                    <i class="fa-solid ${sm.icon}" style="font-size:0.55rem;"></i>
+                    ${sm.label}
+                </span>
+                <div style="display:flex;gap:7px;">
+                    <button onclick="viewJobDetails('${jobId}')" title="View JD" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                        <i class="fa-solid fa-eye" style="font-size:0.8rem;"></i>
+                    </button>
+                    <button onclick="openEditJobModal('${jobId}')" title="Edit" style="background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.3);color:#818cf8;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.28)'" onmouseout="this.style.background='rgba(99,102,241,0.14)'">
+                        <i class="fa-solid fa-pen-to-square" style="font-size:0.8rem;"></i>
+                    </button>
+                    <button onclick="deleteJobVacancy('${jobId}')" title="Delete" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444;width:32px;height:32px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">
+                        <i class="fa-solid fa-trash-can" style="font-size:0.8rem;"></i>
+                    </button>
                 </div>
+            </div>
 
-                <!-- Footer Action Buttons -->
-                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--border);">
-                    <span style="font-size: 0.75rem; color: var(--text-muted);">${createdDate}</span>
-                    
-                    <div style="display: flex; gap: 8px;">
-                        <button onclick="viewJobDetails('${jobId}')" title="View Details" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: #fff; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-eye" style="font-size: 0.85rem;"></i>
-                        </button>
-                        <button onclick="openEditJobModal('${jobId}')" title="Edit Vacancy" style="background: rgba(99,102,241,0.15); border: 1px solid rgba(99,102,241,0.3); color: #818cf8; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-pen-to-square" style="font-size: 0.85rem;"></i>
-                        </button>
-                        <button onclick="deleteJobVacancy('${jobId}')" title="Delete Vacancy" style="background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.3); color: #ef4444; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;">
-                            <i class="fa-solid fa-trash-can" style="font-size: 0.85rem;"></i>
-                        </button>
+            <!-- ── Title & Department ── -->
+            <div style="margin-bottom:14px;">
+                <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin:0 0 4px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${title}">${title}</h3>
+                <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                    ${dept}
+                </div>
+            </div>
+
+            <!-- ── Type Badges ── -->
+            <div style="display:flex;flex-wrap:wrap;gap:7px;margin-bottom:16px;">
+                <span style="font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:7px;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);line-height:1.2;">${workMode}</span>
+                <span style="font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:7px;background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.25);line-height:1.2;">${empType}</span>
+                <span style="font-size:0.72rem;font-weight:700;padding:4px 10px;border-radius:7px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);line-height:1.2;">${openings} Opening${openings > 1 ? 's' : ''}</span>
+            </div>
+
+            <!-- ── Info Rows (Location & Experience only) ── -->
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:0;">
+                <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:8px 11px;overflow:hidden;">
+                    <i class="fa-solid fa-location-dot" style="color:#6366f1;font-size:0.78rem;flex-shrink:0;"></i>
+                    <div style="min-width:0;">
+                        <div style="font-size:0.62rem;color:rgba(255,255,255,0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Location</div>
+                        <div style="font-size:0.8rem;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${location}">${location}</div>
+                    </div>
+                </div>
+                <div style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:9px;padding:8px 11px;overflow:hidden;">
+                    <i class="fa-solid fa-hourglass-half" style="color:#fbbf24;font-size:0.78rem;flex-shrink:0;"></i>
+                    <div style="min-width:0;">
+                        <div style="font-size:0.62rem;color:rgba(255,255,255,0.4);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Experience</div>
+                        <div style="font-size:0.8rem;font-weight:700;color:#fbbf24;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${exp}">${exp}</div>
                     </div>
                 </div>
             </div>
-        `;
+
+        </div>`;
     }).join('');
 }
 
@@ -254,6 +249,7 @@ function openCreateJobModal() {
     document.getElementById('job-id-hidden').value = '';
     document.getElementById('job-modal-title').textContent = 'Create Job Vacancy';
     document.getElementById('job-form').reset();
+    document.getElementById('job-qualification').value = '';
     jobSkillsTags = [];
     renderSkillTags();
 
@@ -275,6 +271,7 @@ function openEditJobModal(jobId) {
     document.getElementById('job-location').value = job.location || '';
     document.getElementById('job-openings').value = job.openings || 1;
     document.getElementById('job-exp').value = job.experience_required || '';
+    document.getElementById('job-qualification').value = job.qualification || '';
     document.getElementById('job-salary').value = job.salary || '';
     document.getElementById('job-desc').value = job.job_description || job.description || '';
     document.getElementById('job-status').value = (job.status || 'draft').toLowerCase();
@@ -297,6 +294,8 @@ async function generateAIJobDescription() {
     const workMode = document.getElementById('job-work-mode')?.value || 'On-site';
     const location = document.getElementById('job-location')?.value.trim() || 'Office';
     const exp = document.getElementById('job-exp')?.value.trim() || 'Entry level';
+    const qualification = document.getElementById('job-qualification')?.value.trim() || 'Not specified';
+    const salary = document.getElementById('job-salary')?.value.trim() || 'Competitive';
 
     if (!title) {
         showToast('Please enter a Job Title before generating description.', 'warning');
@@ -316,6 +315,8 @@ async function generateAIJobDescription() {
             work_mode: workMode,
             location: location,
             experience_required: exp,
+            qualification: qualification,
+            salary: salary,
             skills_required: jobSkillsTags,
         };
 
@@ -366,6 +367,7 @@ async function handleSaveJob(e) {
     const rawOpenings = document.getElementById('job-openings')?.value;
     const openings = parseInt(rawOpenings || '1', 10);
     const exp = document.getElementById('job-exp')?.value.trim() || '';
+    const qualification = document.getElementById('job-qualification')?.value.trim() || '';
     const salary = document.getElementById('job-salary')?.value.trim() || '';
     const desc = document.getElementById('job-desc')?.value.trim();
     const status = document.getElementById('job-status')?.value || 'draft';
@@ -394,6 +396,7 @@ async function handleSaveJob(e) {
     try {
         const payload = {
             organization_id: currentOrgId,
+            branch_id: currentBranchId || null,
             job_title: title,
             department: dept,
             employment_type: empType,
@@ -401,6 +404,7 @@ async function handleSaveJob(e) {
             location: location,
             openings: openings,
             experience_required: exp,
+            qualification: qualification,
             salary: salary,
             skills_required: jobSkillsTags,
             job_description: desc,
@@ -452,38 +456,92 @@ async function deleteJobVacancy(jobId) {
 }
 
 /* View Details Modal */
+let _viewingJobId = null;
+
 function viewJobDetails(jobId) {
     const job = allJobs.find(j => (j.job_id || j.id) === jobId);
     if (!job) return;
+    _viewingJobId = jobId;
 
     const status = (job.status || 'draft').toLowerCase();
-    let statusClass = 'draft';
-    let statusLabel = 'Draft';
-    if (status === 'active') { statusClass = 'active'; statusLabel = 'Active'; }
-    else if (status === 'closed') { statusClass = 'closed'; statusLabel = 'Closed'; }
+    const statusMeta = {
+        active: { cls: 'active', label: 'Active',   icon: 'fa-circle-check' },
+        draft:  { cls: 'draft',  label: 'Draft',    icon: 'fa-circle-half-stroke' },
+        closed: { cls: 'closed', label: 'Closed',   icon: 'fa-circle-xmark' },
+    };
+    const sm = statusMeta[status] || statusMeta.draft;
+    const nextStatus = { active: 'closed', draft: 'active', closed: 'draft' }[status] || 'draft';
+    const nextLabel  = statusMeta[nextStatus]?.label || 'Draft';
 
+    // Status pill
     const statusEl = document.getElementById('vj-status');
     if (statusEl) {
-        statusEl.className = `status-pill ${statusClass}`;
-        statusEl.textContent = statusLabel;
+        statusEl.className = `status-pill ${sm.cls} clickable`;
+        statusEl.title = `Click to change to ${nextLabel}`;
+        statusEl.innerHTML = `<i class="fa-solid ${sm.icon}" style="font-size:0.55rem;"></i> ${sm.label}`;
     }
 
-    document.getElementById('vj-title').textContent = job.job_title || job.title || 'Job Title';
-    document.getElementById('vj-sub').textContent = `${job.department || 'General'} • ${job.branch_name || 'Main Branch'}`;
-    document.getElementById('vj-work-mode').textContent = job.work_mode || 'On-site';
-    document.getElementById('vj-emp-type').textContent = job.employment_type || 'Full-time';
-    document.getElementById('vj-openings').textContent = job.openings || 1;
-    document.getElementById('vj-salary').textContent = job.salary || 'Competitive';
-    document.getElementById('vj-desc').textContent = job.job_description || job.description || '';
+    // Badges
+    const openings = job.openings || 1;
+    document.getElementById('vj-work-mode-badge').textContent  = job.work_mode || 'On-site';
+    document.getElementById('vj-emp-badge').textContent        = job.employment_type || 'Full-time';
+    document.getElementById('vj-openings-badge').textContent   = `${openings} Opening${openings > 1 ? 's' : ''}`;
 
+    // Header
+    document.getElementById('vj-title').textContent = job.job_title || job.title || 'Job Title';
+    document.getElementById('vj-sub').textContent   = `${job.department || 'General'} • ${job.branch_name || 'Main Branch'}`;
+
+    // Info grid
+    document.getElementById('vj-location').textContent      = job.location || 'Not specified';
+    document.getElementById('vj-exp').textContent           = job.experience_required || 'Not specified';
+    document.getElementById('vj-qualification').textContent = job.qualification || 'Not specified';
+    const salaryRaw = job.salary;
+    document.getElementById('vj-salary').textContent =
+        salaryRaw ? `₹${Number(salaryRaw).toLocaleString('en-IN')}` : 'Competitive';
+
+    // Skills
     const skillsWrap = document.getElementById('vj-skills');
     if (skillsWrap) {
-        skillsWrap.innerHTML = (job.skills_required || []).map(s => `<span class="skill-badge">${escapeHtml(s)}</span>`).join('');
+        skillsWrap.innerHTML = (job.skills_required || []).length
+            ? (job.skills_required).map(s => `<span class="skill-badge">${escapeHtml(s)}</span>`).join('')
+            : '<span style="color:rgba(255,255,255,0.4);font-size:0.83rem;">No skills specified</span>';
+    }
+
+    // Job Description — render as Markdown
+    const descEl = document.getElementById('vj-desc');
+    if (descEl) {
+        const raw = job.job_description || job.description || '';
+        if (typeof marked !== 'undefined' && raw.trim()) {
+            marked.setOptions({ breaks: true, gfm: true });
+            descEl.innerHTML = marked.parse(raw);
+        } else {
+            descEl.textContent = raw || 'No description available.';
+        }
     }
 
     openModal('view-job-modal');
 }
 
+/* Cycle status from the view modal */
+async function cycleJobStatus() {
+    if (!_viewingJobId) return;
+    const job = allJobs.find(j => (j.job_id || j.id) === _viewingJobId);
+    if (!job) return;
+    const nextStatus = { active: 'closed', draft: 'active', closed: 'draft' }[(job.status || 'draft')] || 'draft';
+    await changeJobStatus(_viewingJobId, nextStatus);
+    // Re-open with updated data
+    viewJobDetails(_viewingJobId);
+}
+
+/* Close view modal when clicking the dark overlay (outside the card) */
+function handleViewModalOverlayClick(event) {
+    const card = document.getElementById('view-job-modal-card');
+    if (card && !card.contains(event.target)) {
+        closeViewJobModal();
+    }
+}
+
 function closeViewJobModal() {
     closeModal('view-job-modal');
+    _viewingJobId = null;
 }

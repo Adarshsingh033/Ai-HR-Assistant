@@ -17,8 +17,11 @@ def hr_dashboard(org_id: str):
     """Return dashboard statistics for an organization."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM jd_description WHERE org_id = %s", (org_id,))
+            cur.execute("SELECT COUNT(*) FROM job_vacancies WHERE organization_id = %s", (org_id,))
             total_jobs = cur.fetchone()[0]
+
+            cur.execute("SELECT COUNT(*) FROM job_vacancies WHERE organization_id = %s AND status = 'active'", (org_id,))
+            active_jobs = cur.fetchone()[0]
 
             cur.execute("SELECT COUNT(*) FROM candidates WHERE org_id = %s", (org_id,))
             total_candidates = cur.fetchone()[0]
@@ -31,8 +34,10 @@ def hr_dashboard(org_id: str):
     return {
         "company_name": company_name,
         "total_jobs": total_jobs,
+        "active_jobs": active_jobs,
         "total_candidates": total_candidates,
     }
+
 
 
 @router.get("/profile", response_model=HRProfileResponse)
