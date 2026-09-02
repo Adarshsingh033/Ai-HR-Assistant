@@ -55,7 +55,7 @@ def get_schema() -> str:
     inspector = inspect(engine)
     schema_lines = []
 
-    target_tables = ["candidates", "jd_description", "jd_details"]
+    target_tables = ["candidates", "job_vacancies"]
 
     for table in target_tables:
         if table not in inspector.get_table_names():
@@ -87,15 +87,11 @@ def get_schema() -> str:
 
     # Explicit relationship hints for the LLM
     schema_lines.append("\nRELATIONSHIPS:")
-    schema_lines.append("- candidates.job_id → jd_description.id")
-    schema_lines.append("- jd_details.description_id → jd_description.id")
+    schema_lines.append("- candidates.job_id → job_vacancies.id")
     schema_lines.append("")
     schema_lines.append("JOIN RULE:")
     schema_lines.append(
-        "- To join candidates with jd_details: candidates.job_id = jd_details.description_id"
-    )
-    schema_lines.append(
-        "- NEVER use candidates.job_id = jd_details.id (WRONG)"
+        "- To join candidates with job_vacancies: candidates.job_id = job_vacancies.id"
     )
 
     return "\n".join(schema_lines)
@@ -112,7 +108,7 @@ def get_cached_schema() -> str:
             _cached_schema = get_schema()
         except Exception as e:
             logger.warning("Could not introspect DB schema for chatbot yet: %s", e)
-            return "Tables: candidates, jd_description, jd_details"
+            return "Tables: candidates, job_vacancies"
     return _cached_schema
 
 

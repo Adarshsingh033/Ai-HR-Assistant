@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Profile - AI HR Assistant HR Portal</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <style>
+        .module-section {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* User Menu Popover Above Sidebar Chip */
+        .user-menu-popover {
+            position: absolute;
+            bottom: 75px;
+            left: 16px;
+            right: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 8px 0;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+            z-index: 200;
+            animation: popoverUp 0.2s ease forwards;
+        }
+
+        @keyframes popoverUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .popover-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .popover-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .popover-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
+        }
+
+        /* Profile Layout */
+        .profile-header-sub {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .profile-left-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 36px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+
+        .profile-avatar-large {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #3b82f6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: #ffffff;
+            margin-bottom: 16px;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.35);
+            overflow: hidden;
+        }
+
+        .profile-card-name {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .profile-card-email {
+            font-size: 0.83rem;
+            color: var(--text-muted);
+        }
+
+        .role-badge-pill {
+            display: inline-block;
+            padding: 4px 14px;
+            border-radius: 99px;
+            background: rgba(99, 102, 241, 0.15);
+            border: 1px solid rgba(99, 102, 241, 0.35);
+            color: #818cf8;
+            font-size: 0.75rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            margin-top: 16px;
+        }
+
+        .org-details-label {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            margin-top: 12px;
+        }
+
+        .profile-right-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 28px;
+        }
+
+        .section-subtitle {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+        }
+
+        .form-grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .form-grid-2 {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-group-custom {
+            margin-bottom: 18px;
+        }
+
+        .label-custom {
+            display: block;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .input-custom {
+            width: 100%;
+            height: 44px;
+            padding: 0 14px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: inherit;
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-custom:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-save-profile {
+            background: linear-gradient(90deg, #6366f1, #4f46e5);
+            color: #ffffff;
+            border: none;
+            padding: 11px 28px;
+            border-radius: 10px;
+            font-family: inherit;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+        }
+
+        .btn-save-profile:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-layout">
+
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+                <div>
+                    <div class="logo-text">AI HR Assistant</div>
+                    <div class="logo-sub">HR Portal</div>
+                </div>
+            </div>
+
+            <div class="nav-section-label">Main Menu</div>
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                Dashboard
+            </a>
+            <a href="jobs.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+                Job Vacancy
+            </a>
+
+            <!-- Sidebar Footer User Chip & Menu -->
+            <div class="sidebar-footer" style="position: relative;">
+                <!-- Popover Menu (Profile & Logout) -->
+                <div class="user-menu-popover hidden" id="user-menu-popover">
+                    <a href="profile.html" class="popover-item" style="color: #818cf8;">
+                        <i class="fa-solid fa-user"></i> Profile
+                    </a>
+                    <div class="popover-divider"></div>
+                    <a href="#" class="popover-item" onclick="logout()">
+                        <i class="fa-solid fa-right-from-bracket" style="color: #ef4444;"></i> Logout
+                    </a>
+                </div>
+
+                <!-- User Chip -->
+                <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">
+                    <div class="user-avatar" id="sidebar-avatar">H</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-name">HR User</div>
+                        <div class="user-role" id="sidebar-org">HR Manager</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Topbar -->
+            <header class="topbar">
+                <div class="topbar-title">Profile</div>
+            </header>
+
+            <div class="page-content">
+
+                <!-- PROFILE MODULE -->
+                <div id="section-profile" class="module-section">
+                    <p class="profile-header-sub">Manage your personal details and profile image.</p>
+
+                    <div class="profile-grid">
+                        <!-- Left Column: Avatar & Details -->
+                        <div class="profile-left-card">
+                            <div class="profile-avatar-large" id="profile-avatar-large">HU</div>
+                            <div class="profile-card-name" id="profile-card-name">HR User</div>
+                            <div class="profile-card-email" id="profile-card-email">hr@company.com</div>
+                            <div class="role-badge-pill">HR Manager</div>
+                            <div class="org-details-label" id="profile-card-org">Organization</div>
+                            <div class="org-details-label" id="profile-card-branch" style="font-size: 0.75rem; opacity: 0.8;"></div>
+                        </div>
+
+                        <!-- Right Column: Personal Details Form -->
+                        <div class="profile-right-card">
+                            <div class="section-subtitle">Personal Details</div>
+
+                            <form id="profile-form" onsubmit="handleSaveProfile(event)">
+
+                                <!-- Circular Image Uploader -->
+                                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 28px;">
+                                    <div class="avatar-upload-circle"
+                                        onclick="document.getElementById('profile-upload-file').click()"
+                                        title="Click circle to upload profile picture"
+                                        style="width: 90px; height: 90px; border-radius: 50%; background: #15112e; border: 2px dashed rgba(99, 102, 241, 0.5); position: relative; cursor: pointer; flex-shrink: 0; transition: all 0.2s ease;">
+                                        <div id="profile-circle-preview"
+                                            style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; color: #fff; background: linear-gradient(135deg, #6366f1, #3b82f6); overflow: hidden;">
+                                            HU
+                                        </div>
+                                        <div
+                                            style="position: absolute; bottom: 0; right: 0; width: 26px; height: 26px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 2px solid #0f172a;">
+                                            <i class="fa-solid fa-camera"></i>
+                                        </div>
+                                    </div>
+                                    <input type="file" id="profile-upload-file" accept="image/*" class="hidden" style="display: none;"
+                                        onchange="onProfileImageFileChange(event)" />
+                                    <span style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.55); margin-top: 10px; font-weight: 500;">Click circle to upload photo (Max 2MB)</span>
+                                </div>
+
+                                <div class="form-grid-2">
+                                    <div class="form-group-custom">
+                                        <label class="label-custom">Full Name <span style="color:#ef4444;">*</span></label>
+                                        <input type="text" id="profile-full-name" class="input-custom" placeholder="e.g. Jane Doe" required />
+                                    </div>
+                                    <div class="form-group-custom">
+                                        <label class="label-custom">Username <span style="color:#ef4444;">*</span></label>
+                                        <input type="text" id="profile-username" class="input-custom" placeholder="e.g. jane_hr" required />
+                                    </div>
+                                </div>
+
+                                <div class="form-grid-2">
+                                    <div class="form-group-custom">
+                                        <label class="label-custom">Email Address <span style="color:#ef4444;">*</span></label>
+                                        <input type="email" id="profile-email" class="input-custom" placeholder="hr@company.com" required />
+                                    </div>
+                                    <div class="form-group-custom">
+                                        <label class="label-custom">Phone Number</label>
+                                        <input type="text" id="profile-phone" class="input-custom" placeholder="+1 (555) 000-0000" />
+                                    </div>
+                                </div>
+
+                                <div style="display: flex; justify-content: flex-end; margin-top: 16px;">
+                                    <button type="submit" class="btn-save-profile" id="save-profile-btn">Save Changes</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- Logout Confirmation Modal -->
+    <div class="modal-overlay" id="logout-confirm-modal">
+        <div class="modal-card" style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Confirm Logout</h3>
+            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px; line-height: 1.5;">Are you sure you want to log out of AI HR Assistant?</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" onclick="closeLogoutModal()" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
+                <button type="button" onclick="confirmLogoutAction()" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="../js/utils.js"></script>
+    <script src="../js/hr_common.js"></script>
+    <script src="../js/hr_profile.js"></script>
+</body>
+
+</html>

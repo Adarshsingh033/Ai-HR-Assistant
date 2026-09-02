@@ -32,17 +32,19 @@ async def upload_resume(
         with get_db_connection() as conn:
             with conn.cursor() as cur:
                 cur.execute(
-                    "SELECT experience, skills FROM jd_details WHERE description_id = %s",
+                    "SELECT experience_required, skills_required, job_description FROM job_vacancies WHERE id = %s",
                     (job_id,)
                 )
                 row = cur.fetchone()
                 if row:
-                    experience = row[0]
-                    skills = row[1]
+                    experience = row[0] or ""
+                    skills = row[1] or ""
+                    desc = row[2] or ""
                     jd_text = f"""
                     Job Requirements:
                     Experience Required: {experience}
                     Required Skills: {skills}
+                    Description: {desc}
                     """
 
         # Calculate match percentage

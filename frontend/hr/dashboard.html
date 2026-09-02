@@ -6,13 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>HR Dashboard - AI HR Assistant</title>
     <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
         .welcome-banner {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(79, 70, 229, 0.2) 100%);
-            border: 1px solid var(--border-active);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.25) 100%);
+            border: 1px solid rgba(99, 102, 241, 0.3);
             border-radius: var(--radius-lg);
             padding: 32px;
-            margin-bottom: 24px;
+            margin-bottom: 28px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -21,7 +22,7 @@
         .welcome-text h2 {
             font-size: 1.8rem;
             margin-bottom: 8px;
-            background: linear-gradient(135deg, #fff 0%, var(--accent-light) 100%);
+            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             background-clip: text;
@@ -32,10 +33,54 @@
             font-size: 1rem;
         }
 
-        .dashboard-action-btn {
-            padding: 16px 32px;
-            font-size: 1.1rem;
-            border-radius: var(--radius-md);
+        /* User Menu Popover Above Sidebar Chip */
+        .user-menu-popover {
+            position: absolute;
+            bottom: 75px;
+            left: 16px;
+            right: 16px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 8px 0;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
+            z-index: 200;
+            animation: popoverUp 0.2s ease forwards;
+        }
+
+        @keyframes popoverUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .popover-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 16px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        .popover-item:hover {
+            background: rgba(255, 255, 255, 0.07);
+        }
+
+        .popover-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 4px 0;
         }
 
         .recent-activity-item {
@@ -95,28 +140,33 @@
 
             <div class="nav-section-label">Main Menu</div>
             <a href="dashboard.html" class="nav-item active">
-                <span class="nav-icon"><i class="fa-solid fa-chart-simple"></i></span>
+                <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
                 Dashboard
             </a>
             <a href="jobs.html" class="nav-item">
                 <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
                 Job Vacancy
             </a>
-            <a href="all_candidates.html" class="nav-item" id="nav-candidates">
-                <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
-                Candidates
-            </a>
-            <a href="emails.html" class="nav-item" id="nav-emails">
-                <span class="nav-icon"><i class="fa-solid fa-envelope"></i></span>
-                Mailing
-            </a>
 
-            <div class="sidebar-footer">
-                <div class="user-chip" onclick="logout()">
+            <!-- Sidebar Footer User Chip & Menu -->
+            <div class="sidebar-footer" style="position: relative;">
+                <!-- Popover Menu (Profile & Logout) -->
+                <div class="user-menu-popover hidden" id="user-menu-popover">
+                    <a href="profile.html" class="popover-item" style="color: #818cf8;">
+                        <i class="fa-solid fa-user"></i> Profile
+                    </a>
+                    <div class="popover-divider"></div>
+                    <a href="#" class="popover-item" onclick="logout()">
+                        <i class="fa-solid fa-right-from-bracket" style="color: #ef4444;"></i> Logout
+                    </a>
+                </div>
+
+                <!-- User Chip -->
+                <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">
                     <div class="user-avatar" id="sidebar-avatar">H</div>
                     <div class="user-info">
                         <div class="user-name" id="sidebar-name">HR User</div>
-                        <div class="user-role" id="sidebar-org">Organization</div>
+                        <div class="user-role" id="sidebar-org">HR Manager</div>
                     </div>
                 </div>
             </div>
@@ -125,11 +175,7 @@
         <!-- Main Content -->
         <main class="main-content">
             <header class="topbar">
-                <div class="topbar-title">Overview</div>
-                <button class="theme-toggle-btn" onclick="toggleTheme()" title="Toggle dark/light mode">
-                    <span class="toggle-icon">🌙</span>
-                    <span class="toggle-label">Dark</span>
-                </button>
+                <div class="topbar-title">Dashboard</div>
             </header>
 
             <div class="page-content">
@@ -137,43 +183,48 @@
                 <div class="welcome-banner">
                     <div class="welcome-text">
                         <h2>Welcome back, <span id="welcome-name">HR</span>!</h2>
-                        <p>Manage your job postings and review candidate resumes seamlessly.</p>
+                        <p>Access your organization workspace and profile settings seamlessly.</p>
                     </div>
-                </div>
-
-                <!-- Stats -->
-                <div class="grid-3 mb-4">
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(59,130,246,0.15); color: var(--info);"><i
-                                class="fa-solid fa-briefcase"></i></div>
-                        <div class="stat-value" id="stat-jobs">0</div>
-                        <div class="stat-label">Active Job Postings</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(16,185,129,0.15); color: var(--success);"><i
-                                class="fa-solid fa-users"></i>
-                        </div>
-                        <div class="stat-value" id="stat-candidates">0</div>
-                        <div class="stat-label">Total Candidates</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon" style="background: rgba(245,158,11,0.15); color: var(--warning);"><i
-                                class="fa-solid fa-star"></i></div>
-                        <div class="stat-value" id="stat-shortlisted">0</div>
-                        <div class="stat-label">Shortlisted Profiles</div>
-                    </div>
+                    <a href="profile.html" class="btn-save-profile" style="padding: 12px 24px; text-decoration: none; display: flex; align-items: center; gap: 8px; background: linear-gradient(90deg, #6366f1, #4f46e5); color: #fff; border-radius: 10px; font-weight: 700;">
+                        <i class="fa-solid fa-user"></i> View Profile
+                    </a>
                 </div>
 
                 <div class="grid-2">
-                    <!-- Recent Activity Mock -->
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="card-title">Recent Activity</div>
+                    <!-- Account & Organization Summary -->
+                    <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
+                        <div class="card-header" style="margin-bottom: 20px;">
+                            <div class="card-title" style="font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-building" style="color: #818cf8;"></i> Account & Portal Details
+                            </div>
                         </div>
-                        <div class="empty-state hidden" id="activity-empty">
-                            <div class="empty-icon"><i class="fa-solid fa-file-pen"></i></div>
-                            <div class="empty-desc">No recent activity found.</div>
+
+                        <div style="display: flex; flex-direction: column; gap: 16px;">
+                            <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                                <span style="color: var(--text-muted); font-size: 0.88rem;">Role</span>
+                                <span style="color: #818cf8; font-weight: 700; font-size: 0.88rem; text-transform: uppercase;">HR Manager</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                                <span style="color: var(--text-muted); font-size: 0.88rem;">Organization</span>
+                                <span style="color: #fff; font-weight: 600; font-size: 0.88rem;" id="dash-org-name">Your Company</span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between;">
+                                <span style="color: var(--text-muted); font-size: 0.88rem;">System Status</span>
+                                <span style="color: #10b981; font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
+                                    <i class="fa-solid fa-circle" style="font-size: 0.5rem;"></i> Active Session
+                                </span>
+                            </div>
                         </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <div class="card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 24px;">
+                        <div class="card-header" style="margin-bottom: 20px;">
+                            <div class="card-title" style="font-size: 1.1rem; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px;">
+                                <i class="fa-solid fa-clock-rotate-left" style="color: #38bdf8;"></i> Recent Activity
+                            </div>
+                        </div>
+
                         <div id="activity-list">
                             <div class="recent-activity-item">
                                 <div class="activity-icon"><i class="fa-solid fa-rocket"></i></div>
@@ -183,39 +234,13 @@
                                 </div>
                             </div>
                             <div class="recent-activity-item">
-                                <div class="activity-icon"><i class="fa-solid fa-building"></i></div>
+                                <div class="activity-icon"><i class="fa-solid fa-user-check"></i></div>
                                 <div class="activity-content">
-                                    <div class="activity-title">Organization Account Setup Complete</div>
+                                    <div class="activity-title">Profile Authentication Active</div>
                                     <div class="activity-time">Today</div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-
-                    <!-- Quick Tips -->
-                    <div class="card"
-                        style="background: linear-gradient(180deg, var(--bg-card) 0%, rgba(99,102,241,0.03) 100%);">
-                        <div class="card-header">
-                            <div class="card-title"><i class="fa-solid fa-lightbulb"></i> Quick Tips</div>
-                        </div>
-                        <ul
-                            style="list-style-type: none; padding: 0; display: flex; flex-direction: column; gap: 16px; color: var(--text-secondary); font-size: 0.95rem;">
-                            <li style="display: flex; gap: 12px;">
-                                <span><i class="fa-solid fa-wand-magic-sparkles"></i></span>
-                                <span>Use the <strong>AI JD Generator</strong> in the Job Vacancies tab to instantly
-                                    create professional job descriptions based on a few keywords.</span>
-                            </li>
-                            <li style="display: flex; gap: 12px;">
-                                <span><i class="fa-solid fa-file-lines"></i></span>
-                                <span>You can upload multiple resumes at once when adding candidates to a job
-                                    posting.</span>
-                            </li>
-                            <li style="display: flex; gap: 12px;">
-                                <span><i class="fa-solid fa-robot"></i></span>
-                                <span>The AI engine automatically extracts Name, Emails, Phone, Skills and Experience
-                                    from uploaded PDFs!</span>
-                            </li>
-                        </ul>
                     </div>
                 </div>
 
@@ -223,13 +248,27 @@
         </main>
     </div>
 
-    <!-- Toast -->
+    <!-- Logout Confirmation Modal -->
+    <div class="modal-overlay" id="logout-confirm-modal">
+        <div class="modal-card" style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Confirm Logout</h3>
+            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px; line-height: 1.5;">Are you sure you want to log out of AI HR Assistant?</p>
+            <div style="display: flex; gap: 12px; justify-content: center;">
+                <button type="button" onclick="closeLogoutModal()" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
+                <button type="button" onclick="confirmLogoutAction()" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
 
     <script src="../js/utils.js"></script>
+    <script src="../js/hr_common.js"></script>
     <script src="../js/hr_dashboard.js"></script>
-    <script>document.addEventListener('DOMContentLoaded', initTheme);</script>
-    <script src="../js/chatbot.js"></script>
 </body>
 
 </html>

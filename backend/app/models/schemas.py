@@ -78,6 +78,30 @@ class UpdateAdminProfileRequest(BaseModel):
     profile_image: Optional[str] = None
 
 
+class HRProfileResponse(BaseModel):
+    user_id: str
+    username: str
+    email: str
+    full_name: str
+    phone: Optional[str] = None
+    profile_image: Optional[str] = None
+    role: str = "hr"
+    org_id: Optional[str] = None
+    organization_name: Optional[str] = None
+    branch_id: Optional[str] = None
+    branch_name: Optional[str] = None
+    created_at: Optional[str] = None
+
+
+class UpdateHRProfileRequest(BaseModel):
+    full_name: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    profile_image: Optional[str] = None
+
+
+
 # ── Organization ─────────────────────────────────────────────────────────────
 class IndustryEnum(str, Enum):
     information_technology = "information_technology"
@@ -223,38 +247,72 @@ class HRResponse(BaseModel):
 
 # ── Job Vacancy ───────────────────────────────────────────────────────────────
 class CreateJobRequest(BaseModel):
-    title: str
-    department: str
-    location: str
-    job_type: str          # Full-time / Part-time / Contract
-    experience_required: str
-    skills_required: List[str]
-    description: str
-    org_id: str
-    hr_id: str
+    organization_id: Optional[str] = None
+    org_id: Optional[str] = None
+    branch_id: Optional[str] = None
+    created_by_hr_id: Optional[str] = None
+    hr_id: Optional[str] = None
+
+    job_title: str
+    department: Optional[str] = None
+    employment_type: str = "Full-time"
+    work_mode: str = "On-site"
+    location: Optional[str] = None
+    openings: int = 1
+    experience_required: Optional[str] = None
+    salary: Optional[str] = None
+    skills_required: Optional[List[str]] = []
+    job_description: str
+    status: Optional[str] = "draft"
+
+
+class UpdateJobRequest(BaseModel):
+    branch_id: Optional[str] = None
+    job_title: Optional[str] = None
+    department: Optional[str] = None
+    employment_type: Optional[str] = None
+    work_mode: Optional[str] = None
+    location: Optional[str] = None
+    openings: Optional[int] = None
+    experience_required: Optional[str] = None
+    salary: Optional[str] = None
+    skills_required: Optional[List[str]] = None
+    job_description: Optional[str] = None
+    status: Optional[str] = None
 
 
 class JobResponse(BaseModel):
     job_id: str
-    title: str
-    department: str
-    location: str
-    job_type: str
-    experience_required: str
-    skills_required: List[str]
-    description: str
-    org_id: str
-    hr_id: Optional[str] = None
+    organization_id: str
+    branch_id: Optional[str] = None
+    branch_name: Optional[str] = None
+    created_by_hr_id: Optional[str] = None
+
+    job_title: str
+    department: Optional[str] = None
+    employment_type: str
+    work_mode: str
+    location: Optional[str] = None
+    openings: int = 1
+    experience_required: Optional[str] = None
+    salary: Optional[str] = None
+    skills_required: List[str] = []
+    job_description: str
+    status: str = "draft"
+    closed_at: Optional[str] = None
     created_at: str
+    updated_at: Optional[str] = None
 
 
 class GenerateJDRequest(BaseModel):
-    title: str
-    department: str
-    location: str
-    job_type: str
-    experience_required: str
-    skills_required: List[str]
+    job_title: str
+    department: Optional[str] = None
+    employment_type: Optional[str] = "Full-time"
+    work_mode: Optional[str] = "On-site"
+    location: Optional[str] = None
+    experience_required: Optional[str] = None
+    skills_required: Optional[List[str]] = []
+
 
 
 # ── Candidate ─────────────────────────────────────────────────────────────────
