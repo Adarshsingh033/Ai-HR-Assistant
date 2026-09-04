@@ -167,6 +167,44 @@
         .match-medium { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
         .match-low    { background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.3);  }
 
+        /* ── Rank Badge ── */
+        .rank-badge {
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 32px; height: 32px; border-radius: 50%;
+            font-size: 0.82rem; font-weight: 900; color: #fff;
+            background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(79,70,229,0.35));
+            border: 1px solid rgba(99,102,241,0.4);
+        }
+        .rank-badge.top-1 {
+            background: linear-gradient(135deg, #f59e0b, #d97706);
+            border-color: #fbbf24; color: #fff; box-shadow: 0 0 10px rgba(245,158,11,0.4);
+        }
+        .rank-badge.top-2 {
+            background: linear-gradient(135deg, #94a3b8, #64748b);
+            border-color: #cbd5e1; color: #fff;
+        }
+        .rank-badge.top-3 {
+            background: linear-gradient(135deg, #b45309, #78350f);
+            border-color: #f59e0b; color: #fff;
+        }
+
+        /* ── Toggle Switch for Contacted ── */
+        .toggle-switch {
+            position: relative; display: inline-block; width: 42px; height: 23px; vertical-align: middle;
+        }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(255,255,255,0.12); transition: .25s; border-radius: 24px;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .toggle-slider:before {
+            position: absolute; content: ""; height: 17px; width: 17px; left: 2px; bottom: 2px;
+            background-color: #cbd5e1; transition: .25s; border-radius: 50%;
+        }
+        input:checked + .toggle-slider { background-color: #10b981; border-color: #34d399; }
+        input:checked + .toggle-slider:before { transform: translateX(19px); background-color: #fff; }
+
         /* ── Action Three-Dot Dropdown ── */
         .action-dots-btn {
             width: 32px; height: 32px; border-radius: 8px;
@@ -372,6 +410,10 @@
             <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
             Candidates
         </a>
+        <a href="screening.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-clipboard-check"></i></span>
+            Screening
+        </a>
 
         <!-- Sidebar Footer -->
         <div class="sidebar-footer" style="position:relative;">
@@ -447,12 +489,17 @@
                 <select class="filter-select" id="filter-job" onchange="applyFilters()">
                     <option value="">All Job Vacancies</option>
                 </select>
+                <select class="filter-select" id="filter-contacted" onchange="applyFilters()" style="width:170px;">
+                    <option value="">All Contact Status</option>
+                    <option value="true">Contacted</option>
+                    <option value="false">Not Contacted</option>
+                </select>
                 <div class="search-wrap" style="flex:1;">
                     <i class="fa-solid fa-location-dot"></i>
                     <input class="filter-input" id="filter-location"
                            placeholder="Filter by location…" oninput="applyFilters()" />
                 </div>
-                <div class="search-wrap" style="flex:1.5;">
+                <div class="search-wrap" style="flex:1.4;">
                     <i class="fa-solid fa-magnifying-glass"></i>
                     <input class="filter-input" id="filter-search"
                            placeholder="Search by name or email…" oninput="applyFilters()" />
@@ -485,13 +532,13 @@
                     <table class="candidates-table" id="candidates-table">
                         <thead>
                             <tr>
+                                <th style="width:65px;text-align:center;">Rank</th>
                                 <th>Name</th>
                                 <th>Email</th>
                                 <th>Phone Number</th>
-                                <th>Location</th>
-                                <th>Experience</th>
-                                <th>Added On</th>
-                                <th style="text-align:right;">Action</th>
+                                <th style="width:115px;">Match Score</th>
+                                <th style="width:100px;text-align:center;">Contacted</th>
+                                <th style="text-align:right;width:80px;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="candidates-tbody"></tbody>
@@ -531,6 +578,14 @@
                 <div class="val" id="vm-phone">—</div>
             </div>
             <div class="info-item">
+                <div class="lbl"><i class="fa-solid fa-briefcase" style="margin-right:4px;"></i>Applied Vacancy</div>
+                <div class="val" id="vm-job">—</div>
+            </div>
+            <div class="info-item">
+                <div class="lbl"><i class="fa-solid fa-bullseye" style="margin-right:4px;"></i>Match Score</div>
+                <div class="val" id="vm-score">—</div>
+            </div>
+            <div class="info-item">
                 <div class="lbl"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i>Location</div>
                 <div class="val" id="vm-address">—</div>
             </div>
@@ -559,11 +614,14 @@
         <div class="sec-label">Skills</div>
         <div class="skills-wrap" id="vm-skills"></div>
 
-        <div class="sec-label">AI Match Analysis</div>
+        <div class="sec-label">AI Match Analysis & Reason</div>
         <div class="match-explain" id="vm-match-explain">—</div>
 
-        <div class="sec-label">Resume Text Preview</div>
-        <div class="resume-preview" id="vm-resume-text">No resume text available.</div>
+        <div class="sec-label">Original Uploaded Resume Preview</div>
+        <div id="vm-preview-wrap" style="margin-top:8px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;background:#0f172a;">
+            <iframe id="vm-preview-frame" style="width:100%;height:380px;border:none;display:none;background:#fff;"></iframe>
+            <div class="resume-preview" id="vm-resume-text" style="display:none;">No resume text available.</div>
+        </div>
 
         <div style="margin-top:22px;display:flex;justify-content:flex-end;gap:10px;">
             <a id="vm-download-link" href="#" download

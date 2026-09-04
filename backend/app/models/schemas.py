@@ -406,3 +406,27 @@ class SentEmailResponse(BaseModel):
     subject: str
     body: str
     sent_at: str
+
+
+# ── Screening Module ─────────────────────────────────────────────────────────
+class CreateScreeningRoundRequest(BaseModel):
+    job_id: str
+    org_id: str
+    round_title: str
+    round_description: Optional[str] = ""
+
+
+class UpdateScreeningRoundRequest(BaseModel):
+    round_title: Optional[str] = None
+    round_description: Optional[str] = None
+
+
+class UpdateInterviewScheduleRequest(BaseModel):
+    interview_schedule: str  # "Pending" or "Active"
+
+
+class AddScreeningCommentRequest(BaseModel):
+    round_id: str
+    status: Optional[str] = "Pending"  # "Pending", "In Progress", "Passed", "Failed"
+    comment: Optional[str] = ""
+

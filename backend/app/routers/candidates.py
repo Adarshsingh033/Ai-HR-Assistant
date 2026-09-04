@@ -7,10 +7,12 @@ Router: Candidates
   DELETE /api/candidates/{id}   — Delete candidate
 """
 
+import os
 import uuid
 from datetime import datetime, timezone
+from typing import Optional
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse, Response
 from app.database import get_db_connection
 from app.services.resume_parser import parse_resume, ResumeRejected
 from app.services.embedding_service import get_embedding
@@ -22,6 +24,11 @@ logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/candidates", tags=["candidates"])
 
+UPLOAD_DIR = os.path.normpath(
+    os.path.join(os.path.dirname(__file__), "..", "..", "uploads", "resumes")
+)
+os.makedirs(UPLOAD_DIR, exist_ok=True)
+
 
 @router.post("/upload")
 async def upload_resume(
@@ -32,10 +39,6 @@ async def upload_resume(
 ):
     """
     Upload and process a candidate resume.
-
-    Returns HTTP 422 with { rejected: true, reason: str } when the file
-    fails any validation stage (extension / length / not-a-resume).
-    Returns HTTP 200 with full candidate data on success.
     """
     try:
         content = await file.read()
@@ -71,6 +74,14 @@ async def upload_resume(
         candidate_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc).isoformat()
         embedding = get_embedding(parsed.get("raw_text", ""))
+
+        # Save physical resume file
+        file_path = os.path.join(UPLOAD_DIR, f"{candidate_id}_{file.filename}")
+        try:
+            with open(file_path, "wb") as f:
+                f.write(content)
+        except Exception as e_file:
+            logger.warning("Failed to save physical resume file for candidate %s: %s", candidate_id, e_file)
 
         # ── Store in DB ─────────────────────────────────────────
         resume_text = parsed.get("resume_text", "")
@@ -154,15 +165,16 @@ async def upload_resume(
 
 @router.get("")
 def list_candidates(
-    job_id: str = None,
-    org_id: str = None,
-    hr_id: str = None,
-    location: str = None,
-    search: str = None,
+    job_id: Optional[str] = None,
+    org_id: Optional[str] = None,
+    hr_id: Optional[str] = None,
+    location: Optional[str] = None,
+    search: Optional[str] = None,
+    contacted: Optional[bool] = None,
     sort_by_match: bool = False,
     top_10: bool = False,
 ):
-    """List candidates with optional filters and sorting."""
+    """List candidates with optional filters and ranking order."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             query = (
@@ -192,16 +204,18 @@ def list_candidates(
                     "(LOWER(name) LIKE LOWER(%s) OR LOWER(email) LIKE LOWER(%s))"
                 )
                 params.extend([f"%{search}%", f"%{search}%"])
+            if contacted is not None:
+                where_clauses.append("reached = %s")
+                params.append(contacted)
 
             if where_clauses:
                 query += " WHERE " + " AND ".join(where_clauses)
 
             if top_10:
-                query += " ORDER BY match_percentage DESC LIMIT 10"
-            elif sort_by_match:
-                query += " ORDER BY match_percentage DESC"
+                query += " ORDER BY match_percentage DESC, created_at ASC LIMIT 10"
             else:
-                query += " ORDER BY created_at DESC"
+                # Default ranking: Match Score DESC, then upload time ASC (earliest uploaded gets higher rank)
+                query += " ORDER BY match_percentage DESC, created_at ASC"
 
             cur.execute(query, tuple(params))
             rows = cur.fetchall()
@@ -228,9 +242,116 @@ def get_candidate(candidate_id: str):
     return _row_to_dict(row)
 
 
+@router.get("/{candidate_id}/download")
+def download_candidate_resume(candidate_id: str):
+    """Download original candidate resume file."""
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT filename, resume_text FROM candidates WHERE id = %s", (candidate_id,))
+            row = cur.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+
+    filename = row[0] or "resume.pdf"
+    resume_text = row[1] or ""
+    file_path = os.path.join(UPLOAD_DIR, f"{candidate_id}_{filename}")
+
+    if os.path.exists(file_path):
+        return FileResponse(path=file_path, filename=filename, media_type="application/octet-stream")
+
+    txt_filename = filename if filename.endswith('.txt') else f"{filename}.txt"
+    return Response(
+        content=resume_text.encode("utf-8"),
+        media_type="text/plain",
+        headers={"Content-Disposition": f'attachment; filename="{txt_filename}"'}
+    )
+
+
+@router.get("/{candidate_id}/preview")
+def preview_candidate_resume(candidate_id: str):
+    """Preview candidate resume file or text."""
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT filename, resume_text FROM candidates WHERE id = %s", (candidate_id,))
+            row = cur.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Candidate not found")
+
+    filename = row[0] or "resume.pdf"
+    resume_text = row[1] or ""
+    file_path = os.path.join(UPLOAD_DIR, f"{candidate_id}_{filename}")
+
+    if os.path.exists(file_path):
+        ext = filename.lower().split('.')[-1]
+        media_type = "application/pdf" if ext == "pdf" else "text/plain"
+        return FileResponse(path=file_path, media_type=media_type)
+
+    return Response(content=resume_text.encode("utf-8"), media_type="text/plain")
+
+
 @router.put("/{candidate_id}")
 def update_candidate(candidate_id: str, req: UpdateCandidateRequest):
-    """Update candidate profile data."""
+    """Update candidate profile data with smart JD re-matching if criteria fields changed."""
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT address, total_experience, qualification, skills, job_id, name, email, phone, gender, education "
+                "FROM candidates WHERE id = %s",
+                (candidate_id,)
+            )
+            old_row = cur.fetchone()
+            if not old_row:
+                raise HTTPException(status_code=404, detail="Candidate not found")
+
+            old_address, old_exp, old_qual, old_skills, job_id, old_name, old_email, old_phone, old_gender, old_edu = old_row
+
+            addr_changed = req.address is not None and req.address.strip() != (old_address or "").strip()
+            exp_changed  = req.total_experience is not None and str(req.total_experience).strip() != str(old_exp or "").strip()
+            qual_changed = req.qualification is not None and req.qualification.strip() != (old_qual or "").strip()
+
+            def _norm_skills(s):
+                if isinstance(s, list): return sorted([x.strip().lower() for x in s if x.strip()])
+                return sorted([x.strip().lower() for x in (s or "").split(",") if x.strip()])
+
+            skills_changed = req.skills is not None and _norm_skills(req.skills) != _norm_skills(old_skills)
+
+            re_matched = False
+            new_match_pct = None
+            new_match_exp = None
+
+            if (addr_changed or exp_changed or qual_changed or skills_changed) and job_id:
+                cur.execute(
+                    "SELECT experience_required, qualification, skills_required, job_description "
+                    "FROM job_vacancies WHERE id = %s",
+                    (job_id,)
+                )
+                jd_row = cur.fetchone()
+                if jd_row:
+                    jd_text = (
+                        f"Experience Required: {jd_row[0] or ''}\n"
+                        f"Qualification: {jd_row[1] or ''}\n"
+                        f"Skills Required: {jd_row[2] or ''}\n"
+                        f"Description: {jd_row[3] or ''}"
+                    )
+                    cand_payload = {
+                        "candidate_name": req.name if req.name is not None else (old_name or ""),
+                        "contact_number": req.phone if req.phone is not None else (old_phone or ""),
+                        "email_address": req.email if req.email is not None else (old_email or ""),
+                        "total_experience": req.total_experience if req.total_experience is not None else (old_exp or "0"),
+                        "skills": req.skills if req.skills is not None else (old_skills or ""),
+                        "education": req.education if req.education is not None else (old_edu or ""),
+                        "qualification": req.qualification if req.qualification is not None else (old_qual or ""),
+                        "gender": req.gender if req.gender is not None else (old_gender or ""),
+                        "address": req.address if req.address is not None else (old_address or ""),
+                    }
+                    try:
+                        match_res = match_candidate_with_jd(cand_payload, jd_text)
+                        new_match_pct = match_res.get("match_percentage", 0)
+                        new_match_exp = match_res.get("match_explanation", "")
+                        re_matched = True
+                    except Exception as err:
+                        logger.warning("Re-matching failed on edit for candidate %s: %s", candidate_id, err)
+
     fields = {
         "name": req.name,
         "email": req.email,
@@ -246,9 +367,13 @@ def update_candidate(candidate_id: str, req: UpdateCandidateRequest):
         "reached": req.reached,
         "remark": req.remark,
     }
+    if re_matched:
+        fields["match_percentage"] = new_match_pct
+        fields["match_explanation"] = new_match_exp
+
     updates = [(col, val) for col, val in fields.items() if val is not None]
     if not updates:
-        return {"message": "No updates provided"}
+        return {"message": "No updates provided", "re_matched": False}
 
     sql = "UPDATE candidates SET " + ", ".join(f"{col} = %s" for col, _ in updates)
     sql += " WHERE id = %s"
@@ -259,8 +384,13 @@ def update_candidate(candidate_id: str, req: UpdateCandidateRequest):
             cur.execute(sql, tuple(params))
             conn.commit()
 
-    logger.info("Candidate updated: %s", candidate_id)
-    return {"message": "Candidate updated successfully"}
+    logger.info("Candidate updated: %s (re_matched=%s)", candidate_id, re_matched)
+    return {
+        "message": "Candidate updated successfully" + (" (AI match score recalculated)" if re_matched else ""),
+        "re_matched": re_matched,
+        "match_percentage": new_match_pct,
+        "match_explanation": new_match_exp,
+    }
 
 
 @router.put("/{candidate_id}/status")
