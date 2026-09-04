@@ -62,9 +62,32 @@ class ExtractResumeDataSchema(BaseModel):
         description="Total full years of professional experience calculated from work history.",
         ge=0,
     )
-    skills: str = Field(..., description="List of all skills")
-    education: str = Field(..., description="Education summaries")
-    gender: str = Field(..., description="Gender of the candidates (Ex: Male or Female)")
+    skills: str = Field(..., description="Comma-separated list of all technical and soft skills")
+    education: str = Field(..., description="Education qualifications summary (degree, institution, year)")
+    gender: str = Field(..., description="Gender of the candidate (Male / Female / Other)")
+    address: Optional[str] = Field(
+        None,
+        description="Full or partial address / location of the candidate from the resume.",
+    )
+    linkedin_url: Optional[str] = Field(
+        None,
+        description="LinkedIn profile URL if present in the resume.",
+    )
+    github_url: Optional[str] = Field(
+        None,
+        description="GitHub profile URL if present in the resume.",
+    )
+
+
+class IsResumeSchema(BaseModel):
+    is_resume: bool = Field(
+        ...,
+        description="True if the text belongs to a professional resume or CV, False otherwise.",
+    )
+    reason: str = Field(
+        ...,
+        description="Brief reason explaining why it is or is not a resume.",
+    )
 
 
 class MatchResultSchema(BaseModel):
@@ -82,10 +105,12 @@ logger.info("Initializing Ollama primary LLM client with model: %s", OLLAMA_MODE
 ollama_client = ChatOllama(model=OLLAMA_MODEL, temperature=0.0, num_gpu=1)
 llm_resume_data_extractor = ollama_client.with_structured_output(schema=ExtractResumeDataSchema)
 llm_matcher = ollama_client.with_structured_output(schema=MatchResultSchema)
+llm_is_resume_checker = ollama_client.with_structured_output(schema=IsResumeSchema)
 
 _groq_client: Optional["ChatGroq"] = None
 _groq_resume_data_extractor = None
 _groq_matcher = None
+_groq_is_resume_checker = None
 
 
 # ── Groq helpers ─────────────────────────────────────────────────────────────
@@ -186,6 +211,7 @@ def get_groq_client():
             schema=ExtractResumeDataSchema
         )
         _groq_matcher = _groq_client.with_structured_output(schema=MatchResultSchema)
+        _groq_is_resume_checker = _groq_client.with_structured_output(schema=IsResumeSchema)
         logger.info(
             "Groq fallback LLM client initialized with model: %s", GROQ_MODEL_NAME
         )
@@ -275,6 +301,68 @@ Do not include any placeholder text — use the exact values provided above.
     return _invoke_groq_with_retry(_call, context=f"JD generation for '{title}'")
 
 
+# ── Resume Validation (Is this a resume?) ────────────────────────────────────
+
+def check_is_resume(text: str) -> tuple[bool, str]:
+    """
+    Uses LLM to determine if the extracted text is from a professional resume/CV.
+    Only sends the first 800 characters + a lightweight prompt to save tokens.
+    Returns (is_resume: bool, reason: str).
+    """
+    snippet = text[:800].strip()
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", """
+        You are a document classifier. Your only job is to determine whether a given
+        text snippet comes from a professional resume or CV.
+
+        A resume typically contains some of:
+        - Candidate name at the top
+        - Contact information (email, phone)
+        - Work experience section
+        - Education / qualifications section
+        - Skills section
+        - Career objective or summary
+
+        Classify strictly. If the text is an invoice, article, book, form,
+        certificate, or any non-resume document, return is_resume=false.
+        """),
+        ("human", """
+        Classify the following document snippet:
+
+        ---
+        {snippet}
+        ---
+
+        Is this from a professional resume or CV?
+        """),
+    ])
+
+    result = None
+
+    # 1. Try Ollama
+    try:
+        chain = prompt | llm_is_resume_checker
+        result = chain.invoke({"snippet": snippet})
+    except Exception as e:
+        logger.warning("Ollama resume check failed: %s. Trying Groq fallback...", e)
+        _, _, _ = get_groq_client()  # ensure initialized
+        if _groq_is_resume_checker is None:
+            logger.warning("Groq is_resume checker not available, defaulting to True.")
+            return True, "LLM unavailable — assumed resume"
+        try:
+            chain = prompt | _groq_is_resume_checker
+            result = chain.invoke({"snippet": snippet})
+        except Exception as e2:
+            logger.warning("Groq resume check also failed: %s — defaulting to True.", e2)
+            return True, "LLM unavailable — assumed resume"
+
+    if result is None:
+        return True, "LLM returned no result — assumed resume"
+
+    logger.info("Resume check result: is_resume=%s, reason=%s", result.is_resume, result.reason)
+    return result.is_resume, result.reason
+
+
 # ── Resume Data Extraction ───────────────────────────────────────────────────
 
 def extract_candidate_info(text: str) -> dict:
@@ -323,23 +411,29 @@ def extract_candidate_info(text: str) -> dict:
         result = _invoke_groq_with_retry(_call, context="Resume extraction")
 
     candidate_name = result.candidate_name
-    raw_text = f"""
-    Contact number of {candidate_name} : {result.contact_number}
-    Email_address of  {candidate_name} : {result.email_address}
-    total_experience of {candidate_name} : {result.total_experience}
-    skills of {candidate_name} : {result.skills}
-    education details of {candidate_name} : {result.education}
-    gender of {candidate_name} : {result.gender}
-"""
+    raw_text = (
+        f"Contact number of {candidate_name}: {result.contact_number}\n"
+        f"Email of {candidate_name}: {result.email_address}\n"
+        f"Experience of {candidate_name}: {result.total_experience} years\n"
+        f"Skills of {candidate_name}: {result.skills}\n"
+        f"Education of {candidate_name}: {result.education}\n"
+        f"Gender of {candidate_name}: {result.gender}\n"
+        f"Address of {candidate_name}: {result.address or ''}\n"
+        f"LinkedIn: {result.linkedin_url or ''}\n"
+        f"GitHub: {result.github_url or ''}"
+    )
     logger.info("Successfully extracted info for candidate: %s", candidate_name)
     return {
         "candidate_name": candidate_name,
-        "contact_number": result.contact_number,
-        "email_address": result.email_address,
+        "contact_number": result.contact_number or "",
+        "email_address": result.email_address or "",
         "total_experience": result.total_experience,
         "skills": result.skills,
         "education": result.education,
         "gender": result.gender,
+        "address": result.address or "",
+        "linkedin_url": result.linkedin_url or "",
+        "github_url": result.github_url or "",
         "raw_text": raw_text,
     }
 

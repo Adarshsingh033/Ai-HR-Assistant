@@ -345,14 +345,24 @@ function setupDropZone() {
 }
 
 function handleFileSelect(event) {
+    const ALLOWED_EXTS = ['pdf', 'docx', 'doc', 'txt'];
+    const ALLOWED_TYPES = [
+        'application/pdf',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/msword',
+        'text/plain',
+    ];
     const files = Array.from(event.target.files);
-    const pdfs = files.filter(f => f.type === 'application/pdf');
+    const valid = files.filter(f => {
+        const ext = f.name.toLowerCase().split('.').pop();
+        return ALLOWED_TYPES.includes(f.type) || ALLOWED_EXTS.includes(ext);
+    });
 
-    if (pdfs.length !== files.length) {
-        showToast('Only PDF files are supported.', 'warning');
+    if (valid.length !== files.length) {
+        showToast('Only PDF, DOCX, and TXT files are supported.', 'warning');
     }
 
-    selectedFilesToUpload = [...selectedFilesToUpload, ...pdfs].slice(0, 10); // Max 10 limit
+    selectedFilesToUpload = [...selectedFilesToUpload, ...valid].slice(0, 10); // Max 10 limit
 
     // Reset input value to allow selecting same files again
     event.target.value = '';

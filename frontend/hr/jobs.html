@@ -260,6 +260,7 @@
         }
         input[type=number] {
             -moz-appearance: textfield;
+            appearance: textfield;
         }
 
         /* Custom Modal Body Scrollbar */
@@ -332,6 +333,185 @@
             transform: translateY(-1px);
             box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
         }
+
+        /* ── Step Wizard Tabs ───────────────────────────────────────── */
+        .wizard-tabs {
+            display: flex;
+            gap: 0;
+            padding: 0 36px;
+            background: rgba(11, 19, 41, 0.98);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            flex-shrink: 0;
+        }
+        .wizard-tab {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 22px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: rgba(255,255,255,0.4);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s ease;
+            user-select: none;
+            position: relative;
+            top: 1px;
+        }
+        .wizard-tab .tab-num {
+            width: 24px; height: 24px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            transition: all 0.2s ease;
+            flex-shrink: 0;
+        }
+        .wizard-tab.active {
+            color: #a5b4fc;
+            border-bottom-color: #6366f1;
+        }
+        .wizard-tab.active .tab-num {
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            color: #fff;
+            box-shadow: 0 3px 10px rgba(99,102,241,0.5);
+        }
+        .wizard-tab.done .tab-num {
+            background: rgba(16,185,129,0.2);
+            color: #10b981;
+        }
+        .wizard-tab.done { color: rgba(255,255,255,0.55); }
+
+        /* ── Weightage Section ──────────────────────────────────────── */
+        .weight-section { display: none; }
+        .weight-section.active { display: block; }
+        .detail-section { display: block; }
+        .detail-section.hidden-step { display: none; }
+
+        .weight-header-card {
+            background: linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(79,70,229,0.08) 100%);
+            border: 1px solid rgba(99,102,241,0.28);
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .weight-icon-wrap {
+            width: 44px; height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.1rem;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 14px rgba(99,102,241,0.5);
+        }
+
+        .weight-field-card {
+            background: rgba(15,23,42,0.6);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 20px 22px;
+            margin-bottom: 14px;
+            transition: border-color 0.25s ease, box-shadow 0.25s ease;
+        }
+        .weight-field-card:hover {
+            border-color: rgba(99,102,241,0.35);
+            box-shadow: 0 4px 20px rgba(99,102,241,0.12);
+        }
+
+        .weight-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+        .weight-label-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .weight-field-icon {
+            width: 34px; height: 34px;
+            border-radius: 9px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.85rem;
+            flex-shrink: 0;
+        }
+        .weight-value-badge {
+            min-width: 52px;
+            height: 34px;
+            border-radius: 9px;
+            background: rgba(99,102,241,0.15);
+            border: 1px solid rgba(99,102,241,0.35);
+            color: #a5b4fc;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+            padding: 0 10px;
+            transition: all 0.2s ease;
+        }
+
+        /* Custom range slider */
+        .weight-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 6px;
+            border-radius: 99px;
+            outline: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .weight-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(99,102,241,0.45);
+            transition: box-shadow 0.2s ease, transform 0.15s ease;
+        }
+        .weight-slider::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 3px 12px rgba(0,0,0,0.5), 0 0 0 4px rgba(99,102,241,0.6);
+        }
+        .weight-slider::-moz-range-thumb {
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: #fff;
+            cursor: pointer;
+            border: none;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.4), 0 0 0 3px rgba(99,102,241,0.45);
+        }
+
+        /* Total weight bar */
+        .total-weight-bar-wrap {
+            background: rgba(15,23,42,0.7);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px;
+            padding: 18px 22px;
+            margin-top: 20px;
+        }
+        .total-bar-track {
+            height: 10px;
+            background: rgba(255,255,255,0.07);
+            border-radius: 99px;
+            margin: 12px 0 8px;
+            overflow: hidden;
+        }
+        .total-bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.3s ease, background 0.3s ease;
+        }
     </style>
 </head>
 
@@ -357,6 +537,14 @@
             <a href="jobs.html" class="nav-item active">
                 <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
                 Job Vacancy
+            </a>
+            <a href="upload_resumes.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-file-arrow-up"></i></span>
+                Upload Resumes
+            </a>
+            <a href="all_candidates.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                Candidates
             </a>
 
             <!-- Sidebar Footer User Chip & Menu -->
@@ -435,128 +623,289 @@
 
     <!-- Create / Edit Job Vacancy Modal -->
     <div class="modal-overlay" id="job-modal">
-        <div class="modal-card" style="max-width: 880px; width: 95%; max-height: 85vh; padding: 0; background: #0b1329; border: 1px solid rgba(255,255,255,0.18); border-radius: 28px; box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; overflow: hidden;">
+        <div class="modal-card" style="max-width: 880px; width: 95%; max-height: 88vh; padding: 0; background: #0b1329; border: 1px solid rgba(255,255,255,0.18); border-radius: 28px; box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; overflow: hidden;">
             
             <!-- Static Modal Header (Fixed) -->
-            <div class="modal-header" style="padding: 24px 36px; border-bottom: 1px solid rgba(255, 255, 255, 0.1); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: rgba(11, 19, 41, 0.95); backdrop-filter: blur(10px); z-index: 10;">
+            <div class="modal-header" style="padding: 22px 36px 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: rgba(11, 19, 41, 0.98); backdrop-filter: blur(10px); z-index: 10;">
                 <div>
-                    <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="job-modal-title">Create Job Vacancy</h3>
-                    <p style="font-size: 0.88rem; color: rgba(255,255,255,0.6); margin-top: 3px;">Fill in vacancy specifications below.</p>
+                    <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff;" id="job-modal-title">Create Job Vacancy</h3>
+                    <p style="font-size: 0.84rem; color: rgba(255,255,255,0.55); margin-top: 2px;" id="job-modal-subtitle">Fill in vacancy specifications then set field weights.</p>
                 </div>
-                <button type="button" onclick="closeJobModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: background 0.2s;">×</button>
+                <button type="button" onclick="closeJobModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: background 0.2s; flex-shrink: 0;">×</button>
+            </div>
+
+            <!-- Step Tabs -->
+            <div class="wizard-tabs" id="wizard-tabs">
+                <div class="wizard-tab active" id="tab-step1" onclick="goToStep(1)">
+                    <span class="tab-num" id="tab-num-1">1</span>
+                    Job Details
+                </div>
+                <div class="wizard-tab" id="tab-step2" onclick="goToStep(2)">
+                    <span class="tab-num" id="tab-num-2">2</span>
+                    Field Weightage
+                </div>
             </div>
 
             <!-- Scrollable Modal Body -->
-            <div class="modal-body" style="padding: 36px; overflow-y: auto; flex: 1;">
+            <div class="modal-body" style="padding: 30px 36px; overflow-y: auto; flex: 1;">
                 <form id="job-form" onsubmit="handleSaveJob(event)">
                     <input type="hidden" id="job-id-hidden" value="" />
 
-                    <!-- Row 1: Job Title & Department -->
-                    <div class="form-grid-2">
-                        <div class="form-group-custom">
-                            <label class="label-custom">Job Title <span style="color:#ef4444;">*</span></label>
-                            <input type="text" id="job-title" class="input-custom" placeholder="e.g. Senior Software Engineer" required />
-                        </div>
-                        <div class="form-group-custom">
-                            <label class="label-custom">Department</label>
-                            <input type="text" id="job-dept" class="input-custom" placeholder="e.g. Engineering" />
-                        </div>
-                    </div>
+                    <!-- ═══════════════ STEP 1: Job Details ═══════════════ -->
+                    <div class="detail-section" id="step1-content">
 
-                    <!-- Row 2: Employment Type & Work Mode -->
-                    <div class="form-grid-2">
-                        <div class="form-group-custom">
-                            <label class="label-custom">Employment Type <span style="color:#ef4444;">*</span></label>
-                            <select id="job-employment-type" class="input-custom" required>
-                                <option value="Full-time">Full-time</option>
-                                <option value="Part-time">Part-time</option>
-                                <option value="Contract">Contract</option>
-                                <option value="Internship">Internship</option>
+                        <!-- Row 1: Job Title & Department -->
+                        <div class="form-grid-2">
+                            <div class="form-group-custom">
+                                <label class="label-custom">Job Title <span style="color:#ef4444;">*</span></label>
+                                <input type="text" id="job-title" class="input-custom" placeholder="e.g. Senior Software Engineer" />
+                            </div>
+                            <div class="form-group-custom">
+                                <label class="label-custom">Department</label>
+                                <input type="text" id="job-dept" class="input-custom" placeholder="e.g. Engineering" />
+                            </div>
+                        </div>
+
+                        <!-- Row 2: Employment Type & Work Mode -->
+                        <div class="form-grid-2">
+                            <div class="form-group-custom">
+                                <label class="label-custom">Employment Type <span style="color:#ef4444;">*</span></label>
+                                <select id="job-employment-type" class="input-custom">
+                                    <option value="Full-time">Full-time</option>
+                                    <option value="Part-time">Part-time</option>
+                                    <option value="Contract">Contract</option>
+                                    <option value="Internship">Internship</option>
+                                </select>
+                            </div>
+                            <div class="form-group-custom">
+                                <label class="label-custom">Work Mode <span style="color:#ef4444;">*</span></label>
+                                <select id="job-work-mode" class="input-custom">
+                                    <option value="On-site">On-site</option>
+                                    <option value="Remote">Remote</option>
+                                    <option value="Hybrid">Hybrid</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- Row 3: Location & Openings -->
+                        <div class="form-grid-2">
+                            <div class="form-group-custom">
+                                <label class="label-custom">Location</label>
+                                <input type="text" id="job-location" class="input-custom" placeholder="e.g. New York, NY / Remote" />
+                            </div>
+                            <div class="form-group-custom">
+                                <label class="label-custom">Openings Count <span style="color:#ef4444;">*</span></label>
+                                <input type="number" id="job-openings" class="input-custom" min="1" step="1" value="1" onkeydown="blockNonIntegerKeys(event)" oninput="validateOpeningsInput(this)" placeholder="e.g. 5" />
+                            </div>
+                        </div>
+
+                        <!-- Row 4: Experience & Qualification -->
+                        <div class="form-grid-2">
+                            <div class="form-group-custom">
+                                <label class="label-custom">Experience Required</label>
+                                <input type="text" id="job-exp" class="input-custom" placeholder="e.g. 3-5 years" />
+                            </div>
+                            <div class="form-group-custom">
+                                <label class="label-custom">Minimum Qualification</label>
+                                <input type="text" id="job-qualification" class="input-custom" placeholder="e.g. B.Tech / B.Sc / MBA" />
+                            </div>
+                        </div>
+
+                        <!-- Row 5: Salary -->
+                        <div class="form-grid-2">
+                            <div class="form-group-custom">
+                                <label class="label-custom">Salary / Range</label>
+                                <input type="text" id="job-salary" class="input-custom" onkeydown="blockNonIntegerKeys(event)" oninput="validateSalaryInput(this)" placeholder="e.g. 90000" />
+                            </div>
+                            <div class="form-group-custom"><!-- spacer --></div>
+                        </div>
+
+                        <!-- Required Skills Tag Input -->
+                        <div class="form-group-custom" style="margin-bottom: 20px;">
+                            <label class="label-custom">Required Skills</label>
+                            <div class="tag-input-wrap" id="skills-wrap" style="min-height: 48px; padding: 8px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                                <input type="text" id="skill-input" placeholder="Type skill and press Enter..." style="background: transparent; border: none; color: #ffffff; outline: none; font-size: 0.9rem; flex: 1; min-width: 160px;" />
+                            </div>
+                        </div>
+
+                        <!-- AI JD Generator & Description Box -->
+                        <div class="jd-generator-box">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <label class="label-custom" style="color: #a5b4fc; margin-bottom: 0; font-size: 0.9rem;">
+                                    <span class="ai-sparkle"><i class="fa-solid fa-wand-magic-sparkles"></i></span> Job Description <span style="color:#ef4444;">*</span>
+                                </label>
+                                <button type="button" id="btn-generate-jd" onclick="generateAIJobDescription()" style="background: linear-gradient(90deg, rgba(99, 102, 241, 0.25), rgba(79, 70, 229, 0.25)); border: 1px solid rgba(99, 102, 241, 0.45); color: #a5b4fc; padding: 8px 16px; border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease;">
+                                    <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Generate with AI
+                                </button>
+                            </div>
+                            <textarea id="job-desc" class="input-custom" style="min-height: 200px; height: auto; padding: 14px; font-family: inherit; font-size: 0.9rem; line-height: 1.6; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 12px; color: #ffffff;" placeholder="Enter comprehensive job description or use AI auto-generate..."></textarea>
+                        </div>
+
+                        <!-- Status Selection -->
+                        <div class="form-group-custom" style="margin-top: 20px;">
+                            <label class="label-custom">Vacancy Status</label>
+                            <select id="job-status" class="input-custom">
+                                <option value="draft">Draft</option>
+                                <option value="active">Active</option>
+                                <option value="closed">Closed</option>
                             </select>
                         </div>
-                        <div class="form-group-custom">
-                            <label class="label-custom">Work Mode <span style="color:#ef4444;">*</span></label>
-                            <select id="job-work-mode" class="input-custom" required>
-                                <option value="On-site">On-site</option>
-                                <option value="Remote">Remote</option>
-                                <option value="Hybrid">Hybrid</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <!-- Row 3: Location & Openings -->
-                    <div class="form-grid-2">
-                        <div class="form-group-custom">
-                            <label class="label-custom">Location</label>
-                            <input type="text" id="job-location" class="input-custom" placeholder="e.g. New York, NY / Remote" />
-                        </div>
-                        <div class="form-group-custom">
-                            <label class="label-custom">Openings Count <span style="color:#ef4444;">*</span></label>
-                            <input type="number" id="job-openings" class="input-custom" min="1" step="1" value="1" onkeydown="blockNonIntegerKeys(event)" oninput="validateOpeningsInput(this)" placeholder="e.g. 5" required />
-                        </div>
-                    </div>
+                    </div><!-- /step1-content -->
 
-                    <!-- Row 4: Experience & Qualification -->
-                    <div class="form-grid-2">
-                        <div class="form-group-custom">
-                            <label class="label-custom">Experience Required</label>
-                            <input type="text" id="job-exp" class="input-custom" placeholder="e.g. 3-5 years" />
-                        </div>
-                        <div class="form-group-custom">
-                            <label class="label-custom">Minimum Qualification</label>
-                            <input type="text" id="job-qualification" class="input-custom" placeholder="e.g. B.Tech / B.Sc / MBA" />
-                        </div>
-                    </div>
+                    <!-- ═══════════════ STEP 2: Field Weightage ═══════════════ -->
+                    <div class="weight-section" id="step2-content">
 
-                    <!-- Row 5: Salary -->
-                    <div class="form-grid-2">
-                        <div class="form-group-custom">
-                            <label class="label-custom">Salary / Range</label>
-                            <input type="text" id="job-salary" class="input-custom" onkeydown="blockNonIntegerKeys(event)" oninput="validateSalaryInput(this)" placeholder="e.g. 90000" />
+                        <!-- Info banner -->
+                        <div class="weight-header-card">
+                            <div class="weight-icon-wrap">
+                                <i class="fa-solid fa-sliders"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 3px;">Set Candidate Matching Weights</div>
+                                <div style="font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.5;">Adjust how much each field influences AI candidate matching. Higher weight = stronger match priority.</div>
+                            </div>
                         </div>
-                        <div class="form-group-custom">
-                            <!-- intentional spacer -->
+
+                        <!-- Weight Field: Location -->
+                        <div class="weight-field-card" id="wcard-location">
+                            <div class="weight-row">
+                                <div class="weight-label-group">
+                                    <div class="weight-field-icon" style="background: rgba(99,102,241,0.15); color: #818cf8;">
+                                        <i class="fa-solid fa-location-dot"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.88rem; font-weight: 800; color: #e2e8f0;">Location</div>
+                                        <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">Geographical match priority</div>
+                                    </div>
+                                </div>
+                                <div class="weight-value-badge" id="badge-location">20%</div>
+                            </div>
+                            <input type="range" class="weight-slider" id="weight-location"
+                                min="0" max="100" step="5" value="20"
+                                style="background: linear-gradient(to right, #6366f1 20%, rgba(255,255,255,0.12) 20%);"
+                                oninput="onWeightChange('location', this.value)" />
+                            <div style="display:flex; justify-content:space-between; margin-top:6px;">
+                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Low</span>
+                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">High</span>
+                            </div>
                         </div>
-                    </div>
 
-
-                    <!-- Required Skills Tag Input -->
-                    <div class="form-group-custom" style="margin-bottom: 20px;">
-                        <label class="label-custom">Required Skills</label>
-                        <div class="tag-input-wrap" id="skills-wrap" style="min-height: 48px; padding: 8px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-                            <input type="text" id="skill-input" placeholder="Type skill and press Enter..." style="background: transparent; border: none; color: #ffffff; outline: none; font-size: 0.9rem; flex: 1; min-width: 160px;" />
+                        <!-- Weight Field: Experience -->
+                        <div class="weight-field-card" id="wcard-experience">
+                            <div class="weight-row">
+                                <div class="weight-label-group">
+                                    <div class="weight-field-icon" style="background: rgba(251,191,36,0.15); color: #fbbf24;">
+                                        <i class="fa-solid fa-hourglass-half"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.88rem; font-weight: 800; color: #e2e8f0;">Experience Required</div>
+                                        <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">Years of relevant experience</div>
+                                    </div>
+                                </div>
+                                <div class="weight-value-badge" id="badge-experience" style="border-color: rgba(251,191,36,0.35); color: #fbbf24;">30%</div>
+                            </div>
+                            <input type="range" class="weight-slider" id="weight-experience"
+                                min="0" max="100" step="5" value="30"
+                                style="background: linear-gradient(to right, #fbbf24 30%, rgba(255,255,255,0.12) 30%);"
+                                oninput="onWeightChange('experience', this.value)" />
+                            <div style="display:flex; justify-content:space-between; margin-top:6px;">
+                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Low</span>
+                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">High</span>
+                            </div>
                         </div>
-                    </div>
 
-                    <!-- AI JD Generator & Description Box -->
-                    <div class="jd-generator-box">
-                        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                            <label class="label-custom" style="color: #a5b4fc; margin-bottom: 0; font-size: 0.9rem;">
-                                <span class="ai-sparkle"><i class="fa-solid fa-wand-magic-sparkles"></i></span> Job Description <span style="color:#ef4444;">*</span>
-                            </label>
-                            <button type="button" id="btn-generate-jd" onclick="generateAIJobDescription()" style="background: linear-gradient(90deg, rgba(99, 102, 241, 0.25), rgba(79, 70, 229, 0.25)); border: 1px solid rgba(99, 102, 241, 0.45); color: #a5b4fc; padding: 8px 16px; border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease;">
-                                <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Generate with AI
-                            </button>
+                        <!-- Weight Field: Qualification -->
+                        <div class="weight-field-card" id="wcard-qualification">
+                            <div class="weight-row">
+                                <div class="weight-label-group">
+                                    <div class="weight-field-icon" style="background: rgba(165,180,252,0.15); color: #a5b4fc;">
+                                        <i class="fa-solid fa-graduation-cap"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.88rem; font-weight: 800; color: #e2e8f0;">Qualification</div>
+                                        <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">Educational background & degree</div>
+                                    </div>
+                                </div>
+                                <div class="weight-value-badge" id="badge-qualification" style="border-color: rgba(165,180,252,0.35); color: #a5b4fc;">25%</div>
+                            </div>
+                            <input type="range" class="weight-slider" id="weight-qualification"
+                                min="0" max="100" step="5" value="25"
+                                style="background: linear-gradient(to right, #a5b4fc 25%, rgba(255,255,255,0.12) 25%);"
+                                oninput="onWeightChange('qualification', this.value)" />
+                            <div style="display:flex; justify-content:space-between; margin-top:6px;">
+                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Low</span>
+                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">High</span>
+                            </div>
                         </div>
-                        <textarea id="job-desc" class="input-custom" style="min-height: 200px; height: auto; padding: 14px; font-family: inherit; font-size: 0.9rem; line-height: 1.6; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 12px; color: #ffffff;" placeholder="Enter comprehensive job description or use AI auto-generate..." required></textarea>
-                    </div>
 
-                    <!-- Status Selection -->
-                    <div class="form-group-custom" style="margin-top: 20px;">
-                        <label class="label-custom">Vacancy Status</label>
-                        <select id="job-status" class="input-custom">
-                            <option value="draft">Draft</option>
-                            <option value="active">Active</option>
-                            <option value="closed">Closed</option>
-                        </select>
-                    </div>
+                        <!-- Weight Field: Skills -->
+                        <div class="weight-field-card" id="wcard-skills">
+                            <div class="weight-row">
+                                <div class="weight-label-group">
+                                    <div class="weight-field-icon" style="background: rgba(16,185,129,0.15); color: #10b981;">
+                                        <i class="fa-solid fa-code"></i>
+                                    </div>
+                                    <div>
+                                        <div style="font-size: 0.88rem; font-weight: 800; color: #e2e8f0;">Skills</div>
+                                        <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">Technical & soft skills match</div>
+                                    </div>
+                                </div>
+                                <div class="weight-value-badge" id="badge-skills" style="border-color: rgba(16,185,129,0.35); color: #10b981;">25%</div>
+                            </div>
+                            <input type="range" class="weight-slider" id="weight-skills"
+                                min="0" max="100" step="5" value="25"
+                                style="background: linear-gradient(to right, #10b981 25%, rgba(255,255,255,0.12) 25%);"
+                                oninput="onWeightChange('skills', this.value)" />
+                            <div style="display:flex; justify-content:space-between; margin-top:6px;">
+                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Low</span>
+                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">High</span>
+                            </div>
+                        </div>
+
+                        <!-- Total Weight Summary Bar -->
+                        <div class="total-weight-bar-wrap">
+                            <div style="display:flex; align-items:center; justify-content:space-between;">
+                                <div style="font-size:0.84rem; font-weight:800; color:#e2e8f0;">
+                                    <i class="fa-solid fa-chart-pie" style="color:#6366f1; margin-right:8px;"></i>
+                                    Total Weight
+                                </div>
+                                <div style="display:flex; align-items:center; gap:10px;">
+                                    <span id="total-weight-pct" style="font-size:1.1rem; font-weight:900; color:#fff;">100%</span>
+                                    <button type="button" onclick="resetWeights()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.6); padding: 5px 12px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                                        <i class="fa-solid fa-rotate-left" style="margin-right:4px;"></i> Reset
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="total-bar-track">
+                                <div class="total-bar-fill" id="total-bar-fill" style="width:100%; background: linear-gradient(90deg, #6366f1, #10b981);"></div>
+                            </div>
+                            <div id="total-weight-hint" style="font-size: 0.78rem; color: rgba(255,255,255,0.45); text-align:center;">Weights above 100% are allowed — they are normalized during AI matching.</div>
+                        </div>
+
+                    </div><!-- /step2-content -->
+
                 </form>
             </div>
 
             <!-- Static Modal Footer (Fixed) -->
-            <div class="modal-footer" style="padding: 20px 36px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: flex-end; gap: 14px; flex-shrink: 0; background: rgba(11, 19, 41, 0.95); backdrop-filter: blur(10px); z-index: 10;">
-                <button type="button" onclick="closeJobModal()" style="padding: 12px 26px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.92rem;">Cancel</button>
-                <button type="submit" form="job-form" class="btn-save-profile" id="save-job-btn" style="padding: 12px 28px; font-size: 0.92rem; border-radius: 12px;">Save Job Vacancy</button>
+            <div class="modal-footer" style="padding: 18px 36px; border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-shrink: 0; background: rgba(11, 19, 41, 0.95); backdrop-filter: blur(10px); z-index: 10;">
+                <!-- Left side: Cancel / Back -->
+                <div style="display:flex; gap:10px;">
+                    <button type="button" onclick="closeJobModal()" id="modal-cancel-btn" style="padding: 11px 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
+                    <button type="button" onclick="goToStep(1)" id="modal-back-btn" style="display:none; padding: 11px 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">
+                        <i class="fa-solid fa-arrow-left" style="margin-right:6px;"></i> Back
+                    </button>
+                </div>
+                <!-- Right side: Next / Save -->
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <button type="button" onclick="goToStep(2)" id="modal-next-btn" class="btn-save-profile" style="padding: 11px 26px; font-size: 0.9rem; border-radius: 12px; display:flex; align-items:center; gap:8px;">
+                        Next <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                    <button type="button" onclick="handleSaveJob(event)" id="save-job-btn" class="btn-save-profile" style="display:none; padding: 11px 26px; font-size: 0.9rem; border-radius: 12px; display:none; align-items:center; gap:8px;">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Job Vacancy
+                    </button>
+                </div>
             </div>
         </div>
     </div>

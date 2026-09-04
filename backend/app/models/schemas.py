@@ -265,6 +265,7 @@ class CreateJobRequest(BaseModel):
     skills_required: Optional[List[str]] = []
     job_description: str
     status: Optional[str] = "draft"
+    field_weights: Optional[dict] = None
 
 
 class UpdateJobRequest(BaseModel):
@@ -281,6 +282,7 @@ class UpdateJobRequest(BaseModel):
     skills_required: Optional[List[str]] = None
     job_description: Optional[str] = None
     status: Optional[str] = None
+    field_weights: Optional[dict] = None
 
 
 class JobResponse(BaseModel):
@@ -302,6 +304,7 @@ class JobResponse(BaseModel):
     skills_required: List[str] = []
     job_description: str
     status: str = "draft"
+    field_weights: Optional[dict] = None
     closed_at: Optional[str] = None
     created_at: str
     updated_at: Optional[str] = None
@@ -341,6 +344,22 @@ class CandidateResponse(BaseModel):
 
 
 class UpdateCandidateStatusRequest(BaseModel):
+    reached: Optional[bool] = None
+    remark: Optional[str] = None
+
+
+class UpdateCandidateRequest(BaseModel):
+    name: Optional[str] = None
+    email: Optional[str] = None
+    phone: Optional[str] = None
+    gender: Optional[str] = None
+    address: Optional[str] = None
+    total_experience: Optional[str] = None
+    skills: Optional[str] = None
+    education: Optional[str] = None
+    qualification: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    github_url: Optional[str] = None
     reached: Optional[bool] = None
     remark: Optional[str] = None
 

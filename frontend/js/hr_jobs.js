@@ -8,6 +8,10 @@ let allJobs = [];
 let branchesList = [];
 let jobSkillsTags = [];
 
+/* ── Default field weights ──────────────────────────────────────── */
+const DEFAULT_WEIGHTS = { location: 20, experience: 30, qualification: 25, skills: 25 };
+let fieldWeights = { ...DEFAULT_WEIGHTS };
+
 window.addEventListener('DOMContentLoaded', async () => {
     initSkillTagInput();
     await initJobVacancyModule();
@@ -244,6 +248,139 @@ function removeSkillTag(index) {
     renderSkillTags();
 }
 
+/* ── Wizard Step Navigation ──────────────────────────────────── */
+function goToStep(step) {
+    const step1 = document.getElementById('step1-content');
+    const step2 = document.getElementById('step2-content');
+    const tab1  = document.getElementById('tab-step1');
+    const tab2  = document.getElementById('tab-step2');
+    const nextBtn  = document.getElementById('modal-next-btn');
+    const saveBtn  = document.getElementById('save-job-btn');
+    const backBtn  = document.getElementById('modal-back-btn');
+
+    if (step === 2) {
+        // Validate step 1 first
+        const title = document.getElementById('job-title')?.value.trim();
+        const desc  = document.getElementById('job-desc')?.value.trim();
+        if (!title) {
+            showToast('Please enter a Job Title before proceeding.', 'warning');
+            return;
+        }
+        if (!desc) {
+            showToast('Please enter a Job Description before proceeding.', 'warning');
+            return;
+        }
+
+        step1.classList.add('hidden-step');
+        step2.classList.add('active');
+        tab1.classList.remove('active');
+        tab1.classList.add('done');
+        document.getElementById('tab-num-1').innerHTML = '<i class="fa-solid fa-check" style="font-size:0.7rem;"></i>';
+        tab2.classList.add('active');
+
+        nextBtn.style.display = 'none';
+        saveBtn.style.display = 'flex';
+        backBtn.style.display = 'flex';
+
+        updateTotalWeightUI();
+    } else {
+        step1.classList.remove('hidden-step');
+        step2.classList.remove('active');
+        tab2.classList.remove('active');
+        tab1.classList.add('active');
+        tab1.classList.remove('done');
+        document.getElementById('tab-num-1').textContent = '1';
+
+        nextBtn.style.display = 'flex';
+        saveBtn.style.display = 'none';
+        backBtn.style.display = 'none';
+    }
+}
+
+/* ── Weight Slider Logic ────────────────────────────────────────── */
+const SLIDER_COLORS = {
+    location:      '#6366f1',
+    experience:    '#fbbf24',
+    qualification: '#a5b4fc',
+    skills:        '#10b981',
+};
+
+function onWeightChange(field, value) {
+    const v = parseInt(value, 10);
+    fieldWeights[field] = v;
+
+    // Update badge text
+    const badge = document.getElementById(`badge-${field}`);
+    if (badge) badge.textContent = `${v}%`;
+
+    // Update slider gradient fill
+    const slider = document.getElementById(`weight-${field}`);
+    if (slider) {
+        const color = SLIDER_COLORS[field] || '#6366f1';
+        slider.style.background = `linear-gradient(to right, ${color} ${v}%, rgba(255,255,255,0.12) ${v}%)`;
+    }
+
+    updateTotalWeightUI();
+}
+
+function updateTotalWeightUI() {
+    const total = Object.values(fieldWeights).reduce((s, v) => s + v, 0);
+    const pctEl = document.getElementById('total-weight-pct');
+    const barEl = document.getElementById('total-bar-fill');
+    const hintEl = document.getElementById('total-weight-hint');
+
+    if (pctEl) pctEl.textContent = `${total}%`;
+
+    if (barEl) {
+        const barPct = Math.min(total, 100);
+        barEl.style.width = `${barPct}%`;
+        if (total === 100) {
+            barEl.style.background = 'linear-gradient(90deg, #6366f1, #10b981)';
+            pctEl && (pctEl.style.color = '#10b981');
+        } else if (total > 100) {
+            barEl.style.background = 'linear-gradient(90deg, #f59e0b, #ef4444)';
+            pctEl && (pctEl.style.color = '#fbbf24');
+        } else {
+            barEl.style.background = 'linear-gradient(90deg, #6366f1, #818cf8)';
+            pctEl && (pctEl.style.color = 'rgba(255,255,255,0.6)');
+        }
+    }
+
+    if (hintEl) {
+        if (total === 100) {
+            hintEl.textContent = '✔️ Perfect balance — total weight equals 100%.';
+            hintEl.style.color = '#10b981';
+        } else if (total > 100) {
+            hintEl.textContent = `Total is ${total}% — weights will be normalized proportionally during AI matching.`;
+            hintEl.style.color = '#fbbf24';
+        } else {
+            hintEl.textContent = `Total is ${total}% — remaining ${100 - total}% will be distributed equally.`;
+            hintEl.style.color = 'rgba(255,255,255,0.45)';
+        }
+    }
+}
+
+function resetWeights() {
+    fieldWeights = { ...DEFAULT_WEIGHTS };
+    Object.entries(DEFAULT_WEIGHTS).forEach(([field, val]) => {
+        const slider = document.getElementById(`weight-${field}`);
+        if (slider) slider.value = val;
+        onWeightChange(field, val);
+    });
+}
+
+function applyWeightsToSliders(weights) {
+    const w = weights || {};
+    const keys = ['location', 'experience', 'qualification', 'skills'];
+    keys.forEach(key => {
+        const val = w[key] !== undefined ? w[key] : DEFAULT_WEIGHTS[key];
+        fieldWeights[key] = val;
+        const slider = document.getElementById(`weight-${key}`);
+        if (slider) slider.value = val;
+        onWeightChange(key, val);
+    });
+}
+
 /* Open Create Job Vacancy Modal */
 function openCreateJobModal() {
     document.getElementById('job-id-hidden').value = '';
@@ -252,6 +389,9 @@ function openCreateJobModal() {
     document.getElementById('job-qualification').value = '';
     jobSkillsTags = [];
     renderSkillTags();
+    fieldWeights = { ...DEFAULT_WEIGHTS };
+    applyWeightsToSliders();
+    goToStep(1);
 
     openModal('job-modal');
 }
@@ -278,6 +418,10 @@ function openEditJobModal(jobId) {
 
     jobSkillsTags = [...(job.skills_required || [])];
     renderSkillTags();
+
+    // Load saved field weights or fall back to defaults
+    applyWeightsToSliders(job.field_weights || {});
+    goToStep(1);
 
     openModal('job-modal');
 }
@@ -409,6 +553,7 @@ async function handleSaveJob(e) {
             skills_required: jobSkillsTags,
             job_description: desc,
             status: status,
+            field_weights: { ...fieldWeights },
         };
 
         if (jobId) {
