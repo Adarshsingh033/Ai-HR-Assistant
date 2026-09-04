@@ -102,10 +102,14 @@ function renderStats() {
         : 0;
     const reached = allCandidates.filter(c => c.reached).length;
 
-    document.getElementById('stat-total').textContent   = total;
-    document.getElementById('stat-month').textContent   = month;
-    document.getElementById('stat-avg').textContent     = avg + '%';
-    document.getElementById('stat-reached').textContent = reached;
+    const totalEl = document.getElementById('stat-total');
+    if (totalEl) totalEl.textContent = total;
+    const monthEl = document.getElementById('stat-month');
+    if (monthEl) monthEl.textContent = month;
+    const avgEl   = document.getElementById('stat-avg');
+    if (avgEl)   avgEl.textContent   = avg + '%';
+    const rchEl   = document.getElementById('stat-reached');
+    if (rchEl)   rchEl.textContent   = reached;
 }
 
 /* ── Table Render ────────────────────────────────────────── */
@@ -128,9 +132,7 @@ function renderTable() {
     if (wrap)  wrap.style.display  = 'block';
     if (count) count.textContent   = `${allCandidates.length} candidate${allCandidates.length !== 1 ? 's' : ''}`;
 
-    tbody.innerHTML = allCandidates.map((c, i) => {
-        const pct       = c.match_percentage || 0;
-        const matchCls  = pct >= 70 ? 'match-high' : pct >= 40 ? 'match-medium' : 'match-low';
+    tbody.innerHTML = allCandidates.map((c) => {
         const initial   = (c.name || 'U').charAt(0).toUpperCase();
         const location  = c.address || '—';
         const exp       = c.total_experience
@@ -143,7 +145,6 @@ function renderTable() {
 
         return `
         <tr>
-            <td style="color:rgba(255,255,255,0.3);font-weight:600;">${i + 1}</td>
             <td>
                 <div class="cand-name-cell">
                     <div class="cand-avatar">${initial}</div>
@@ -156,31 +157,52 @@ function renderTable() {
             <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(c.email)}">
                 ${escapeHtml(c.email || '—')}
             </td>
-            <td>${escapeHtml(c.phone || '—')}</td>
-            <td style="max-width:130px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(location)}">
+            <td style="white-space:nowrap;">${escapeHtml(c.phone || '—')}</td>
+            <td style="max-width:140px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(location)}">
                 ${escapeHtml(location)}
             </td>
-            <td>${escapeHtml(exp)}</td>
-            <td>
-                <span class="match-badge ${matchCls}">${pct}%</span>
-            </td>
+            <td style="white-space:nowrap;">${escapeHtml(exp)}</td>
             <td style="white-space:nowrap;color:rgba(255,255,255,0.45);font-size:0.78rem;">${added}</td>
-            <td>
-                <div class="action-btns">
-                    <button class="action-btn view" title="View Candidate" onclick="openViewModal('${cid}')">
-                        <i class="fa-solid fa-eye"></i>
-                    </button>
-                    <button class="action-btn edit" title="Edit Candidate" onclick="openEditModal('${cid}')">
-                        <i class="fa-solid fa-pen-to-square"></i>
-                    </button>
-                    <button class="action-btn del" title="Delete Candidate" onclick="openDeleteModal('${cid}', '${escapeHtml(c.name || '')}')">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
+            <td style="text-align:right;position:relative;">
+                <button class="action-dots-btn" onclick="toggleActionMenu(event, '${cid}')" title="Actions">
+                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                </button>
+                <div class="action-dropdown" id="amenu-${cid}">
+                    <div class="action-dropdown-item" onclick="handleAction('view', '${cid}')">
+                        <i class="fa-solid fa-eye" style="color:#818cf8;"></i> View
+                    </div>
+                    <div class="action-dropdown-item" onclick="handleAction('edit', '${cid}')">
+                        <i class="fa-solid fa-pen-to-square" style="color:#fbbf24;"></i> Edit
+                    </div>
+                    <div class="action-dropdown-divider"></div>
+                    <div class="action-dropdown-item danger" onclick="handleAction('delete', '${cid}', '${escapeHtml(c.name || '')}')">
+                        <i class="fa-solid fa-trash-can" style="color:#f87171;"></i> Delete
+                    </div>
                 </div>
             </td>
         </tr>`;
     }).join('');
 }
+
+function toggleActionMenu(event, cid) {
+    event.stopPropagation();
+    document.querySelectorAll('.action-dropdown.open').forEach(el => {
+        if (el.id !== `amenu-${cid}`) el.classList.remove('open');
+    });
+    const menu = document.getElementById(`amenu-${cid}`);
+    if (menu) menu.classList.toggle('open');
+}
+
+function handleAction(action, cid, name = '') {
+    document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
+    if (action === 'view') openViewModal(cid);
+    if (action === 'edit') openEditModal(cid);
+    if (action === 'delete') openDeleteModal(cid, name);
+}
+
+document.addEventListener('click', () => {
+    document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
+});
 
 /* ── Relative Time ───────────────────────────────────────── */
 function relativeTime(iso) {

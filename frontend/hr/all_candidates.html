@@ -15,8 +15,8 @@
         /* ── Stats bar ── */
         .stats-strip {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 14px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
             margin-bottom: 22px;
         }
         .stat-card {
@@ -41,51 +41,56 @@
         .filter-bar {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 18px;
-            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+            width: 100%;
         }
-        .filter-select, .filter-input {
+        .filter-select {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 10px;
+            border-radius: 11px;
             color: #fff;
             font-size: 0.85rem;
             font-family: 'Inter', sans-serif;
-            padding: 9px 14px;
+            padding: 0 14px;
             outline: none;
-            transition: border-color 0.2s;
-            height: 40px;
+            transition: all 0.2s;
+            height: 42px;
+            width: 240px;
+            flex-shrink: 0;
         }
-        .filter-select:focus, .filter-input:focus {
+        .filter-select:focus {
             border-color: rgba(99,102,241,0.6);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
         }
-        .filter-select option { background: #1e293b; }
+        .filter-select option { background: #1e293b; color: #fff; }
         .search-wrap {
-            position: relative; flex: 1; min-width: 180px;
+            position: relative;
         }
         .search-wrap i {
-            position: absolute; left: 12px; top: 50%;
+            position: absolute; left: 14px; top: 50%;
             transform: translateY(-50%);
-            color: rgba(255,255,255,0.35); font-size: 0.82rem;
+            color: rgba(255,255,255,0.4); font-size: 0.84rem;
+            pointer-events: none;
         }
         .search-wrap input {
-            padding-left: 34px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 11px;
+            color: #fff;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            padding: 0 14px 0 38px;
+            outline: none;
+            transition: all 0.2s;
+            height: 42px;
             width: 100%;
             box-sizing: border-box;
         }
-        .filter-bar .btn-reset {
-            background: transparent;
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 10px;
-            color: rgba(255,255,255,0.5);
-            font-size: 0.82rem;
-            padding: 9px 14px;
-            cursor: pointer;
-            height: 40px;
-            transition: all 0.2s;
+        .search-wrap input:focus {
+            border-color: rgba(99,102,241,0.6);
+            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
         }
-        .filter-bar .btn-reset:hover { border-color: rgba(239,68,68,0.5); color: #f87171; }
 
         /* ── Table ── */
         .table-card {
@@ -156,23 +161,43 @@
         .match-medium { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
         .match-low    { background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.3);  }
 
-        /* ── Action buttons ── */
-        .action-btns { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
-        .action-btn {
-            width: 32px; height: 32px;
-            border-radius: 8px;
+        /* ── Action Three-Dot Dropdown ── */
+        .action-dots-btn {
+            width: 32px; height: 32px; border-radius: 8px;
             border: 1px solid var(--border);
-            background: transparent;
-            color: rgba(255,255,255,0.55);
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.8rem;
-            transition: all 0.2s;
+            background: rgba(255,255,255,0.04);
+            color: rgba(255,255,255,0.6);
+            cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.9rem; transition: all 0.2s;
         }
-        .action-btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.25); }
-        .action-btn.view:hover { background: rgba(99,102,241,0.2); color: #a5b4fc; border-color: rgba(99,102,241,0.4); }
-        .action-btn.edit:hover { background: rgba(245,158,11,0.2); color: #fbbf24; border-color: rgba(245,158,11,0.4); }
-        .action-btn.del:hover  { background: rgba(239,68,68,0.2);  color: #f87171; border-color: rgba(239,68,68,0.4); }
+        .action-dots-btn:hover {
+            background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.25);
+        }
+        .action-dropdown {
+            position: absolute; right: 0; top: 38px;
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px; padding: 6px 0; min-width: 150px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            z-index: 100; text-align: left;
+            display: none;
+        }
+        .action-dropdown.open {
+            display: block; animation: popoverUp 0.15s ease forwards;
+        }
+        .action-dropdown-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 14px; font-size: 0.82rem; font-weight: 600;
+            color: #e2e8f0; cursor: pointer; transition: background 0.15s;
+        }
+        .action-dropdown-item:hover {
+            background: rgba(255,255,255,0.08);
+        }
+        .action-dropdown-item.danger:hover {
+            background: rgba(239,68,68,0.15); color: #f87171;
+        }
+        .action-dropdown-divider {
+            height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0;
+        }
 
         /* ── Empty state ── */
         .table-empty {
@@ -367,9 +392,6 @@
     <main class="main-content">
         <header class="topbar">
             <div class="topbar-title">Candidates</div>
-            <a href="upload_resumes.html" class="btn btn-primary btn-sm" style="text-decoration:none;">
-                <i class="fa-solid fa-file-arrow-up"></i> Upload Resumes
-            </a>
         </header>
 
         <div class="page-content">
@@ -394,44 +416,23 @@
                         <div class="stat-value" id="stat-month">—</div>
                     </div>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#fbbf24;">
-                        <i class="fa-solid fa-bullseye"></i>
-                    </div>
-                    <div>
-                        <div class="stat-label">Avg Match %</div>
-                        <div class="stat-value" id="stat-avg">—</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(56,189,248,0.15);color:#38bdf8;">
-                        <i class="fa-solid fa-phone-volume"></i>
-                    </div>
-                    <div>
-                        <div class="stat-label">Contacted</div>
-                        <div class="stat-value" id="stat-reached">—</div>
-                    </div>
-                </div>
             </div>
 
             <!-- Filter bar -->
             <div class="filter-bar">
-                <select class="filter-select" id="filter-job" onchange="applyFilters()" style="min-width:200px;">
+                <select class="filter-select" id="filter-job" onchange="applyFilters()">
                     <option value="">All Job Vacancies</option>
                 </select>
-                <div class="search-wrap" style="max-width:200px;">
+                <div class="search-wrap" style="flex:1;">
                     <i class="fa-solid fa-location-dot"></i>
-                    <input class="filter-input search-wrap input" id="filter-location"
+                    <input class="filter-input" id="filter-location"
                            placeholder="Filter by location…" oninput="applyFilters()" />
                 </div>
-                <div class="search-wrap">
+                <div class="search-wrap" style="flex:1.5;">
                     <i class="fa-solid fa-magnifying-glass"></i>
-                    <input class="filter-input search-wrap input" id="filter-search"
+                    <input class="filter-input" id="filter-search"
                            placeholder="Search by name or email…" oninput="applyFilters()" />
                 </div>
-                <button class="btn-reset" onclick="resetFilters()">
-                    <i class="fa-solid fa-rotate-left"></i> Reset
-                </button>
             </div>
 
             <!-- Table card -->
@@ -440,14 +441,6 @@
                     <div>
                         <div class="table-title">All Candidates</div>
                         <div class="table-subtitle" id="table-count">Loading…</div>
-                    </div>
-                    <div style="display:flex;gap:8px;">
-                        <button class="btn btn-secondary btn-sm" onclick="loadCandidates(true)">
-                            <i class="fa-solid fa-trophy"></i> Top Matches
-                        </button>
-                        <button class="btn btn-secondary btn-sm" onclick="loadCandidates(false)">
-                            <i class="fa-solid fa-clock-rotate-left"></i> Recent First
-                        </button>
                     </div>
                 </div>
 
@@ -468,15 +461,13 @@
                     <table class="candidates-table" id="candidates-table">
                         <thead>
                             <tr>
-                                <th style="width:48px;">#</th>
                                 <th>Name</th>
                                 <th>Email</th>
-                                <th>Phone</th>
+                                <th>Phone Number</th>
                                 <th>Location</th>
                                 <th>Experience</th>
-                                <th>Match %</th>
                                 <th>Added On</th>
-                                <th style="text-align:right;">Actions</th>
+                                <th style="text-align:right;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="candidates-tbody"></tbody>
