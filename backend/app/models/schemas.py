@@ -14,6 +14,12 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class ChangePasswordRequest(BaseModel):
+    old_password: str
+    new_password: str
+    confirm_password: str
+
+
 class RegisterAdminRequest(BaseModel):
     full_name: str
     username: str

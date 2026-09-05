@@ -3,7 +3,7 @@
 from typing import Optional
 from fastapi import APIRouter, HTTPException, Header
 
-from app.models.schemas import HRProfileResponse, UpdateHRProfileRequest
+from app.models.schemas import HRProfileResponse, UpdateHRProfileRequest, ChangePasswordRequest
 from app.database import get_db_connection
 from app.logger import get_logger
 
@@ -235,4 +235,68 @@ def update_hr_profile(
                 )
 
     raise HTTPException(status_code=404, detail="HR Profile not found for update")
+
+
+@router.put("/change-password")
+def change_hr_password(
+    payload: ChangePasswordRequest,
+    x_user_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Change password for current HR user with validation."""
+    if not x_user_id:
+        raise HTTPException(status_code=401, detail="User identification header missing. Please re-login.")
+
+    old_pass = payload.old_password.strip()
+    new_pass = payload.new_password.strip()
+    confirm_pass = payload.confirm_password.strip()
+
+    if not old_pass or not new_pass or not confirm_pass:
+        raise HTTPException(status_code=400, detail="All password fields (Old Password, New Password, and Confirm Password) are required.")
+
+    if new_pass != confirm_pass:
+        raise HTTPException(status_code=400, detail="New password and confirm password do not match.")
+
+    if old_pass == new_pass:
+        raise HTTPException(status_code=400, detail="New password cannot be the same as your old password.")
+
+    if len(new_pass) < 6:
+        raise HTTPException(status_code=400, detail="New password must be at least 6 characters long.")
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            # 1. Try organization_members
+            cur.execute("SELECT id, password FROM organization_members WHERE id = %s LIMIT 1", (x_user_id,))
+            member = cur.fetchone()
+            if member:
+                if member[1] != old_pass:
+                    raise HTTPException(status_code=400, detail="Incorrect old password. Please try again.")
+                cur.execute("UPDATE organization_members SET password = %s, updated_at = NOW() WHERE id = %s", (new_pass, x_user_id))
+                conn.commit()
+                logger.info("Password successfully updated for organization_member user_id '%s'", x_user_id)
+                return {"message": "Password changed successfully."}
+
+            # 2. Try legacy hr table
+            cur.execute("SELECT id, password FROM hr WHERE id = %s LIMIT 1", (x_user_id,))
+            hr_user = cur.fetchone()
+            if hr_user:
+                if hr_user[1] != old_pass:
+                    raise HTTPException(status_code=400, detail="Incorrect old password. Please try again.")
+                cur.execute("UPDATE hr SET password = %s WHERE id = %s", (new_pass, x_user_id))
+                conn.commit()
+                logger.info("Password successfully updated for hr user_id '%s'", x_user_id)
+                return {"message": "Password changed successfully."}
+
+            # 3. Try admin table
+            cur.execute("SELECT id, password FROM admin WHERE id = %s LIMIT 1", (x_user_id,))
+            admin_user = cur.fetchone()
+            if admin_user:
+                if admin_user[1] != old_pass:
+                    raise HTTPException(status_code=400, detail="Incorrect old password. Please try again.")
+                cur.execute("UPDATE admin SET password = %s WHERE id = %s", (new_pass, x_user_id))
+                conn.commit()
+                logger.info("Password successfully updated for admin user_id '%s'", x_user_id)
+                return {"message": "Password changed successfully."}
+
+    raise HTTPException(status_code=404, detail="User profile not found for password update.")
+
 

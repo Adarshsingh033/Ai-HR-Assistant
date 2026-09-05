@@ -23,7 +23,7 @@ function togglePassword() {
     const btn = document.getElementById('pwd-toggle');
     const isHidden = input.type === 'password';
     input.type = isHidden ? 'text' : 'password';
-    btn.innerHTML = isHidden ? '<i class="fa-solid fa-eye-slash"></i>' : '<i class="fa-solid fa-eye"></i>';
+    btn.innerHTML = isHidden ? '<i class="fa-regular fa-eye-slash"></i>' : '<i class="fa-regular fa-eye"></i>';
 }
 
 /* Error & Success display */

@@ -386,7 +386,6 @@
     <!-- ── Sidebar ── -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-logo">
-            <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
             <div>
                 <div class="logo-text">AI HR Assistant</div>
                 <div class="logo-sub">HR Portal</div>
@@ -422,12 +421,16 @@
         <!-- Sidebar Footer -->
         <div class="sidebar-footer" style="position:relative;">
             <div class="user-menu-popover hidden" id="user-menu-popover">
-                <a href="profile.html" class="popover-item" style="color:#818cf8;">
-                    <i class="fa-solid fa-user"></i> Profile
+                <a href="profile.html" class="popover-item">
+                    <i class="fa-solid fa-user" style="color: #818cf8;"></i> Profile
+                </a>
+                <div class="popover-divider"></div>
+                <a href="change_password.html" class="popover-item">
+                    <i class="fa-solid fa-key" style="color: #38bdf8;"></i> Change Password
                 </a>
                 <div class="popover-divider"></div>
                 <a href="#" class="popover-item" onclick="logout()">
-                    <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i> Logout
+                    <i class="fa-solid fa-right-from-bracket" style="color: #ef4444;"></i> Logout
                 </a>
             </div>
             <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">

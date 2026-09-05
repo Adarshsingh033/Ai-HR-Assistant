@@ -10,7 +10,7 @@ from app.models.schemas import (
     CreateBranchRequest, UpdateBranchRequest, BranchResponse,
     CreateMemberRequest, UpdateMemberRequest, MemberResponse,
     CreateHRRequest, AssignHRRequest, HRResponse,
-    AdminProfileResponse, UpdateAdminProfileRequest,
+    AdminProfileResponse, UpdateAdminProfileRequest, ChangePasswordRequest,
 )
 from app.database import get_db_connection
 from app.logger import get_logger
@@ -274,6 +274,16 @@ def update_admin_profile(
                 role="admin",
                 created_at=str(current[6]) if current[6] else "",
             )
+
+
+@router.put("/change-password")
+def change_admin_password(
+    payload: ChangePasswordRequest,
+    x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """Change password for current Admin user with validation."""
+    from app.routers.hr import change_hr_password
+    return change_hr_password(payload=payload, x_user_id=x_admin_id)
 
 
 @router.post("/organizations", response_model=OrganizationResponse)
