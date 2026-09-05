@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Candidate Comparison — AI HR Assistant</title>
+    <meta name="description" content="Compare candidates side-by-side against Job Vacancy requirements." />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        /* ── Page Header ── */
+        .page-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+        .page-title-group h1 {
+            font-size: 1.45rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            letter-spacing: -0.01em;
+        }
+        .page-title-group p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 3px;
+        }
+
+        /* ── Selector Card ── */
+        .selector-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px 28px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-md);
+        }
+        .selector-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr auto;
+            gap: 18px;
+            align-items: flex-end;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 7px; margin-bottom: 0; }
+        .form-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        .form-control {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 12px; color: #fff; font-size: 0.88rem; font-family: inherit;
+            padding: 0 16px; height: 46px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; box-sizing: border-box;
+        }
+        .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        select.form-control option { background: #111827; color: #fff; padding: 8px; }
+
+        /* ── Centerpiece Donut Comparison (Reference Image Layout) ── */
+        .comparison-centerpiece {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 36px 32px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-md);
+            position: relative;
+        }
+        .comp-heading {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+            margin-bottom: 32px;
+        }
+        .donut-comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+            align-items: center;
+        }
+        .donut-profile-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+        .score-percentage-label {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+        .donut-ring-wrap {
+            width: 140px;
+            height: 140px;
+            border-radius: 50%;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(#6366f1 0deg, rgba(255,255,255,0.08) 0deg);
+            padding: 10px;
+            box-shadow: 0 0 25px rgba(99,102,241,0.25);
+            transition: all 0.5s ease;
+        }
+        .donut-inner-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: #0f172a;
+            border: 3px solid rgba(255,255,255,0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.2rem;
+            font-weight: 900;
+            color: #fff;
+            overflow: hidden;
+        }
+        .profile-name-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-top: 16px;
+        }
+        .profile-sub-title {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .rec-badge-winner {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            border-radius: 99px;
+            background: linear-gradient(135deg, rgba(16,185,129,0.2), rgba(5,150,105,0.3));
+            border: 1px solid #10b981;
+            color: #34d399;
+            font-size: 0.78rem;
+            font-weight: 800;
+            margin-top: 12px;
+            box-shadow: 0 0 18px rgba(16,185,129,0.35);
+        }
+
+        /* ── Category Cards ── */
+        .category-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            box-shadow: var(--shadow-sm);
+        }
+        .category-title {
+            font-size: 0.88rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 18px;
+        }
+        .cat-01 { color: #ef4444; }
+        .cat-02 { color: #f97316; }
+        .cat-03 { color: #14b8a6; }
+        .cat-04 { color: #06b6d4; }
+
+        .side-by-side-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 32px;
+        }
+        .cand-criterion-block {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .bar-track {
+            height: 10px;
+            border-radius: 99px;
+            background: rgba(255,255,255,0.08);
+            overflow: hidden;
+            position: relative;
+        }
+        .bar-fill {
+            height: 100%;
+            border-radius: 99px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .bar-fill-cat-1 { background: linear-gradient(90deg, #ef4444, #f87171); }
+        .bar-fill-cat-2 { background: linear-gradient(90deg, #f97316, #fb923c); }
+        .bar-fill-cat-3 { background: linear-gradient(90deg, #14b8a6, #2dd4bf); }
+        .bar-fill-cat-4 { background: linear-gradient(90deg, #06b6d4, #38bdf8); }
+
+        .crit-status-tag {
+            font-size: 0.75rem;
+            font-weight: 800;
+            float: right;
+        }
+        .crit-detail-text {
+            font-size: 0.83rem;
+            color: rgba(255,255,255,0.7);
+            line-height: 1.4;
+            margin-top: 4px;
+        }
+
+        /* ── Recommendation Panel ── */
+        .rec-panel-card {
+            background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(16,185,129,0.12));
+            border: 1px solid rgba(99,102,241,0.35);
+            border-radius: 20px;
+            padding: 28px;
+            margin-top: 28px;
+            box-shadow: 0 10px 30px rgba(99,102,241,0.15);
+        }
+        .rec-panel-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 12px;
+        }
+        .rec-icon-badge {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(16,185,129,0.4);
+            flex-shrink: 0;
+        }
+        .rec-reason-text {
+            font-size: 0.92rem;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+            <div>
+                <div class="logo-text">AI HR Assistant</div>
+                <div class="logo-sub">HR Portal</div>
+            </div>
+        </div>
+
+        <div class="nav-section-label">Main Menu</div>
+        <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+            Dashboard
+        </a>
+        <a href="jobs.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+            Job Vacancy
+        </a>
+        <a href="upload_resumes.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-file-arrow-up"></i></span>
+            Upload Resumes
+        </a>
+        <a href="all_candidates.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+            Candidates
+        </a>
+        <a href="comparison.html" class="nav-item active">
+            <span class="nav-icon"><i class="fa-solid fa-code-compare"></i></span>
+            Candidate Comparison
+        </a>
+        <a href="screening.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-clipboard-check"></i></span>
+            Screening
+        </a>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer" style="position:relative;">
+            <div class="user-menu-popover hidden" id="user-menu-popover">
+                <a href="profile.html" class="popover-item" style="color:#818cf8;">
+                    <i class="fa-solid fa-user"></i> Profile
+                </a>
+                <div class="popover-divider"></div>
+                <a href="#" class="popover-item logout-item" onclick="logout()">
+                    <i class="fa-solid fa-right-from-bracket" style="color:#ef4444;"></i> Logout
+                </a>
+            </div>
+            <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">
+                <div class="user-avatar" id="sidebar-avatar">H</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-name">HR User</div>
+                    <div class="user-role">HR Manager</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-title">Candidate Comparison</div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- Page Title -->
+            <div class="page-header">
+                <div class="page-title-group">
+                    <h1>Side-by-Side Candidate Comparison</h1>
+                    <p>Select a job vacancy and pick two candidates to compare location, skills, education, and experience against the JD.</p>
+                </div>
+            </div>
+
+            <!-- Selection Controls Card -->
+            <div class="selector-card">
+                <div class="selector-grid">
+                    <div class="form-group">
+                        <label class="form-label">1. Select Job Vacancy</label>
+                        <select class="form-control" id="compare-job-select" onchange="onJobSelectionChanged()">
+                            <option value="">-- Choose Job Vacancy --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">2. Candidate A (Profile A)</label>
+                        <select class="form-control" id="compare-cand1-select" disabled>
+                            <option value="">-- Select Candidate A --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">3. Candidate B (Profile B)</label>
+                        <select class="form-control" id="compare-cand2-select" disabled>
+                            <option value="">-- Select Candidate B --</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">&nbsp;</label>
+                        <button class="btn btn-primary" id="btn-run-compare" onclick="runCandidateComparison()" disabled style="height:46px;padding:0 24px;">
+                            <i class="fa-solid fa-code-compare"></i> Compare Profiles
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Placeholder State when no comparison performed -->
+            <div id="compare-placeholder" class="table-empty" style="background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:64px 24px;box-shadow:var(--shadow-sm);">
+                <div class="empty-icon-circle">
+                    <i class="fa-solid fa-scale-balanced"></i>
+                </div>
+                <div class="empty-title">Select Job Vacancy & Candidates</div>
+                <div class="empty-sub">
+                    Choose a job vacancy from the dropdown above to load candidates, then select two candidates to generate an instant side-by-side comparison report.
+                </div>
+            </div>
+
+            <!-- Main Comparison Container (Hidden by default) -->
+            <div id="compare-result-container" style="display:none;">
+
+                <!-- ════════════════════════════════════════════════════════════
+                     CENTERPIECE DONUT COMPARISON (PROFILE A vs PROFILE B)
+                ════════════════════════════════════════════════════════════ -->
+                <div class="comparison-centerpiece">
+                    <div class="comp-heading">Profile Comparison</div>
+
+                    <div class="donut-comparison-grid">
+                        <!-- Profile A Card -->
+                        <div class="donut-profile-card">
+                            <div class="score-percentage-label" id="c1-score-num">0%</div>
+                            <div class="donut-ring-wrap" id="c1-donut-ring">
+                                <div class="donut-inner-avatar" id="c1-avatar">A</div>
+                            </div>
+                            <div class="profile-name-title" id="c1-name-display">Candidate A</div>
+                            <div class="profile-sub-title" id="c1-email-display">candidate1@email.com</div>
+                            <div id="c1-rec-badge"></div>
+                        </div>
+
+                        <!-- Profile B Card -->
+                        <div class="donut-profile-card">
+                            <div class="score-percentage-label" id="c2-score-num">0%</div>
+                            <div class="donut-ring-wrap" id="c2-donut-ring">
+                                <div class="donut-inner-avatar" id="c2-avatar">B</div>
+                            </div>
+                            <div class="profile-name-title" id="c2-name-display">Candidate B</div>
+                            <div class="profile-sub-title" id="c2-email-display">candidate2@email.com</div>
+                            <div id="c2-rec-badge"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ════════════════════════════════════════════════════════════
+                     4 SIDE-BY-SIDE CRITERIA COMPARISON CARDS
+                ════════════════════════════════════════════════════════════ -->
+
+                <!-- Category 01: Location -->
+                <div class="category-card">
+                    <div class="category-title cat-01">Category 01 — Location Match</div>
+                    <div class="side-by-side-grid">
+                        <div class="cand-criterion-block">
+                            <div>
+                                <strong style="color:#fff;" id="c1-name-cat1">Candidate A</strong>
+                                <span class="crit-status-tag" id="c1-loc-status">Location</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill-cat-1" id="c1-loc-bar" style="width:0%;"></div>
+                            </div>
+                            <div class="crit-detail-text" id="c1-loc-desc">Details loading…</div>
+                        </div>
+
+                        <div class="cand-criterion-block">
+                            <div>
+                                <strong style="color:#fff;" id="c2-name-cat1">Candidate B</strong>
+                                <span class="crit-status-tag" id="c2-loc-status">Location</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill-cat-1" id="c2-loc-bar" style="width:0%;"></div>
+                            </div>
+                            <div class="crit-detail-text" id="c2-loc-desc">Details loading…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 02: Skills -->
+                <div class="category-card">
+                    <div class="category-title cat-02">Category 02 — Technical & Core Skills</div>
+                    <div class="side-by-side-grid">
+                        <div class="cand-criterion-block">
+                            <div>
+                                <strong style="color:#fff;" id="c1-name-cat2">Candidate A</strong>
+                                <span class="crit-status-tag" id="c1-skills-status">Skills Match</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill-cat-2" id="c1-skills-bar" style="width:0%;"></div>
+                            </div>
+                            <div class="crit-detail-text" id="c1-skills-desc">Skills loading…</div>
+                            <div id="c1-skills-badges" style="margin-top:6px;"></div>
+                        </div>
+
+                        <div class="cand-criterion-block">
+                            <div>
+                                <strong style="color:#fff;" id="c2-name-cat2">Candidate B</strong>
+                                <span class="crit-status-tag" id="c2-skills-status">Skills Match</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill-cat-2" id="c2-skills-bar" style="width:0%;"></div>
+                            </div>
+                            <div class="crit-detail-text" id="c2-skills-desc">Skills loading…</div>
+                            <div id="c2-skills-badges" style="margin-top:6px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 03: Education & Qualification -->
+                <div class="category-card">
+                    <div class="category-title cat-03">Category 03 — Education & Qualification</div>
+                    <div class="side-by-side-grid">
+                        <div class="cand-criterion-block">
+                            <div>
+                                <strong style="color:#fff;" id="c1-name-cat3">Candidate A</strong>
+                                <span class="crit-status-tag" id="c1-edu-status">Education</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill-cat-3" id="c1-edu-bar" style="width:0%;"></div>
+                            </div>
+                            <div class="crit-detail-text" id="c1-edu-desc">Details loading…</div>
+                        </div>
+
+                        <div class="cand-criterion-block">
+                            <div>
+                                <strong style="color:#fff;" id="c2-name-cat3">Candidate B</strong>
+                                <span class="crit-status-tag" id="c2-edu-status">Education</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill-cat-3" id="c2-edu-bar" style="width:0%;"></div>
+                            </div>
+                            <div class="crit-detail-text" id="c2-edu-desc">Details loading…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Category 04: Experience -->
+                <div class="category-card">
+                    <div class="category-title cat-04">Category 04 — Professional Experience</div>
+                    <div class="side-by-side-grid">
+                        <div class="cand-criterion-block">
+                            <div>
+                                <strong style="color:#fff;" id="c1-name-cat4">Candidate A</strong>
+                                <span class="crit-status-tag" id="c1-exp-status">Experience</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill-cat-4" id="c1-exp-bar" style="width:0%;"></div>
+                            </div>
+                            <div class="crit-detail-text" id="c1-exp-desc">Details loading…</div>
+                        </div>
+
+                        <div class="cand-criterion-block">
+                            <div>
+                                <strong style="color:#fff;" id="c2-name-cat4">Candidate B</strong>
+                                <span class="crit-status-tag" id="c2-exp-status">Experience</span>
+                            </div>
+                            <div class="bar-track">
+                                <div class="bar-fill bar-fill-cat-4" id="c2-exp-bar" style="width:0%;"></div>
+                            </div>
+                            <div class="crit-detail-text" id="c2-exp-desc">Details loading…</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ════════════════════════════════════════════════════════════
+                     AI RECOMMENDATION & REASON PANEL
+                ════════════════════════════════════════════════════════════ -->
+                <div class="rec-panel-card">
+                    <div class="rec-panel-header">
+                        <div class="rec-icon-badge">
+                            <i class="fa-solid fa-trophy"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin:0;" id="rec-title">Recommended Candidate</h3>
+                            <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);margin-top:2px;">AI Comparison Rationale & Decision Factors</div>
+                        </div>
+                    </div>
+                    <div class="rec-reason-text" id="rec-reason-body">
+                        Loading comparison explanation…
+                    </div>
+                </div>
+
+            </div><!-- compare-result-container -->
+
+        </div><!-- page-content -->
+    </main>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal-overlay" id="logout-confirm-modal">
+    <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.14);border-radius:22px;width:400px;max-width:96vw;padding:32px 28px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin:0 auto 16px;box-shadow:0 0 20px rgba(239,68,68,0.2);">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </div>
+        <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin-bottom:8px;">Log out of your account?</h3>
+        <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:24px;">You will need to sign back in to access the AI HR Assistant portal.</p>
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <button onclick="closeLogoutModal()"
+                    style="padding:10px 22px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.85rem;">
+                Cancel
+            </button>
+            <button onclick="confirmLogoutAction()"
+                    style="padding:10px 24px;border-radius:11px;border:none;background:linear-gradient(135deg, #ef4444, #dc2626);color:#fff;cursor:pointer;font-weight:800;font-size:0.85rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);">
+                Logout
+            </button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../js/utils.js"></script>
+<script src="../js/hr_common.js"></script>
+<script src="../js/hr_compare.js"></script>
+</body>
+</html>

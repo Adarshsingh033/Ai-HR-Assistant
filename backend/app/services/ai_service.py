@@ -9,7 +9,7 @@ Fallback LLM : Groq – model: compound-beta-mini
 
 import os
 import time
-from typing import Optional, Callable, TypeVar
+from typing import Optional, Callable, TypeVar, List
 
 try:
     from langchain_ollama import ChatOllama
@@ -99,6 +99,36 @@ class MatchResultSchema(BaseModel):
     )
 
 
+class CategoryEvalItem(BaseModel):
+    category: str = Field(..., description="Category name: 'location', 'skills', 'education', or 'experience'")
+    score: int = Field(..., description="Score 0-100 for candidate match in this category", ge=0, le=100)
+    status: str = Field(..., description="Short status tag e.g. 'Strong Match', 'Relocation Needed', 'Fully Qualified'")
+    details: str = Field(..., description="Detailed explanation sentence comparing candidate value against job requirement.")
+    value: str = Field(..., description="Extracted candidate value for this category")
+
+
+class CandidateComparisonEval(BaseModel):
+    candidate_id: str = Field(..., description="ID of candidate being evaluated")
+    overall_score: int = Field(..., description="Overall match percentage score 0-100", ge=0, le=100)
+    location: CategoryEvalItem = Field(..., description="Location category evaluation")
+    skills: CategoryEvalItem = Field(..., description="Skills category evaluation")
+    education: CategoryEvalItem = Field(..., description="Education category evaluation")
+    experience: CategoryEvalItem = Field(..., description="Experience category evaluation")
+    matched_skills: List[str] = Field(default_factory=list, description="List of skills matching the JD requirements")
+    missing_skills: List[str] = Field(default_factory=list, description="List of required JD skills missing in candidate")
+
+
+class CompareCandidatesLLMSchema(BaseModel):
+    cand1_eval: CandidateComparisonEval = Field(..., description="Evaluation for candidate 1")
+    cand2_eval: CandidateComparisonEval = Field(..., description="Evaluation for candidate 2")
+    better_candidate_id: str = Field(..., description="ID of the candidate who is the better match overall")
+    better_candidate_name: str = Field(..., description="Name of the candidate who is the better match overall")
+    comparison_summary_reason: str = Field(
+        ...,
+        description="Comprehensive and clear summary paragraph explaining why one candidate is a better fit compared to the other for this specific job vacancy."
+    )
+
+
 # ── LLM Clients Initialization ───────────────────────────────────────────────
 
 logger.info("Initializing Ollama primary LLM client with model: %s", OLLAMA_MODEL)
@@ -106,11 +136,14 @@ ollama_client = ChatOllama(model=OLLAMA_MODEL, temperature=0.0, num_gpu=1)
 llm_resume_data_extractor = ollama_client.with_structured_output(schema=ExtractResumeDataSchema)
 llm_matcher = ollama_client.with_structured_output(schema=MatchResultSchema)
 llm_is_resume_checker = ollama_client.with_structured_output(schema=IsResumeSchema)
+llm_comparator = ollama_client.with_structured_output(schema=CompareCandidatesLLMSchema)
 
 _groq_client: Optional["ChatGroq"] = None
 _groq_resume_data_extractor = None
 _groq_matcher = None
 _groq_is_resume_checker = None
+_groq_comparator = None
+
 
 
 # ── Groq helpers ─────────────────────────────────────────────────────────────
@@ -200,10 +233,10 @@ def _invoke_groq_with_retry(call: Callable[[], T], context: str = "") -> T:
 
 
 def get_groq_client():
-    """Return a cached tuple of (groq_client, resume_extractor, matcher)."""
-    global _groq_client, _groq_resume_data_extractor, _groq_matcher
+    """Return a cached tuple of (groq_client, resume_extractor, matcher, comparator)."""
+    global _groq_client, _groq_resume_data_extractor, _groq_matcher, _groq_is_resume_checker, _groq_comparator
     if _groq_client is not None:
-        return _groq_client, _groq_resume_data_extractor, _groq_matcher
+        return _groq_client, _groq_resume_data_extractor, _groq_matcher, _groq_comparator
 
     try:
         _groq_client = _build_groq_client()
@@ -212,13 +245,14 @@ def get_groq_client():
         )
         _groq_matcher = _groq_client.with_structured_output(schema=MatchResultSchema)
         _groq_is_resume_checker = _groq_client.with_structured_output(schema=IsResumeSchema)
+        _groq_comparator = _groq_client.with_structured_output(schema=CompareCandidatesLLMSchema)
         logger.info(
             "Groq fallback LLM client initialized with model: %s", GROQ_MODEL_NAME
         )
-        return _groq_client, _groq_resume_data_extractor, _groq_matcher
+        return _groq_client, _groq_resume_data_extractor, _groq_matcher, _groq_comparator
     except Exception as e:
         logger.warning("Could not initialize Groq fallback LLM client: %s", e)
-        return None, None, None
+        return None, None, None, None
 
 
 # ── Job Description Generation ───────────────────────────────────────────────
@@ -505,3 +539,229 @@ Skills: {candidate_data.get('skills')}
         "match_percentage": result.match_percentage,
         "match_explanation": result.match_explanation,
     }
+
+
+# ── Candidate Comparison with LLM ───────────────────────────────────────────
+
+def compare_two_candidates_with_llm(job_data: dict, c1: dict, c2: dict) -> Optional[dict]:
+    """
+    Uses LLM (Ollama primary, Groq fallback) to compare two candidates against a Job Vacancy.
+    Returns structured evaluation with category scores, overall scores, and comparison summary reason.
+    """
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", """
+        You are an expert HR Talent Acquisition Specialist.
+        Compare two candidates side-by-side against a Job Vacancy.
+
+        Evaluate both candidates across 4 core categories:
+        1. Location (Candidate address vs Job Location requirement)
+        2. Skills (Candidate skills vs Job Required Skills)
+        3. Education (Candidate degree/qualifications vs Job Minimum Qualification)
+        4. Experience (Candidate total years of experience vs Job Required Experience)
+
+        Assign appropriate percentage scores (0-100) and status tags for each category.
+        Calculate an overall match percentage score (0-100) for each candidate.
+        Determine which candidate is the better fit overall (`better_candidate_id` and `better_candidate_name`).
+        Provide a comprehensive, professional `comparison_summary_reason` explaining clearly why the recommended candidate is a superior fit compared to the other.
+        """),
+        ("human", """
+        # JOB VACANCY DETAILS
+        Title: {job_title}
+        Department: {job_department}
+        Location: {job_location}
+        Job Type: {job_type}
+        Experience Required: {job_experience}
+        Qualification Required: {job_qualification}
+        Required Skills: {job_skills}
+        Description: {job_description}
+
+        ---
+        # CANDIDATE 1 (ID: {c1_id})
+        Name: {c1_name}
+        Email: {c1_email}
+        Location/Address: {c1_address}
+        Total Experience: {c1_experience} years
+        Skills: {c1_skills}
+        Qualification / Education: {c1_education}
+
+        ---
+        # CANDIDATE 2 (ID: {c2_id})
+        Name: {c2_name}
+        Email: {c2_email}
+        Location/Address: {c2_address}
+        Total Experience: {c2_experience} years
+        Skills: {c2_skills}
+        Qualification / Education: {c2_education}
+        """)
+    ])
+
+    job_skills_str = ", ".join(job_data.get("skills_required", [])) if isinstance(job_data.get("skills_required"), list) else str(job_data.get("skills_required", ""))
+    c1_skills = c1.get("skills", [])
+    c1_skills_str = ", ".join(c1_skills) if isinstance(c1_skills, list) else str(c1_skills)
+    c2_skills = c2.get("skills", [])
+    c2_skills_str = ", ".join(c2_skills) if isinstance(c2_skills, list) else str(c2_skills)
+
+    input_payload = {
+        "job_title": job_data.get("job_title", "Job Vacancy"),
+        "job_department": job_data.get("department", ""),
+        "job_location": job_data.get("location", ""),
+        "job_type": job_data.get("employment_type", "Full-time"),
+        "job_experience": job_data.get("experience_required", ""),
+        "job_qualification": job_data.get("qualification", ""),
+        "job_skills": job_skills_str,
+        "job_description": job_data.get("job_description", "")[:1000],
+
+        "c1_id": c1["candidate_id"],
+        "c1_name": c1["name"],
+        "c1_email": c1.get("email", ""),
+        "c1_address": c1.get("address", "Not specified"),
+        "c1_experience": c1.get("total_experience", "0"),
+        "c1_skills": c1_skills_str,
+        "c1_education": f"{c1.get('qualification', '')} {c1.get('education', '')}".strip(),
+
+        "c2_id": c2["candidate_id"],
+        "c2_name": c2["name"],
+        "c2_email": c2.get("email", ""),
+        "c2_address": c2.get("address", "Not specified"),
+        "c2_experience": c2.get("total_experience", "0"),
+        "c2_skills": c2_skills_str,
+        "c2_education": f"{c2.get('qualification', '')} {c2.get('education', '')}".strip(),
+    }
+
+    result: Optional[CompareCandidatesLLMSchema] = None
+
+    # 1. Try Ollama primary
+    try:
+        logger.info("Executing candidate comparison via Ollama LLM...")
+        chain = prompt | llm_comparator
+        result = chain.invoke(input=input_payload)
+    except Exception as e:
+        logger.warning("Ollama candidate comparison failed: %s. Trying Groq fallback...", e)
+
+        # 2. Try Groq fallback
+        try:
+            groq_res = get_groq_client()
+            g_comparator = groq_res[3] if groq_res and len(groq_res) > 3 else None
+            if g_comparator is not None:
+                chain = prompt | g_comparator
+                def _call():
+                    return chain.invoke(input=input_payload)
+                result = _invoke_groq_with_retry(_call, context="Candidate comparison")
+        except Exception as e2:
+            logger.warning("Groq candidate comparison fallback failed: %s", e2)
+
+    if result is None:
+        logger.warning("LLM comparison returned no result.")
+        return None
+
+    c1_res = result.cand1_eval
+    c2_res = result.cand2_eval
+
+    better_id = result.better_candidate_id
+    if better_id not in (c1["candidate_id"], c2["candidate_id"]):
+        better_id = c1["candidate_id"] if c1_res.overall_score >= c2_res.overall_score else c2["candidate_id"]
+
+    better_name = result.better_candidate_name or (c1["name"] if better_id == c1["candidate_id"] else c2["name"])
+
+    req_skills_list = job_data.get("skills_required", [])
+    if isinstance(req_skills_list, str):
+        req_skills_list = [s.strip() for s in req_skills_list.split(",") if s.strip()]
+
+    c1_matched = [s for s in req_skills_list if s.lower() in [sk.lower() for sk in (c1.get("skills") or [])]]
+    c1_missing = [s for s in req_skills_list if s.lower() not in [sk.lower() for sk in (c1.get("skills") or [])]]
+
+    c2_matched = [s for s in req_skills_list if s.lower() in [sk.lower() for sk in (c2.get("skills") or [])]]
+    c2_missing = [s for s in req_skills_list if s.lower() not in [sk.lower() for sk in (c2.get("skills") or [])]]
+
+    return {
+        "candidate1": {
+            "candidate_id": c1["candidate_id"],
+            "name": c1["name"],
+            "email": c1.get("email", ""),
+            "phone": c1.get("phone", ""),
+            "filename": c1.get("filename", ""),
+            "overall_score": c1_res.overall_score,
+            "is_recommended": (c1["candidate_id"] == better_id),
+            "criteria": {
+                "location": {
+                    "title": "Location",
+                    "score": c1_res.location.score,
+                    "status": c1_res.location.status,
+                    "details": c1_res.location.details,
+                    "value": c1_res.location.value or c1.get("address", "Not specified"),
+                },
+                "skills": {
+                    "title": "Skills",
+                    "score": c1_res.skills.score,
+                    "status": c1_res.skills.status,
+                    "details": c1_res.skills.details,
+                    "value": c1.get("skills", []),
+                    "matched_skills": c1_res.matched_skills or c1_matched,
+                    "missing_skills": c1_res.missing_skills or c1_missing,
+                },
+                "education": {
+                    "title": "Education / Qualification",
+                    "score": c1_res.education.score,
+                    "status": c1_res.education.status,
+                    "details": c1_res.education.details,
+                    "value": c1_res.education.value or c1.get("qualification", "") or c1.get("education", "Not specified"),
+                },
+                "experience": {
+                    "title": "Experience",
+                    "score": c1_res.experience.score,
+                    "status": c1_res.experience.status,
+                    "details": c1_res.experience.details,
+                    "value": c1_res.experience.value or f"{c1.get('total_experience', '0')} years",
+                },
+            }
+        },
+        "candidate2": {
+            "candidate_id": c2["candidate_id"],
+            "name": c2["name"],
+            "email": c2.get("email", ""),
+            "phone": c2.get("phone", ""),
+            "filename": c2.get("filename", ""),
+            "overall_score": c2_res.overall_score,
+            "is_recommended": (c2["candidate_id"] == better_id),
+            "criteria": {
+                "location": {
+                    "title": "Location",
+                    "score": c2_res.location.score,
+                    "status": c2_res.location.status,
+                    "details": c2_res.location.details,
+                    "value": c2_res.location.value or c2.get("address", "Not specified"),
+                },
+                "skills": {
+                    "title": "Skills",
+                    "score": c2_res.skills.score,
+                    "status": c2_res.skills.status,
+                    "details": c2_res.skills.details,
+                    "value": c2.get("skills", []),
+                    "matched_skills": c2_res.matched_skills or c2_matched,
+                    "missing_skills": c2_res.missing_skills or c2_missing,
+                },
+                "education": {
+                    "title": "Education / Qualification",
+                    "score": c2_res.education.score,
+                    "status": c2_res.education.status,
+                    "details": c2_res.education.details,
+                    "value": c2_res.education.value or c2.get("qualification", "") or c2.get("education", "Not specified"),
+                },
+                "experience": {
+                    "title": "Experience",
+                    "score": c2_res.experience.score,
+                    "status": c2_res.experience.status,
+                    "details": c2_res.experience.details,
+                    "value": c2_res.experience.value or f"{c2.get('total_experience', '0')} years",
+                },
+            }
+        },
+        "recommendation": {
+            "recommended_candidate_id": better_id,
+            "recommended_candidate_name": better_name,
+            "recommendation_title": f"{better_name} is recommended for {job_data.get('job_title', 'Job Vacancy')}",
+            "score_difference": abs(c1_res.overall_score - c2_res.overall_score),
+            "reason": result.comparison_summary_reason,
+        }
+    }
+

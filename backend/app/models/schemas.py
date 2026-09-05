@@ -448,3 +448,10 @@ class UpdateCandidateInterviewProgressRequest(BaseModel):
     comment: Optional[str] = ""
 
 
+class CompareCandidatesRequest(BaseModel):
+    job_id: str
+    candidate1_id: str
+    candidate2_id: str
+
+
+
