@@ -127,6 +127,9 @@ async function loadCandidates(jobId = null, orgId = null) {
                     <div class="candidate-meta-item" title="Phone">
                         <span><i class="fa-solid fa-mobile-screen"></i></span> ${cand.phone || 'N/A'}
                     </div>
+                    <div class="candidate-meta-item" title="Location">
+                        <span><i class="fa-solid fa-location-dot"></i></span> ${cand.address || 'N/A'}
+                    </div>
                     <div class="candidate-meta-item" title="Gender">
                         <span><i class="fa-solid fa-user"></i></span> ${cand.gender || 'N/A'}
                     </div>
@@ -210,7 +213,7 @@ async function openTopMatchListModal() {
                 </td>
                 <td>
                     <div class="text-sm">${cand.email || 'N/A'}</div>
-                    <div class="text-muted text-xs">${cand.phone || 'N/A'}</div>
+                    <div class="text-muted text-xs">${cand.phone || 'N/A'}${cand.address ? ` • ${cand.address}` : ''}</div>
                     <a href="emails.html?to=${encodeURIComponent(cand.email || '')}&candidate_id=${cand.candidate_id}" class="text-xs text-accent hover:underline mt-1 inline-block" title="Send Email">Send Mail</a>
                 </td>
                 <td>

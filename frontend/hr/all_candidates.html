@@ -52,18 +52,22 @@
             width: 100%;
         }
         .filter-select {
-            background: var(--bg-card);
+            background: var(--bg-card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.55)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 16px center / 14px 14px;
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
             border: 1px solid var(--border);
             border-radius: 11px;
             color: #fff;
             font-size: 0.85rem;
             font-family: 'Inter', sans-serif;
-            padding: 0 14px;
+            padding: 0 38px 0 16px;
             outline: none;
             transition: all 0.2s;
             height: 42px;
             width: 240px;
             flex-shrink: 0;
+            cursor: pointer;
         }
         .filter-select:focus {
             border-color: rgba(99,102,241,0.6);
@@ -103,7 +107,7 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            overflow: hidden;
+            overflow: visible;
         }
         .table-header-row {
             display: flex;
@@ -118,16 +122,16 @@
         .candidates-table thead th {
             background: rgba(255,255,255,0.03);
             text-align: left;
-            padding: 11px 16px;
-            font-size: 0.71rem;
+            padding: 14px 18px;
+            font-size: 0.72rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: rgba(255,255,255,0.4);
+            color: rgba(255,255,255,0.45);
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
-        .candidates-table thead th:first-child { padding-left: 22px; }
+        .candidates-table thead th:first-child { padding-left: 20px; padding-right: 12px; }
         .candidates-table thead th:last-child { padding-right: 22px; text-align: right; }
         .candidates-table tbody tr {
             border-bottom: 1px solid rgba(255,255,255,0.05);
@@ -136,12 +140,12 @@
         .candidates-table tbody tr:last-child { border-bottom: none; }
         .candidates-table tbody tr:hover { background: rgba(255,255,255,0.03); }
         .candidates-table tbody td {
-            padding: 13px 16px;
+            padding: 14px 18px;
             font-size: 0.83rem;
-            color: rgba(255,255,255,0.75);
+            color: rgba(255,255,255,0.78);
             vertical-align: middle;
         }
-        .candidates-table tbody td:first-child { padding-left: 22px; }
+        .candidates-table tbody td:first-child { padding-left: 20px; padding-right: 12px; }
         .candidates-table tbody td:last-child { padding-right: 22px; }
 
         /* ── Name cell ── */
@@ -274,8 +278,24 @@
         /* ── View Modal ── */
         .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:900;display:none;align-items:center;justify-content:center; }
         .modal-overlay.open { display:flex; }
-        .modal-xl { background:#0f172a;border:1px solid rgba(255,255,255,0.12);border-radius:22px;width:860px;max-width:96vw;max-height:92vh;overflow-y:auto;padding:32px; }
-        .modal-lg { background:#0f172a;border:1px solid rgba(255,255,255,0.12);border-radius:22px;width:640px;max-width:96vw;max-height:92vh;overflow-y:auto;padding:32px; }
+        .modal-xl {
+            background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:22px;
+            width:860px; max-width:96vw; max-height:92vh;
+            display:flex; flex-direction:column; overflow:hidden; padding:28px 32px 20px 32px;
+        }
+        .modal-fixed-top { flex-shrink:0; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:14px; }
+        .modal-fixed-top .modal-top { margin-bottom:0; }
+        .modal-details-scroll { flex:1; overflow-y:auto; padding-right:8px; }
+        .modal-details-scroll::-webkit-scrollbar { width:6px; }
+        .modal-details-scroll::-webkit-scrollbar-track { background:rgba(255,255,255,0.04); border-radius:3px; }
+        .modal-details-scroll::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:3px; }
+        .modal-details-scroll::-webkit-scrollbar-thumb:hover { background:rgba(99,102,241,0.5); }
+        .modal-bottom-actions { flex-shrink:0; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:flex-end; }
+        .modal-lg {
+            background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:22px;
+            width:860px; max-width:96vw; max-height:92vh;
+            display:flex; flex-direction:column; overflow:hidden; padding:28px 32px 20px 32px;
+        }
 
         .modal-top { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px; }
         .modal-close-btn {
@@ -487,7 +507,7 @@
                 <select class="filter-select" id="filter-job" onchange="applyFilters()">
                     <option value="">All Job Vacancies</option>
                 </select>
-                <select class="filter-select" id="filter-contacted" onchange="applyFilters()" style="width:170px;">
+                <select class="filter-select" id="filter-contacted" onchange="applyFilters()" style="width:185px;">
                     <option value="">All Contact Status</option>
                     <option value="true">Contacted</option>
                     <option value="false">Not Contacted</option>
@@ -526,22 +546,25 @@
                     <span style="font-size:0.78rem;opacity:0.6;">Try adjusting the filters or upload new resumes.</span>
                 </div>
 
-                <div style="overflow-x:auto;" id="table-wrap" style="display:none;">
+                <div style="overflow:visible;" id="table-wrap" style="display:none;">
                     <table class="candidates-table" id="candidates-table">
                         <thead>
                             <tr>
-                                <th style="width:65px;text-align:center;">Rank</th>
-                                <th>Name</th>
-                                <th>Email</th>
-                                <th>Phone Number</th>
-                                <th style="width:115px;">Match Score</th>
-                                <th style="width:100px;text-align:center;">Contacted</th>
-                                <th style="text-align:right;width:80px;">Action</th>
+                                <th style="width:75px;text-align:center;">Rank</th>
+                                <th style="width:23%;">Name</th>
+                                <th style="width:22%;">Email</th>
+                                <th style="width:16%;">Phone Number</th>
+                                <th style="width:14%;">Location</th>
+                                <th style="width:125px;text-align:center;">Match Score</th>
+                                <th style="width:105px;text-align:center;">Contacted</th>
+                                <th style="width:75px;text-align:right;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="candidates-tbody"></tbody>
                     </table>
                 </div>
+                <!-- Pagination Controls -->
+                <div id="candidate-pagination-container"></div>
             </div>
 
         </div><!-- page-content -->
@@ -553,83 +576,86 @@
 ══════════════════════════════════════════════ -->
 <div class="modal-overlay" id="view-modal">
     <div class="modal-xl">
-        <div class="modal-top">
-            <div class="profile-header">
-                <div class="profile-avatar-lg" id="vm-avatar">A</div>
-                <div>
-                    <div class="profile-name" id="vm-name">Candidate Name</div>
-                    <div class="profile-sub" id="vm-sub">Job Title • Experience</div>
+        <!-- FIXED TOP HEADER -->
+        <div class="modal-fixed-top">
+            <div class="modal-top">
+                <div class="profile-header">
+                    <div class="profile-avatar-lg" id="vm-avatar">A</div>
+                    <div>
+                        <div class="profile-name" id="vm-name">Candidate Name</div>
+                        <div class="profile-sub" id="vm-sub">Job Title • Experience</div>
+                    </div>
+                </div>
+                <button class="modal-close-btn" onclick="closeModal('view-modal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- SCROLLABLE BODY (CARDS + SKILLS + AI REASON + RESUME PREVIEW) -->
+        <div class="modal-details-scroll">
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-solid fa-envelope" style="margin-right:4px;"></i>Email</div>
+                    <div class="val" id="vm-email">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-solid fa-phone" style="margin-right:4px;"></i>Phone</div>
+                    <div class="val" id="vm-phone">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-solid fa-briefcase" style="margin-right:4px;"></i>Applied Vacancy</div>
+                    <div class="val" id="vm-job">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-solid fa-bullseye" style="margin-right:4px;"></i>Match Score</div>
+                    <div class="val" id="vm-score">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i>Location</div>
+                    <div class="val" id="vm-address">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-solid fa-venus-mars" style="margin-right:4px;"></i>Gender</div>
+                    <div class="val" id="vm-gender">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-solid fa-hourglass-half" style="margin-right:4px;"></i>Experience</div>
+                    <div class="val" id="vm-exp">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-solid fa-graduation-cap" style="margin-right:4px;"></i>Qualification</div>
+                    <div class="val" id="vm-qual">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-brands fa-linkedin" style="margin-right:4px;"></i>LinkedIn</div>
+                    <div class="val" id="vm-linkedin">—</div>
+                </div>
+                <div class="info-item">
+                    <div class="lbl"><i class="fa-brands fa-github" style="margin-right:4px;"></i>GitHub</div>
+                    <div class="val" id="vm-github">—</div>
                 </div>
             </div>
-            <button class="modal-close-btn" onclick="closeModal('view-modal')">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
 
-        <div class="info-grid">
-            <div class="info-item">
-                <div class="lbl"><i class="fa-solid fa-envelope" style="margin-right:4px;"></i>Email</div>
-                <div class="val" id="vm-email">—</div>
-            </div>
-            <div class="info-item">
-                <div class="lbl"><i class="fa-solid fa-phone" style="margin-right:4px;"></i>Phone</div>
-                <div class="val" id="vm-phone">—</div>
-            </div>
-            <div class="info-item">
-                <div class="lbl"><i class="fa-solid fa-briefcase" style="margin-right:4px;"></i>Applied Vacancy</div>
-                <div class="val" id="vm-job">—</div>
-            </div>
-            <div class="info-item">
-                <div class="lbl"><i class="fa-solid fa-bullseye" style="margin-right:4px;"></i>Match Score</div>
-                <div class="val" id="vm-score">—</div>
-            </div>
-            <div class="info-item">
-                <div class="lbl"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i>Location</div>
-                <div class="val" id="vm-address">—</div>
-            </div>
-            <div class="info-item">
-                <div class="lbl"><i class="fa-solid fa-venus-mars" style="margin-right:4px;"></i>Gender</div>
-                <div class="val" id="vm-gender">—</div>
-            </div>
-            <div class="info-item">
-                <div class="lbl"><i class="fa-solid fa-hourglass-half" style="margin-right:4px;"></i>Experience</div>
-                <div class="val" id="vm-exp">—</div>
-            </div>
-            <div class="info-item">
-                <div class="lbl"><i class="fa-solid fa-graduation-cap" style="margin-right:4px;"></i>Education</div>
-                <div class="val" id="vm-edu">—</div>
-            </div>
-            <div class="info-item">
-                <div class="lbl"><i class="fa-brands fa-linkedin" style="margin-right:4px;"></i>LinkedIn</div>
-                <div class="val" id="vm-linkedin">—</div>
-            </div>
-            <div class="info-item">
-                <div class="lbl"><i class="fa-brands fa-github" style="margin-right:4px;"></i>GitHub</div>
-                <div class="val" id="vm-github">—</div>
+            <div class="sec-label">Skills</div>
+            <div class="skills-wrap" id="vm-skills"></div>
+
+            <div class="sec-label">AI Match Analysis & Reason</div>
+            <div class="match-explain" id="vm-match-explain">—</div>
+
+            <div class="sec-label">Original Uploaded Resume Preview</div>
+            <div id="vm-preview-wrap" style="margin-top:8px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;background:#0f172a;">
+                <iframe id="vm-preview-frame" style="width:100%;height:380px;border:none;display:none;background:#fff;"></iframe>
+                <div class="resume-preview" id="vm-resume-text" style="display:none;">No resume text available.</div>
             </div>
         </div>
 
-        <div class="sec-label">Skills</div>
-        <div class="skills-wrap" id="vm-skills"></div>
-
-        <div class="sec-label">AI Match Analysis & Reason</div>
-        <div class="match-explain" id="vm-match-explain">—</div>
-
-        <div class="sec-label">Original Uploaded Resume Preview</div>
-        <div id="vm-preview-wrap" style="margin-top:8px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;background:#0f172a;">
-            <iframe id="vm-preview-frame" style="width:100%;height:380px;border:none;display:none;background:#fff;"></iframe>
-            <div class="resume-preview" id="vm-resume-text" style="display:none;">No resume text available.</div>
-        </div>
-
-        <div style="margin-top:22px;display:flex;justify-content:flex-end;gap:10px;">
+        <!-- FIXED BOTTOM ACTIONS -->
+        <div class="modal-bottom-actions">
             <a id="vm-download-link" href="#" download
-               style="text-decoration:none;display:flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;border-radius:10px;font-size:0.82rem;font-weight:700;">
+               style="text-decoration:none;display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;border-radius:10px;font-size:0.82rem;font-weight:700;">
                 <i class="fa-solid fa-download"></i> Download Resume
             </a>
-            <button onclick="closeModal('view-modal')"
-                    style="padding:9px 18px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border-radius:10px;cursor:pointer;font-size:0.82rem;font-weight:700;">
-                Close
-            </button>
         </div>
     </div>
 </div>
@@ -639,71 +665,75 @@
 ══════════════════════════════════════════════ -->
 <div class="modal-overlay" id="edit-modal">
     <div class="modal-lg">
-        <div class="modal-top">
-            <div>
-                <div style="font-size:1.1rem;font-weight:900;color:#fff;">Edit Candidate</div>
-                <div style="font-size:0.78rem;color:rgba(255,255,255,0.45);margin-top:3px;">Update extracted resume information</div>
-            </div>
-            <button class="modal-close-btn" onclick="closeModal('edit-modal')">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <form id="edit-form" onsubmit="saveCandidate(event)">
-            <input type="hidden" id="edit-candidate-id" />
-            <div class="form-grid">
-                <div class="form-group">
-                    <label class="form-label">Full Name</label>
-                    <input class="form-control" id="edit-name" placeholder="Candidate full name" />
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Gender</label>
-                    <select class="form-control" id="edit-gender">
-                        <option value="">Select Gender</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Email Address</label>
-                    <input class="form-control" id="edit-email" type="email" placeholder="email@example.com" />
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Phone Number</label>
-                    <input class="form-control" id="edit-phone" placeholder="+1 234 567 890" />
-                </div>
-                <div class="form-group full">
-                    <label class="form-label">Address / Location</label>
-                    <input class="form-control" id="edit-address" placeholder="City, State, Country" />
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Total Experience</label>
-                    <input class="form-control" id="edit-experience" placeholder="e.g. 3 years" />
-                </div>
-                <div class="form-group">
-                    <label class="form-label">Qualification</label>
-                    <input class="form-control" id="edit-qualification" placeholder="e.g. B.Tech, MBA" />
-                </div>
-                <div class="form-group full">
-                    <label class="form-label">Skills (comma-separated)</label>
-                    <textarea class="form-control" id="edit-skills" rows="3" placeholder="Python, React, SQL, …"></textarea>
-                </div>
-                <div class="form-group full">
-                    <label class="form-label">Education Details</label>
-                    <textarea class="form-control" id="edit-education" rows="3" placeholder="Degree, Institution, Year"></textarea>
-                </div>
-                <div class="form-group">
-                    <label class="form-label">LinkedIn URL</label>
-                    <input class="form-control" id="edit-linkedin" placeholder="https://linkedin.com/in/…" />
-                </div>
-                <div class="form-group">
-                    <label class="form-label">GitHub URL</label>
-                    <input class="form-control" id="edit-github" placeholder="https://github.com/…" />
+        <form id="edit-form" onsubmit="saveCandidate(event)" style="display:flex;flex-direction:column;height:100%;flex:1;overflow:hidden;">
+            <!-- FIXED TOP HEADER -->
+            <div class="modal-fixed-top">
+                <div class="modal-top">
+                    <div>
+                        <div style="font-size:1.2rem;font-weight:900;color:#fff;">Edit Candidate</div>
+                        <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:3px;">Update extracted resume information</div>
+                    </div>
+                    <button type="button" class="modal-close-btn" onclick="closeModal('edit-modal')">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
                 </div>
             </div>
 
-            <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:24px;">
+            <!-- SCROLLABLE FORM BODY -->
+            <div class="modal-details-scroll">
+                <input type="hidden" id="edit-candidate-id" />
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Full Name</label>
+                        <input class="form-control" id="edit-name" placeholder="Candidate full name" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Gender</label>
+                        <select class="form-control" id="edit-gender">
+                            <option value="">Select Gender</option>
+                            <option value="Male">Male</option>
+                            <option value="Female">Female</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input class="form-control" id="edit-email" type="email" placeholder="email@example.com" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Phone Number</label>
+                        <input class="form-control" id="edit-phone" placeholder="+1 234 567 890" />
+                    </div>
+                    <div class="form-group full">
+                        <label class="form-label">Address / Location</label>
+                        <input class="form-control" id="edit-address" placeholder="City, State, Country" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Total Experience</label>
+                        <input class="form-control" id="edit-experience" placeholder="e.g. 3 years" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Qualification</label>
+                        <input class="form-control" id="edit-qualification" placeholder="e.g. B.Tech, MBA" />
+                    </div>
+                    <div class="form-group full">
+                        <label class="form-label">Skills (comma-separated)</label>
+                        <textarea class="form-control" id="edit-skills" rows="3" placeholder="Python, React, SQL, …"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">LinkedIn URL</label>
+                        <input class="form-control" id="edit-linkedin" placeholder="https://linkedin.com/in/…" />
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">GitHub URL</label>
+                        <input class="form-control" id="edit-github" placeholder="https://github.com/…" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- FIXED BOTTOM ACTIONS -->
+            <div class="modal-bottom-actions" style="gap:10px;">
                 <button type="button" onclick="closeModal('edit-modal')"
                         style="padding:10px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:700;">
                     Cancel

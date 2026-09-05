@@ -225,29 +225,55 @@ function renderOrgPagination(data) {
     const endItem = Math.min(page * limit, total);
 
     let pageButtons = '';
-    for (let p = 1; p <= totalPages; p++) {
-        if (p === page) {
-            pageButtons += `<button class="pagination-btn active" style="padding: 6px 14px; border-radius: 8px; border: 1px solid #6366f1; background: linear-gradient(135deg, #6366f1, #4f46e5); color: #fff; font-weight: 700; font-size: 0.85rem; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4); cursor: default;">${p}</button>`;
-        } else if (p === 1 || p === totalPages || (p >= page - 1 && p <= page + 1)) {
-            pageButtons += `<button class="pagination-btn" onclick="loadOrganizations(${p})" style="padding: 6px 14px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: all 0.2s ease;">${p}</button>`;
-        } else if (p === page - 2 || p === page + 2) {
-            pageButtons += `<span style="color: rgba(255,255,255,0.4); padding: 0 4px; font-weight: 700;">...</span>`;
+    const maxVisiblePages = 7;
+    let startPage = 1;
+    let endPage = totalPages;
+
+    if (totalPages > maxVisiblePages) {
+        if (page <= 4) {
+            startPage = 1;
+            endPage = 5;
+        } else if (page >= totalPages - 3) {
+            startPage = totalPages - 4;
+            endPage = totalPages;
+        } else {
+            startPage = page - 2;
+            endPage = page + 2;
         }
+    }
+
+    if (startPage > 1) {
+        pageButtons += `<button onclick="loadOrganizations(1)" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">1</button>`;
+        if (startPage > 2) {
+            pageButtons += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
+        }
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+        if (p === page) {
+            pageButtons += `<button style="width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);color:#fff;font-size:0.82rem;font-weight:700;cursor:default;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);">${p}</button>`;
+        } else {
+            pageButtons += `<button onclick="loadOrganizations(${p})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${p}</button>`;
+        }
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            pageButtons += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
+        }
+        pageButtons += `<button onclick="loadOrganizations(${totalPages})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${totalPages}</button>`;
     }
 
     const isPrevDisabled = page <= 1;
     const isNextDisabled = page >= totalPages;
 
     container.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding: 14px 20px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; flex-wrap: wrap; gap: 16px; backdrop-filter: blur(10px);">
-            <!-- Left: Info & Rows per Page Select -->
-            <div style="display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
-                <span style="font-size: 0.86rem; color: rgba(255,255,255,0.65);">
-                    Showing <strong style="color: #fff;">${startItem}</strong>–<strong style="color: #fff;">${endItem}</strong> of <strong style="color: #fff;">${total}</strong> organizations
-                </span>
-                <div style="display: flex; align-items: center; gap: 8px; border-left: 1px solid rgba(255,255,255,0.12); padding-left: 16px;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.5); font-weight: 500;">Rows per page:</span>
-                    <select id="org-page-size-select" onchange="onOrgPageSizeChange(this.value)" class="input-custom" style="height: 34px; padding: 0 28px 0 10px; font-size: 0.82rem; width: 75px; background: #0f172a !important; color: #fff !important; cursor: pointer; border-radius: 8px; border: 1px solid rgba(255,255,255,0.15);">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding: 12px 20px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; flex-wrap: wrap; gap: 16px; backdrop-filter: blur(10px); font-family: 'Inter', sans-serif;">
+            <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 500;">
+                <span>${startItem}–${endItem} of ${total} <span style="margin:0 4px;opacity:0.4;">·</span> Page ${page} of ${totalPages}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span>Rows per page:</span>
+                    <select id="org-page-size-select" onchange="onOrgPageSizeChange(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 3px 8px; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;">
                         <option value="10" ${limit === 10 ? 'selected' : ''}>10</option>
                         <option value="25" ${limit === 25 ? 'selected' : ''}>25</option>
                         <option value="35" ${limit === 35 ? 'selected' : ''}>35</option>
@@ -256,18 +282,19 @@ function renderOrgPagination(data) {
                 </div>
             </div>
 
-            <!-- Right: Arrow Buttons & Page Numbers -->
-            <div style="display: flex; align-items: center; gap: 8px;">
-                <button onclick="loadOrganizations(${page - 1})" ${isPrevDisabled ? 'disabled' : ''} style="padding: 7px 14px; border-radius: 8px; border: 1px solid ${isPrevDisabled ? 'rgba(255,255,255,0.08)' : 'rgba(99, 102, 241, 0.4)'}; background: ${isPrevDisabled ? 'rgba(255,255,255,0.02)' : 'rgba(99, 102, 241, 0.15)'}; color: ${isPrevDisabled ? 'rgba(255,255,255,0.25)' : '#818cf8'}; font-size: 0.84rem; font-weight: 600; cursor: ${isPrevDisabled ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
-                    <i class="fa-solid fa-chevron-left" style="font-size: 0.75rem;"></i> Previous
+            <div style="display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 4px 6px;">
+                <button onclick="loadOrganizations(1)" ${isPrevDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isPrevDisabled ? '0.3' : '1'};transition:all 0.15s;" title="First page">
+                    <i class="fa-solid fa-angles-left"></i>
                 </button>
-
-                <div style="display: flex; gap: 5px; align-items: center;">
-                    ${pageButtons}
-                </div>
-
-                <button onclick="loadOrganizations(${page + 1})" ${isNextDisabled ? 'disabled' : ''} style="padding: 7px 14px; border-radius: 8px; border: 1px solid ${isNextDisabled ? 'rgba(255,255,255,0.08)' : 'rgba(99, 102, 241, 0.4)'}; background: ${isNextDisabled ? 'rgba(255,255,255,0.02)' : 'rgba(99, 102, 241, 0.15)'}; color: ${isNextDisabled ? 'rgba(255,255,255,0.25)' : '#818cf8'}; font-size: 0.84rem; font-weight: 600; cursor: ${isNextDisabled ? 'not-allowed' : 'pointer'}; display: flex; align-items: center; gap: 6px; transition: all 0.2s ease;">
-                    Next <i class="fa-solid fa-chevron-right" style="font-size: 0.75rem;"></i>
+                <button onclick="loadOrganizations(${page - 1})" ${isPrevDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isPrevDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Previous page">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                ${pageButtons}
+                <button onclick="loadOrganizations(${page + 1})" ${isNextDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isNextDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Next page">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button onclick="loadOrganizations(${totalPages})" ${isNextDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isNextDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Last page">
+                    <i class="fa-solid fa-angles-right"></i>
                 </button>
             </div>
         </div>

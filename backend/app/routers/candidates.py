@@ -15,7 +15,6 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse, FileResponse, Response
 from app.database import get_db_connection
 from app.services.resume_parser import parse_resume, ResumeRejected
-from app.services.embedding_service import get_embedding
 from app.models.schemas import UpdateCandidateStatusRequest, UpdateCandidateRequest
 from app.services.ai_service import match_candidate_with_jd
 from app.logger import get_logger
@@ -73,29 +72,29 @@ async def upload_resume(
 
         candidate_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc).isoformat()
-        embedding = get_embedding(parsed.get("raw_text", ""))
 
-        # Save physical resume file
-        file_path = os.path.join(UPLOAD_DIR, f"{candidate_id}_{file.filename}")
-        try:
-            with open(file_path, "wb") as f:
-                f.write(content)
-        except Exception as e_file:
-            logger.warning("Failed to save physical resume file for candidate %s: %s", candidate_id, e_file)
+        # No longer saving physical resume file locally.
+        # It will be stored in the database as a BYTEA BLOB.
 
         # ── Store in DB ─────────────────────────────────────────
         resume_text = parsed.get("resume_text", "")
 
         with get_db_connection() as conn:
             with conn.cursor() as cur:
+                # Verify hr_id exists, otherwise set to None to avoid foreign key violation
+                if hr_id:
+                    cur.execute("SELECT id FROM hr WHERE id = %s", (hr_id,))
+                    if not cur.fetchone():
+                        hr_id = None
+
                 cur.execute(
                     """
                     INSERT INTO candidates
                         (id, name, email, phone, gender, address,
                          total_experience, skills, education, qualification,
                          linkedin_url, github_url,
-                         job_id, org_id, hr_id, filename, resume_text,
-                         embedding, match_percentage, match_explanation, created_at)
+                         job_id, org_id, hr_id, filename, resume_file, resume_text,
+                         match_percentage, match_explanation, created_at)
                     VALUES
                         (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                     """,
@@ -114,8 +113,8 @@ async def upload_resume(
                         parsed.get("github_url", ""),
                         job_id, org_id, hr_id,
                         file.filename,
+                        content,
                         resume_text,
-                        embedding,
                         match_data["match_percentage"],
                         match_data["match_explanation"],
                         now,
@@ -247,15 +246,23 @@ def download_candidate_resume(candidate_id: str):
     """Download original candidate resume file."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT filename, resume_text FROM candidates WHERE id = %s", (candidate_id,))
+            cur.execute("SELECT filename, resume_text, resume_file FROM candidates WHERE id = %s", (candidate_id,))
             row = cur.fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="Candidate not found")
 
     filename = row[0] or "resume.pdf"
     resume_text = row[1] or ""
-    file_path = os.path.join(UPLOAD_DIR, f"{candidate_id}_{filename}")
+    resume_file = row[2]
 
+    if resume_file:
+        return Response(
+            content=bytes(resume_file),
+            media_type="application/octet-stream",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+        )
+
+    file_path = os.path.join(UPLOAD_DIR, f"{candidate_id}_{filename}")
     if os.path.exists(file_path):
         return FileResponse(path=file_path, filename=filename, media_type="application/octet-stream")
 
@@ -272,18 +279,22 @@ def preview_candidate_resume(candidate_id: str):
     """Preview candidate resume file or text."""
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT filename, resume_text FROM candidates WHERE id = %s", (candidate_id,))
+            cur.execute("SELECT filename, resume_text, resume_file FROM candidates WHERE id = %s", (candidate_id,))
             row = cur.fetchone()
     if not row:
         raise HTTPException(status_code=404, detail="Candidate not found")
 
     filename = row[0] or "resume.pdf"
     resume_text = row[1] or ""
-    file_path = os.path.join(UPLOAD_DIR, f"{candidate_id}_{filename}")
+    resume_file = row[2]
+    ext = filename.lower().split('.')[-1]
+    media_type = "application/pdf" if ext == "pdf" else "text/plain"
 
+    if resume_file:
+        return Response(content=bytes(resume_file), media_type=media_type)
+
+    file_path = os.path.join(UPLOAD_DIR, f"{candidate_id}_{filename}")
     if os.path.exists(file_path):
-        ext = filename.lower().split('.')[-1]
-        media_type = "application/pdf" if ext == "pdf" else "text/plain"
         return FileResponse(path=file_path, media_type=media_type)
 
     return Response(content=resume_text.encode("utf-8"), media_type="text/plain")

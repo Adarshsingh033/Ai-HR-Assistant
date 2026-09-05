@@ -8,6 +8,11 @@ let currentOrgId = null;
 let currentHrId  = null;
 let sortByMatch  = false;
 
+let candidateState = {
+    page: 1,
+    limit: 10
+};
+
 /* ── Init ──────────────────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', async () => {
     const session = Session.get();
@@ -69,6 +74,7 @@ async function loadCandidates(byMatch = false) {
         const data = await apiRequest('GET', url);
         allCandidates = (data && data.candidates) ? data.candidates : [];
 
+        candidateState.page = 1;
         renderStats();
         renderTable();
     } catch (e) {
@@ -129,10 +135,17 @@ function renderTable() {
     if (wrap)  wrap.style.display  = 'block';
     if (count) count.textContent   = `${allCandidates.length} candidate${allCandidates.length !== 1 ? 's' : ''}`;
 
-    tbody.innerHTML = allCandidates.map((c, index) => {
-        const rank      = index + 1;
+    const total = allCandidates.length;
+    const totalPages = Math.ceil(total / candidateState.limit) || 1;
+    if (candidateState.page > totalPages) candidateState.page = totalPages;
+    if (candidateState.page < 1) candidateState.page = 1;
+
+    const startIdx = (candidateState.page - 1) * candidateState.limit;
+    const pagedCandidates = allCandidates.slice(startIdx, startIdx + candidateState.limit);
+
+    tbody.innerHTML = pagedCandidates.map((c, index) => {
+        const rank      = startIdx + index + 1;
         const rankClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
-        const initial   = (c.name || 'U').charAt(0).toUpperCase();
         const cid       = c.candidate_id;
         const matchPct  = c.match_percentage || 0;
         const matchCls  = matchPct >= 70 ? 'match-high' : matchPct >= 40 ? 'match-medium' : 'match-low';
@@ -143,19 +156,16 @@ function renderTable() {
                 <div class="rank-badge ${rankClass}" title="Rank #${rank}">#${rank}</div>
             </td>
             <td>
-                <div class="cand-name-cell">
-                    <div class="cand-avatar">${initial}</div>
-                    <div>
-                        <div class="cand-name">${escapeHtml(c.name || 'Unknown Candidate')}</div>
-                        <div class="cand-file">${escapeHtml(c.filename || '')}</div>
-                    </div>
-                </div>
+                <div class="cand-name">${escapeHtml(c.name || 'Unknown Candidate')}</div>
             </td>
-            <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(c.email)}">
+            <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(c.email || '')}">
                 ${escapeHtml(c.email || '—')}
             </td>
             <td style="white-space:nowrap;">${escapeHtml(c.phone || '—')}</td>
-            <td style="white-space:nowrap;">
+            <td style="max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(c.address || '')}">
+                ${escapeHtml(c.address || '—')}
+            </td>
+            <td style="text-align:center;white-space:nowrap;">
                 <span class="match-badge ${matchCls}">${matchPct}% Match</span>
             </td>
             <td style="text-align:center;">
@@ -175,9 +185,6 @@ function renderTable() {
                     <div class="action-dropdown-item" onclick="handleAction('edit', '${cid}')">
                         <i class="fa-solid fa-pen-to-square" style="color:#fbbf24;"></i> Edit
                     </div>
-                    <div class="action-dropdown-item" onclick="handleAction('download', '${cid}')">
-                        <i class="fa-solid fa-download" style="color:#34d399;"></i> Download
-                    </div>
                     <div class="action-dropdown-item" onclick="handleAction('sendmail', '${cid}')">
                         <i class="fa-solid fa-envelope" style="color:#38bdf8;"></i> Send Mail
                     </div>
@@ -189,6 +196,106 @@ function renderTable() {
             </td>
         </tr>`;
     }).join('');
+
+    renderCandidatePagination(total, totalPages, startIdx, pagedCandidates.length);
+}
+
+function changeCandidateLimit(newLimit) {
+    candidateState.limit = parseInt(newLimit, 10) || 10;
+    candidateState.page = 1;
+    renderTable();
+}
+
+function renderCandidatePagination(total, totalPages, startIdx, pagedCount) {
+    const container = document.getElementById('candidate-pagination-container');
+    if (!container) return;
+
+    if (total === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const startItem = total === 0 ? 0 : startIdx + 1;
+    const endItem   = startIdx + pagedCount;
+    const currentPage = candidateState.page;
+
+    let pageBtns = '';
+
+    const maxVisiblePages = 7;
+    let startPage = 1;
+    let endPage = totalPages;
+
+    if (totalPages > maxVisiblePages) {
+        if (currentPage <= 4) {
+            startPage = 1;
+            endPage = 5;
+        } else if (currentPage >= totalPages - 3) {
+            startPage = totalPages - 4;
+            endPage = totalPages;
+        } else {
+            startPage = currentPage - 2;
+            endPage = currentPage + 2;
+        }
+    }
+
+    if (startPage > 1) {
+        pageBtns += `<button onclick="changeCandidatePage(1)" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">1</button>`;
+        if (startPage > 2) {
+            pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
+        }
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+        if (p === currentPage) {
+            pageBtns += `<button style="width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);color:#fff;font-size:0.82rem;font-weight:700;cursor:default;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);">${p}</button>`;
+        } else {
+            pageBtns += `<button onclick="changeCandidatePage(${p})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${p}</button>`;
+        }
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
+        }
+        pageBtns += `<button onclick="changeCandidatePage(${totalPages})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${totalPages}</button>`;
+    }
+
+    container.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-card); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; font-family: 'Inter', sans-serif;">
+            <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 500;">
+                <span>${startItem}–${endItem} of ${total} <span style="margin:0 4px;opacity:0.4;">·</span> Page ${currentPage} of ${totalPages}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span>Rows per page:</span>
+                    <select onchange="changeCandidateLimit(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 3px 8px; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;">
+                        <option value="10" ${candidateState.limit === 10 ? 'selected' : ''}>10</option>
+                        <option value="25" ${candidateState.limit === 25 ? 'selected' : ''}>25</option>
+                        <option value="50" ${candidateState.limit === 50 ? 'selected' : ''}>50</option>
+                        <option value="100" ${candidateState.limit === 100 ? 'selected' : ''}>100</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 4px 6px;">
+                <button onclick="changeCandidatePage(1)" ${currentPage <= 1 ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage <= 1 ? '0.3' : '1'};transition:all 0.15s;" title="First page">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button onclick="changeCandidatePage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage <= 1 ? '0.3' : '1'};transition:all 0.15s;" title="Previous page">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                ${pageBtns}
+                <button onclick="changeCandidatePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage >= totalPages ? '0.3' : '1'};transition:all 0.15s;" title="Next page">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button onclick="changeCandidatePage(${totalPages})" ${currentPage >= totalPages ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage >= totalPages ? '0.3' : '1'};transition:all 0.15s;" title="Last page">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+            </div>
+        </div>
+    `;
+}
+
+function changeCandidatePage(page) {
+    candidateState.page = page;
+    renderTable();
 }
 
 /* ── Contacted Status Toggle ─────────────────────────────── */
@@ -274,7 +381,7 @@ function openViewModal(candidateId) {
     document.getElementById('vm-address').textContent = c.address || '—';
     document.getElementById('vm-gender').textContent  = c.gender  || '—';
     document.getElementById('vm-exp').textContent     = c.total_experience ? c.total_experience + ' years' : '—';
-    document.getElementById('vm-edu').textContent     = c.education || '—';
+    document.getElementById('vm-qual').textContent    = c.qualification || c.education || '—';
 
     // Applied Job Vacancy
     const jobObj = allJobs.find(j => (j.job_id || j.id) === c.job_id);
@@ -348,11 +455,10 @@ function openEditModal(candidateId) {
     document.getElementById('edit-phone').value          = c.phone || '';
     document.getElementById('edit-address').value        = c.address || '';
     document.getElementById('edit-experience').value     = c.total_experience || '';
-    document.getElementById('edit-qualification').value  = c.qualification || '';
+    document.getElementById('edit-qualification').value  = c.qualification || c.education || '';
     document.getElementById('edit-skills').value         = Array.isArray(c.skills)
         ? c.skills.join(', ')
         : (c.skills || '');
-    document.getElementById('edit-education').value      = c.education || '';
     document.getElementById('edit-linkedin').value       = c.linkedin_url || '';
     document.getElementById('edit-github').value         = c.github_url || '';
 
@@ -375,22 +481,17 @@ async function saveCandidate(e) {
         total_experience: document.getElementById('edit-experience').value.trim() || null,
         qualification:    document.getElementById('edit-qualification').value.trim() || null,
         skills:           document.getElementById('edit-skills').value.trim() || null,
-        education:        document.getElementById('edit-education').value.trim() || null,
         linkedin_url:     document.getElementById('edit-linkedin').value.trim() || null,
         github_url:       document.getElementById('edit-github').value.trim() || null,
     };
 
     try {
-        const res = await apiRequest('PUT', `/api/candidates/${cid}`, payload);
-        if (res && res.re_matched) {
-            showToast(`✅ Candidate updated & AI Match Score recalculated (${res.match_percentage}%)!`, 'success');
-        } else {
-            showToast('✅ Candidate updated successfully!', 'success');
-        }
+        await apiRequest('PUT', `/api/candidates/${cid}`, payload);
+        showToast('Candidate updated successfully', 'success');
         closeModal('edit-modal');
         await loadCandidates(sortByMatch);
     } catch (err) {
-        showToast('Failed to save: ' + err.message, 'error');
+        showToast('Failed to update', 'error');
     } finally {
         btn.disabled = false;
         btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Changes';

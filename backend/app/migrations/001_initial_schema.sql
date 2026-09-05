@@ -47,7 +47,6 @@ CREATE TABLE IF NOT EXISTS jd_description (
     id UUID PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
     description TEXT NOT NULL,
-    embedding FLOAT[],
     org_id UUID REFERENCES organization(id) ON DELETE CASCADE,
     hr_id UUID REFERENCES hr(id) ON DELETE SET NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -80,7 +79,6 @@ CREATE TABLE IF NOT EXISTS candidates (
     org_id UUID REFERENCES organization(id) ON DELETE CASCADE,
     hr_id UUID REFERENCES hr(id) ON DELETE SET NULL,
     filename VARCHAR(500),
-    embedding FLOAT[],
     match_percentage INTEGER,
     match_explanation TEXT,
     reached BOOLEAN DEFAULT FALSE,

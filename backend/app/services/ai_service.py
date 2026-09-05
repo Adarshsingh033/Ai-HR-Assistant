@@ -95,7 +95,7 @@ class MatchResultSchema(BaseModel):
         ..., description="Percentage match between 0 and 100", ge=0, le=100
     )
     match_explanation: str = Field(
-        ..., description="Explanation of why the candidate matches or doesn't match"
+        ..., description="Concise, executive HR explanation of fit and key gaps (2-3 sentences max). Do NOT include score math formulas, percentage weights, or arithmetic breakdowns."
     )
 
 
@@ -241,11 +241,11 @@ def get_groq_client():
     try:
         _groq_client = _build_groq_client()
         _groq_resume_data_extractor = _groq_client.with_structured_output(
-            schema=ExtractResumeDataSchema
+            schema=ExtractResumeDataSchema, method="json_mode"
         )
-        _groq_matcher = _groq_client.with_structured_output(schema=MatchResultSchema)
-        _groq_is_resume_checker = _groq_client.with_structured_output(schema=IsResumeSchema)
-        _groq_comparator = _groq_client.with_structured_output(schema=CompareCandidatesLLMSchema)
+        _groq_matcher = _groq_client.with_structured_output(schema=MatchResultSchema, method="json_mode")
+        _groq_is_resume_checker = _groq_client.with_structured_output(schema=IsResumeSchema, method="json_mode")
+        _groq_comparator = _groq_client.with_structured_output(schema=CompareCandidatesLLMSchema, method="json_mode")
         logger.info(
             "Groq fallback LLM client initialized with model: %s", GROQ_MODEL_NAME
         )
@@ -359,6 +359,9 @@ def check_is_resume(text: str) -> tuple[bool, str]:
 
         Classify strictly. If the text is an invoice, article, book, form,
         certificate, or any non-resume document, return is_resume=false.
+        You must respond strictly in JSON format with exactly these keys:
+        - "is_resume": boolean (true/false)
+        - "reason": string
         """),
         ("human", """
         Classify the following document snippet:
@@ -411,6 +414,17 @@ def extract_candidate_info(text: str) -> dict:
         - If a value is implied but not explicit, infer the most likely value.
         - Never leave a field empty if reasonable inference is available.
         - If multiple values exist, choose the most relevant one.
+        You must respond strictly in JSON format with exactly these keys:
+        - "candidate_name": string
+        - "contact_number": string or null
+        - "email_address": string or null
+        - "total_experience": integer (total full years of experience)
+        - "skills": string (comma-separated list of skills)
+        - "education": string (education summary)
+        - "gender": string (Male/Female/Other)
+        - "address": string or null
+        - "linkedin_url": string or null
+        - "github_url": string or null
         """),
         ("human", """
         Please analyze the following resume and extract the information as per the provided schema.
@@ -464,6 +478,7 @@ def extract_candidate_info(text: str) -> dict:
         "total_experience": result.total_experience,
         "skills": result.skills,
         "education": result.education,
+        "qualification": result.education,
         "gender": result.gender,
         "address": result.address or "",
         "linkedin_url": result.linkedin_url or "",
@@ -478,28 +493,52 @@ def match_candidate_with_jd(candidate_data: dict, jd_text: str) -> dict:
     """Uses LLM (Ollama with Groq fallback) to calculate match percentage and explanation."""
     match_prompt = ChatPromptTemplate.from_messages([
         ("system", """
-        You are an expert HR recruiter. 
-        Compare the candidate's extracted data with the Job Description (JD).
-        Calculate a match percentage (0-100) based on:
-        1. Skills overlap.
-        2. Experience level vs required.
-        
-        Provide a clear, brief explanation of the score.
+        You are an expert HR Talent Acquisition Specialist evaluating candidate fit for a job vacancy.
+        Compare the candidate's profile with the Job Description (JD).
+
+        Evaluate the fit across 4 core criteria:
+        1. Skills match (matching required skills vs missing skills)
+        2. Experience level (candidate's total years vs required years)
+        3. Qualification & Education (candidate's degree/qualification vs required minimum qualification)
+        4. Location fit (candidate address vs required location, if specified)
+
+        Calculate an overall fit score as an integer percentage from 0 to 100.
+
+        Provide a concise, professional summary explaining the match score.
+
+        STRICT EXPLANATION RULES (`match_explanation`):
+        - Keep the explanation short, executive-ready, and direct (2-3 sentences max).
+        - Clearly state the candidate's key matching strengths (e.g., matching skills, valid qualification) and key gaps (e.g., missing specific required skills, lower experience).
+        - DO NOT include mathematical formulas, score percentage calculations, weight breakdowns, or arithmetic averages (e.g., NEVER write "50% skill + 33% experience yields 40%").
+        - Always accurately acknowledge the candidate's qualification/education provided in the candidate profile.
+
+        You must respond strictly in JSON format with exactly these keys:
+        - "match_percentage": integer (0 to 100)
+        - "match_explanation": string (concise professional summary of fit and gaps without math/weights)
         """),
         ("human", """
-        # CANDIDATE DATA
+        # CANDIDATE PROFILE
         {candidate_data}
         
         # JOB DESCRIPTION
         {jd_text}
         
-        Analyze and return the match percentage and explanation.
+        Analyze fit and return the match percentage and explanation.
         """),
     ])
 
+    qual = candidate_data.get('qualification') or candidate_data.get('education') or 'Not specified'
+    loc = candidate_data.get('address') or 'Not specified'
+    exp = candidate_data.get('total_experience') if candidate_data.get('total_experience') is not None else '0'
+    skills = candidate_data.get('skills') or 'Not specified'
+    name = candidate_data.get('candidate_name') or 'Candidate'
+
     candidate_summary = f"""
-Experience: {candidate_data.get('total_experience')} years
-Skills: {candidate_data.get('skills')}
+Candidate Name: {name}
+Total Experience: {exp} years
+Qualification / Education: {qual}
+Skills: {skills}
+Location / Address: {loc}
 """
 
     result = None
@@ -563,6 +602,21 @@ def compare_two_candidates_with_llm(job_data: dict, c1: dict, c2: dict) -> Optio
         Calculate an overall match percentage score (0-100) for each candidate.
         Determine which candidate is the better fit overall (`better_candidate_id` and `better_candidate_name`).
         Provide a comprehensive, professional `comparison_summary_reason` explaining clearly why the recommended candidate is a superior fit compared to the other.
+        You must respond strictly in JSON format matching this structure:
+        {{
+            "cand1_eval": {{
+                "candidate_id": "...", "overall_score": 0,
+                "location": {{"category": "location", "score": 0, "status": "...", "details": "...", "value": "..."}},
+                "skills": {{"category": "skills", "score": 0, "status": "...", "details": "...", "value": "..."}},
+                "education": {{"category": "education", "score": 0, "status": "...", "details": "...", "value": "..."}},
+                "experience": {{"category": "experience", "score": 0, "status": "...", "details": "...", "value": "..."}},
+                "matched_skills": ["..."], "missing_skills": ["..."]
+            }},
+            "cand2_eval": {{ /* same structure as cand1_eval */ }},
+            "better_candidate_id": "...",
+            "better_candidate_name": "...",
+            "comparison_summary_reason": "..."
+        }}
         """),
         ("human", """
         # JOB VACANCY DETAILS
