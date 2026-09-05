@@ -30,19 +30,21 @@ UPLOAD_DIR = os.path.normpath(
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 
-@router.post("/upload")
-async def upload_resume(
+import json
+
+@router.post("/parse")
+async def parse_resume_only(
     job_id: str = Form(...),
     org_id: str = Form(...),
     hr_id: str = Form(...),
     file: UploadFile = File(...),
 ):
     """
-    Upload and process a candidate resume.
+    Parse a candidate resume and run AI matching without saving to database.
     """
     try:
         content = await file.read()
-        logger.info("Resume upload: '%s' for job_id=%s", file.filename, job_id)
+        logger.info("Resume parse: '%s' for job_id=%s", file.filename, job_id)
 
         # ── Parse + validate ────────────────────────────────────
         parsed = parse_resume(content, file.filename)
@@ -71,18 +73,76 @@ async def upload_resume(
         if jd_text:
             match_data = match_candidate_with_jd(parsed, jd_text)
 
+        resume_text = parsed.get("resume_text", "")
+        
+        # Save temp file for later saving
+        tmp_uuid = str(uuid.uuid4())
+        tmp_filename = f"tmp_{tmp_uuid}_{file.filename}"
+        tmp_filepath = os.path.join(UPLOAD_DIR, tmp_filename)
+        with open(tmp_filepath, "wb") as f:
+            f.write(content)
+
+        return {
+            "name": parsed.get("candidate_name", ""),
+            "email": parsed.get("email_address", ""),
+            "phone": parsed.get("contact_number", ""),
+            "gender": parsed.get("gender", ""),
+            "address": parsed.get("address", ""),
+            "total_experience": parsed.get("total_experience", ""),
+            "skills": parsed.get("skills", ""),
+            "education": parsed.get("education", ""),
+            "qualification": parsed.get("qualification", ""),
+            "linkedin_url": parsed.get("linkedin_url", ""),
+            "github_url": parsed.get("github_url", ""),
+            "job_id": job_id,
+            "org_id": org_id,
+            "hr_id": hr_id,
+            "filename": file.filename,
+            "tmp_filename": tmp_filename,
+            "resume_text": resume_text,
+            "match_percentage": match_data["match_percentage"],
+            "match_explanation": match_data["match_explanation"],
+        }
+
+    except ResumeRejected as e:
+        logger.warning("Resume rejected '%s': %s", file.filename, e.reason)
+        return JSONResponse(
+            status_code=422,
+            content={"rejected": True, "reason": e.reason, "filename": file.filename},
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Unexpected error for '%s': %s", file.filename, e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to process resume: {e}")
+
+@router.post("/save")
+async def save_parsed_candidate(
+    job_id: str = Form(...),
+    org_id: str = Form(...),
+    hr_id: str = Form(...),
+    parsed_data: str = Form(...),
+    tmp_filename: str = Form(...),
+):
+    """
+    Save the previously parsed candidate data and resume file to the database.
+    """
+    try:
+        parsed = json.loads(parsed_data)
+        tmp_filepath = os.path.join(UPLOAD_DIR, tmp_filename)
+        
+        content = None
+        if os.path.exists(tmp_filepath):
+            with open(tmp_filepath, "rb") as f:
+                content = f.read()
+            # Clean up temp file
+            os.remove(tmp_filepath)
+        
         candidate_id = str(uuid.uuid4())
         now = datetime.now(timezone.utc).isoformat()
 
-        # No longer saving physical resume file locally.
-        # It will be stored in the database as a BYTEA BLOB.
-
-        # ── Store in DB ─────────────────────────────────────────
-        resume_text = parsed.get("resume_text", "")
-
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-                # Verify hr_id exists, otherwise set to None to avoid foreign key violation
                 if hr_id:
                     cur.execute("SELECT id FROM hr WHERE id = %s", (hr_id,))
                     if not cur.fetchone():
@@ -101,9 +161,9 @@ async def upload_resume(
                     """,
                     (
                         candidate_id,
-                        parsed.get("candidate_name", ""),
-                        parsed.get("email_address", ""),
-                        parsed.get("contact_number", ""),
+                        parsed.get("name", ""),
+                        parsed.get("email", ""),
+                        parsed.get("phone", ""),
                         parsed.get("gender", ""),
                         parsed.get("address", ""),
                         str(parsed.get("total_experience", "0")),
@@ -113,54 +173,30 @@ async def upload_resume(
                         parsed.get("linkedin_url", ""),
                         parsed.get("github_url", ""),
                         job_id, org_id, hr_id,
-                        file.filename,
+                        parsed.get("filename", "unknown.pdf"),
                         psycopg2.Binary(content) if content else None,
-                        resume_text,
-                        match_data["match_percentage"],
-                        match_data["match_explanation"],
+                        parsed.get("resume_text", ""),
+                        parsed.get("match_percentage", 0),
+                        parsed.get("match_explanation", ""),
                         now,
                     ),
                 )
                 conn.commit()
 
         logger.info("Candidate stored: '%s' id=%s match=%s%%",
-                    parsed.get("candidate_name", ""), candidate_id,
-                    match_data["match_percentage"])
+                    parsed.get("name", ""), candidate_id,
+                    parsed.get("match_percentage", 0))
 
-        return {
-            "candidate_id": candidate_id,
-            "name": parsed.get("candidate_name", ""),
-            "email": parsed.get("email_address", ""),
-            "phone": parsed.get("contact_number", ""),
-            "gender": parsed.get("gender", ""),
-            "address": parsed.get("address", ""),
-            "total_experience": parsed.get("total_experience", ""),
-            "skills": parsed.get("skills", ""),
-            "education": parsed.get("education", ""),
-            "qualification": parsed.get("qualification", ""),
-            "linkedin_url": parsed.get("linkedin_url", ""),
-            "github_url": parsed.get("github_url", ""),
-            "job_id": job_id,
-            "org_id": org_id,
-            "hr_id": hr_id,
-            "filename": file.filename,
-            "resume_text": resume_text,
-            "match_percentage": match_data["match_percentage"],
-            "match_explanation": match_data["match_explanation"],
-            "created_at": now,
-        }
+        return {"status": "success", "candidate_id": candidate_id}
 
-    except ResumeRejected as e:
-        logger.warning("Resume rejected '%s': %s", file.filename, e.reason)
-        return JSONResponse(
-            status_code=422,
-            content={"rejected": True, "reason": e.reason, "filename": file.filename},
-        )
-    except HTTPException:
-        raise
     except Exception as e:
-        logger.error("Unexpected error for '%s': %s", file.filename, e, exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to process resume: {e}")
+        filename = "unknown"
+        try:
+            filename = json.loads(parsed_data).get("filename", "unknown")
+        except:
+            pass
+        logger.error("Unexpected error saving '%s': %s", filename, e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to save candidate: {e}")
 
 
 @router.get("")

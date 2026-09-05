@@ -375,7 +375,7 @@ async function processItems(sess, fileMap) {
             fd.append('hr_id', sess.hrId);
             fd.append('file', file);
 
-            const res = await fetch(`${window.location.protocol}//${window.location.host}/api/candidates/upload`, {
+            const res = await fetch(`${window.location.protocol}//${window.location.host}/api/candidates/parse`, {
                 method: 'POST',
                 body: fd,
             });
@@ -583,7 +583,7 @@ async function retryFile(failedIndex) {
             fd.append('hr_id', sess.hrId);
             fd.append('file', file);
 
-            const res = await fetch(`${window.location.protocol}//${window.location.host}/api/candidates/upload`, {
+            const res = await fetch(`${window.location.protocol}//${window.location.host}/api/candidates/parse`, {
                 method: 'POST', body: fd,
             });
             const data = await res.json();
@@ -617,12 +617,54 @@ async function retryFile(failedIndex) {
 }
 
 /* ── Submit Passed Candidates ──────────────────────────────────── */
-function submitCandidates() {
+async function submitCandidates() {
     const sess = loadSession();
     if (!sess) return;
 
-    const passed = sess.items.filter(i => i.status === 'passed').length;
-    showToast(` ${passed} candidate${passed !== 1 ? 's' : ''} added to the Candidates list!`, 'success');
+    const passedItems = sess.items.filter(i => i.status === 'passed');
+    if (passedItems.length === 0) return;
+
+    // Show loading state
+    const btn = document.getElementById('btn-submit');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving...';
+    }
+
+    let savedCount = 0;
+    let failCount = 0;
+
+    for (const item of passedItems) {
+        try {
+            const fd = new FormData();
+            fd.append('job_id', sess.jobId);
+            fd.append('org_id', sess.orgId);
+            fd.append('hr_id', sess.hrId);
+            fd.append('parsed_data', JSON.stringify(item.result));
+            fd.append('tmp_filename', item.result.tmp_filename);
+
+            const res = await fetch(`${window.location.protocol}//${window.location.host}/api/candidates/save`, {
+                method: 'POST',
+                body: fd,
+            });
+
+            if (res.ok) {
+                savedCount++;
+            } else {
+                failCount++;
+            }
+        } catch (err) {
+            console.error('Error saving candidate:', err);
+            failCount++;
+        }
+    }
+
+    if (savedCount > 0) {
+        showToast(` ${savedCount} candidate${savedCount !== 1 ? 's' : ''} added to the Candidates list!`, 'success');
+    }
+    if (failCount > 0) {
+        showToast(`Failed to save ${failCount} candidate(s).`, 'error');
+    }
 
     clearSession();
     uploadSession = null;
