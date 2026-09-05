@@ -648,6 +648,10 @@
                     <span class="tab-num" id="tab-num-2">2</span>
                     Field Weightage
                 </div>
+                <div class="wizard-tab" id="tab-step3" onclick="goToStep(3)">
+                    <span class="tab-num" id="tab-num-3">3</span>
+                    Create Interview Round
+                </div>
             </div>
 
             <!-- Scrollable Modal Body -->
@@ -889,6 +893,39 @@
 
                     </div><!-- /step2-content -->
 
+                    <!-- ═══════════════ STEP 3: Create Interview Round ═══════════════ -->
+                    <div class="weight-section" id="step3-content">
+
+                        <!-- Info banner -->
+                        <div class="weight-header-card" style="background: linear-gradient(135deg, rgba(168,85,247,0.14) 0%, rgba(99,102,241,0.08) 100%); border-color: rgba(168,85,247,0.3);">
+                            <div class="weight-icon-wrap" style="background: linear-gradient(135deg, #a855f7, #6366f1); box-shadow: 0 4px 14px rgba(168,85,247,0.4);">
+                                <i class="fa-solid fa-layer-group"></i>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 3px;">Configure Interview Rounds</div>
+                                <div style="font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.5;">Enter the number of interview rounds required for this job vacancy. The corresponding round sections will be created automatically.</div>
+                            </div>
+                        </div>
+
+                        <!-- Number of Rounds Input Card -->
+                        <div class="weight-field-card" style="margin-bottom: 22px; padding: 18px 22px; background: rgba(15,23,42,0.8);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
+                                <label class="label-custom" style="margin-bottom: 0; font-size: 0.9rem; flex: 1; min-width: 200px;">
+                                    <i class="fa-solid fa-list-ol" style="color: #c084fc; margin-right: 8px;"></i> Number of Interview Rounds <span style="color:#ef4444;">*</span>
+                                </label>
+                                <div style="width: 140px;">
+                                    <input type="number" id="job-rounds-count" class="input-custom" min="1" max="20" value="1" onkeydown="blockNonIntegerKeys(event)" oninput="onNumRoundsChange(this.value)" placeholder="e.g. 2" style="text-align: center; font-size: 1rem; font-weight: 800; color: #c084fc; border-color: rgba(168,85,247,0.4);" />
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Container for Generated Interview Round Sections -->
+                        <div id="interview-rounds-container" style="display: flex; flex-direction: column; gap: 16px;">
+                            <!-- Round cards generated dynamically via JS -->
+                        </div>
+
+                    </div><!-- /step3-content -->
+
                 </form>
             </div>
 
@@ -940,7 +977,7 @@
             <div style="padding: 24px 28px; overflow-y: auto; flex: 1;">
 
                 <!-- Info Grid -->
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px;">
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 22px;">
                     <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;">
                         <div style="font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-location-dot" style="margin-right:5px;"></i>Location</div>
                         <div style="font-size: 0.9rem; font-weight: 700; color: #fff;" id="vj-location">—</div>
@@ -966,9 +1003,15 @@
                 </div>
 
                 <!-- Job Description (Markdown Rendered) -->
-                <div>
+                <div style="margin-bottom: 22px;">
                     <div style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;">Job Description</div>
                     <div id="vj-desc" class="jd-markdown" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px 22px; line-height: 1.7;"></div>
+                </div>
+
+                <!-- Configured Interview Rounds List -->
+                <div>
+                    <div style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;"><i class="fa-solid fa-layer-group" style="color:#c084fc; margin-right:6px;"></i>Configured Interview Rounds</div>
+                    <div id="vj-rounds-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
                 </div>
             </div>
         </div>

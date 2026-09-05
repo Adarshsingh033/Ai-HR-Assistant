@@ -80,6 +80,30 @@ def create_job(
                 ),
             )
             dates = cur.fetchone()
+
+            # Save interview rounds if provided
+            created_rounds = []
+            if payload.interview_rounds:
+                for idx, r in enumerate(payload.interview_rounds, start=1):
+                    rtitle = r.round_title.strip() if r.round_title else ""
+                    if rtitle:
+                        r_id = str(uuid.uuid4())
+                        r_desc = r.round_description.strip() if r.round_description else ""
+                        cur.execute(
+                            """
+                            INSERT INTO screening_rounds (id, job_id, org_id, round_title, round_description, round_order, created_at)
+                            VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                            """,
+                            (r_id, job_id, org_id, rtitle, r_desc, idx),
+                        )
+                        created_rounds.append({
+                            "round_id": r_id,
+                            "job_id": job_id,
+                            "round_title": rtitle,
+                            "round_description": r_desc,
+                            "round_order": idx,
+                        })
+
             conn.commit()
 
             # Get branch name if branch_id present
@@ -109,6 +133,8 @@ def create_job(
         skills_required=payload.skills_required or [],
         job_description=payload.job_description,
         status=status_val,
+        total_interview_rounds=len(created_rounds),
+        interview_rounds=created_rounds,
         created_at=str(dates[0]),
         updated_at=str(dates[1]),
     )
@@ -162,10 +188,30 @@ def list_jobs(
             cur.execute(sql, tuple(params))
             rows = cur.fetchall()
 
+            # Query screening rounds mapping for vacancies
+            cur.execute(
+                "SELECT job_id, id, round_title, round_description, round_order FROM screening_rounds ORDER BY round_order ASC, created_at ASC"
+            )
+            r_rows = cur.fetchall()
+            job_rounds_map = {}
+            for rr in r_rows:
+                jid = str(rr[0])
+                if jid not in job_rounds_map:
+                    job_rounds_map[jid] = []
+                job_rounds_map[jid].append({
+                    "round_id": str(rr[1]),
+                    "job_id": jid,
+                    "round_title": rr[2],
+                    "round_description": rr[3] or "",
+                    "round_order": rr[4] or 1,
+                })
+
             jobs = []
             for r in rows:
+                jid = str(r[0])
+                rounds = job_rounds_map.get(jid, [])
                 jobs.append({
-                    "job_id": str(r[0]),
+                    "job_id": jid,
                     "organization_id": str(r[1]),
                     "branch_id": str(r[2]) if r[2] else "",
                     "branch_name": r[3] or "",
@@ -184,6 +230,8 @@ def list_jobs(
                     "job_description": r[15],
                     "description": r[15], # Legacy alias
                     "status": r[16],
+                    "total_interview_rounds": len(rounds),
+                    "interview_rounds": rounds,
                     "closed_at": str(r[17]) if r[17] else None,
                     "created_at": str(r[18]),
                     "updated_at": str(r[19]),
@@ -213,6 +261,23 @@ def get_job(job_id: str):
             if not r:
                 raise HTTPException(status_code=404, detail="Job Vacancy not found")
 
+            # Query screening rounds for this job
+            cur.execute(
+                "SELECT id, round_title, round_description, round_order FROM screening_rounds WHERE job_id = %s ORDER BY round_order ASC, created_at ASC",
+                (job_id,),
+            )
+            r_rows = cur.fetchall()
+            rounds_list = [
+                {
+                    "round_id": str(rr[0]),
+                    "job_id": job_id,
+                    "round_title": rr[1],
+                    "round_description": rr[2] or "",
+                    "round_order": rr[3] or 1,
+                }
+                for rr in r_rows
+            ]
+
     return {
         "job_id": str(r[0]),
         "organization_id": str(r[1]),
@@ -233,6 +298,8 @@ def get_job(job_id: str):
         "job_description": r[15],
         "description": r[15],
         "status": r[16],
+        "total_interview_rounds": len(rounds_list),
+        "interview_rounds": rounds_list,
         "closed_at": str(r[17]) if r[17] else None,
         "created_at": str(r[18]),
         "updated_at": str(r[19]),
@@ -302,6 +369,47 @@ def update_job(job_id: str, payload: UpdateJobRequest):
                 ),
             )
             dates = cur.fetchone()
+
+            # Handle interview rounds update if passed
+            updated_rounds = []
+            if payload.interview_rounds is not None:
+                cur.execute("DELETE FROM screening_rounds WHERE job_id = %s", (job_id,))
+                for idx, r in enumerate(payload.interview_rounds, start=1):
+                    rtitle = r.round_title.strip() if r.round_title else ""
+                    if rtitle:
+                        r_id = str(uuid.uuid4())
+                        r_desc = r.round_description.strip() if r.round_description else ""
+                        cur.execute(
+                            """
+                            INSERT INTO screening_rounds (id, job_id, org_id, round_title, round_description, round_order, created_at)
+                            VALUES (%s, %s, %s, %s, %s, %s, NOW())
+                            """,
+                            (r_id, job_id, curr[1], rtitle, r_desc, idx),
+                        )
+                        updated_rounds.append({
+                            "round_id": r_id,
+                            "job_id": job_id,
+                            "round_title": rtitle,
+                            "round_description": r_desc,
+                            "round_order": idx,
+                        })
+            else:
+                cur.execute(
+                    "SELECT id, round_title, round_description, round_order FROM screening_rounds WHERE job_id = %s ORDER BY round_order ASC, created_at ASC",
+                    (job_id,),
+                )
+                r_rows = cur.fetchall()
+                updated_rounds = [
+                    {
+                        "round_id": str(rr[0]),
+                        "job_id": job_id,
+                        "round_title": rr[1],
+                        "round_description": rr[2] or "",
+                        "round_order": rr[3] or 1,
+                    }
+                    for rr in r_rows
+                ]
+
             conn.commit()
 
             branch_name = ""
@@ -330,6 +438,8 @@ def update_job(job_id: str, payload: UpdateJobRequest):
         skills_required=new_skills.split(",") if new_skills else [],
         job_description=new_desc,
         status=new_status,
+        total_interview_rounds=len(updated_rounds),
+        interview_rounds=updated_rounds,
         closed_at=str(new_closed_at) if new_closed_at else None,
         created_at=str(dates[0]),
         updated_at=str(dates[1]),

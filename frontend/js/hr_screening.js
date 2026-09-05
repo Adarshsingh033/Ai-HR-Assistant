@@ -3,11 +3,11 @@
    ======================================================== */
 
 let allJobs = [];
-let allRounds = [];
 let screeningCandidates = [];
 let currentOrgId = null;
 let currentHrId  = null;
-let currentSubTab = 'rounds';
+let activeCandidateId = null;
+let activeCandidateProgressData = null;
 
 /* ── Init ──────────────────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', async () => {
@@ -23,12 +23,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('sidebar-avatar').textContent = (session.username || 'H').charAt(0).toUpperCase();
 
     await loadJobs();
-
-    // Check URL tab parameter or default to 'rounds'
-    const params = new URLSearchParams(window.location.search);
-    const tabParam = params.get('tab');
-    if (tabParam === 'candidates') switchSubTab('candidates');
-    else switchSubTab('rounds');
+    await loadScreeningCandidates();
 });
 
 /* ── Load Job list ─────────────────────────────────────── */
@@ -36,7 +31,6 @@ async function loadJobs() {
     try {
         const data = await apiRequest('GET', `/api/jobs?organization_id=${currentOrgId}`);
         allJobs = (data && data.jobs) ? data.jobs : [];
-
         populateJobSelects();
     } catch (e) {
         console.warn('Failed to load jobs:', e);
@@ -44,9 +38,8 @@ async function loadJobs() {
 }
 
 function populateJobSelects() {
-    const roundSel  = document.getElementById('round-job-select');
-    const modalSel  = document.getElementById('round-modal-job');
     const screenSel = document.getElementById('screen-filter-job');
+    if (!screenSel) return;
 
     const options = allJobs.map(j => {
         const jid   = j.job_id || j.id;
@@ -54,219 +47,25 @@ function populateJobSelects() {
         return `<option value="${jid}">${title}</option>`;
     }).join('');
 
-    if (roundSel)  roundSel.innerHTML  = '<option value="">Select Job Vacancy…</option>' + options;
-    if (modalSel)  modalSel.innerHTML  = '<option value="">Select Job Vacancy…</option>' + options;
-    if (screenSel) screenSel.innerHTML = '<option value="">All Job Vacancies</option>' + options;
-
-    // Auto-select first job if available for rounds tab
-    if (allJobs.length > 0 && roundSel && !roundSel.value) {
-        roundSel.value = allJobs[0].job_id || allJobs[0].id;
-        loadRoundsForJob();
-    }
-}
-
-/* ── Subtab Switch ─────────────────────────────────────── */
-function switchSubTab(tabName) {
-    currentSubTab = tabName;
-
-    const bRounds     = document.getElementById('subtab-rounds');
-    const bCandidates = document.getElementById('subtab-candidates');
-    const vRounds     = document.getElementById('subtab-view-rounds');
-    const vCandidates = document.getElementById('subtab-view-candidates');
-
-    if (tabName === 'rounds') {
-        bRounds.classList.add('active');
-        bCandidates.classList.remove('active');
-        vRounds.style.display     = 'block';
-        vCandidates.style.display = 'none';
-        loadRoundsForJob();
-    } else {
-        bCandidates.classList.add('active');
-        bRounds.classList.remove('active');
-        vCandidates.style.display = 'block';
-        vRounds.style.display     = 'none';
-        loadScreeningCandidates();
-    }
+    screenSel.innerHTML = '<option value="">All Job Vacancies</option>' + options;
 }
 
 /* ========================================================
-   SUB-MODULE 1: ADD ROUND LOGIC
-   ======================================================== */
-
-async function loadRoundsForJob() {
-    const jobId = document.getElementById('round-job-select')?.value;
-    const grid  = document.getElementById('rounds-grid');
-    const empty = document.getElementById('rounds-empty');
-    const countInfo = document.getElementById('round-count-info');
-
-    if (!jobId) {
-        grid.innerHTML = '';
-        if (empty) empty.style.display = 'block';
-        if (countInfo) countInfo.textContent = '0 rounds added';
-        return;
-    }
-
-    try {
-        const data = await apiRequest('GET', `/api/screening/rounds?job_id=${jobId}`);
-        allRounds = (data && data.rounds) ? data.rounds : [];
-
-        if (countInfo) countInfo.textContent = `${allRounds.length} round${allRounds.length !== 1 ? 's' : ''} created`;
-
-        if (allRounds.length === 0) {
-            grid.innerHTML = '';
-            if (empty) empty.style.display = 'block';
-            return;
-        }
-
-        if (empty) empty.style.display = 'none';
-
-        grid.innerHTML = allRounds.map((r, i) => {
-            const rid   = r.round_id;
-            const title = escapeHtml(r.round_title);
-            const desc  = escapeHtml(r.round_description || 'No description provided.');
-
-            return `
-            <div class="round-card">
-                <div class="round-badge">Round ${r.round_order || (i + 1)}</div>
-                <div class="round-title">${title}</div>
-                <div class="round-desc">${desc}</div>
-                <div class="round-card-actions">
-                    <button class="btn btn-secondary btn-sm" onclick="openViewRoundModal('${rid}')" style="flex:1;">
-                        <i class="fa-solid fa-eye" style="color:#818cf8;"></i> View
-                    </button>
-                    <button class="btn btn-secondary btn-sm" onclick="openEditRoundModal('${rid}')" style="flex:1;">
-                        <i class="fa-solid fa-pen-to-square" style="color:#fbbf24;"></i> Edit
-                    </button>
-                    <button class="btn btn-secondary btn-sm" onclick="openDeleteRoundModal('${rid}')" style="padding:6px 12px;color:#f87171;" title="Delete Round">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
-            </div>`;
-        }).join('');
-
-    } catch (e) {
-        showToast('Failed to load screening rounds: ' + e.message, 'error');
-    }
-}
-
-function openAddRoundModal() {
-    document.getElementById('round-modal-title').textContent = 'Add Screening Round';
-    document.getElementById('round-id-input').value          = '';
-    document.getElementById('round-title-input').value       = '';
-    document.getElementById('round-desc-input').value        = '';
-
-    const sel = document.getElementById('round-job-select')?.value;
-    if (sel) document.getElementById('round-modal-job').value = sel;
-
-    openModal('round-modal');
-}
-
-function openEditRoundModal(roundId) {
-    const r = allRounds.find(x => x.round_id === roundId);
-    if (!r) return;
-
-    document.getElementById('round-modal-title').textContent = 'Edit Screening Round';
-    document.getElementById('round-id-input').value          = r.round_id;
-    document.getElementById('round-modal-job').value         = r.job_id;
-    document.getElementById('round-title-input').value       = r.round_title || '';
-    document.getElementById('round-desc-input').value        = r.round_description || '';
-
-    openModal('round-modal');
-}
-
-async function saveScreeningRound(e) {
-    e.preventDefault();
-    const rid   = document.getElementById('round-id-input').value;
-    const jobId = document.getElementById('round-modal-job').value;
-    const title = document.getElementById('round-title-input').value.trim();
-    const desc  = document.getElementById('round-desc-input').value.trim();
-
-    if (!jobId || !title) {
-        showToast('Please select a job vacancy and enter a round title.', 'warning');
-        return;
-    }
-
-    const btn = document.getElementById('round-save-btn');
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
-
-    try {
-        if (rid) {
-            // Edit existing
-            await apiRequest('PUT', `/api/screening/rounds/${rid}`, {
-                round_title: title,
-                round_description: desc,
-            });
-            showToast('✅ Screening round updated!', 'success');
-        } else {
-            // Create new
-            await apiRequest('POST', '/api/screening/rounds', {
-                job_id: jobId,
-                org_id: currentOrgId,
-                round_title: title,
-                round_description: desc,
-            });
-            showToast('✅ Screening round created successfully!', 'success');
-        }
-
-        closeModal('round-modal');
-
-        // Sync dropdown & reload
-        document.getElementById('round-job-select').value = jobId;
-        await loadRoundsForJob();
-    } catch (err) {
-        showToast('Failed to save round: ' + err.message, 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Round';
-    }
-}
-
-function openViewRoundModal(roundId) {
-    const r = allRounds.find(x => x.round_id === roundId);
-    if (!r) return;
-
-    document.getElementById('vr-badge').textContent = `Round ${r.round_order || 1}`;
-    document.getElementById('vr-title').textContent = r.round_title || '';
-    document.getElementById('vr-job').textContent   = r.job_title || 'Applied Job Vacancy';
-    document.getElementById('vr-desc').textContent  = r.round_description || 'No description provided.';
-
-    openModal('view-round-modal');
-}
-
-function openDeleteRoundModal(roundId) {
-    document.getElementById('del-round-id').value = roundId;
-    openModal('del-round-modal');
-}
-
-async function confirmDeleteRound() {
-    const rid = document.getElementById('del-round-id').value;
-    try {
-        await apiRequest('DELETE', `/api/screening/rounds/${rid}`);
-        showToast('✅ Screening round deleted.', 'success');
-        closeModal('del-round-modal');
-        await loadRoundsForJob();
-    } catch (err) {
-        showToast('Failed to delete round: ' + err.message, 'error');
-    }
-}
-
-/* ========================================================
-   SUB-MODULE 2: CANDIDATES SCREENING LIST LOGIC
+   CANDIDATES SCREENING LIST LOGIC
    ======================================================== */
 
 async function loadScreeningCandidates() {
     showScreeningSkeleton(true);
 
     try {
-        const jobId    = document.getElementById('screen-filter-job')?.value || '';
-        const schedule = document.getElementById('screen-filter-schedule')?.value || '';
-        const search   = document.getElementById('screen-filter-search')?.value?.trim() || '';
+        const jobId  = document.getElementById('screen-filter-job')?.value || '';
+        const status = document.getElementById('screen-filter-status')?.value || '';
+        const search = document.getElementById('screen-filter-search')?.value?.trim() || '';
 
         let url = `/api/screening/candidates?org_id=${currentOrgId}`;
-        if (jobId)    url += `&job_id=${encodeURIComponent(jobId)}`;
-        if (schedule) url += `&interview_schedule=${encodeURIComponent(schedule)}`;
-        if (search)   url += `&search=${encodeURIComponent(search)}`;
+        if (jobId)  url += `&job_id=${encodeURIComponent(jobId)}`;
+        if (status) url += `&interview_status=${encodeURIComponent(status)}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
 
         const data = await apiRequest('GET', url);
         screeningCandidates = (data && data.candidates) ? data.candidates : [];
@@ -293,7 +92,7 @@ function renderScreeningTable() {
     if (!tbody) return;
 
     if (screeningCandidates.length === 0) {
-        if (empty) empty.style.display = 'block';
+        if (empty) empty.style.display = 'flex';
         if (wrap)  wrap.style.display  = 'none';
         if (count) count.textContent   = '0 candidates';
         return;
@@ -304,56 +103,59 @@ function renderScreeningTable() {
     if (count) count.textContent   = `${screeningCandidates.length} contacted candidate${screeningCandidates.length !== 1 ? 's' : ''}`;
 
     tbody.innerHTML = screeningCandidates.map(c => {
-        const cid        = c.candidate_id;
-        const initial    = (c.name || 'U').charAt(0).toUpperCase();
-        const matchPct   = c.match_percentage || 0;
-        const matchCls   = matchPct >= 70 ? 'match-high' : matchPct >= 40 ? 'match-medium' : 'match-low';
-        const isPending  = (c.interview_schedule || 'Pending') === 'Pending';
-        const schedCls   = isPending ? 'schedule-pending' : 'schedule-active';
-        const stageCls   = (c.screening_stage || 'Screening') === 'Interview' ? 'stage-interview' : 'stage-screening';
+        const cid     = c.candidate_id;
+        const initial = (c.name || 'U').charAt(0).toUpperCase();
+
+        const contactedStatus = c.contacted_status || 'Contacted';
+        const interviewStatus = c.interview_status || 'Ongoing';
+        const roundStep       = c.current_round_title || `Round ${c.current_round_order || 1}`;
+
+        let statusPillClass = 'status-pill-ongoing';
+        if (interviewStatus === 'Passed') statusPillClass = 'status-pill-passed';
+        else if (interviewStatus === 'Rejected') statusPillClass = 'status-pill-rejected';
+        else if (interviewStatus === 'On Hold') statusPillClass = 'status-pill-onhold';
 
         return `
         <tr>
             <td>
                 <div class="cand-name-cell">
                     <div class="cand-avatar">${initial}</div>
-                    <div>
-                        <div class="cand-name">${escapeHtml(c.name || 'Unknown')}</div>
-                        <div class="cand-email">${escapeHtml(c.email || '—')}</div>
-                    </div>
+                    <div class="cand-name">${escapeHtml(c.name || 'Unknown')}</div>
                 </div>
             </td>
-            <td style="max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${escapeHtml(c.job_title)}">
-                ${escapeHtml(c.job_title || 'General Vacancy')}
-            </td>
-            <td style="white-space:nowrap;">${escapeHtml(c.phone || '—')}</td>
-            <td style="white-space:nowrap;">
-                <span class="match-badge ${matchCls}">${matchPct}% Match</span>
-            </td>
-            <td style="text-align:center;">
-                <span class="schedule-badge ${schedCls}" onclick="toggleInterviewSchedule('${cid}', '${c.interview_schedule || 'Pending'}')" title="Click to toggle Pending / Active">
-                    <i class="fa-solid ${isPending ? 'fa-clock' : 'fa-circle-check'}"></i> ${c.interview_schedule || 'Pending'}
+            <td>${escapeHtml(c.email || '—')}</td>
+            <td>
+                <span class="status-pill status-pill-contacted">
+                    <i class="fa-solid fa-phone-volume"></i> ${escapeHtml(contactedStatus)}
                 </span>
             </td>
-            <td style="text-align:center;">
-                <span class="stage-badge ${stageCls}">
-                    <i class="fa-solid ${c.screening_stage === 'Interview' ? 'fa-user-tie' : 'fa-clipboard-check'}"></i> ${c.screening_stage || 'Screening'}
+            <td>
+                <span class="round-step-badge">
+                    <i class="fa-solid fa-diagram-next"></i> ${escapeHtml(roundStep)}
                 </span>
             </td>
-            <td style="text-align:right;position:relative;">
+            <td>
+                <span class="status-pill ${statusPillClass}">
+                    <i class="fa-solid ${getInterviewStatusIcon(interviewStatus)}"></i> ${escapeHtml(interviewStatus)}
+                </span>
+            </td>
+            <td style="text-align:right;" class="action-cell">
                 <button class="action-dots-btn" onclick="toggleActionMenu(event, '${cid}')" title="Actions">
                     <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
                 <div class="action-dropdown" id="amenu-${cid}">
-                    <div class="action-dropdown-item" onclick="handleScreenAction('move-interview', '${cid}')">
-                        <i class="fa-solid fa-person-arrow-right" style="color:#c084fc;"></i> Move for Interview
+                    <div class="action-dropdown-item" onclick="openViewProgressModal('${cid}')">
+                        <i class="fa-solid fa-eye" style="color:#a5b4fc;"></i> View
                     </div>
-                    <div class="action-dropdown-item" onclick="handleScreenAction('progress', '${cid}')">
-                        <i class="fa-solid fa-comments" style="color:#38bdf8;"></i> See Progress & Add Comment
+                    <div class="action-dropdown-item" onclick="openUpdateProgressModal('${cid}')">
+                        <i class="fa-solid fa-pen-to-square" style="color:#38bdf8;"></i> Update Interview Progress
+                    </div>
+                    <div class="action-dropdown-item" onclick="openEditRoundsModal('${cid}', '${c.job_id || ''}')">
+                        <i class="fa-solid fa-sliders" style="color:#fbbf24;"></i> Edit Interview Round
                     </div>
                     <div class="action-dropdown-divider"></div>
-                    <div class="action-dropdown-item danger" onclick="handleScreenAction('delete', '${cid}', '${escapeHtml(c.name || '')}')">
-                        <i class="fa-solid fa-user-minus" style="color:#f87171;"></i> Delete
+                    <div class="action-dropdown-item disabled" onclick="event.stopPropagation()">
+                        <i class="fa-solid fa-envelope" style="color:#94a3b8;"></i> Send Mail
                     </div>
                 </div>
             </td>
@@ -361,139 +163,13 @@ function renderScreeningTable() {
     }).join('');
 }
 
-/* ── Toggle Interview Schedule Status (Pending / Active) ── */
-async function toggleInterviewSchedule(candidateId, currentStatus) {
-    const newStatus = currentStatus === 'Pending' ? 'Active' : 'Pending';
-    try {
-        await apiRequest('PUT', `/api/screening/candidates/${candidateId}/schedule`, {
-            interview_schedule: newStatus,
-        });
-        showToast(`✅ Interview schedule set to ${newStatus}`, 'success');
-        await loadScreeningCandidates();
-    } catch (err) {
-        showToast('Failed to toggle interview schedule: ' + err.message, 'error');
-    }
+function getInterviewStatusIcon(status) {
+    if (status === 'Passed') return 'fa-circle-check';
+    if (status === 'Rejected') return 'fa-circle-xmark';
+    if (status === 'On Hold') return 'fa-circle-pause';
+    return 'fa-spinner';
 }
 
-/* ── Move for Interview ── */
-async function moveCandidateToInterview(candidateId) {
-    try {
-        await apiRequest('PUT', `/api/screening/candidates/${candidateId}/move-interview`);
-        showToast('🚀 Candidate advanced to Interview stage!', 'success');
-        await loadScreeningCandidates();
-    } catch (err) {
-        showToast('Failed to move candidate for interview: ' + err.message, 'error');
-    }
-}
-
-/* ── Remove Candidate from Screening ── */
-function openRemoveScreeningModal(candidateId, name) {
-    document.getElementById('del-screen-cid').value = candidateId;
-    document.getElementById('del-screen-name').textContent = name || 'this candidate';
-    openModal('del-screen-cand-modal');
-}
-
-async function confirmRemoveScreeningCandidate() {
-    const cid = document.getElementById('del-screen-cid').value;
-    try {
-        await apiRequest('DELETE', `/api/screening/candidates/${cid}`);
-        showToast('Candidate removed from screening list.', 'success');
-        closeModal('del-screen-cand-modal');
-        await loadScreeningCandidates();
-    } catch (err) {
-        showToast('Failed to remove candidate: ' + err.message, 'error');
-    }
-}
-
-/* ── See Progress & Add Comment Modal ── */
-async function openProgressModal(candidateId) {
-    try {
-        const data = await apiRequest('GET', `/api/screening/candidates/${candidateId}/progress`);
-        const c = data.candidate;
-        const rounds = data.rounds || [];
-
-        document.getElementById('pm-avatar').textContent = (c.name || 'U').charAt(0).toUpperCase();
-        document.getElementById('pm-name').textContent   = c.name || 'Unknown Candidate';
-        document.getElementById('pm-sub').textContent    = `${c.job_title} • ${c.match_percentage}% Match • Schedule: ${c.interview_schedule}`;
-
-        const container = document.getElementById('pm-rounds-container');
-
-        if (rounds.length === 0) {
-            container.innerHTML = `
-            <div class="table-empty" style="padding:40px 20px;">
-                <i class="fa-solid fa-layer-group" style="font-size:2rem;color:rgba(99,102,241,0.4);margin-bottom:10px;"></i>
-                No screening rounds created for ${escapeHtml(c.job_title)} yet.<br>
-                <span style="font-size:0.78rem;opacity:0.6;">Go to the <strong>Add Round</strong> sub-module to create screening rounds for this job.</span>
-            </div>`;
-            openModal('progress-modal');
-            return;
-        }
-
-        container.innerHTML = rounds.map((r, idx) => {
-            const rid = r.round_id;
-            return `
-            <div class="progress-round-box" id="pbox-${rid}">
-                <div class="progress-round-top">
-                    <div>
-                        <span class="round-badge">Round ${r.round_order || (idx + 1)}</span>
-                        <span class="progress-round-title" style="margin-left:8px;">${escapeHtml(r.round_title)}</span>
-                    </div>
-                    <select class="filter-select" id="pstat-${rid}" style="width:150px;height:34px;font-size:0.78rem;">
-                        <option value="Pending"     ${r.status === 'Pending' ? 'selected' : ''}>Pending</option>
-                        <option value="In Progress" ${r.status === 'In Progress' ? 'selected' : ''}>In Progress</option>
-                        <option value="Passed"      ${r.status === 'Passed' ? 'selected' : ''}>Passed</option>
-                        <option value="Failed"      ${r.status === 'Failed' ? 'selected' : ''}>Failed</option>
-                    </select>
-                </div>
-                <div style="font-size:0.8rem;color:rgba(255,255,255,0.55);margin-bottom:12px;">${escapeHtml(r.round_description || 'No description.')}</div>
-
-                <div class="form-group" style="margin-bottom:10px;">
-                    <label class="form-label" style="font-size:0.68rem;">HR Evaluation Comment & Notes</label>
-                    <textarea class="form-control" id="pcomm-${rid}" rows="2" placeholder="Enter candidate performance feedback, strengths, weak points, or interviewer notes…">${escapeHtml(r.comment || '')}</textarea>
-                </div>
-
-                <div style="display:flex;justify-content:flex-end;">
-                    <button class="btn btn-primary btn-sm" onclick="saveRoundComment('${cid}', '${rid}')" id="pbtn-${rid}" style="padding:6px 16px;font-size:0.78rem;">
-                        <i class="fa-solid fa-floppy-disk"></i> Save Evaluation
-                    </button>
-                </div>
-            </div>`;
-        }).join('');
-
-        openModal('progress-modal');
-    } catch (err) {
-        showToast('Failed to load candidate progress: ' + err.message, 'error');
-    }
-}
-
-async function saveRoundComment(candidateId, roundId) {
-    const status  = document.getElementById(`pstat-${roundId}`)?.value || 'Pending';
-    const comment = document.getElementById(`pcomm-${roundId}`)?.value?.trim() || '';
-
-    const btn = document.getElementById(`pbtn-${roundId}`);
-    if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
-    }
-
-    try {
-        await apiRequest('POST', `/api/screening/candidates/${candidateId}/comments`, {
-            round_id: roundId,
-            status: status,
-            comment: comment,
-        });
-        showToast('✅ Evaluation comment saved!', 'success');
-    } catch (err) {
-        showToast('Failed to save evaluation: ' + err.message, 'error');
-    } finally {
-        if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-floppy-disk"></i> Save Evaluation';
-        }
-    }
-}
-
-/* ── Action Dropdown Handlers ────────────────────────────── */
 function toggleActionMenu(event, cid) {
     event.stopPropagation();
     document.querySelectorAll('.action-dropdown.open').forEach(el => {
@@ -503,16 +179,293 @@ function toggleActionMenu(event, cid) {
     if (menu) menu.classList.toggle('open');
 }
 
-function handleScreenAction(action, cid, name = '') {
-    document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
-    if (action === 'move-interview') moveCandidateToInterview(cid);
-    if (action === 'progress')       openProgressModal(cid);
-    if (action === 'delete')         openRemoveScreeningModal(cid, name);
-}
-
 document.addEventListener('click', () => {
     document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
 });
+
+/* ========================================================
+   1. VIEW CANDIDATE PROGRESS MODAL
+   ======================================================== */
+
+async function openViewProgressModal(candidateId) {
+    try {
+        const data = await apiRequest('GET', `/api/screening/candidates/${candidateId}/progress`);
+        const c = data.candidate;
+        const rounds = data.rounds || [];
+        activeCandidateProgressData = data;
+
+        document.getElementById('vp-avatar').textContent = (c.name || 'U').charAt(0).toUpperCase();
+        document.getElementById('vp-name').textContent   = c.name || 'Unknown Candidate';
+        document.getElementById('vp-sub').textContent    = `${c.email || '—'} • ${c.job_title || 'General Vacancy'}`;
+
+        const alertContainer = document.getElementById('vp-alert-banner');
+        if (c.interview_status === 'Rejected' || c.interview_status === 'On Hold') {
+            const currentRound = rounds.find(r => (r.round_order || 1) === c.current_round_order) || rounds[rounds.length - 1] || {};
+            const isRejected   = c.interview_status === 'Rejected';
+            const bannerClass  = isRejected ? 'alert-banner-rejected' : 'alert-banner-onhold';
+            const iconColor    = isRejected ? '#f87171' : '#fbbf24';
+            const iconClass    = isRejected ? 'fa-circle-xmark' : 'fa-circle-pause';
+
+            alertContainer.className = bannerClass;
+            alertContainer.style.display = 'flex';
+            alertContainer.innerHTML = `
+                <div style="font-size:1.4rem;color:${iconColor};margin-top:2px;">
+                    <i class="fa-solid ${iconClass}"></i>
+                </div>
+                <div>
+                    <div style="font-size:0.95rem;font-weight:800;color:#fff;">Candidate Status: ${c.interview_status}</div>
+                    <div style="font-size:0.83rem;color:rgba(255,255,255,0.8);margin-top:4px;">
+                        <strong>Round:</strong> ${escapeHtml(currentRound.round_title || 'Current Round')}<br>
+                        <strong>Description:</strong> ${escapeHtml(currentRound.round_description || 'No description.')}
+                    </div>
+                    ${currentRound.comment ? `<div style="font-size:0.8rem;color:rgba(255,255,255,0.7);margin-top:6px;font-style:italic;">"${escapeHtml(currentRound.comment)}"</div>` : ''}
+                </div>
+            `;
+        } else {
+            alertContainer.style.display = 'none';
+        }
+
+        // Stepper rendering
+        const stepper = document.getElementById('vp-stepper');
+        if (rounds.length === 0) {
+            stepper.innerHTML = `<div style="color:rgba(255,255,255,0.5);font-size:0.85rem;">No interview rounds configured for this vacancy.</div>`;
+        } else {
+            stepper.innerHTML = rounds.map(r => {
+                const order = r.round_order || 1;
+                let stepClass = '';
+                let nodeContent = order;
+
+                if (r.status === 'Passed' || (c.interview_status === 'Passed' && order <= c.current_round_order)) {
+                    stepClass = 'completed';
+                    nodeContent = '<i class="fa-solid fa-check"></i>';
+                } else if (order === c.current_round_order) {
+                    if (c.interview_status === 'Rejected') {
+                        stepClass = 'rejected';
+                        nodeContent = '<i class="fa-solid fa-xmark"></i>';
+                    } else if (c.interview_status === 'On Hold') {
+                        stepClass = 'onhold';
+                        nodeContent = '<i class="fa-solid fa-pause"></i>';
+                    } else {
+                        stepClass = 'active';
+                    }
+                }
+
+                return `
+                <div class="step-item ${stepClass}">
+                    <div class="step-circle">${nodeContent}</div>
+                    <div class="step-title-text">${escapeHtml(r.round_title)}</div>
+                    <div class="step-status-sub">${r.status || 'Pending'}</div>
+                </div>`;
+            }).join('');
+        }
+
+        // Round feedback cards rendering
+        const roundsDetails = document.getElementById('vp-rounds-details');
+        if (rounds.length === 0) {
+            roundsDetails.innerHTML = `<div style="color:rgba(255,255,255,0.4);font-size:0.84rem;">No round evaluation comments saved yet.</div>`;
+        } else {
+            roundsDetails.innerHTML = rounds.map(r => `
+                <div class="progress-round-box">
+                    <div class="progress-round-top">
+                        <div style="font-size:0.95rem;font-weight:800;color:#fff;">
+                            Round ${r.round_order}: ${escapeHtml(r.round_title)}
+                        </div>
+                        <div style="display:flex;align-items:center;gap:8px;">
+                            ${r.score !== null && r.score !== undefined ? `<span style="background:rgba(99,102,241,0.2);color:#a5b4fc;padding:3px 10px;border-radius:99px;font-weight:800;font-size:0.75rem;border:1px solid rgba(99,102,241,0.4);"><i class="fa-solid fa-star"></i> Score: ${r.score}/100</span>` : ''}
+                            <span class="status-pill ${r.status === 'Passed' ? 'status-pill-passed' : r.status === 'Rejected' ? 'status-pill-rejected' : r.status === 'On Hold' ? 'status-pill-onhold' : 'status-pill-ongoing'}">${r.status || 'Pending'}</span>
+                        </div>
+                    </div>
+                    <div style="font-size:0.8rem;color:rgba(255,255,255,0.55);margin-bottom:8px;">${escapeHtml(r.round_description || 'No description.')}</div>
+                    ${r.comment ? `<div style="font-size:0.84rem;color:#e2e8f0;background:rgba(255,255,255,0.03);padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-top:6px;"><strong>HR Comment:</strong> ${escapeHtml(r.comment)}</div>` : `<div style="font-size:0.78rem;color:rgba(255,255,255,0.35);font-style:italic;margin-top:4px;">No evaluation comments added for this round.</div>`}
+                </div>
+            `).join('');
+        }
+
+        openModal('view-progress-modal');
+    } catch (err) {
+        showToast('Failed to load candidate progress: ' + err.message, 'error');
+    }
+}
+
+/* ========================================================
+   2. UPDATE INTERVIEW PROGRESS MODAL
+   ======================================================== */
+
+async function openUpdateProgressModal(candidateId) {
+    activeCandidateId = candidateId;
+    document.getElementById('up-candidate-id').value = candidateId;
+
+    try {
+        const data = await apiRequest('GET', `/api/screening/candidates/${candidateId}/progress`);
+        const c = data.candidate;
+        const rounds = data.rounds || [];
+        activeCandidateProgressData = data;
+
+        document.getElementById('up-cand-sub').textContent = `${c.name} • ${c.job_title}`;
+
+        const roundSelect = document.getElementById('up-round-select');
+        roundSelect.innerHTML = rounds.map(r => `
+            <option value="${r.round_id}" ${r.round_order === c.current_round_order ? 'selected' : ''}>
+                Round ${r.round_order}: ${escapeHtml(r.round_title)} ${r.round_order === c.current_round_order ? '(Current Active Step)' : ''}
+            </option>
+        `).join('');
+
+        const selectedRound = rounds.find(r => r.round_order === c.current_round_order) || rounds[0] || {};
+        document.getElementById('up-status-select').value = selectedRound.status && selectedRound.status !== 'Pending' ? selectedRound.status : c.interview_status || 'Passed';
+        document.getElementById('up-score-input').value  = selectedRound.score !== null && selectedRound.score !== undefined ? selectedRound.score : '';
+        document.getElementById('up-comment-input').value= selectedRound.comment || '';
+
+        openModal('update-progress-modal');
+    } catch (err) {
+        showToast('Failed to load candidate details: ' + err.message, 'error');
+    }
+}
+
+async function submitInterviewProgress() {
+    const cid     = document.getElementById('up-candidate-id').value;
+    const roundId = document.getElementById('up-round-select').value;
+    const status  = document.getElementById('up-status-select').value;
+    const scoreVal= document.getElementById('up-score-input').value;
+    const comment = document.getElementById('up-comment-input').value.trim();
+
+    if (!roundId) {
+        showToast('Please select an interview round.', 'error');
+        return;
+    }
+
+    const score = scoreVal !== '' ? parseInt(scoreVal, 10) : null;
+
+    try {
+        await apiRequest('POST', `/api/screening/candidates/${cid}/progress`, {
+            round_id: roundId,
+            status: status,
+            score: score,
+            comment: comment,
+        });
+
+        showToast('✅ Interview progress updated successfully!', 'success');
+        closeModal('update-progress-modal');
+        await loadScreeningCandidates();
+    } catch (err) {
+        showToast('Failed to save interview progress: ' + err.message, 'error');
+    }
+}
+
+/* ========================================================
+   3. EDIT INTERVIEW ROUND MODAL
+   ======================================================== */
+
+async function openEditRoundsModal(candidateId, jobId) {
+    document.getElementById('er-job-id').value = jobId;
+
+    try {
+        const data = await apiRequest('GET', `/api/screening/rounds?job_id=${jobId}`);
+        const rounds = data.rounds || [];
+
+        const job = allJobs.find(j => (j.job_id || j.id) === jobId);
+        document.getElementById('er-job-sub').textContent = job ? (job.job_title || job.title) : 'Job Vacancy Rounds';
+
+        const listContainer = document.getElementById('er-rounds-list');
+
+        if (rounds.length === 0) {
+            listContainer.innerHTML = `<div style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:14px;">No rounds currently configured. Click below to add rounds.</div>`;
+        } else {
+            listContainer.innerHTML = rounds.map((r, idx) => `
+                <div class="progress-round-box er-round-box" data-round-id="${r.round_id}">
+                    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+                        <span class="round-step-badge">Round ${idx + 1}</span>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Round Title *</label>
+                        <input type="text" class="form-control er-round-title" value="${escapeHtml(r.round_title)}" placeholder="e.g. HR Screening" />
+                    </div>
+                    <div class="form-group" style="margin-bottom:0;">
+                        <label class="form-label">Round Description</label>
+                        <textarea class="form-control er-round-desc" rows="2" placeholder="Enter round description or guidelines">${escapeHtml(r.round_description || '')}</textarea>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        openModal('edit-rounds-modal');
+    } catch (err) {
+        showToast('Failed to load job vacancy rounds: ' + err.message, 'error');
+    }
+}
+
+function addNewRoundToEditForm() {
+    const listContainer = document.getElementById('er-rounds-list');
+    const currentCount  = listContainer.querySelectorAll('.er-round-box').length;
+    const newIdx = currentCount + 1;
+
+    const div = document.createElement('div');
+    div.className = 'progress-round-box er-round-box';
+    div.dataset.roundId = 'new';
+    div.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;">
+            <span class="round-step-badge">Round ${newIdx} (New)</span>
+            <button onclick="this.closest('.er-round-box').remove()" style="background:none;border:none;color:#f87171;cursor:pointer;font-size:0.85rem;"><i class="fa-solid fa-trash"></i></button>
+        </div>
+        <div class="form-group">
+            <label class="form-label">Round Title *</label>
+            <input type="text" class="form-control er-round-title" value="" placeholder="e.g. Technical Interview" />
+        </div>
+        <div class="form-group" style="margin-bottom:0;">
+            <label class="form-label">Round Description</label>
+            <textarea class="form-control er-round-desc" rows="2" placeholder="Enter round description or guidelines"></textarea>
+        </div>
+    `;
+    listContainer.appendChild(div);
+}
+
+async function saveEditedRounds() {
+    const jobId = document.getElementById('er-job-id').value;
+    const roundBoxes = document.querySelectorAll('.er-round-box');
+
+    let hasError = false;
+    roundBoxes.forEach(box => {
+        const titleInput = box.querySelector('.er-round-title');
+        if (!titleInput.value.trim()) {
+            titleInput.style.borderColor = '#ef4444';
+            hasError = true;
+        } else {
+            titleInput.style.borderColor = '';
+        }
+    });
+
+    if (hasError) {
+        showToast('Please enter a Title for all rounds.', 'error');
+        return;
+    }
+
+    try {
+        for (const box of roundBoxes) {
+            const roundId = box.dataset.roundId;
+            const title   = box.querySelector('.er-round-title').value.trim();
+            const desc    = box.querySelector('.er-round-desc').value.trim();
+
+            if (roundId === 'new') {
+                await apiRequest('POST', `/api/screening/rounds`, {
+                    job_id: jobId,
+                    org_id: currentOrgId,
+                    round_title: title,
+                    round_description: desc
+                });
+            } else {
+                await apiRequest('PUT', `/api/screening/rounds/${roundId}`, {
+                    round_title: title,
+                    round_description: desc
+                });
+            }
+        }
+
+        showToast('✅ Interview rounds updated successfully!', 'success');
+        closeModal('edit-rounds-modal');
+        await loadScreeningCandidates();
+    } catch (err) {
+        showToast('Failed to save interview rounds: ' + err.message, 'error');
+    }
+}
 
 /* ── Helpers ─────────────────────────────────────────────── */
 function showScreeningSkeleton(show) {

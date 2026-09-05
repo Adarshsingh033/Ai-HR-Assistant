@@ -185,6 +185,7 @@ function renderJobsGrid(jobs) {
                 <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${workMode}</span>
                 <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${empType}</span>
                 <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${openings} Opening${openings > 1 ? 's' : ''}</span>
+                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3);display:inline-flex;align-items:center;justify-content:center;line-height:1;"><i class="fa-solid fa-layer-group" style="margin-right:5px;"></i>${job.total_interview_rounds !== undefined ? job.total_interview_rounds : (job.interview_rounds ? job.interview_rounds.length : 0)} Rounds</span>
             </div>
 
             <!-- ── Info Rows (Location & Experience only) ── -->
@@ -248,15 +249,19 @@ function removeSkillTag(index) {
     renderSkillTags();
 }
 
+let configuredRounds = [{ round_title: 'Round 1: HR Screening', round_description: '' }];
+
 /* ── Wizard Step Navigation ──────────────────────────────────── */
 function goToStep(step) {
     const step1 = document.getElementById('step1-content');
     const step2 = document.getElementById('step2-content');
+    const step3 = document.getElementById('step3-content');
     const tab1  = document.getElementById('tab-step1');
     const tab2  = document.getElementById('tab-step2');
-    const nextBtn  = document.getElementById('modal-next-btn');
-    const saveBtn  = document.getElementById('save-job-btn');
-    const backBtn  = document.getElementById('modal-back-btn');
+    const tab3  = document.getElementById('tab-step3');
+    const nextBtn = document.getElementById('modal-next-btn');
+    const saveBtn = document.getElementById('save-job-btn');
+    const backBtn = document.getElementById('modal-back-btn');
 
     if (step === 2) {
         // Validate step 1 first
@@ -273,28 +278,159 @@ function goToStep(step) {
 
         step1.classList.add('hidden-step');
         step2.classList.add('active');
+        if (step3) {
+            step3.classList.remove('active');
+            step3.style.display = 'none';
+        }
+        step2.style.display = 'block';
+
         tab1.classList.remove('active');
         tab1.classList.add('done');
         document.getElementById('tab-num-1').innerHTML = '<i class="fa-solid fa-check" style="font-size:0.7rem;"></i>';
+
         tab2.classList.add('active');
+        tab2.classList.remove('done');
+        document.getElementById('tab-num-2').textContent = '2';
+
+        if (tab3) {
+            tab3.classList.remove('active');
+            tab3.classList.remove('done');
+            document.getElementById('tab-num-3').textContent = '3';
+        }
+
+        nextBtn.style.display = 'flex';
+        nextBtn.onclick = () => goToStep(3);
+        saveBtn.style.display = 'none';
+        backBtn.style.display = 'flex';
+        backBtn.onclick = () => goToStep(1);
+
+        updateTotalWeightUI();
+    } else if (step === 3) {
+        // Validate step 1 first
+        const title = document.getElementById('job-title')?.value.trim();
+        const desc  = document.getElementById('job-desc')?.value.trim();
+        if (!title || !desc) {
+            showToast('Please complete Job Details before proceeding.', 'warning');
+            goToStep(1);
+            return;
+        }
+
+        step1.classList.add('hidden-step');
+        step2.classList.remove('active');
+        step2.style.display = 'none';
+        if (step3) {
+            step3.classList.add('active');
+            step3.style.display = 'block';
+        }
+
+        tab1.classList.remove('active');
+        tab1.classList.add('done');
+        document.getElementById('tab-num-1').innerHTML = '<i class="fa-solid fa-check" style="font-size:0.7rem;"></i>';
+
+        tab2.classList.remove('active');
+        tab2.classList.add('done');
+        document.getElementById('tab-num-2').innerHTML = '<i class="fa-solid fa-check" style="font-size:0.7rem;"></i>';
+
+        if (tab3) {
+            tab3.classList.add('active');
+            tab3.classList.remove('done');
+            document.getElementById('tab-num-3').textContent = '3';
+        }
 
         nextBtn.style.display = 'none';
         saveBtn.style.display = 'flex';
         backBtn.style.display = 'flex';
+        backBtn.onclick = () => goToStep(2);
 
-        updateTotalWeightUI();
+        renderInterviewRoundForms();
     } else {
         step1.classList.remove('hidden-step');
         step2.classList.remove('active');
-        tab2.classList.remove('active');
+        step2.style.display = 'none';
+        if (step3) {
+            step3.classList.remove('active');
+            step3.style.display = 'none';
+        }
+
         tab1.classList.add('active');
         tab1.classList.remove('done');
         document.getElementById('tab-num-1').textContent = '1';
 
+        tab2.classList.remove('active');
+        tab2.classList.remove('done');
+        document.getElementById('tab-num-2').textContent = '2';
+
+        if (tab3) {
+            tab3.classList.remove('active');
+            tab3.classList.remove('done');
+            document.getElementById('tab-num-3').textContent = '3';
+        }
+
         nextBtn.style.display = 'flex';
+        nextBtn.onclick = () => goToStep(2);
         saveBtn.style.display = 'none';
         backBtn.style.display = 'none';
     }
+}
+
+/* ── Dynamic Interview Round Forms ─────────────────────────────── */
+function onNumRoundsChange(value) {
+    let num = parseInt(value, 10);
+    if (isNaN(num) || num < 1) num = 1;
+    if (num > 20) num = 20;
+
+    while (configuredRounds.length < num) {
+        const roundNum = configuredRounds.length + 1;
+        configuredRounds.push({ round_title: `Round ${roundNum}`, round_description: '' });
+    }
+    if (configuredRounds.length > num) {
+        configuredRounds = configuredRounds.slice(0, num);
+    }
+
+    renderInterviewRoundForms();
+}
+
+function updateConfiguredRound(index, field, val) {
+    if (configuredRounds[index]) {
+        if (field === 'title') configuredRounds[index].round_title = val;
+        if (field === 'desc') configuredRounds[index].round_description = val;
+    }
+}
+
+function renderInterviewRoundForms() {
+    const container = document.getElementById('interview-rounds-container');
+    if (!container) return;
+
+    if (configuredRounds.length === 0) {
+        container.innerHTML = `<div style="text-align:center; color:rgba(255,255,255,0.4); padding:20px; font-size:0.88rem;">No interview rounds configured. Set number of rounds above to generate round sections.</div>`;
+        return;
+    }
+
+    container.innerHTML = configuredRounds.map((r, i) => {
+        const roundNum = i + 1;
+        const titleVal = escapeHtml(r.round_title || '');
+        const descVal = escapeHtml(r.round_description || '');
+
+        return `
+        <div class="weight-field-card" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.25); border-radius: 16px; padding: 18px 20px;">
+            <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+                <span class="status-pill" style="background:rgba(168,85,247,0.18); border:1px solid rgba(168,85,247,0.4); color:#c084fc;">
+                    <i class="fa-solid fa-layer-group" style="font-size:0.6rem;"></i> Round ${roundNum}
+                </span>
+                <span style="font-size:0.75rem; color:rgba(255,255,255,0.4);">Interview Step ${roundNum} of ${configuredRounds.length}</span>
+            </div>
+
+            <div class="form-group-custom" style="margin-bottom:14px;">
+                <label class="label-custom">Round Title <span style="color:#ef4444;">*</span></label>
+                <input type="text" id="round-title-${i}" class="input-custom" placeholder="e.g. Round ${roundNum}: HR Screening / Technical Assessment" value="${titleVal}" oninput="updateConfiguredRound(${i}, 'title', this.value)" />
+            </div>
+
+            <div class="form-group-custom">
+                <label class="label-custom">Round Description <span style="font-weight:400; color:rgba(255,255,255,0.45);">(Optional)</span></label>
+                <textarea id="round-desc-${i}" class="input-custom" style="min-height: 80px; height: auto; padding: 10px 14px; font-family: inherit; font-size: 0.88rem; line-height: 1.5; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 12px; color: #ffffff;" placeholder="Brief description, interview format, key topics, or criteria for this round..." oninput="updateConfiguredRound(${i}, 'desc', this.value)">${descVal}</textarea>
+            </div>
+        </div>`;
+    }).join('');
 }
 
 /* ── Weight Slider Logic ────────────────────────────────────────── */
@@ -391,8 +527,16 @@ function openCreateJobModal() {
     renderSkillTags();
     fieldWeights = { ...DEFAULT_WEIGHTS };
     applyWeightsToSliders();
-    goToStep(1);
 
+    configuredRounds = [
+        { round_title: 'Round 1: HR Screening', round_description: 'Initial HR phone screening and qualification check' },
+        { round_title: 'Round 2: Technical Interview', round_description: 'Technical assessment and domain knowledge evaluation' }
+    ];
+    const roundsCountInput = document.getElementById('job-rounds-count');
+    if (roundsCountInput) roundsCountInput.value = configuredRounds.length;
+    renderInterviewRoundForms();
+
+    goToStep(1);
     openModal('job-modal');
 }
 
@@ -421,8 +565,23 @@ function openEditJobModal(jobId) {
 
     // Load saved field weights or fall back to defaults
     applyWeightsToSliders(job.field_weights || {});
-    goToStep(1);
 
+    // Load configured interview rounds
+    if (job.interview_rounds && job.interview_rounds.length > 0) {
+        configuredRounds = job.interview_rounds.map(r => ({
+            round_title: r.round_title || '',
+            round_description: r.round_description || ''
+        }));
+    } else {
+        configuredRounds = [
+            { round_title: 'Round 1: HR Screening', round_description: '' }
+        ];
+    }
+    const roundsCountInput = document.getElementById('job-rounds-count');
+    if (roundsCountInput) roundsCountInput.value = configuredRounds.length;
+    renderInterviewRoundForms();
+
+    goToStep(1);
     openModal('job-modal');
 }
 
@@ -531,6 +690,27 @@ async function handleSaveJob(e) {
         return;
     }
 
+    // Validate configured interview rounds
+    if (configuredRounds.length === 0) {
+        showToast('At least 1 interview round is required.', 'warning');
+        goToStep(3);
+        return;
+    }
+
+    for (let i = 0; i < configuredRounds.length; i++) {
+        const titleEl = document.getElementById(`round-title-${i}`);
+        const rTitle = titleEl ? titleEl.value.trim() : (configuredRounds[i].round_title || '').trim();
+        if (!rTitle) {
+            showToast(`Please enter a Round Title for Interview Round ${i + 1}.`, 'warning');
+            goToStep(3);
+            if (titleEl) titleEl.focus();
+            return;
+        }
+        configuredRounds[i].round_title = rTitle;
+        const descEl = document.getElementById(`round-desc-${i}`);
+        if (descEl) configuredRounds[i].round_description = descEl.value.trim();
+    }
+
     const btn = document.getElementById('save-job-btn');
     if (btn) {
         btn.disabled = true;
@@ -554,6 +734,7 @@ async function handleSaveJob(e) {
             job_description: desc,
             status: status,
             field_weights: { ...fieldWeights },
+            interview_rounds: configuredRounds,
         };
 
         if (jobId) {
@@ -685,6 +866,27 @@ function viewJobDetails(jobId) {
             descEl.innerHTML = marked.parse(raw);
         } else {
             descEl.textContent = raw || 'No description available.';
+        }
+    }
+
+    // Configured Interview Rounds List
+    const roundsListEl = document.getElementById('vj-rounds-list');
+    if (roundsListEl) {
+        const rounds = job.interview_rounds || [];
+        if (rounds.length === 0) {
+            roundsListEl.innerHTML = `<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; color:rgba(255,255,255,0.45); font-size:0.84rem;">No interview rounds configured for this vacancy.</div>`;
+        } else {
+            roundsListEl.innerHTML = rounds.map((r, i) => `
+                <div style="background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.22); border-radius:12px; padding:14px 16px;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
+                        <span class="status-pill" style="background:rgba(168,85,247,0.18); border:1px solid rgba(168,85,247,0.4); color:#c084fc; font-size:0.7rem;">
+                            Round ${r.round_order || (i + 1)}
+                        </span>
+                    </div>
+                    <div style="font-size:0.92rem; font-weight:800; color:#fff; margin-bottom:4px;">${escapeHtml(r.round_title || `Round ${i+1}`)}</div>
+                    <div style="font-size:0.83rem; color:rgba(255,255,255,0.65); line-height:1.5;">${escapeHtml(r.round_description || 'No description provided.')}</div>
+                </div>
+            `).join('');
         }
     }
 

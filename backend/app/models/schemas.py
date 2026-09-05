@@ -246,6 +246,12 @@ class HRResponse(BaseModel):
 
 
 # ── Job Vacancy ───────────────────────────────────────────────────────────────
+class InterviewRoundInput(BaseModel):
+    round_title: str
+    round_description: Optional[str] = ""
+    round_order: Optional[int] = None
+
+
 class CreateJobRequest(BaseModel):
     organization_id: Optional[str] = None
     org_id: Optional[str] = None
@@ -266,6 +272,7 @@ class CreateJobRequest(BaseModel):
     job_description: str
     status: Optional[str] = "draft"
     field_weights: Optional[dict] = None
+    interview_rounds: Optional[List[InterviewRoundInput]] = []
 
 
 class UpdateJobRequest(BaseModel):
@@ -283,6 +290,7 @@ class UpdateJobRequest(BaseModel):
     job_description: Optional[str] = None
     status: Optional[str] = None
     field_weights: Optional[dict] = None
+    interview_rounds: Optional[List[InterviewRoundInput]] = None
 
 
 class JobResponse(BaseModel):
@@ -305,6 +313,8 @@ class JobResponse(BaseModel):
     job_description: str
     status: str = "draft"
     field_weights: Optional[dict] = None
+    total_interview_rounds: int = 0
+    interview_rounds: Optional[List[dict]] = []
     closed_at: Optional[str] = None
     created_at: str
     updated_at: Optional[str] = None
@@ -429,4 +439,12 @@ class AddScreeningCommentRequest(BaseModel):
     round_id: str
     status: Optional[str] = "Pending"  # "Pending", "In Progress", "Passed", "Failed"
     comment: Optional[str] = ""
+
+
+class UpdateCandidateInterviewProgressRequest(BaseModel):
+    round_id: str
+    status: str  # "Ongoing", "Passed", "Rejected", "On Hold"
+    score: Optional[int] = None
+    comment: Optional[str] = ""
+
 
