@@ -220,6 +220,45 @@
             margin-bottom: 16px;
         }
         .progress-round-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+
+        /* ── Status Tiles Grid ── */
+        .status-tiles-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 6px;
+        }
+        .status-tile {
+            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 12px; padding: 10px 12px; cursor: pointer; transition: all 0.18s ease;
+            display: flex; align-items: flex-start; gap: 10px; user-select: none;
+        }
+        .status-tile:hover {
+            background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.22);
+        }
+        .status-tile-icon {
+            width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center;
+            justify-content: center; font-size: 0.9rem; flex-shrink: 0; transition: all 0.18s;
+        }
+        .status-tile-title { font-size: 0.85rem; font-weight: 700; color: #fff; }
+        .status-tile-desc { font-size: 0.72rem; color: rgba(255,255,255,0.5); margin-top: 1px; line-height: 1.25; }
+
+        .status-tile[data-status="Passed"].active {
+            background: rgba(34,197,94,0.12); border-color: #22c55e; box-shadow: 0 0 14px rgba(34,197,94,0.25);
+        }
+        .status-tile[data-status="Passed"].active .status-tile-icon { background: #22c55e; color: #fff; }
+
+        .status-tile[data-status="Ongoing"].active {
+            background: rgba(99,102,241,0.12); border-color: #6366f1; box-shadow: 0 0 14px rgba(99,102,241,0.25);
+        }
+        .status-tile[data-status="Ongoing"].active .status-tile-icon { background: #6366f1; color: #fff; }
+
+        .status-tile[data-status="On Hold"].active {
+            background: rgba(245,158,11,0.12); border-color: #f59e0b; box-shadow: 0 0 14px rgba(245,158,11,0.25);
+        }
+        .status-tile[data-status="On Hold"].active .status-tile-icon { background: #f59e0b; color: #fff; }
+
+        .status-tile[data-status="Rejected"].active {
+            background: rgba(239,68,68,0.12); border-color: #ef4444; box-shadow: 0 0 14px rgba(239,68,68,0.25);
+        }
+        .status-tile[data-status="Rejected"].active .status-tile-icon { background: #ef4444; color: #fff; }
     </style>
 </head>
 <body>
@@ -429,54 +468,131 @@
      2. UPDATE INTERVIEW PROGRESS MODAL
 ══════════════════════════════════════════════ -->
 <div class="modal-overlay" id="update-progress-modal">
-    <div class="modal-md">
-        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-            <div>
-                <h3 style="font-size:1.2rem;font-weight:900;color:#fff;margin:0;">Update Interview Progress</h3>
-                <div style="font-size:0.82rem;color:var(--text-muted);margin-top:3px;" id="up-cand-sub">Candidate Name</div>
+    <div class="modal-md" style="width:820px;max-width:95vw;padding:0;overflow:hidden;max-height:92vh;display:flex;flex-direction:column;background:#0f172a;border:1px solid rgba(255,255,255,0.14);border-radius:24px;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+        
+        <!-- FIXED TOP HEADER AREA -->
+        <div style="padding:24px 28px 18px;border-bottom:1px solid rgba(255,255,255,0.08);background:#0f172a;flex-shrink:0;">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+                <div>
+                    <h3 style="font-size:1.25rem;font-weight:900;color:#fff;margin:0;display:flex;align-items:center;gap:10px;">
+                        <i class="fa-solid fa-pen-to-square" style="color:#6366f1;"></i> Update Status
+                    </h3>
+                    <div style="font-size:0.8rem;color:var(--text-muted);margin-top:3px;">Evaluate candidate performance and update interview outcome</div>
+                </div>
+                <button class="modal-close-btn" onclick="closeModal('update-progress-modal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
-            <button class="modal-close-btn" onclick="closeModal('update-progress-modal')">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+
+            <!-- Candidate Badge Header Card (FIXED) -->
+            <div class="candidate-header-card" style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:14px;padding:12px 18px;display:flex;align-items:center;gap:14px;">
+                <div id="up-cand-avatar" style="width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#6366f1,#4f46e5);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:1.1rem;color:#fff;box-shadow:0 4px 12px rgba(99,102,241,0.3);flex-shrink:0;">
+                    A
+                </div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:1.02rem;font-weight:800;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" id="up-cand-name">Candidate Name</div>
+                    <div style="display:flex;align-items:center;gap:10px;margin-top:4px;">
+                        <span style="background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);padding:2px 10px;border-radius:6px;font-size:0.76rem;font-weight:600;" id="up-cand-job">
+                            Job Title
+                        </span>
+                        <span style="font-size:0.8rem;color:rgba(255,255,255,0.55);" id="up-cand-sub">Candidate Email</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <input type="hidden" id="up-candidate-id" />
+        <!-- SCROLLABLE FORM BODY -->
+        <div style="padding:22px 28px;overflow-y:auto;flex:1;">
+            <input type="hidden" id="up-candidate-id" />
+            <input type="hidden" id="up-status-select" value="Passed" />
 
-        <div class="form-group">
-            <label class="form-label">Interview Round Step</label>
-            <select class="form-control" id="up-round-select">
-                <!-- Populated dynamically -->
-            </select>
+            <!-- Round Selection -->
+            <div style="margin-bottom:24px;">
+                <label style="font-size:0.75rem;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-diagram-next" style="color:#818cf8;"></i> INTERVIEW ROUND STEP
+                </label>
+                <select class="form-control" id="up-round-select" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:12px;padding:12px 16px;font-size:0.88rem;width:100%;outline:none;cursor:pointer;">
+                    <!-- Populated dynamically -->
+                </select>
+            </div>
+
+            <!-- Status Outcome Interactive Tiles -->
+            <div style="margin-bottom:26px;">
+                <label style="font-size:0.75rem;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px;display:flex;align-items:center;gap:8px;">
+                    <i class="fa-solid fa-flag" style="color:#818cf8;"></i> INTERVIEW STATUS OUTCOME
+                </label>
+                <div class="status-tiles-grid">
+                    <div class="status-tile active" data-status="Passed" onclick="selectStatusTile('Passed')">
+                        <div class="status-tile-icon" style="background:rgba(34,197,94,0.15);color:#4ade80;">
+                            <i class="fa-solid fa-circle-check"></i>
+                        </div>
+                        <div>
+                            <div class="status-tile-title">Passed</div>
+                            <div class="status-tile-desc">Advance candidate to next round</div>
+                        </div>
+                    </div>
+
+                    <div class="status-tile" data-status="Ongoing" onclick="selectStatusTile('Ongoing')">
+                        <div class="status-tile-icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">
+                            <i class="fa-solid fa-spinner"></i>
+                        </div>
+                        <div>
+                            <div class="status-tile-title">Ongoing</div>
+                            <div class="status-tile-desc">Evaluation currently in progress</div>
+                        </div>
+                    </div>
+
+                    <div class="status-tile" data-status="On Hold" onclick="selectStatusTile('On Hold')">
+                        <div class="status-tile-icon" style="background:rgba(245,158,11,0.15);color:#fbbf24;">
+                            <i class="fa-solid fa-circle-pause"></i>
+                        </div>
+                        <div>
+                            <div class="status-tile-title">On Hold</div>
+                            <div class="status-tile-desc">Temporarily pause evaluation</div>
+                        </div>
+                    </div>
+
+                    <div class="status-tile" data-status="Rejected" onclick="selectStatusTile('Rejected')">
+                        <div class="status-tile-icon" style="background:rgba(239,68,68,0.15);color:#f87171;">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </div>
+                        <div>
+                            <div class="status-tile-title">Rejected</div>
+                            <div class="status-tile-desc">Discontinue candidate application</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Score & Comment Grid -->
+            <div style="display:grid;grid-template-columns:160px 1fr;gap:20px;">
+                <div>
+                    <label style="font-size:0.75rem;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-star" style="color:#fbbf24;"></i> SCORE (0–100)
+                    </label>
+                    <input type="number" min="0" max="100" class="form-control" id="up-score-input" placeholder="e.g. 85"
+                           style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:12px;padding:12px 16px;font-size:0.88rem;width:100%;outline:none;" />
+                </div>
+                <div>
+                    <label style="font-size:0.75rem;font-weight:800;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-comment-dots" style="color:#38bdf8;"></i> FEEDBACK & NOTES
+                    </label>
+                    <textarea class="form-control" id="up-comment-input" rows="3" placeholder="Enter HR comments or evaluation feedback..."
+                              style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.12);color:#fff;border-radius:12px;padding:12px 16px;font-size:0.86rem;width:100%;outline:none;resize:vertical;font-family:inherit;line-height:1.5;"></textarea>
+                </div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <label class="form-label">Interview Status Outcome</label>
-            <select class="form-control" id="up-status-select">
-                <option value="Passed">Passed (Advance to Next Round Step)</option>
-                <option value="Ongoing">Ongoing</option>
-                <option value="On Hold">On Hold</option>
-                <option value="Rejected">Rejected</option>
-            </select>
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">Candidate Score (out of 100)</label>
-            <input type="number" min="0" max="100" class="form-control" id="up-score-input" placeholder="e.g. 85" />
-        </div>
-
-        <div class="form-group">
-            <label class="form-label">Feedback / Evaluation Notes</label>
-            <textarea class="form-control" id="up-comment-input" rows="4" placeholder="Enter HR comments or evaluation feedback for this round..."></textarea>
-        </div>
-
-        <div style="display:flex;justify-content:flex-end;gap:12px;margin-top:28px;">
+        <!-- FIXED BOTTOM FOOTER BUTTONS -->
+        <div style="padding:16px 28px 22px;border-top:1px solid rgba(255,255,255,0.08);background:#0f172a;flex-shrink:0;display:flex;justify-content:flex-end;gap:12px;">
             <button onclick="closeModal('update-progress-modal')"
-                    style="padding:11px 22px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">
+                    style="padding:11px 22px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.86rem;transition:all 0.15s;"
+                    onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
                 Cancel
             </button>
             <button onclick="submitInterviewProgress()"
-                    style="padding:11px 26px;border-radius:12px;border:none;background:linear-gradient(135deg, #6366f1, #4f46e5);color:#fff;cursor:pointer;font-weight:800;font-size:0.88rem;box-shadow:0 4px 15px rgba(99,102,241,0.4);">
-                Save Progress
+                    style="padding:11px 26px;border-radius:12px;border:none;background:linear-gradient(135deg, #6366f1, #4f46e5);color:#fff;cursor:pointer;font-weight:800;font-size:0.86rem;box-shadow:0 4px 15px rgba(99,102,241,0.4);display:inline-flex;align-items:center;gap:8px;transition:all 0.15s;">
+                <i class="fa-solid fa-floppy-disk"></i> Save Status
             </button>
         </div>
     </div>

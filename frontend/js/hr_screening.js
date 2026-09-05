@@ -151,7 +151,7 @@ function renderScreeningTable() {
                         <i class="fa-regular fa-eye" style="color:#a5b4fc;"></i> View
                     </div>
                     <div class="action-dropdown-item" onclick="openUpdateProgressModal('${cid}')">
-                        <i class="fa-solid fa-pen-to-square" style="color:#38bdf8;"></i> Update Interview Progress
+                        <i class="fa-solid fa-pen-to-square" style="color:#38bdf8;"></i> Update Status
                     </div>
                     <div class="action-dropdown-divider"></div>
                     <div class="action-dropdown-item disabled" onclick="event.stopPropagation()">
@@ -308,17 +308,13 @@ async function openViewProgressModal(candidateId) {
 
             alertContainer.className = bannerClass;
             alertContainer.style.display = 'flex';
+            alertContainer.style.alignItems = 'center';
             alertContainer.innerHTML = `
-                <div style="font-size:1.4rem;color:${iconColor};margin-top:2px;">
+                <div style="font-size:1.3rem;color:${iconColor};display:flex;align-items:center;">
                     <i class="fa-solid ${iconClass}"></i>
                 </div>
                 <div>
-                    <div style="font-size:0.95rem;font-weight:800;color:#fff;">Candidate Status: ${c.interview_status}</div>
-                    <div style="font-size:0.83rem;color:rgba(255,255,255,0.8);margin-top:4px;">
-                        <strong>Round:</strong> ${escapeHtml(currentRound.round_title || 'Current Round')}<br>
-                        <strong>Description:</strong> ${escapeHtml(currentRound.round_description || 'No description.')}
-                    </div>
-                    ${currentRound.comment ? `<div style="font-size:0.8rem;color:rgba(255,255,255,0.7);margin-top:6px;font-style:italic;">"${escapeHtml(currentRound.comment)}"</div>` : ''}
+                    <div style="font-size:0.95rem;font-weight:800;color:${iconColor};">Candidate Status: ${escapeHtml(c.interview_status)}</div>
                 </div>
             `;
         } else {
@@ -391,6 +387,18 @@ async function openViewProgressModal(candidateId) {
    2. UPDATE INTERVIEW PROGRESS MODAL
    ======================================================== */
 
+function selectStatusTile(status) {
+    const input = document.getElementById('up-status-select');
+    if (input) input.value = status;
+    document.querySelectorAll('.status-tile').forEach(tile => {
+        if (tile.getAttribute('data-status') === status) {
+            tile.classList.add('active');
+        } else {
+            tile.classList.remove('active');
+        }
+    });
+}
+
 async function openUpdateProgressModal(candidateId) {
     activeCandidateId = candidateId;
     document.getElementById('up-candidate-id').value = candidateId;
@@ -401,7 +409,18 @@ async function openUpdateProgressModal(candidateId) {
         const rounds = data.rounds || [];
         activeCandidateProgressData = data;
 
-        document.getElementById('up-cand-sub').textContent = `${c.name} • ${c.job_title}`;
+        const initial = (c.name || 'U').charAt(0).toUpperCase();
+        const avatarEl = document.getElementById('up-cand-avatar');
+        if (avatarEl) avatarEl.textContent = initial;
+        
+        const nameEl = document.getElementById('up-cand-name');
+        if (nameEl) nameEl.textContent = c.name || 'Unknown Candidate';
+
+        const jobEl = document.getElementById('up-cand-job');
+        if (jobEl) jobEl.innerHTML = `<i class="fa-solid fa-briefcase" style="margin-right:4px;"></i> ${escapeHtml(c.job_title || 'General Vacancy')}`;
+
+        const subEl = document.getElementById('up-cand-sub');
+        if (subEl) subEl.textContent = c.email || '—';
 
         const roundSelect = document.getElementById('up-round-select');
         roundSelect.innerHTML = rounds.map(r => `
@@ -411,7 +430,9 @@ async function openUpdateProgressModal(candidateId) {
         `).join('');
 
         const selectedRound = rounds.find(r => r.round_order === c.current_round_order) || rounds[0] || {};
-        document.getElementById('up-status-select').value = selectedRound.status && selectedRound.status !== 'Pending' ? selectedRound.status : c.interview_status || 'Passed';
+        const targetStatus = selectedRound.status && selectedRound.status !== 'Pending' ? selectedRound.status : c.interview_status || 'Passed';
+        selectStatusTile(targetStatus);
+
         document.getElementById('up-score-input').value = selectedRound.score !== null && selectedRound.score !== undefined ? selectedRound.score : '';
         document.getElementById('up-comment-input').value = selectedRound.comment || '';
 

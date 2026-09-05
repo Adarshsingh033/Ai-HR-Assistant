@@ -9,6 +9,7 @@ Router: Candidates
 
 import os
 import uuid
+import psycopg2
 from datetime import datetime, timezone
 from typing import Optional
 from fastapi import APIRouter, UploadFile, File, Form, HTTPException
@@ -113,7 +114,7 @@ async def upload_resume(
                         parsed.get("github_url", ""),
                         job_id, org_id, hr_id,
                         file.filename,
-                        content,
+                        psycopg2.Binary(content) if content else None,
                         resume_text,
                         match_data["match_percentage"],
                         match_data["match_explanation"],

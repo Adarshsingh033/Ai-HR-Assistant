@@ -6,6 +6,68 @@ let allJobs = [];
 let availableCandidates = [];
 let currentOrgId = null;
 let currentHrId = null;
+let tsJob = null;
+let tsCand1 = null;
+let tsCand2 = null;
+const COMPARE_SESSION_KEY = 'hr_compare_session';
+
+function saveCompareSession(jobId, cand1Id, cand2Id, resultData) {
+    try {
+        localStorage.setItem(COMPARE_SESSION_KEY, JSON.stringify({
+            jobId, cand1Id, cand2Id, data: resultData, timestamp: Date.now()
+        }));
+    } catch(e) {}
+}
+
+function loadCompareSession() {
+    try {
+        const raw = localStorage.getItem(COMPARE_SESSION_KEY);
+        if (!raw) return null;
+        const sess = JSON.parse(raw);
+        if (Date.now() - sess.timestamp > 2 * 60 * 60 * 1000) {
+            localStorage.removeItem(COMPARE_SESSION_KEY);
+            return null;
+        }
+        return sess;
+    } catch(e) { return null; }
+}
+
+function clearCompareSession() {
+    try { localStorage.removeItem(COMPARE_SESSION_KEY); } catch(e) {}
+}
+
+async function restoreCompareSession() {
+    const sess = loadCompareSession();
+    if (!sess) return;
+    
+    const jobSel = document.getElementById('compare-job-select');
+    if (jobSel) {
+        jobSel.value = sess.jobId;
+        try {
+            const data = await apiRequest('GET', `/api/comparison/candidates-by-job?job_id=${sess.jobId}&org_id=${currentOrgId}`);
+            availableCandidates = (data && data.candidates) ? data.candidates : [];
+            populateCandidateDropdowns();
+            
+            const cand1Sel = document.getElementById('compare-cand1-select');
+            const cand2Sel = document.getElementById('compare-cand2-select');
+            
+            if (tsCand1) { tsCand1.setValue(sess.cand1Id); }
+            else if (cand1Sel) { cand1Sel.value = sess.cand1Id; }
+            
+            if (tsCand2) { tsCand2.setValue(sess.cand2Id); }
+            else if (cand2Sel) { cand2Sel.value = sess.cand2Id; }
+            
+            validateSelections();
+            
+            renderComparisonResults(sess.data);
+            document.getElementById('compare-placeholder').style.display = 'none';
+            document.getElementById('compare-result-container').style.display = 'block';
+        } catch (e) {
+            console.warn('Failed to restore comparison session:', e);
+            clearCompareSession();
+        }
+    }
+}
 
 /* ── Init ──────────────────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', async () => {
@@ -25,6 +87,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Attach change listeners to candidate dropdowns
     document.getElementById('compare-cand1-select')?.addEventListener('change', validateSelections);
     document.getElementById('compare-cand2-select')?.addEventListener('change', validateSelections);
+    
+    // Restore session if available
+    await restoreCompareSession();
 });
 
 /* ── Load Job Vacancies ────────────────────────────────── */
@@ -43,6 +108,10 @@ async function loadJobs() {
         }).join('');
 
         jobSel.innerHTML = '<option value="">-- Choose Job Vacancy --</option>' + options;
+        
+        if (tsJob) tsJob.destroy();
+        tsJob = new TomSelect('#compare-job-select', { create: false, controlInput: '<input>' });
+        
     } catch (e) {
         showToast('Failed to load job vacancies: ' + e.message, 'error');
     }
@@ -50,6 +119,8 @@ async function loadJobs() {
 
 /* ── On Job Selection Changed ──────────────────────────── */
 async function onJobSelectionChanged() {
+    clearCompareSession();
+
     const jobId = document.getElementById('compare-job-select').value;
     const cand1Sel = document.getElementById('compare-cand1-select');
     const cand2Sel = document.getElementById('compare-cand2-select');
@@ -60,10 +131,16 @@ async function onJobSelectionChanged() {
     document.getElementById('compare-result-container').style.display = 'none';
 
     if (!jobId) {
-        cand1Sel.disabled = true;
-        cand2Sel.disabled = true;
         cand1Sel.innerHTML = '<option value="">-- Select Candidate A --</option>';
         cand2Sel.innerHTML = '<option value="">-- Select Candidate B --</option>';
+        
+        if (tsCand1) tsCand1.destroy();
+        if (tsCand2) tsCand2.destroy();
+        tsCand1 = new TomSelect('#compare-cand1-select', { create: false, controlInput: '<input>' });
+        tsCand2 = new TomSelect('#compare-cand2-select', { create: false, controlInput: '<input>' });
+        tsCand1.disable();
+        tsCand2.disable();
+        
         btnCompare.disabled = true;
         return;
     }
@@ -89,27 +166,38 @@ function populateCandidateDropdowns() {
     if (availableCandidates.length === 0) {
         cand1Sel.innerHTML = '<option value="">No candidates found for this job</option>';
         cand2Sel.innerHTML = '<option value="">No candidates found for this job</option>';
-        cand1Sel.disabled = true;
-        cand2Sel.disabled = true;
+        
+        if (tsCand1) tsCand1.destroy();
+        if (tsCand2) tsCand2.destroy();
+        tsCand1 = new TomSelect('#compare-cand1-select', { create: false, controlInput: '<input>' });
+        tsCand2 = new TomSelect('#compare-cand2-select', { create: false, controlInput: '<input>' });
+        tsCand1.disable();
+        tsCand2.disable();
+        
         document.getElementById('btn-run-compare').disabled = true;
         return;
     }
 
     const options = availableCandidates.map(c => {
-        return `<option value="${c.candidate_id}">${escapeHtml(c.name)} (${c.match_percentage}% Match)</option>`;
+        return `<option value="${c.candidate_id}">${escapeHtml(c.name)}</option>`;
     }).join('');
 
     cand1Sel.innerHTML = '<option value="">-- Select Candidate A --</option>' + options;
     cand2Sel.innerHTML = '<option value="">-- Select Candidate B --</option>' + options;
+    
+    if (tsCand1) tsCand1.destroy();
+    if (tsCand2) tsCand2.destroy();
+    tsCand1 = new TomSelect('#compare-cand1-select', { create: false, controlInput: '<input>' });
+    tsCand2 = new TomSelect('#compare-cand2-select', { create: false, controlInput: '<input>' });
 
     // Auto-select top 2 candidates if available
     if (availableCandidates.length >= 2) {
-        cand1Sel.value = availableCandidates[0].candidate_id;
-        cand2Sel.value = availableCandidates[1].candidate_id;
+        tsCand1.setValue(availableCandidates[0].candidate_id);
+        tsCand2.setValue(availableCandidates[1].candidate_id);
     }
 
-    cand1Sel.disabled = false;
-    cand2Sel.disabled = false;
+    tsCand1.enable();
+    tsCand2.enable();
 
     validateSelections();
 }
@@ -151,6 +239,7 @@ async function runCandidateComparison() {
             candidate2_id: cand2Id,
         });
 
+        saveCompareSession(jobId, cand1Id, cand2Id, data);
         renderComparisonResults(data);
 
         document.getElementById('compare-placeholder').style.display = 'none';

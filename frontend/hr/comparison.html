@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/css/tom-select.css" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
 
@@ -54,6 +55,38 @@
         }
         .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
         select.form-control option { background: #111827; color: #fff; padding: 8px; }
+
+        /* ── Tom Select Dark Theme Overrides ── */
+        .ts-wrapper, .ts-wrapper.form-control, .ts-wrapper.single, .ts-wrapper.multi {
+            padding: 0; background: transparent; border: none; box-shadow: none; height: auto;
+        }
+        .ts-wrapper.single .ts-control, .ts-wrapper.multi .ts-control, .ts-control {
+            background: rgba(255,255,255,0.05) !important; 
+            border: 1px solid var(--border) !important;
+            border-radius: 12px !important; 
+            color: #fff !important; 
+            font-size: 0.88rem; font-family: inherit;
+            padding: 0 16px !important; 
+            height: 46px !important; 
+            box-sizing: border-box; display: flex; align-items: center;
+        }
+        .ts-wrapper.disabled .ts-control {
+            opacity: 0.4;
+            background: rgba(255,255,255,0.02) !important;
+            cursor: not-allowed;
+        }
+        .ts-control > input, .ts-wrapper.single .ts-control input { color: #fff !important; font-family: inherit; }
+        .ts-wrapper.focus .ts-control { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-glow) !important; }
+        .ts-dropdown, .ts-wrapper.single .ts-dropdown, .ts-wrapper.multi .ts-dropdown {
+            background: #111827 !important; border: 1px solid var(--border) !important; border-radius: 12px !important;
+            color: #fff !important; margin-top: 6px; box-shadow: var(--shadow-md) !important;
+        }
+        .ts-dropdown .option { padding: 10px 16px !important; color: #fff !important; }
+        .ts-dropdown .active, .ts-dropdown .option:hover { background: var(--accent) !important; color: #fff !important; }
+        .ts-control .item { color: #fff !important; }
+        /* Fix the dropdown arrow color */
+        .ts-wrapper.single .ts-control:after { border-color: rgba(255,255,255,0.6) transparent transparent transparent !important; }
+        .ts-wrapper.single.dropdown-active .ts-control:after { border-color: transparent transparent rgba(255,255,255,0.6) transparent !important; }
 
         /* ── Modern Enhanced Comparison Empty Placeholder ── */
         .compare-hero-card {
@@ -712,6 +745,7 @@
 
 <script src="../js/utils.js"></script>
 <script src="../js/hr_common.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.2.2/dist/js/tom-select.complete.min.js"></script>
 <script src="../js/hr_compare.js"></script>
 </body>
 </html>
