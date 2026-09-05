@@ -1,11 +1,11 @@
 """Router: Emails — AI email drafting, sending, and sent email logs."""
 
 import re
-from typing import List
-from fastapi import APIRouter, HTTPException
+from typing import List, Optional
+from fastapi import APIRouter, HTTPException, Query
 
-from app.models.schemas import GenerateEmailRequest, SendEmailRequest, SentEmailResponse, DraftResponse
-from app.services.email_service import draft_email_content, send_and_save_email, get_sent_emails
+from app.models.schemas import GenerateEmailRequest, SendEmailRequest, EmailResponse, DraftResponse, SaveDraftRequest, ToggleStarRequest
+from app.services.email_service import draft_email_content, send_and_save_email, get_emails, save_email_draft, toggle_email_star
 from app.logger import get_logger
 
 logger = get_logger(__name__)
@@ -52,7 +52,8 @@ def send_email(request: SendEmailRequest, hr_id: str):
         body=request.body,
         candidate_id=request.candidate_id,
         cc_emails=request.cc_emails,
-        bcc_emails=request.bcc_emails
+        bcc_emails=request.bcc_emails,
+        draft_id=request.draft_id
     )
     
     if success:
@@ -62,11 +63,39 @@ def send_email(request: SendEmailRequest, hr_id: str):
         raise HTTPException(status_code=500, detail="Failed to send email.")
 
 
-@router.get("/sent", response_model=List[SentEmailResponse])
-def get_emails(hr_id: str):
-    """Retrieves all sent emails for the HR dashboard."""
+@router.get("", response_model=List[EmailResponse])
+def get_all_emails(hr_id: str, folder: Optional[str] = Query(None)):
+    """Retrieves emails for the HR dashboard, optionally filtered by folder."""
     if not hr_id:
         raise HTTPException(status_code=401, detail="Unauthorized. Need hr_id.")
         
-    emails = get_sent_emails(hr_id)
+    emails = get_emails(hr_id, folder)
     return emails
+
+@router.post("/save_draft")
+def save_draft(request: SaveDraftRequest, hr_id: str):
+    """Saves an email as draft."""
+    if not hr_id:
+        raise HTTPException(status_code=401, detail="Unauthorized. Need hr_id.")
+        
+    return save_email_draft(
+        hr_id=hr_id,
+        subject=request.subject,
+        body=request.body,
+        to_email=request.to_email,
+        cc_emails=request.cc_emails,
+        bcc_emails=request.bcc_emails,
+        candidate_id=request.candidate_id
+    )
+
+@router.put("/{email_id}/star")
+def toggle_star(email_id: str, request: ToggleStarRequest, hr_id: str):
+    """Toggles the star status of an email."""
+    if not hr_id:
+        raise HTTPException(status_code=401, detail="Unauthorized. Need hr_id.")
+        
+    success = toggle_email_star(hr_id, email_id, request.is_starred)
+    if not success:
+        raise HTTPException(status_code=404, detail="Email not found")
+        
+    return {"success": True, "message": "Star status updated."}

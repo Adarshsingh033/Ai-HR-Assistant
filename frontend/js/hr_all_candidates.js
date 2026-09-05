@@ -186,7 +186,7 @@ function renderTable() {
                         <i class="fa-solid fa-pen-to-square" style="color:#fbbf24;"></i> Edit
                     </div>
                     <div class="action-dropdown-item" onclick="handleAction('sendmail', '${cid}')">
-                        <i class="fa-solid fa-envelope" style="color:#38bdf8;"></i> Send Mail
+                        <i class="fa-solid fa-paper-plane" style="color:#a5b4fc;"></i> Send Mail
                     </div>
                     <div class="action-dropdown-divider"></div>
                     <div class="action-dropdown-item danger" onclick="handleAction('delete', '${cid}', '${escapeHtml(c.name || '')}')">
@@ -338,7 +338,12 @@ function handleAction(action, cid, name = '') {
     if (action === 'edit') openEditModal(cid);
     if (action === 'download') downloadResume(cid);
     if (action === 'delete') openDeleteModal(cid, name);
-    if (action === 'sendmail') showToast('📧 Send Mail functionality will be available in the next release.', 'info');
+    if (action === 'sendmail') {
+        const c = allCandidates.find(x => x.candidate_id === cid);
+        if (c) {
+            window.location.href = `emails.html?source=candidates&candidate_id=${cid}&to=${encodeURIComponent(c.email || '')}&name=${encodeURIComponent(c.name || '')}`;
+        }
+    }
 }
 
 document.addEventListener('click', () => {

@@ -1,0 +1,1 @@
+import urllib.request; import json; req = urllib.request.Request('http://127.0.0.1:8000/api/emails?hr_id=c3c2989f-62f8-4e55-b959-fe361e6a10e3&folder=drafts'); res = urllib.request.urlopen(req); print('API response code:', res.getcode()); print(json.loads(res.read().decode('utf-8'))[0]['id'])

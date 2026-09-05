@@ -298,6 +298,10 @@
             <span class="nav-icon"><i class="fa-solid fa-code-compare"></i></span>
             Candidate Comparison
         </a>
+            <a href="emails.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-paper-plane"></i></span>
+                Mailing
+            </a>
 
         <!-- Sidebar Footer -->
         <div class="sidebar-footer" style="position:relative;">
@@ -307,7 +311,7 @@
                 </a>
                 <div class="popover-divider"></div>
                 <a href="change_password.html" class="popover-item">
-                    <i class="fa-solid fa-key" style="color: #38bdf8;"></i> Change Password
+                    <i class="fa-solid fa-lock" style="color: #f97316;"></i> Change Password
                 </a>
                 <div class="popover-divider"></div>
                 <a href="#" class="popover-item" onclick="logout()">
@@ -420,46 +424,46 @@
      1. VIEW CANDIDATE PROGRESS MODAL
 ══════════════════════════════════════════════ -->
 <div class="modal-overlay" id="view-progress-modal">
-    <div class="modal-lg">
-        <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">
-            <div class="cand-name-cell">
-                <div class="cand-avatar" id="vp-avatar">C</div>
-                <div>
-                    <div style="font-size:1.25rem;font-weight:900;color:#fff;" id="vp-name">Candidate Name</div>
-                    <div style="font-size:0.84rem;color:var(--text-muted);margin-top:2px;" id="vp-sub">email@example.com • Job Title</div>
+    <div class="modal-lg" style="padding:0; overflow:hidden; display:flex; flex-direction:column; max-height:90vh;">
+        
+        <!-- FIXED TOP HEADER -->
+        <div style="padding: 36px 36px 24px 36px; flex-shrink: 0; background: #0f172a; border-bottom: 1px solid rgba(255,255,255,0.08); z-index: 10;">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">
+                <div class="cand-name-cell">
+                    <div class="cand-avatar" id="vp-avatar">C</div>
+                    <div>
+                        <div style="font-size:1.25rem;font-weight:900;color:#fff;" id="vp-name">Candidate Name</div>
+                        <div style="font-size:0.84rem;color:var(--text-muted);margin-top:2px;" id="vp-sub">email@example.com • Job Title</div>
+                    </div>
                 </div>
+                <button class="modal-close-btn" onclick="closeModal('view-progress-modal')">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
-            <button class="modal-close-btn" onclick="closeModal('view-progress-modal')">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
+
+            <!-- Alert Banner for Rejected / On Hold -->
+            <div id="vp-alert-banner" style="display:none;"></div>
+
+            <!-- Timeline / Stepper Header -->
+            <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:12px;">
+                Interview Rounds Progress Timeline
+            </div>
+
+            <div class="stepper-container" id="vp-stepper" style="margin-bottom:0;">
+                <!-- Dynamic Stepper Nodes -->
+            </div>
         </div>
 
-        <!-- Alert Banner for Rejected / On Hold -->
-        <div id="vp-alert-banner" style="display:none;"></div>
+        <!-- SCROLLABLE BODY -->
+        <div style="padding: 24px 36px 36px 36px; overflow-y: auto; flex: 1; background: #0f172a;">
+            <!-- Feedback & Evaluations per Round -->
+            <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:14px;">
+                Round Details & HR Evaluation Notes
+            </div>
 
-        <!-- Timeline / Stepper Header -->
-        <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:12px;">
-            Interview Rounds Progress Timeline
-        </div>
-
-        <div class="stepper-container" id="vp-stepper">
-            <!-- Dynamic Stepper Nodes -->
-        </div>
-
-        <!-- Feedback & Evaluations per Round -->
-        <div style="font-size:0.75rem;font-weight:800;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-muted);margin-bottom:14px;">
-            Round Details & HR Evaluation Notes
-        </div>
-
-        <div id="vp-rounds-details">
-            <!-- Dynamic feedback cards -->
-        </div>
-
-        <div style="display:flex;justify-content:flex-end;margin-top:28px;">
-            <button onclick="closeModal('view-progress-modal')"
-                    style="padding:11px 26px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.85);border-radius:12px;cursor:pointer;font-size:0.88rem;font-weight:700;transition:var(--transition);">
-                Close
-            </button>
+            <div id="vp-rounds-details">
+                <!-- Dynamic feedback cards -->
+            </div>
         </div>
     </div>
 </div>

@@ -409,19 +409,36 @@ class SendEmailRequest(BaseModel):
     bcc_emails: Optional[str] = None
     subject: str
     body: str
+    draft_id: Optional[str] = None
 
 
-class SentEmailResponse(BaseModel):
+class EmailResponse(BaseModel):
     id: str
     hr_id: str
     org_id: str
     candidate_id: Optional[str] = None
+    from_email: Optional[str] = None
     to_email: str
     cc_emails: Optional[str] = None
     bcc_emails: Optional[str] = None
     subject: str
     body: str
-    sent_at: str
+    folder: str = "sent"
+    is_starred: bool = False
+    sent_at: Optional[str] = None
+    updated_at: Optional[str] = None
+
+
+class SaveDraftRequest(BaseModel):
+    candidate_id: Optional[str] = None
+    to_email: Optional[str] = ""
+    cc_emails: Optional[str] = ""
+    bcc_emails: Optional[str] = ""
+    subject: Optional[str] = ""
+    body: Optional[str] = ""
+
+class ToggleStarRequest(BaseModel):
+    is_starred: bool
 
 
 # ── Screening Module ─────────────────────────────────────────────────────────

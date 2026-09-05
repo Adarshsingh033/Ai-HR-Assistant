@@ -67,21 +67,36 @@
             box-shadow:
                 0 20px 50px rgba(0, 0, 0, 0.5),
                 0 0 40px rgba(99, 102, 241, 0.18);
-            position: relative;
-            animation: floatCard 6s ease-in-out infinite;
+            position: absolute;
         }
 
-        @keyframes floatCard {
-
-            0%,
-            100% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
+        .card-1 {
+            top: 0px;
+            left: -10px;
+            transform: scale(0.85) rotate(-4deg);
+            z-index: 1;
+            animation: floatCard1 7s ease-in-out infinite;
         }
+
+        .card-2 {
+            top: 80px;
+            right: -10px;
+            transform: scale(0.9) rotate(3deg);
+            z-index: 2;
+            animation: floatCard2 6s ease-in-out infinite 1s;
+        }
+
+        .card-3 {
+            top: 200px;
+            left: 20px;
+            transform: scale(0.95) rotate(-1deg);
+            z-index: 3;
+            animation: floatCard3 8s ease-in-out infinite 0.5s;
+        }
+
+        @keyframes floatCard1 { 0%, 100% { transform: scale(0.85) rotate(-4deg) translateY(0px); } 50% { transform: scale(0.85) rotate(-4deg) translateY(-12px); } }
+        @keyframes floatCard2 { 0%, 100% { transform: scale(0.9) rotate(3deg) translateY(0px); } 50% { transform: scale(0.9) rotate(3deg) translateY(-10px); } }
+        @keyframes floatCard3 { 0%, 100% { transform: scale(0.95) rotate(-1deg) translateY(0px); } 50% { transform: scale(0.95) rotate(-1deg) translateY(-15px); } }
 
         .card-glass-header {
             display: flex;
@@ -503,8 +518,10 @@
             </div>
 
             <!-- AI HR Feature Showcase Card Graphic -->
-            <div class="visual-graphic-container">
-                <div class="ai-showcase-card">
+            <div class="visual-graphic-container" style="height: 480px; max-width: 480px; margin: 0 auto; position: relative;">
+                
+                <!-- CARD 1: AI MATCHING ENGINE -->
+                <div class="ai-showcase-card card-1">
                     <div class="card-glass-header">
                         <div class="ai-badge">
                             <span class="ai-pulse-dot"></span>
@@ -512,7 +529,6 @@
                         </div>
                         <div class="score-ring">98% Match</div>
                     </div>
-
                     <div class="candidate-preview-box">
                         <div class="candidate-avatar"><i class="fa-solid fa-user-tie"></i></div>
                         <div class="candidate-info">
@@ -520,21 +536,68 @@
                             <div class="cand-status">Recommended Candidate</div>
                         </div>
                     </div>
-
                     <div class="skills-tags-row">
                         <span class="skill-pill">Python</span>
                         <span class="skill-pill">FastAPI</span>
                         <span class="skill-pill">PostgreSQL</span>
-                        <span class="skill-pill">+AI Vector Search</span>
                     </div>
-
                     <div class="floating-badge badge-top-right">
                         <i class="fa-solid fa-bolt" style="color: #f59e0b;"></i> AI JD Generated
                     </div>
-                    <div class="floating-badge badge-bottom-left">
-                        <i class="fa-solid fa-circle-check" style="color: #10b981;"></i> Resume Parsed
+                </div>
+
+                <!-- CARD 2: COMPARE CANDIDATES -->
+                <div class="ai-showcase-card card-2" style="max-width: 340px;">
+                    <div class="card-glass-header">
+                        <div class="ai-badge" style="background: rgba(236, 72, 153, 0.18); border-color: rgba(236, 72, 153, 0.35); color: #f472b6;">
+                            <i class="fa-solid fa-code-compare"></i>
+                            <span>Compare Candidates</span>
+                        </div>
+                    </div>
+                    <div class="candidate-preview-box" style="padding: 10px; margin-bottom: 8px;">
+                        <div class="candidate-avatar" style="width: 36px; height: 36px; font-size: 0.9rem; background: linear-gradient(135deg, #ec4899, #db2777);"><i class="fa-solid fa-user"></i></div>
+                        <div class="candidate-info">
+                            <div class="cand-name" style="font-size: 0.85rem;">Alex M. - <span style="color:#10b981;">95%</span></div>
+                            <div class="cand-status" style="font-size: 0.7rem;">Backend Specialist</div>
+                        </div>
+                    </div>
+                    <div class="candidate-preview-box" style="padding: 10px; margin-bottom: 0;">
+                        <div class="candidate-avatar" style="width: 36px; height: 36px; font-size: 0.9rem; background: linear-gradient(135deg, #8b5cf6, #7c3aed);"><i class="fa-solid fa-user"></i></div>
+                        <div class="candidate-info">
+                            <div class="cand-name" style="font-size: 0.85rem;">Sarah T. - <span style="color:#10b981;">92%</span></div>
+                            <div class="cand-status" style="font-size: 0.7rem;">Frontend Expert</div>
+                        </div>
+                    </div>
+                    <div class="floating-badge badge-bottom-left" style="background: rgba(15, 12, 34, 0.95); animation-delay: 1.5s;">
+                        <i class="fa-solid fa-scale-balanced" style="color: #ec4899;"></i> Unbiased Analysis
                     </div>
                 </div>
+
+                <!-- CARD 3: AI INTERVIEW SCREENING -->
+                <div class="ai-showcase-card card-3">
+                    <div class="card-glass-header">
+                        <div class="ai-badge" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.35); color: #34d399;">
+                            <i class="fa-solid fa-clipboard-check"></i>
+                            <span>Automated Screening</span>
+                        </div>
+                        <div class="score-ring" style="background: linear-gradient(135deg, #f59e0b, #d97706);">Round 2</div>
+                    </div>
+                    <div class="candidate-preview-box">
+                        <div class="candidate-avatar" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fa-solid fa-microphone"></i></div>
+                        <div class="candidate-info">
+                            <div class="cand-name">Technical Interview</div>
+                            <div class="cand-status">In Progress...</div>
+                        </div>
+                    </div>
+                    <div class="skills-tags-row">
+                        <span class="skill-pill">System Design</span>
+                        <span class="skill-pill">Algorithms</span>
+                    </div>
+                    <div class="floating-badge badge-top-right" style="right: -25px; animation-delay: 1s;">
+                        <i class="fa-solid fa-wand-magic-sparkles" style="color: #a5b4fc;"></i> AI Evaluation
+                    </div>
+                </div>
+
             </div>
 
             <div class="hero-title-group">

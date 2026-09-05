@@ -146,7 +146,7 @@ async function loadCandidates(jobId = null, orgId = null) {
 
                 <div class="card-footer flex gap-2">
                     <button class="btn btn-secondary w-full btn-sm" onclick='openViewCandidateModal(${JSON.stringify(cand).replace(/'/g, "&#39;")})'>View Details</button>
-                    <a href="emails.html?to=${encodeURIComponent(cand.email || '')}" class="btn btn-secondary btn-sm" title="Send Email"><i class="fa-solid fa-envelope"></i></a>
+                    <a href="emails.html?to=${encodeURIComponent(cand.email || '')}" class="btn btn-secondary btn-sm" title="Send Email"><i class="fa-solid fa-paper-plane"></i></a>
                     <button class="btn btn-secondary btn-sm" onclick="delCandidate('${cand.candidate_id}')" title="Remove Candidate"><i class="fa-solid fa-trash"></i></button>
                 </div>
             `;

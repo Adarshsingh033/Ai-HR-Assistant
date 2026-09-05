@@ -1,162 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mailing - HR Dashboard</title>
     <link rel="stylesheet" href="../css/main.css" />
     <style>
-        .tabs {
+        .mail-layout {
+            display: grid;
+            grid-template-columns: 240px 1fr;
+            gap: 24px;
+            height: calc(100vh - 120px);
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: var(--radius-xl);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            overflow: hidden;
+            backdrop-filter: blur(16px);
+        }
+
+        /* Mail Sidebar */
+        .mail-sidebar {
+            background: rgba(255, 255, 255, 0.02);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 24px 16px;
             display: flex;
+            flex-direction: column;
             gap: 8px;
-            margin-bottom: 24px;
-            background: rgba(255, 255, 255, 0.03);
-            padding: 6px;
-            border-radius: var(--radius-md);
-            width: fit-content;
         }
 
-        .tab {
-            padding: 8px 18px;
+        .btn-compose {
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            color: white;
+            border: none;
+            padding: 14px 24px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
             cursor: pointer;
-            font-weight: 600;
-            font-size: 0.9rem;
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.25);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-bottom: 24px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-compose:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(99, 102, 241, 0.4);
+        }
+
+        .mail-folder {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 12px;
             color: var(--text-muted);
-            border-radius: var(--radius-sm);
-            transition: var(--transition);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 600;
+            font-size: 0.95rem;
         }
 
-        .tab:hover {
+        .mail-folder:hover {
+            background: rgba(255, 255, 255, 0.04);
             color: var(--text-primary);
-            background: rgba(255, 255, 255, 0.05);
         }
 
-        .tab.active {
-            color: #fff;
-            background: var(--accent);
-            box-shadow: 0 4px 12px var(--accent-glow);
+        .mail-folder.active {
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent-light);
+            border-right: 3px solid var(--accent);
+            border-radius: 12px 4px 4px 12px;
         }
 
-        .tab-content {
-            display: none;
+        .mail-folder i {
+            font-size: 1.1rem;
+            width: 20px;
+            text-align: center;
+        }
+
+        /* Mail Main Content */
+        .mail-main {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .mail-header {
+            padding: 24px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .mail-header h2 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin: 0;
+            color: var(--text-primary);
+            text-transform: capitalize;
+        }
+
+        .mail-body {
+            flex: 1;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* Email List View */
+        .email-list {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .email-row {
+            display: grid;
+            grid-template-columns: 40px 180px 1fr 100px;
+            align-items: center;
+            padding: 16px 32px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            gap: 16px;
+        }
+
+        .email-row:hover {
+            background: rgba(255, 255, 255, 0.04);
+            transform: translateX(4px);
+            box-shadow: -4px 0 0 var(--accent);
+        }
+
+        .email-star {
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .email-star:hover {
+            color: var(--warning);
+        }
+        
+        .email-star .text-warning {
+            color: var(--warning);
+        }
+
+        .email-sender {
+            font-weight: 700;
+            color: var(--text-primary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-subject-snippet {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .email-subject {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .email-snippet {
+            color: var(--text-muted);
+        }
+
+        .email-time {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        /* Detail View */
+        .email-detail {
+            padding: 32px;
             animation: fadeIn 0.3s ease;
         }
 
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .email-detail-header {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .email-detail-subject {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 16px;
+        }
+        
+        .email-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
         }
 
-        .tab-content.active {
-            display: block;
+        .email-from {
+            font-weight: 700;
+            font-size: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .email-to {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        
+        .email-date {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 600;
         }
 
-        .email-form {
+        .email-content-body {
+            line-height: 1.7;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            white-space: pre-wrap;
+        }
+        
+        .btn-icon {
+            background: rgba(255,255,255,0.05);
+            border: none;
+            color: var(--text-primary);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .btn-icon:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        /* Compose View */
+        .compose-view {
+            padding: 32px;
+            animation: fadeIn 0.3s ease;
             display: flex;
             flex-direction: column;
             gap: 20px;
         }
 
-        .ai-prompt-box {
-            background: rgba(99, 102, 241, 0.03);
-            border: 1px solid var(--border-active);
-            padding: 20px;
-            border-radius: var(--radius-lg);
-            margin-bottom: 8px;
-            position: relative;
-            overflow: hidden;
+        .compose-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            padding: 12px 0;
+            font-size: 0.95rem;
+            transition: all 0.2s;
         }
 
-        .ai-prompt-box::before {
+        .compose-input:focus {
+            outline: none;
+            border-bottom-color: var(--accent);
+        }
+
+        .compose-textarea {
+            width: 100%;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: var(--radius-md);
+            color: var(--text-primary);
+            padding: 16px;
+            font-size: 0.95rem;
+            resize: vertical;
+            min-height: 250px;
+            margin-top: 10px;
+        }
+        
+        .compose-textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .ai-drafter {
+            background: linear-gradient(to right, rgba(99, 102, 241, 0.05), rgba(168, 85, 247, 0.05));
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            position: relative;
+        }
+        
+        .ai-drafter::before {
             content: '';
             position: absolute;
-            top: 0;
             left: 0;
-            width: 4px;
+            top: 0;
             height: 100%;
-            background: var(--accent);
+            width: 4px;
+            background: linear-gradient(to bottom, var(--primary), var(--accent));
+            border-radius: 4px 0 0 4px;
         }
 
-        .ai-prompt-box label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--accent-light);
-            font-weight: 700;
-            font-size: 0.95rem;
-            margin-bottom: 12px;
+        .hidden {
+            display: none !important;
         }
 
-        .loading-spinner {
-            width: 18px;
-            height: 18px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Modal Styles */
-        .email-view-modal {
-            max-width: 700px;
-        }
-
-        .email-meta-item {
-            margin-bottom: 12px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .email-meta-label {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            margin-bottom: 4px;
-        }
-
-        .email-meta-value {
-            font-size: 0.95rem;
-            color: var(--text-primary);
-        }
-
-        .email-view-body {
-            background: rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-            white-space: pre-wrap;
-            font-family: inherit;
-            line-height: 1.6;
-            margin-top: 16px;
-            max-height: 400px;
-            overflow-y: auto;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
 
 <body>
-
     <div class="app-layout">
-
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
-                <div class="logo-icon"><i class="fa-solid fa-robot"></i></div>
+                
                 <div>
                     <div class="logo-text">AI HR Assistant</div>
                     <div class="logo-sub">HR Portal</div>
@@ -188,6 +360,10 @@
                 <span class="nav-icon"><i class="fa-solid fa-code-compare"></i></span>
                 Candidate Comparison
             </a>
+            <a href="emails.html" class="nav-item active">
+                <span class="nav-icon"><i class="fa-solid fa-paper-plane"></i></span>
+                Mailing
+            </a>
 
             <!-- Sidebar Footer User Chip & Menu -->
             <div class="sidebar-footer" style="position: relative;">
@@ -197,7 +373,7 @@
                     </a>
                     <div class="popover-divider"></div>
                     <a href="change_password.html" class="popover-item">
-                        <i class="fa-solid fa-key" style="color: #38bdf8;"></i> Change Password
+                        <i class="fa-solid fa-lock" style="color: #f97316;"></i> Change Password
                     </a>
                     <div class="popover-divider"></div>
                     <a href="#" class="popover-item" onclick="logout()">
@@ -221,80 +397,124 @@
                 <div class="topbar-title">Mailing</div>
             </header>
 
-            <div class="page-content">
-                <div class="card">
-                    <div class="tabs">
-                        <div class="tab active" onclick="switchTab('compose')">Compose Email</div>
-                        <div class="tab" onclick="switchTab('sent')">Sent Emails</div>
-                    </div>
-
-                    <!-- Compose Tab -->
-                    <div id="tab-compose" class="tab-content active">
-                        <div class="email-form">
-                            <div class="form-group">
-                                <label>To</label>
-                                <input type="email" id="email-to" class="form-control"
-                                    placeholder="candidate@example.com">
-                            </div>
-                            <div class="form-row">
-                                <div class="form-group">
-                                    <label>CC</label>
-                                    <input type="text" id="email-cc" class="form-control"
-                                        placeholder="manager@example.com">
-                                </div>
-                                <div class="form-group">
-                                    <label>BCC</label>
-                                    <input type="text" id="email-bcc" class="form-control"
-                                        placeholder="hidden@example.com">
-                                </div>
-                            </div>
-
-                            <div class="ai-prompt-box">
-                                <label><i class="fa-solid fa-wand-magic-sparkles"></i> AI Email Drafter</label>
-                                <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 8px;">
-                                    Describe what you want to send. The AI will draft a professional email and include
-                                    your signature automatically.</p>
-                                <textarea id="ai-prompt" class="form-control" rows="3"
-                                    placeholder="E.g., Invite this candidate for a technical interview next Tuesday at 10 AM."></textarea>
-                                <button class="btn btn-secondary mt-3" id="btn-draft" onclick="generateDraft()">Generate
-                                    Draft</button>
-                            </div>
-
-                            <div class="form-group">
-                                <label>Subject</label>
-                                <input type="text" id="email-subject" class="form-control" placeholder="Email Subject">
-                            </div>
-                            <div class="form-group">
-                                <label>Body</label>
-                                <textarea id="email-body" class="form-control" rows="10"
-                                    placeholder="Email content..."></textarea>
-                            </div>
-
-                            <div>
-                                <button class="btn btn-primary" id="btn-send" onclick="sendEmail()">Send Email</button>
-                            </div>
+            <div class="page-content" style="padding-top: 10px;">
+                <div class="mail-layout">
+                    
+                    <!-- Mail Sidebar -->
+                    <div class="mail-sidebar">
+                        <button class="btn-compose" onclick="openCompose()">
+                            <i class="fa-solid fa-pen"></i> Compose
+                        </button>
+                        
+                        <div class="mail-folder active" data-folder="inbox">
+                            <i class="fa-solid fa-inbox"></i>
+                            <span class="folder-name">Inbox</span>
+                        </div>
+                        <div class="mail-folder" data-folder="starred">
+                            <i class="fa-solid fa-star"></i>
+                            <span class="folder-name">Starred</span>
+                        </div>
+                        <div class="mail-folder" data-folder="sent">
+                            <i class="fa-solid fa-paper-plane"></i>
+                            <span class="folder-name">Sent</span>
                         </div>
                     </div>
+                    
+                    <!-- Mail Main Area -->
+                    <div class="mail-main">
+                        <div class="mail-header">
+                            <h2 id="current-folder-title">Inbox</h2>
+                            <div style="display: flex; gap: 8px;">
+                                <button class="btn-icon" onclick="loadEmails(currentFolder)" title="Refresh">
+                                    <i class="fa-solid fa-rotate-right"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="mail-body">
+                            
+                            <!-- Email List View -->
+                            <div id="email-list-view" class="email-list">
+                                <div id="email-list-container">
+                                    <!-- Dynamic rows go here -->
+                                </div>
+                            </div>
+                            
+                            <!-- Detail View -->
+                            <div id="email-detail-view" class="email-detail hidden">
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                                    <button class="btn btn-secondary btn-sm" onclick="backToList()">
+                                        <i class="fa-solid fa-arrow-left"></i> Back
+                                    </button>
+                                </div>
+                                
+                                <div class="email-detail-header">
+                                    <div class="email-detail-subject" id="detail-subject">Subject</div>
+                                    <div class="email-meta">
+                                        <div>
+                                            <div class="email-from" id="detail-from">Sender</div>
+                                            <div class="email-to">to <span id="detail-to">Recipient</span></div>
+                                        </div>
+                                        <div class="email-date" id="detail-time">Date</div>
+                                    </div>
+                                </div>
+                                <div class="email-content-body" id="detail-body">
+                                    Content goes here
+                                </div>
+                            </div>
+                            
+                            <!-- Compose View -->
+                            <div id="compose-view" class="compose-view hidden">
+                                <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
+                                    <h3 style="margin: 0; color: #fff;">New Message</h3>
+                                    <button class="btn btn-secondary btn-sm" onclick="backToList()"><i class="fa-solid fa-xmark"></i> Discard</button>
+                                </div>
+                                
+                                <input type="hidden" id="hidden-candidate-id" />
+                                
+                                <div style="display: flex; flex-direction: column;">
+                                    <div style="display: flex; align-items: center;">
+                                        <span style="color: var(--text-muted); width: 60px; font-weight: 600;">To</span>
+                                        <input type="email" id="compose-to" class="compose-input" placeholder="recipient@example.com" />
+                                    </div>
+                                    <div style="display: flex; align-items: center;">
+                                        <span style="color: var(--text-muted); width: 60px; font-weight: 600;">Cc</span>
+                                        <input type="text" id="compose-cc" class="compose-input" />
+                                    </div>
+                                    <div style="display: flex; align-items: center;">
+                                        <span style="color: var(--text-muted); width: 60px; font-weight: 600;">Bcc</span>
+                                        <input type="text" id="compose-bcc" class="compose-input" />
+                                    </div>
+                                    <div style="display: flex; align-items: center;">
+                                        <span style="color: var(--text-muted); width: 60px; font-weight: 600;">Subject</span>
+                                        <input type="text" id="compose-subject" class="compose-input" placeholder="Email Subject" />
+                                    </div>
+                                </div>
 
-                    <!-- Sent Emails Tab -->
-                    <div id="tab-sent" class="tab-content">
-                        <div style="overflow-x: auto;">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Date</th>
-                                        <th>To</th>
-                                        <th>Subject</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="sent-emails-body">
-                                    <tr>
-                                        <td colspan="4" style="text-align: center; color: var(--text-muted);">Loading...
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                                <div class="ai-drafter">
+                                    <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 8px;">
+                                        <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--accent);"></i>
+                                        <strong style="color: var(--accent-light);">AI Assistant</strong>
+                                    </div>
+                                    <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 12px;">
+                                        Let AI write the email for you. Provide a brief prompt.</p>
+                                    <div style="display: flex; gap: 12px;">
+                                        <input type="text" id="ai-prompt" class="form-control" placeholder="E.g., Invite candidate for interview next Monday..." style="flex: 1;" />
+                                        <button class="btn btn-secondary" id="btn-ai-draft" onclick="generateDraft()">Draft</button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <textarea id="compose-body" class="compose-textarea" placeholder="Write your message here..."></textarea>
+                                </div>
+                                
+                                <div style="display: flex; gap: 16px; margin-top: 10px;">
+                                    <button class="btn btn-primary" id="btn-send" onclick="sendEmail()">
+                                        <i class="fa-solid fa-paper-plane"></i> Send
+                                    </button>
+                                </div>
+                            </div>
+                            
                         </div>
                     </div>
                 </div>
@@ -302,34 +522,9 @@
         </main>
     </div>
 
-    <!-- Email View Modal -->
-    <div class="modal-overlay" id="email-view-overlay">
-        <div class="modal email-view-modal">
-            <div class="modal-header">
-                <h3 class="modal-title">Sent Email Details</h3>
-                <button class="modal-close" onclick="closeModal('email-view-overlay')">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="email-meta-item">
-                    <div class="email-meta-label">Recipient</div>
-                    <div class="email-meta-value" id="view-email-to">-</div>
-                </div>
-                <div class="email-meta-item">
-                    <div class="email-meta-label">Subject</div>
-                    <div class="email-meta-value" id="view-email-subject">-</div>
-                </div>
-                <div class="email-meta-item">
-                    <div class="email-meta-label">Sent At</div>
-                    <div class="email-meta-value" id="view-email-date">-</div>
-                </div>
-                <div class="email-view-body" id="view-email-body"></div>
-            </div>
-            <div style="margin-top: 24px; text-align: right;">
-                <button class="btn btn-secondary" onclick="closeModal('email-view-overlay')">Close</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- Toast -->
+    <div class="toast-container" id="toast-container"></div>
+    
     <!-- Logout Confirmation Modal -->
     <div class="modal-overlay" id="logout-confirm-modal">
         <div class="modal-card" style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
@@ -345,205 +540,8 @@
         </div>
     </div>
 
-    <!-- Toast -->
-    <div class="toast-container" id="toast-container"></div>
-
     <script src="../js/utils.js"></script>
     <script src="../js/hr_common.js"></script>
-    <script>
-        // Init sidebar based on session
-        document.addEventListener('DOMContentLoaded', () => {
-            const user = Session.get();
-            if (!user || user.role !== 'hr') {
-                location.href = '../index.html';
-                return;
-            }
-            if (document.getElementById('sidebar-name')) {
-                document.getElementById('sidebar-name').innerText = user.full_name || user.username;
-                document.getElementById('sidebar-avatar').innerText = (user.full_name || user.username).charAt(0).toUpperCase();
-            }
-
-            // Allow URL params to pre-fill TO and Candidate ID
-            const urlParams = new URLSearchParams(window.location.search);
-            const prefillEmail = urlParams.get('to');
-            if (prefillEmail) document.getElementById('email-to').value = prefillEmail;
-
-            // Load sent emails in background
-            loadSentEmails();
-        });
-
-        function switchTab(tabName) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-
-            event.target.classList.add('active');
-            document.getElementById('tab-' + tabName).classList.add('active');
-
-            if (tabName === 'sent') {
-                loadSentEmails();
-            }
-        }
-
-        async function generateDraft() {
-            const prompt = document.getElementById('ai-prompt').value.trim();
-
-            if (!prompt) {
-                showToast("Please enter a prompt for the AI to draft the email.", "warning");
-                return;
-            }
-
-            const btn = document.getElementById('btn-draft');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="loading-spinner"></span> Drafting...';
-            btn.disabled = true;
-
-            try {
-                const user = Session.get();
-                const response = await fetch(`${API}/api/emails/draft?hr_id=${user.user_id}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        prompt: prompt,
-                        candidate_id: null
-                    })
-                });
-
-                if (!response.ok) throw new Error("Failed to generate draft.");
-
-                const data = await response.json();
-                document.getElementById('email-subject').value = data.subject || '';
-                document.getElementById('email-body').value = data.body || '';
-                showToast("Draft generated successfully!", "success");
-            } catch (error) {
-                console.error(error);
-                showToast(error.message, "error");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        async function sendEmail() {
-            const to = document.getElementById('email-to').value.trim();
-            const cc = document.getElementById('email-cc').value.trim();
-            const bcc = document.getElementById('email-bcc').value.trim();
-            const subject = document.getElementById('email-subject').value.trim();
-            const body = document.getElementById('email-body').value.trim();
-
-            if (!to || !subject || !body) {
-                showToast("Please fill in To, Subject, and Body fields.", "warning");
-                return;
-            }
-
-            const btn = document.getElementById('btn-send');
-            const originalText = btn.innerHTML;
-            btn.innerHTML = '<span class="loading-spinner"></span> Sending...';
-            btn.disabled = true;
-
-            try {
-                const user = Session.get();
-                const response = await fetch(`${API}/api/emails/send?hr_id=${user.user_id}`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        to_email: to,
-                        candidate_id: null,
-                        cc_emails: cc,
-                        bcc_emails: bcc,
-                        subject: subject,
-                        body: body
-                    })
-                });
-
-                if (!response.ok) throw new Error("Failed to send email.");
-
-                showToast("Email sent and recorded successfully!", "success");
-
-                // Clear fields
-                document.getElementById('email-to').value = '';
-                document.getElementById('email-cc').value = '';
-                document.getElementById('email-bcc').value = '';
-                document.getElementById('email-subject').value = '';
-                document.getElementById('email-body').value = '';
-                document.getElementById('ai-prompt').value = '';
-
-                loadSentEmails(); // Refresh background sent list
-            } catch (error) {
-                console.error(error);
-                showToast(error.message, "error");
-            } finally {
-                btn.innerHTML = originalText;
-                btn.disabled = false;
-            }
-        }
-
-        async function loadSentEmails() {
-            const tbody = document.getElementById('sent-emails-body');
-            try {
-                const user = Session.get();
-                const response = await fetch(`${API}/api/emails/sent?hr_id=${user.user_id}`);
-                const emails = await response.json();
-
-                tbody.innerHTML = '';
-
-                if (emails.length === 0) {
-                    tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted); padding: 40px;">No emails sent yet.</td></tr>`;
-                    return;
-                }
-
-                emails.forEach(email => {
-                    const dateObj = new Date(email.sent_at);
-                    const dateStr = dateObj.toLocaleDateString() + ' ' + dateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td>${dateStr}</td>
-                        <td style="font-weight: 500;">${email.to_email}</td>
-                        <td>${email.subject}</td>
-                        <td>
-                            <button class="btn btn-secondary btn-sm" onclick="viewEmail('${email.id}')">
-                                <i class="fa-regular fa-eye"></i> View
-                            </button>
-                        </td>
-                    `;
-                    // Store detailed info in data attributes for the modal
-                    tr.dataset.emailBody = email.body;
-                    tr.dataset.emailTo = email.to_email;
-                    tr.dataset.emailSubject = email.subject;
-                    tr.dataset.emailDate = dateStr;
-                    tbody.appendChild(tr);
-                });
-
-            } catch (error) {
-                console.error("Failed to load sent emails", error);
-                tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--danger); padding: 40px;">Failed to load emails. Check if backend is running.</td></tr>`;
-            }
-        }
-
-        function viewEmail(id) {
-            // Find the row to get the details
-            const rows = Array.from(document.querySelectorAll('#sent-emails-body tr'));
-            const row = rows.find(r => r.querySelector('button') && r.querySelector('button').getAttribute('onclick').includes(id));
-            if (row) {
-                document.getElementById('view-email-to').innerText = row.dataset.emailTo;
-                document.getElementById('view-email-subject').innerText = row.dataset.emailSubject;
-                document.getElementById('view-email-date').innerText = row.dataset.emailDate;
-                document.getElementById('view-email-body').innerText = row.dataset.emailBody;
-
-                openModal('email-view-overlay');
-            }
-        }
-
-        function openModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.add('open');
-        }
-
-        function closeModal(id) {
-            const modal = document.getElementById(id);
-            modal.classList.remove('open');
-        }
-    </script>
+    <script src="../js/hr_emails.js"></script>
 </body>
-
 </html>

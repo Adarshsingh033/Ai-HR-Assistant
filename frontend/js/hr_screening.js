@@ -154,8 +154,8 @@ function renderScreeningTable() {
                         <i class="fa-solid fa-pen-to-square" style="color:#38bdf8;"></i> Update Status
                     </div>
                     <div class="action-dropdown-divider"></div>
-                    <div class="action-dropdown-item disabled" onclick="event.stopPropagation()">
-                        <i class="fa-solid fa-envelope" style="color:#94a3b8;"></i> Send Mail
+                    <div class="action-dropdown-item" onclick="openScreeningEmail('${cid}')">
+                        <i class="fa-solid fa-paper-plane" style="color:#a5b4fc;"></i> Send Mail
                     </div>
                 </div>
             </td>
@@ -282,6 +282,13 @@ function toggleActionMenu(event, cid) {
 document.addEventListener('click', () => {
     document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
 });
+
+function openScreeningEmail(cid) {
+    const c = screeningCandidates.find(x => x.candidate_id === cid);
+    if (c) {
+        window.location.href = `emails.html?source=screening&candidate_id=${cid}&to=${encodeURIComponent(c.email || '')}&name=${encodeURIComponent(c.name || '')}&status=${encodeURIComponent(c.interview_status || 'Ongoing')}&round=${encodeURIComponent(c.current_round_title || '')}`;
+    }
+}
 
 /* ========================================================
    1. VIEW CANDIDATE PROGRESS MODAL
