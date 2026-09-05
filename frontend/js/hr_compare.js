@@ -5,7 +5,7 @@
 let allJobs = [];
 let availableCandidates = [];
 let currentOrgId = null;
-let currentHrId  = null;
+let currentHrId = null;
 
 /* ── Init ──────────────────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', async () => {
@@ -15,9 +15,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     currentOrgId = session.org_id;
-    currentHrId  = session.user_id;
+    currentHrId = session.user_id;
 
-    document.getElementById('sidebar-name').textContent   = session.username || 'HR User';
+    document.getElementById('sidebar-name').textContent = session.username || 'HR User';
     document.getElementById('sidebar-avatar').textContent = (session.username || 'H').charAt(0).toUpperCase();
 
     await loadJobs();
@@ -37,7 +37,7 @@ async function loadJobs() {
         if (!jobSel) return;
 
         const options = allJobs.map(j => {
-            const jid   = j.job_id || j.id;
+            const jid = j.job_id || j.id;
             const title = escapeHtml(j.job_title || j.title || 'Untitled');
             return `<option value="${jid}">${title}</option>`;
         }).join('');
@@ -156,7 +156,7 @@ async function runCandidateComparison() {
         document.getElementById('compare-placeholder').style.display = 'none';
         document.getElementById('compare-result-container').style.display = 'block';
 
-        showToast('✅ Candidate comparison generated!', 'success');
+        showToast('Candidate comparison generated!', 'success');
     } catch (err) {
         showToast('Comparison failed: ' + err.message, 'error');
     } finally {
@@ -224,10 +224,10 @@ function renderProfileCard(prefix, candidate) {
 }
 
 function renderCategoryBlock(prefix, candidateName, criterion, catType) {
-    const nameEl   = document.getElementById(`${prefix.split('-')[0]}-name-${prefix.split('-')[1]}`);
+    const nameEl = document.getElementById(`${prefix.split('-')[0]}-name-${prefix.split('-')[1]}`);
     const statusEl = document.getElementById(`${prefix}-status`);
-    const barEl    = document.getElementById(`${prefix}-bar`);
-    const descEl   = document.getElementById(`${prefix}-desc`);
+    const barEl = document.getElementById(`${prefix}-bar`);
+    const descEl = document.getElementById(`${prefix}-desc`);
 
     if (nameEl) nameEl.textContent = candidateName;
 

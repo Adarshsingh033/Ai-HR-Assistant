@@ -79,7 +79,7 @@
         /* ── Table Card ── */
         .table-card {
             background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md);
+            border-radius: var(--radius-lg); overflow: visible; box-shadow: var(--shadow-md);
         }
         .table-header-row {
             display: flex; align-items: center; justify-content: space-between;
@@ -137,7 +137,7 @@
         .action-dropdown {
             position: absolute; right: 0; top: 42px; background: #1e293b; border: 1px solid rgba(255,255,255,0.15);
             border-radius: 14px; padding: 6px 0; min-width: 220px; box-shadow: 0 12px 35px rgba(0,0,0,0.5);
-            z-index: 100; text-align: left; display: none;
+            z-index: 1000; text-align: left; display: none;
         }
         .action-dropdown.open { display: block; animation: popoverUp 0.15s ease forwards; }
         .action-dropdown-item {
@@ -251,13 +251,13 @@
             <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
             Candidates
         </a>
-        <a href="comparison.html" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-code-compare"></i></span>
-            Candidate Comparison
-        </a>
         <a href="screening.html" class="nav-item active">
             <span class="nav-icon"><i class="fa-solid fa-clipboard-check"></i></span>
             Screening
+        </a>
+        <a href="comparison.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-code-compare"></i></span>
+            Candidate Comparison
         </a>
 
         <!-- Sidebar Footer -->
@@ -352,21 +352,24 @@
                         </div>
                     </div>
 
-                    <div style="overflow-x:auto;display:none;" id="screen-table-wrap">
-                        <table class="candidates-table">
+                    <div style="overflow:visible;display:none;" id="screen-table-wrap">
+                        <table class="candidates-table" style="table-layout:fixed;width:100%;">
                             <thead>
                                 <tr>
-                                    <th>Candidate Name</th>
-                                    <th>Email</th>
-                                    <th style="width:140px;">Contacted Status</th>
-                                    <th>Round Step</th>
-                                    <th style="width:150px;">Interview Status</th>
-                                    <th style="text-align:right;width:80px;">Action</th>
+                                    <th style="width:20%;">Candidate Name</th>
+                                    <th style="width:24%;">Email</th>
+                                    <th style="width:18%;white-space:nowrap;">Phone Number</th>
+                                    <th style="width:20%;">Round Step</th>
+                                    <th style="width:13%;">Interview Status</th>
+                                    <th style="width:5%;text-align:right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="screen-tbody"></tbody>
                         </table>
                     </div>
+
+                    <!-- Pagination Controls -->
+                    <div id="screening-pagination-container"></div>
                 </div>
             </div>
 

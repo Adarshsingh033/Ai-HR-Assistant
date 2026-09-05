@@ -5,9 +5,10 @@
 let allJobs = [];
 let screeningCandidates = [];
 let currentOrgId = null;
-let currentHrId  = null;
+let currentHrId = null;
 let activeCandidateId = null;
 let activeCandidateProgressData = null;
+let screeningState = { page: 1, limit: 10 };
 
 /* ── Init ──────────────────────────────────────────────── */
 window.addEventListener('DOMContentLoaded', async () => {
@@ -17,9 +18,9 @@ window.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     currentOrgId = session.org_id;
-    currentHrId  = session.user_id;
+    currentHrId = session.user_id;
 
-    document.getElementById('sidebar-name').textContent   = session.username || 'HR User';
+    document.getElementById('sidebar-name').textContent = session.username || 'HR User';
     document.getElementById('sidebar-avatar').textContent = (session.username || 'H').charAt(0).toUpperCase();
 
     await loadJobs();
@@ -42,7 +43,7 @@ function populateJobSelects() {
     if (!screenSel) return;
 
     const options = allJobs.map(j => {
-        const jid   = j.job_id || j.id;
+        const jid = j.job_id || j.id;
         const title = escapeHtml(j.job_title || j.title || 'Untitled');
         return `<option value="${jid}">${title}</option>`;
     }).join('');
@@ -58,17 +59,18 @@ async function loadScreeningCandidates() {
     showScreeningSkeleton(true);
 
     try {
-        const jobId  = document.getElementById('screen-filter-job')?.value || '';
+        const jobId = document.getElementById('screen-filter-job')?.value || '';
         const status = document.getElementById('screen-filter-status')?.value || '';
         const search = document.getElementById('screen-filter-search')?.value?.trim() || '';
 
         let url = `/api/screening/candidates?org_id=${currentOrgId}`;
-        if (jobId)  url += `&job_id=${encodeURIComponent(jobId)}`;
+        if (jobId) url += `&job_id=${encodeURIComponent(jobId)}`;
         if (status) url += `&interview_status=${encodeURIComponent(status)}`;
         if (search) url += `&search=${encodeURIComponent(search)}`;
 
         const data = await apiRequest('GET', url);
         screeningCandidates = (data && data.candidates) ? data.candidates : [];
+        screeningState.page = 1;
 
         renderScreeningTable();
     } catch (e) {
@@ -86,29 +88,39 @@ function applyScreeningFilters() {
 function renderScreeningTable() {
     const tbody = document.getElementById('screen-tbody');
     const empty = document.getElementById('screen-empty');
-    const wrap  = document.getElementById('screen-table-wrap');
+    const wrap = document.getElementById('screen-table-wrap');
     const count = document.getElementById('screen-count');
 
     if (!tbody) return;
 
-    if (screeningCandidates.length === 0) {
+    const total = screeningCandidates.length;
+
+    if (total === 0) {
         if (empty) empty.style.display = 'flex';
-        if (wrap)  wrap.style.display  = 'none';
-        if (count) count.textContent   = '0 candidates';
+        if (wrap) wrap.style.display = 'none';
+        if (count) count.textContent = '0 candidates';
+        renderScreeningPagination(0, 1, 0, 0);
         return;
     }
 
     if (empty) empty.style.display = 'none';
-    if (wrap)  wrap.style.display  = 'block';
-    if (count) count.textContent   = `${screeningCandidates.length} contacted candidate${screeningCandidates.length !== 1 ? 's' : ''}`;
+    if (wrap) wrap.style.display = 'block';
+    if (count) count.textContent = `${total} contacted candidate${total !== 1 ? 's' : ''}`;
 
-    tbody.innerHTML = screeningCandidates.map(c => {
-        const cid     = c.candidate_id;
+    const totalPages = Math.ceil(total / screeningState.limit) || 1;
+    if (screeningState.page > totalPages) screeningState.page = totalPages;
+    if (screeningState.page < 1) screeningState.page = 1;
+
+    const startIdx = (screeningState.page - 1) * screeningState.limit;
+    const pagedCandidates = screeningCandidates.slice(startIdx, startIdx + screeningState.limit);
+
+    tbody.innerHTML = pagedCandidates.map(c => {
+        const cid = c.candidate_id;
         const initial = (c.name || 'U').charAt(0).toUpperCase();
 
         const contactedStatus = c.contacted_status || 'Contacted';
         const interviewStatus = c.interview_status || 'Ongoing';
-        const roundStep       = c.current_round_title || `Round ${c.current_round_order || 1}`;
+        const roundStep = c.current_round_title || `Round ${c.current_round_order || 1}`;
 
         let statusPillClass = 'status-pill-ongoing';
         if (interviewStatus === 'Passed') statusPillClass = 'status-pill-passed';
@@ -117,24 +129,15 @@ function renderScreeningTable() {
 
         return `
         <tr>
-            <td>
-                <div class="cand-name-cell">
-                    <div class="cand-avatar">${initial}</div>
-                    <div class="cand-name">${escapeHtml(c.name || 'Unknown')}</div>
-                </div>
-            </td>
-            <td>${escapeHtml(c.email || '—')}</td>
-            <td>
-                <span class="status-pill status-pill-contacted">
-                    <i class="fa-solid fa-phone-volume"></i> ${escapeHtml(contactedStatus)}
-                </span>
-            </td>
-            <td>
+            <td style="font-weight:600;color:var(--text-bright);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(c.name || 'Unknown')}</td>
+            <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(c.email || '—')}</td>
+            <td style="white-space:nowrap;">${escapeHtml(c.phone || '—')}</td>
+            <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
                 <span class="round-step-badge">
                     <i class="fa-solid fa-diagram-next"></i> ${escapeHtml(roundStep)}
                 </span>
             </td>
-            <td>
+            <td style="white-space:nowrap;">
                 <span class="status-pill ${statusPillClass}">
                     <i class="fa-solid ${getInterviewStatusIcon(interviewStatus)}"></i> ${escapeHtml(interviewStatus)}
                 </span>
@@ -150,9 +153,6 @@ function renderScreeningTable() {
                     <div class="action-dropdown-item" onclick="openUpdateProgressModal('${cid}')">
                         <i class="fa-solid fa-pen-to-square" style="color:#38bdf8;"></i> Update Interview Progress
                     </div>
-                    <div class="action-dropdown-item" onclick="openEditRoundsModal('${cid}', '${c.job_id || ''}')">
-                        <i class="fa-solid fa-sliders" style="color:#fbbf24;"></i> Edit Interview Round
-                    </div>
                     <div class="action-dropdown-divider"></div>
                     <div class="action-dropdown-item disabled" onclick="event.stopPropagation()">
                         <i class="fa-solid fa-envelope" style="color:#94a3b8;"></i> Send Mail
@@ -161,6 +161,106 @@ function renderScreeningTable() {
             </td>
         </tr>`;
     }).join('');
+
+    renderScreeningPagination(total, totalPages, startIdx, pagedCandidates.length);
+}
+
+function changeScreeningLimit(newLimit) {
+    screeningState.limit = parseInt(newLimit, 10) || 10;
+    screeningState.page = 1;
+    renderScreeningTable();
+}
+
+function changeScreeningPage(page) {
+    screeningState.page = page;
+    renderScreeningTable();
+}
+
+function renderScreeningPagination(total, totalPages, startIdx, pagedCount) {
+    const container = document.getElementById('screening-pagination-container');
+    if (!container) return;
+
+    if (total === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    const startItem = total === 0 ? 0 : startIdx + 1;
+    const endItem = startIdx + pagedCount;
+    const currentPage = screeningState.page;
+
+    let pageBtns = '';
+
+    const maxVisiblePages = 7;
+    let startPage = 1;
+    let endPage = totalPages;
+
+    if (totalPages > maxVisiblePages) {
+        if (currentPage <= 4) {
+            startPage = 1;
+            endPage = 5;
+        } else if (currentPage >= totalPages - 3) {
+            startPage = totalPages - 4;
+            endPage = totalPages;
+        } else {
+            startPage = currentPage - 2;
+            endPage = currentPage + 2;
+        }
+    }
+
+    if (startPage > 1) {
+        pageBtns += `<button onclick="changeScreeningPage(1)" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">1</button>`;
+        if (startPage > 2) {
+            pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
+        }
+    }
+
+    for (let p = startPage; p <= endPage; p++) {
+        if (p === currentPage) {
+            pageBtns += `<button style="width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);color:#fff;font-size:0.82rem;font-weight:700;cursor:default;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);">${p}</button>`;
+        } else {
+            pageBtns += `<button onclick="changeScreeningPage(${p})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${p}</button>`;
+        }
+    }
+
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) {
+            pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
+        }
+        pageBtns += `<button onclick="changeScreeningPage(${totalPages})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${totalPages}</button>`;
+    }
+
+    container.innerHTML = `
+        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-card); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; font-family: 'Inter', sans-serif;">
+            <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 500;">
+                <span>${startItem}–${endItem} of ${total} <span style="margin:0 4px;opacity:0.4;">·</span> Page ${currentPage} of ${totalPages}</span>
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <span>Rows per page:</span>
+                    <select onchange="changeScreeningLimit(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 3px 8px; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;">
+                        <option value="10" ${screeningState.limit === 10 ? 'selected' : ''}>10</option>
+                        <option value="25" ${screeningState.limit === 25 ? 'selected' : ''}>25</option>
+                        <option value="50" ${screeningState.limit === 50 ? 'selected' : ''}>50</option>
+                        <option value="100" ${screeningState.limit === 100 ? 'selected' : ''}>100</option>
+                    </select>
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 4px 6px;">
+                <button onclick="changeScreeningPage(1)" ${currentPage <= 1 ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage <= 1 ? '0.3' : '1'};transition:all 0.15s;" title="First page">
+                    <i class="fa-solid fa-angles-left"></i>
+                </button>
+                <button onclick="changeScreeningPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage <= 1 ? '0.3' : '1'};transition:all 0.15s;" title="Previous page">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+                ${pageBtns}
+                <button onclick="changeScreeningPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage >= totalPages ? '0.3' : '1'};transition:all 0.15s;" title="Next page">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+                <button onclick="changeScreeningPage(${totalPages})" ${currentPage >= totalPages ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage >= totalPages ? '0.3' : '1'};transition:all 0.15s;" title="Last page">
+                    <i class="fa-solid fa-angles-right"></i>
+                </button>
+            </div>
+        </div>
+    `;
 }
 
 function getInterviewStatusIcon(status) {
@@ -195,16 +295,16 @@ async function openViewProgressModal(candidateId) {
         activeCandidateProgressData = data;
 
         document.getElementById('vp-avatar').textContent = (c.name || 'U').charAt(0).toUpperCase();
-        document.getElementById('vp-name').textContent   = c.name || 'Unknown Candidate';
-        document.getElementById('vp-sub').textContent    = `${c.email || '—'} • ${c.job_title || 'General Vacancy'}`;
+        document.getElementById('vp-name').textContent = c.name || 'Unknown Candidate';
+        document.getElementById('vp-sub').textContent = `${c.email || '—'} • ${c.job_title || 'General Vacancy'}`;
 
         const alertContainer = document.getElementById('vp-alert-banner');
         if (c.interview_status === 'Rejected' || c.interview_status === 'On Hold') {
             const currentRound = rounds.find(r => (r.round_order || 1) === c.current_round_order) || rounds[rounds.length - 1] || {};
-            const isRejected   = c.interview_status === 'Rejected';
-            const bannerClass  = isRejected ? 'alert-banner-rejected' : 'alert-banner-onhold';
-            const iconColor    = isRejected ? '#f87171' : '#fbbf24';
-            const iconClass    = isRejected ? 'fa-circle-xmark' : 'fa-circle-pause';
+            const isRejected = c.interview_status === 'Rejected';
+            const bannerClass = isRejected ? 'alert-banner-rejected' : 'alert-banner-onhold';
+            const iconColor = isRejected ? '#f87171' : '#fbbf24';
+            const iconClass = isRejected ? 'fa-circle-xmark' : 'fa-circle-pause';
 
             alertContainer.className = bannerClass;
             alertContainer.style.display = 'flex';
@@ -312,8 +412,8 @@ async function openUpdateProgressModal(candidateId) {
 
         const selectedRound = rounds.find(r => r.round_order === c.current_round_order) || rounds[0] || {};
         document.getElementById('up-status-select').value = selectedRound.status && selectedRound.status !== 'Pending' ? selectedRound.status : c.interview_status || 'Passed';
-        document.getElementById('up-score-input').value  = selectedRound.score !== null && selectedRound.score !== undefined ? selectedRound.score : '';
-        document.getElementById('up-comment-input').value= selectedRound.comment || '';
+        document.getElementById('up-score-input').value = selectedRound.score !== null && selectedRound.score !== undefined ? selectedRound.score : '';
+        document.getElementById('up-comment-input').value = selectedRound.comment || '';
 
         openModal('update-progress-modal');
     } catch (err) {
@@ -322,10 +422,10 @@ async function openUpdateProgressModal(candidateId) {
 }
 
 async function submitInterviewProgress() {
-    const cid     = document.getElementById('up-candidate-id').value;
+    const cid = document.getElementById('up-candidate-id').value;
     const roundId = document.getElementById('up-round-select').value;
-    const status  = document.getElementById('up-status-select').value;
-    const scoreVal= document.getElementById('up-score-input').value;
+    const status = document.getElementById('up-status-select').value;
+    const scoreVal = document.getElementById('up-score-input').value;
     const comment = document.getElementById('up-comment-input').value.trim();
 
     if (!roundId) {
@@ -343,7 +443,7 @@ async function submitInterviewProgress() {
             comment: comment,
         });
 
-        showToast('✅ Interview progress updated successfully!', 'success');
+        showToast(' Interview progress updated successfully!', 'success');
         closeModal('update-progress-modal');
         await loadScreeningCandidates();
     } catch (err) {
@@ -395,7 +495,7 @@ async function openEditRoundsModal(candidateId, jobId) {
 
 function addNewRoundToEditForm() {
     const listContainer = document.getElementById('er-rounds-list');
-    const currentCount  = listContainer.querySelectorAll('.er-round-box').length;
+    const currentCount = listContainer.querySelectorAll('.er-round-box').length;
     const newIdx = currentCount + 1;
 
     const div = document.createElement('div');
@@ -441,8 +541,8 @@ async function saveEditedRounds() {
     try {
         for (const box of roundBoxes) {
             const roundId = box.dataset.roundId;
-            const title   = box.querySelector('.er-round-title').value.trim();
-            const desc    = box.querySelector('.er-round-desc').value.trim();
+            const title = box.querySelector('.er-round-title').value.trim();
+            const desc = box.querySelector('.er-round-desc').value.trim();
 
             if (roundId === 'new') {
                 await apiRequest('POST', `/api/screening/rounds`, {
@@ -459,7 +559,7 @@ async function saveEditedRounds() {
             }
         }
 
-        showToast('✅ Interview rounds updated successfully!', 'success');
+        showToast(' Interview rounds updated successfully!', 'success');
         closeModal('edit-rounds-modal');
         await loadScreeningCandidates();
     } catch (err) {
@@ -469,23 +569,23 @@ async function saveEditedRounds() {
 
 /* ── Helpers ─────────────────────────────────────────────── */
 function showScreeningSkeleton(show) {
-    const sk   = document.getElementById('screen-skeleton');
+    const sk = document.getElementById('screen-skeleton');
     const wrap = document.getElementById('screen-table-wrap');
-    const emp  = document.getElementById('screen-empty');
+    const emp = document.getElementById('screen-empty');
     if (show) {
-        if (sk)   sk.style.display   = 'block';
+        if (sk) sk.style.display = 'block';
         if (wrap) wrap.style.display = 'none';
-        if (emp)  emp.style.display  = 'none';
+        if (emp) emp.style.display = 'none';
     } else {
         if (sk) sk.style.display = 'none';
     }
 }
 
-function openModal(id)  { document.getElementById(id)?.classList.add('open'); }
+function openModal(id) { document.getElementById(id)?.classList.add('open'); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
 
 document.querySelectorAll('.modal-overlay').forEach(el => {
-    el.addEventListener('click', function(e) {
+    el.addEventListener('click', function (e) {
         if (e.target === this) this.classList.remove('open');
     });
 });

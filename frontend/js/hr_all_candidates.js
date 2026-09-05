@@ -5,8 +5,8 @@
 let allCandidates = [];
 let allJobs = [];
 let currentOrgId = null;
-let currentHrId  = null;
-let sortByMatch  = false;
+let currentHrId = null;
+let sortByMatch = false;
 
 let candidateState = {
     page: 1,
@@ -21,13 +21,13 @@ window.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     currentOrgId = session.org_id;
-    currentHrId  = session.user_id;
+    currentHrId = session.user_id;
 
-    document.getElementById('sidebar-name').textContent   = session.username || 'HR User';
+    document.getElementById('sidebar-name').textContent = session.username || 'HR User';
     document.getElementById('sidebar-avatar').textContent = (session.username || 'H').charAt(0).toUpperCase();
 
     // Pre-select job from URL param (e.g. linked from jobs.html)
-    const params  = new URLSearchParams(window.location.search);
+    const params = new URLSearchParams(window.location.search);
     const jobParam = params.get('job_id');
 
     await Promise.all([loadJobs(jobParam), loadCandidates()]);
@@ -59,17 +59,17 @@ async function loadCandidates(byMatch = false) {
     showSkeleton(true);
 
     try {
-        const jobId     = document.getElementById('filter-job')?.value || '';
+        const jobId = document.getElementById('filter-job')?.value || '';
         const contacted = document.getElementById('filter-contacted')?.value || '';
-        const location  = document.getElementById('filter-location')?.value?.trim() || '';
-        const search    = document.getElementById('filter-search')?.value?.trim() || '';
+        const location = document.getElementById('filter-location')?.value?.trim() || '';
+        const search = document.getElementById('filter-search')?.value?.trim() || '';
 
         let url = `/api/candidates?org_id=${currentOrgId}`;
-        if (jobId)     url += `&job_id=${encodeURIComponent(jobId)}`;
+        if (jobId) url += `&job_id=${encodeURIComponent(jobId)}`;
         if (contacted) url += `&contacted=${encodeURIComponent(contacted)}`;
-        if (location)  url += `&location=${encodeURIComponent(location)}`;
-        if (search)    url += `&search=${encodeURIComponent(search)}`;
-        if (byMatch)   url += `&sort_by_match=true`;
+        if (location) url += `&location=${encodeURIComponent(location)}`;
+        if (search) url += `&search=${encodeURIComponent(search)}`;
+        if (byMatch) url += `&sort_by_match=true`;
 
         const data = await apiRequest('GET', url);
         allCandidates = (data && data.candidates) ? data.candidates : [];
@@ -90,18 +90,18 @@ function applyFilters() {
 }
 
 function resetFilters() {
-    if (document.getElementById('filter-job'))       document.getElementById('filter-job').value = '';
+    if (document.getElementById('filter-job')) document.getElementById('filter-job').value = '';
     if (document.getElementById('filter-contacted')) document.getElementById('filter-contacted').value = '';
-    if (document.getElementById('filter-location'))  document.getElementById('filter-location').value = '';
-    if (document.getElementById('filter-search'))    document.getElementById('filter-search').value = '';
+    if (document.getElementById('filter-location')) document.getElementById('filter-location').value = '';
+    if (document.getElementById('filter-search')) document.getElementById('filter-search').value = '';
     loadCandidates(false);
 }
 
 /* ── Stats ──────────────────────────────────────────────── */
 function renderStats() {
-    const total   = allCandidates.length;
-    const now     = new Date();
-    const month   = allCandidates.filter(c => {
+    const total = allCandidates.length;
+    const now = new Date();
+    const month = allCandidates.filter(c => {
         const d = new Date(c.created_at);
         return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
     }).length;
@@ -111,29 +111,29 @@ function renderStats() {
     if (totalEl) totalEl.textContent = total;
     const monthEl = document.getElementById('stat-month');
     if (monthEl) monthEl.textContent = month;
-    const rchEl   = document.getElementById('stat-reached');
-    if (rchEl)   rchEl.textContent   = reached;
+    const rchEl = document.getElementById('stat-reached');
+    if (rchEl) rchEl.textContent = reached;
 }
 
 /* ── Table Render (7 Columns with Rank & Contacted Toggle) ── */
 function renderTable() {
-    const tbody  = document.getElementById('candidates-tbody');
-    const empty  = document.getElementById('table-empty');
-    const wrap   = document.getElementById('table-wrap');
-    const count  = document.getElementById('table-count');
+    const tbody = document.getElementById('candidates-tbody');
+    const empty = document.getElementById('table-empty');
+    const wrap = document.getElementById('table-wrap');
+    const count = document.getElementById('table-count');
 
     if (!tbody) return;
 
     if (allCandidates.length === 0) {
         if (empty) empty.style.display = 'block';
-        if (wrap)  wrap.style.display  = 'none';
-        if (count) count.textContent   = '0 candidates';
+        if (wrap) wrap.style.display = 'none';
+        if (count) count.textContent = '0 candidates';
         return;
     }
 
     if (empty) empty.style.display = 'none';
-    if (wrap)  wrap.style.display  = 'block';
-    if (count) count.textContent   = `${allCandidates.length} candidate${allCandidates.length !== 1 ? 's' : ''}`;
+    if (wrap) wrap.style.display = 'block';
+    if (count) count.textContent = `${allCandidates.length} candidate${allCandidates.length !== 1 ? 's' : ''}`;
 
     const total = allCandidates.length;
     const totalPages = Math.ceil(total / candidateState.limit) || 1;
@@ -144,11 +144,11 @@ function renderTable() {
     const pagedCandidates = allCandidates.slice(startIdx, startIdx + candidateState.limit);
 
     tbody.innerHTML = pagedCandidates.map((c, index) => {
-        const rank      = startIdx + index + 1;
+        const rank = startIdx + index + 1;
         const rankClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
-        const cid       = c.candidate_id;
-        const matchPct  = c.match_percentage || 0;
-        const matchCls  = matchPct >= 70 ? 'match-high' : matchPct >= 40 ? 'match-medium' : 'match-low';
+        const cid = c.candidate_id;
+        const matchPct = c.match_percentage || 0;
+        const matchCls = matchPct >= 70 ? 'match-high' : matchPct >= 40 ? 'match-medium' : 'match-low';
 
         return `
         <tr>
@@ -216,7 +216,7 @@ function renderCandidatePagination(total, totalPages, startIdx, pagedCount) {
     }
 
     const startItem = total === 0 ? 0 : startIdx + 1;
-    const endItem   = startIdx + pagedCount;
+    const endItem = startIdx + pagedCount;
     const currentPage = candidateState.page;
 
     let pageBtns = '';
@@ -305,7 +305,7 @@ async function toggleCandidateReached(cid, reached) {
         const c = allCandidates.find(x => x.candidate_id === cid);
         if (c) c.reached = reached;
         renderStats();
-        showToast(reached ? '✅ Candidate marked as Contacted' : 'ℹ️ Candidate marked as Not Contacted', 'success');
+        showToast(reached ? ' Candidate marked as Contacted' : ' Candidate marked as Not Contacted', 'success');
     } catch (err) {
         showToast('Failed to update status: ' + err.message, 'error');
         loadCandidates(sortByMatch);
@@ -334,10 +334,10 @@ function toggleActionMenu(event, cid) {
 
 function handleAction(action, cid, name = '') {
     document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
-    if (action === 'view')     openViewModal(cid);
-    if (action === 'edit')     openEditModal(cid);
+    if (action === 'view') openViewModal(cid);
+    if (action === 'edit') openEditModal(cid);
     if (action === 'download') downloadResume(cid);
-    if (action === 'delete')   openDeleteModal(cid, name);
+    if (action === 'delete') openDeleteModal(cid, name);
     if (action === 'sendmail') showToast('📧 Send Mail functionality will be available in the next release.', 'info');
 }
 
@@ -349,20 +349,20 @@ document.addEventListener('click', () => {
 function relativeTime(iso) {
     if (!iso) return '—';
     const diff = Date.now() - new Date(iso).getTime();
-    const s  = Math.floor(diff / 1000);
-    const m  = Math.floor(s / 60);
-    const h  = Math.floor(m / 60);
-    const d  = Math.floor(h / 24);
-    const w  = Math.floor(d / 7);
+    const s = Math.floor(diff / 1000);
+    const m = Math.floor(s / 60);
+    const h = Math.floor(m / 60);
+    const d = Math.floor(h / 24);
+    const w = Math.floor(d / 7);
     const mo = Math.floor(d / 30);
-    const y  = Math.floor(d / 365);
+    const y = Math.floor(d / 365);
 
-    if (s < 60)   return 'Just now';
-    if (m < 60)   return `${m}m ago`;
-    if (h < 24)   return `${h}h ago`;
-    if (d < 7)    return `${d} day${d !== 1 ? 's' : ''} ago`;
-    if (w < 4)    return `${w} week${w !== 1 ? 's' : ''} ago`;
-    if (mo < 12)  return `${mo} month${mo !== 1 ? 's' : ''} ago`;
+    if (s < 60) return 'Just now';
+    if (m < 60) return `${m}m ago`;
+    if (h < 24) return `${h}h ago`;
+    if (d < 7) return `${d} day${d !== 1 ? 's' : ''} ago`;
+    if (w < 4) return `${w} week${w !== 1 ? 's' : ''} ago`;
+    if (mo < 12) return `${mo} month${mo !== 1 ? 's' : ''} ago`;
     return `${y} year${y !== 1 ? 's' : ''} ago`;
 }
 
@@ -372,16 +372,16 @@ function openViewModal(candidateId) {
     if (!c) return;
 
     document.getElementById('vm-avatar').textContent = (c.name || 'U').charAt(0).toUpperCase();
-    document.getElementById('vm-name').textContent   = c.name || 'Unknown Candidate';
-    document.getElementById('vm-sub').textContent    =
+    document.getElementById('vm-name').textContent = c.name || 'Unknown Candidate';
+    document.getElementById('vm-sub').textContent =
         `${c.total_experience ? c.total_experience + ' yr experience' : 'Experience N/A'} • ${c.gender || 'Gender N/A'}`;
 
-    document.getElementById('vm-email').textContent   = c.email   || '—';
-    document.getElementById('vm-phone').textContent   = c.phone   || '—';
+    document.getElementById('vm-email').textContent = c.email || '—';
+    document.getElementById('vm-phone').textContent = c.phone || '—';
     document.getElementById('vm-address').textContent = c.address || '—';
-    document.getElementById('vm-gender').textContent  = c.gender  || '—';
-    document.getElementById('vm-exp').textContent     = c.total_experience ? c.total_experience + ' years' : '—';
-    document.getElementById('vm-qual').textContent    = c.qualification || c.education || '—';
+    document.getElementById('vm-gender').textContent = c.gender || '—';
+    document.getElementById('vm-exp').textContent = c.total_experience ? c.total_experience + ' years' : '—';
+    document.getElementById('vm-qual').textContent = c.qualification || c.education || '—';
 
     // Applied Job Vacancy
     const jobObj = allJobs.find(j => (j.job_id || j.id) === c.job_id);
@@ -396,7 +396,7 @@ function openViewModal(candidateId) {
     const li = document.getElementById('vm-linkedin');
     const gh = document.getElementById('vm-github');
     li.innerHTML = c.linkedin_url ? `<a href="${escapeHtml(c.linkedin_url)}" target="_blank">${escapeHtml(c.linkedin_url)}</a>` : '—';
-    gh.innerHTML = c.github_url   ? `<a href="${escapeHtml(c.github_url)}"   target="_blank">${escapeHtml(c.github_url)}</a>`   : '—';
+    gh.innerHTML = c.github_url ? `<a href="${escapeHtml(c.github_url)}"   target="_blank">${escapeHtml(c.github_url)}</a>` : '—';
 
     // Skills
     const skillsWrap = document.getElementById('vm-skills');
@@ -448,41 +448,41 @@ function openEditModal(candidateId) {
     const c = allCandidates.find(x => x.candidate_id === candidateId);
     if (!c) return;
 
-    document.getElementById('edit-candidate-id').value   = c.candidate_id;
-    document.getElementById('edit-name').value           = c.name || '';
-    document.getElementById('edit-gender').value         = c.gender || '';
-    document.getElementById('edit-email').value          = c.email || '';
-    document.getElementById('edit-phone').value          = c.phone || '';
-    document.getElementById('edit-address').value        = c.address || '';
-    document.getElementById('edit-experience').value     = c.total_experience || '';
-    document.getElementById('edit-qualification').value  = c.qualification || c.education || '';
-    document.getElementById('edit-skills').value         = Array.isArray(c.skills)
+    document.getElementById('edit-candidate-id').value = c.candidate_id;
+    document.getElementById('edit-name').value = c.name || '';
+    document.getElementById('edit-gender').value = c.gender || '';
+    document.getElementById('edit-email').value = c.email || '';
+    document.getElementById('edit-phone').value = c.phone || '';
+    document.getElementById('edit-address').value = c.address || '';
+    document.getElementById('edit-experience').value = c.total_experience || '';
+    document.getElementById('edit-qualification').value = c.qualification || c.education || '';
+    document.getElementById('edit-skills').value = Array.isArray(c.skills)
         ? c.skills.join(', ')
         : (c.skills || '');
-    document.getElementById('edit-linkedin').value       = c.linkedin_url || '';
-    document.getElementById('edit-github').value         = c.github_url || '';
+    document.getElementById('edit-linkedin').value = c.linkedin_url || '';
+    document.getElementById('edit-github').value = c.github_url || '';
 
     document.getElementById('edit-modal').classList.add('open');
 }
 
 async function saveCandidate(e) {
     e.preventDefault();
-    const cid  = document.getElementById('edit-candidate-id').value;
-    const btn  = document.getElementById('edit-save-btn');
+    const cid = document.getElementById('edit-candidate-id').value;
+    const btn = document.getElementById('edit-save-btn');
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Saving…';
 
     const payload = {
-        name:             document.getElementById('edit-name').value.trim() || null,
-        gender:           document.getElementById('edit-gender').value || null,
-        email:            document.getElementById('edit-email').value.trim() || null,
-        phone:            document.getElementById('edit-phone').value.trim() || null,
-        address:          document.getElementById('edit-address').value.trim() || null,
+        name: document.getElementById('edit-name').value.trim() || null,
+        gender: document.getElementById('edit-gender').value || null,
+        email: document.getElementById('edit-email').value.trim() || null,
+        phone: document.getElementById('edit-phone').value.trim() || null,
+        address: document.getElementById('edit-address').value.trim() || null,
         total_experience: document.getElementById('edit-experience').value.trim() || null,
-        qualification:    document.getElementById('edit-qualification').value.trim() || null,
-        skills:           document.getElementById('edit-skills').value.trim() || null,
-        linkedin_url:     document.getElementById('edit-linkedin').value.trim() || null,
-        github_url:       document.getElementById('edit-github').value.trim() || null,
+        qualification: document.getElementById('edit-qualification').value.trim() || null,
+        skills: document.getElementById('edit-skills').value.trim() || null,
+        linkedin_url: document.getElementById('edit-linkedin').value.trim() || null,
+        github_url: document.getElementById('edit-github').value.trim() || null,
     };
 
     try {
@@ -501,7 +501,7 @@ async function saveCandidate(e) {
 /* ── Delete Modal & Ranking Update ──────────────────────── */
 function openDeleteModal(candidateId, name) {
     document.getElementById('del-candidate-id').value = candidateId;
-    document.getElementById('del-name').textContent   = name || 'this candidate';
+    document.getElementById('del-name').textContent = name || 'this candidate';
     document.getElementById('delete-modal').classList.add('open');
 }
 
@@ -509,7 +509,7 @@ async function confirmDelete() {
     const cid = document.getElementById('del-candidate-id').value;
     try {
         await apiRequest('DELETE', `/api/candidates/${cid}`);
-        showToast('✅ Candidate deleted and rankings updated.', 'success');
+        showToast('Candidate deleted and rankings updated.', 'success');
         closeModal('delete-modal');
         await loadCandidates(sortByMatch);
     } catch (err) {
@@ -519,24 +519,24 @@ async function confirmDelete() {
 
 /* ── Helpers ─────────────────────────────────────────────── */
 function showSkeleton(show) {
-    const sk   = document.getElementById('table-skeleton');
+    const sk = document.getElementById('table-skeleton');
     const wrap = document.getElementById('table-wrap');
-    const emp  = document.getElementById('table-empty');
+    const emp = document.getElementById('table-empty');
     if (show) {
-        if (sk)   sk.style.display   = 'block';
+        if (sk) sk.style.display = 'block';
         if (wrap) wrap.style.display = 'none';
-        if (emp)  emp.style.display  = 'none';
+        if (emp) emp.style.display = 'none';
     } else {
         if (sk) sk.style.display = 'none';
     }
 }
 
-function openModal(id)  { document.getElementById(id)?.classList.add('open'); }
+function openModal(id) { document.getElementById(id)?.classList.add('open'); }
 function closeModal(id) { document.getElementById(id)?.classList.remove('open'); }
 
 // Close modal on overlay click
 document.querySelectorAll('.modal-overlay').forEach(el => {
-    el.addEventListener('click', function(e) {
+    el.addEventListener('click', function (e) {
         if (e.target === this) this.classList.remove('open');
     });
 });
