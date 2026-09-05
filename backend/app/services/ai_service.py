@@ -379,7 +379,7 @@ def check_is_resume(text: str) -> tuple[bool, str]:
         result = chain.invoke({"snippet": snippet})
     except Exception as e:
         logger.warning("Ollama resume check failed: %s. Trying Groq fallback...", e)
-        _, _, _ = get_groq_client()  # ensure initialized
+        _, _, _, _ = get_groq_client()  # ensure initialized
         if _groq_is_resume_checker is None:
             logger.warning("Groq is_resume checker not available, defaulting to True.")
             return True, "LLM unavailable — assumed resume"
@@ -431,7 +431,7 @@ def extract_candidate_info(text: str) -> dict:
         logger.warning("Ollama candidate extraction failed: %s. Trying Groq fallback...", e)
 
         # 2. Groq fallback with retry
-        _, g_extractor, _ = get_groq_client()
+        _, g_extractor, _, _ = get_groq_client()
         if g_extractor is None:
             raise RuntimeError(
                 "Ollama extraction failed and Groq client could not be initialized."
@@ -515,7 +515,7 @@ Skills: {candidate_data.get('skills')}
         logger.warning("Ollama candidate matching failed: %s. Trying Groq fallback...", e)
 
         # 2. Groq fallback with retry
-        _, _, g_matcher = get_groq_client()
+        _, _, g_matcher, _ = get_groq_client()
         if g_matcher is None:
             raise RuntimeError(
                 "Ollama matching failed and Groq client could not be initialized."
