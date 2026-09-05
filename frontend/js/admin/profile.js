@@ -180,14 +180,12 @@ function togglePasswordVisibility(inputId, btn) {
     if (input.type === 'password') {
         input.type = 'text';
         if (icon) {
-            icon.classList.remove('fa-eye');
-            icon.classList.add('fa-eye-slash');
+            icon.className = 'fa-regular fa-eye-slash';
         }
     } else {
         input.type = 'password';
         if (icon) {
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
+            icon.className = 'fa-regular fa-eye';
         }
     }
 }

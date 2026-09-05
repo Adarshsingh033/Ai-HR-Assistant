@@ -145,7 +145,7 @@ function renderScreeningTable() {
                 </button>
                 <div class="action-dropdown" id="amenu-${cid}">
                     <div class="action-dropdown-item" onclick="openViewProgressModal('${cid}')">
-                        <i class="fa-solid fa-eye" style="color:#a5b4fc;"></i> View
+                        <i class="fa-regular fa-eye" style="color:#a5b4fc;"></i> View
                     </div>
                     <div class="action-dropdown-item" onclick="openUpdateProgressModal('${cid}')">
                         <i class="fa-solid fa-pen-to-square" style="color:#38bdf8;"></i> Update Interview Progress

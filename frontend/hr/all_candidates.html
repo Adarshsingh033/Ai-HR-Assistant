@@ -15,11 +15,11 @@
         /* ── Stats bar ── */
         .stats-strip {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             margin-bottom: 22px;
         }
-        @media (max-width: 1024px) {
+        @media (max-width: 900px) {
             .stats-strip { grid-template-columns: repeat(2, 1fr); }
         }
         @media (max-width: 550px) {
@@ -469,15 +469,6 @@
                     <div>
                         <div class="stat-label">This Month</div>
                         <div class="stat-value" id="stat-month">—</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(245,158,11,0.15);color:#fbbf24;border:1px solid rgba(245,158,11,0.25);">
-                        <i class="fa-solid fa-bullseye"></i>
-                    </div>
-                    <div>
-                        <div class="stat-label">AVG MATCH %</div>
-                        <div class="stat-value" id="stat-avg">0%</div>
                     </div>
                 </div>
                 <div class="stat-card">

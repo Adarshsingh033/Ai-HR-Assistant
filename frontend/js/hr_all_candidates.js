@@ -99,17 +99,12 @@ function renderStats() {
         const d = new Date(c.created_at);
         return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
     }).length;
-    const avg     = total > 0
-        ? Math.round(allCandidates.reduce((s, c) => s + (c.match_percentage || 0), 0) / total)
-        : 0;
     const reached = allCandidates.filter(c => c.reached).length;
 
     const totalEl = document.getElementById('stat-total');
     if (totalEl) totalEl.textContent = total;
     const monthEl = document.getElementById('stat-month');
     if (monthEl) monthEl.textContent = month;
-    const avgEl   = document.getElementById('stat-avg');
-    if (avgEl)   avgEl.textContent   = avg + '%';
     const rchEl   = document.getElementById('stat-reached');
     if (rchEl)   rchEl.textContent   = reached;
 }
@@ -175,7 +170,7 @@ function renderTable() {
                 </button>
                 <div class="action-dropdown" id="amenu-${cid}">
                     <div class="action-dropdown-item" onclick="handleAction('view', '${cid}')">
-                        <i class="fa-solid fa-eye" style="color:#818cf8;"></i> View
+                        <i class="fa-regular fa-eye" style="color:#818cf8;"></i> View
                     </div>
                     <div class="action-dropdown-item" onclick="handleAction('edit', '${cid}')">
                         <i class="fa-solid fa-pen-to-square" style="color:#fbbf24;"></i> Edit

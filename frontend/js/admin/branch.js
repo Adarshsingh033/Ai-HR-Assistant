@@ -174,7 +174,7 @@ function renderBranchTable() {
 
                     <div id="branch-action-menu-${branch.branch_id}" class="branch-action-dropdown hidden" style="position: absolute; right: 0; top: 42px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; min-width: 140px; padding: 6px 0; text-align: left;">
                         <div onclick="triggerBranchView('${branch.branch_id}')" style="padding: 8px 16px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
-                            <i class="fa-solid fa-eye" style="color: #60a5fa;"></i> View
+                            <i class="fa-regular fa-eye" style="color: #60a5fa;"></i> View
                         </div>
                         <div onclick="triggerBranchEdit('${branch.branch_id}')" style="padding: 8px 16px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
                             <i class="fa-solid fa-pen-to-square" style="color: #f59e0b;"></i> Edit
