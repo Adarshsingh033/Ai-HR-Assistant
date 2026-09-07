@@ -5,7 +5,8 @@
 /* Redirect if already logged in or clear form inputs */
 window.addEventListener('DOMContentLoaded', () => {
     const session = Session.get();
-    if (session?.role === 'admin') location.href = '/admin/dashboard.html';
+    if (session?.role === 'super_admin') location.href = '/super_admin/dashboard.html';
+    else if (session?.role === 'admin') location.href = '/admin/dashboard.html';
     else if (session?.role === 'hr') location.href = '/hr/dashboard.html';
 
     // Clear any browser pre-filled credentials
@@ -90,7 +91,9 @@ async function handleLogin(e) {
             showToast(`Login Successful!`, 'success', 3500);
 
             setTimeout(() => {
-                if (data.role === 'admin') {
+                if (data.role === 'super_admin') {
+                    location.href = '/super_admin/dashboard.html';
+                } else if (data.role === 'admin') {
                     location.href = '/admin/dashboard.html';
                 } else {
                     location.href = '/hr/dashboard.html';

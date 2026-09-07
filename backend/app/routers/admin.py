@@ -300,6 +300,17 @@ def create_organization(
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
+            # Check Plan Limit
+            cur.execute("""
+                SELECT p.max_organizations, (SELECT COUNT(*) FROM organization WHERE admin_id = %s)
+                FROM admin a JOIN plans p ON a.plan_id = p.id WHERE a.id = %s
+            """, (x_admin_id, x_admin_id))
+            plan_check = cur.fetchone()
+            if plan_check:
+                max_orgs, current_orgs = plan_check
+                if current_orgs >= max_orgs:
+                    raise HTTPException(status_code=403, detail=f"Organization limit reached. Your current plan allows a maximum of {max_orgs} Organizations.")
+
             cur.execute(
                 """
                 INSERT INTO organization (id, company_name, organization_name, industry, company_size, status, image, admin_id)
@@ -498,6 +509,17 @@ def create_hr(
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
+            # Check Plan Limit
+            cur.execute("""
+                SELECT p.max_hr_users, (SELECT COUNT(*) FROM hr WHERE admin_id = %s)
+                FROM admin a JOIN plans p ON a.plan_id = p.id WHERE a.id = %s
+            """, (x_admin_id, x_admin_id))
+            plan_check = cur.fetchone()
+            if plan_check:
+                max_hr, current_hr = plan_check
+                if current_hr >= max_hr:
+                    raise HTTPException(status_code=403, detail=f"HR user limit reached. Your current plan allows a maximum of {max_hr} HR users.")
+            
             # Unique username check
             cur.execute("SELECT id FROM hr WHERE username = %s LIMIT 1", (payload.username,))
             if cur.fetchone():
@@ -621,6 +643,17 @@ def create_branch(
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
+            # Check Plan Limit
+            cur.execute("""
+                SELECT p.max_branches, (SELECT COUNT(*) FROM branches WHERE created_by_admin_id = %s)
+                FROM admin a JOIN plans p ON a.plan_id = p.id WHERE a.id = %s
+            """, (x_admin_id, x_admin_id))
+            plan_check = cur.fetchone()
+            if plan_check:
+                max_branches, current_branches = plan_check
+                if current_branches >= max_branches:
+                    raise HTTPException(status_code=403, detail=f"Branch limit reached. Your current plan allows a maximum of {max_branches} Branches.")
+                    
             # Verify Organization belongs to current admin
             cur.execute("SELECT COALESCE(organization_name, company_name, '') FROM organization WHERE id = %s AND admin_id = %s", (payload.organization_id, x_admin_id))
             org_row = cur.fetchone()
@@ -891,6 +924,17 @@ def create_member(
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
+            # Check Plan Limit
+            cur.execute("""
+                SELECT p.max_hr_users, (SELECT COUNT(*) FROM organization_members WHERE created_by_admin_id = %s)
+                FROM admin a JOIN plans p ON a.plan_id = p.id WHERE a.id = %s
+            """, (x_admin_id, x_admin_id))
+            plan_check = cur.fetchone()
+            if plan_check:
+                max_hr, current_hr = plan_check
+                if current_hr >= max_hr:
+                    raise HTTPException(status_code=403, detail=f"HR user limit reached. Your current plan allows a maximum of {max_hr} HR users.")
+
             # 1. Check unique email/username
             cur.execute(
                 "SELECT id FROM organization_members WHERE (email = %s OR username = %s) LIMIT 1",

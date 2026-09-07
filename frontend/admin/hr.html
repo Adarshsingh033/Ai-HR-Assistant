@@ -8,91 +8,8 @@
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
-        /* Modern Clean Admin Dashboard Aesthetics */
-        .module-section {
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(6px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* User Menu Popover Above Sidebar Chip */
-        .user-menu-popover {
-            position: absolute;
-            bottom: 75px;
-            left: 16px;
-            right: 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 8px 0;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
-            z-index: 200;
-            animation: popoverUp 0.2s ease forwards;
-        }
-
-        @keyframes popoverUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .popover-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 16px;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: background 0.2s ease;
-            cursor: pointer;
-        }
-
-        .popover-item:hover {
-            background: rgba(255, 255, 255, 0.07);
-        }
-
-        .popover-divider {
-            height: 1px;
-            background: var(--border);
-            margin: 4px 0;
-        }
-
-        .btn-save-profile {
-            background: linear-gradient(90deg, #f97316, #ea580c);
-            color: #ffffff;
-            border: none;
-            padding: 11px 28px;
-            border-radius: 10px;
-            font-family: inherit;
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.35);
-        }
-
-        .btn-save-profile:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45);
-        }
+        .module-section { animation: fadeIn 0.3s ease; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
     </style>
 </head>
 
@@ -164,51 +81,37 @@
 
             <div class="page-content">
 
-                <!-- 1. HR MODULE -->
+                <!-- ── HR MODULE ── -->
                 <div id="section-hr" class="module-section">
-                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-                        <div>
-                            <h2 style="font-size: 1.5rem; font-weight: 800; color: #fff; margin: 0 0 4px 0;">HR Managers</h2>
-                            <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin: 0;">Manage HR manager accounts, assigned organizations, and branch permissions.</p>
+                    <div class="page-header">
+                        <div class="page-header-text">
+                            <h2>HR Managers</h2>
+                            <p>Manage HR manager accounts, assigned organizations, and branch permissions.</p>
                         </div>
-                        <button type="button" onclick="openCreateMemberModal()" class="btn-save-profile" style="display: flex; align-items: center; gap: 8px; font-size: 0.88rem; padding: 10px 20px;">
-                            <i class="fa-solid fa-plus"></i> Create HR
-                        </button>
+                        <div class="page-header-actions">
+                            <button type="button" class="btn btn-primary" onclick="openCreateMemberModal()">
+                                <i class="fa-solid fa-plus"></i> Create HR
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Search & Filter Controls Bar -->
-                    <div style="display: flex; align-items: center; justify-content: flex-end; gap: 12px; margin-bottom: 24px; flex-wrap: wrap;">
-                        <!-- Search Bar Input -->
-                        <div style="width: 260px; max-width: 100%; position: relative; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); overflow: hidden; display: flex; align-items: center; height: 46px;">
-                            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: rgba(255, 255, 255, 0.4); font-size: 0.88rem;"></i>
-                            <input type="text" id="member-search-input" placeholder="Search by org or branch..." oninput="onMemberFilterChange()" style="width: 100%; height: 44px; padding-left: 40px; padding-right: 12px; background: transparent; border: none; color: #fff; font-size: 0.88rem; outline: none;" />
+                    <!-- Filter Bar -->
+                    <div class="filter-bar">
+                        <div class="search-bar">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="member-search-input" placeholder="Search by org or branch..." oninput="onMemberFilterChange()">
                         </div>
-
-                        <!-- Organization Filter Dropdown Box -->
-                        <div style="min-width: 180px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; height: 46px;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">ORGANIZATION <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
-                            <select id="member-filter-org" onchange="onMemberFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 6px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
-                                <option value="" style="background: #0f172a; color: #fff;">All Organizations</option>
-                            </select>
-                        </div>
-
-                        <!-- Branch Filter Dropdown Box -->
-                        <div style="min-width: 170px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; height: 46px;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">BRANCH <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
-                            <select id="member-filter-branch" onchange="onMemberFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 6px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
-                                <option value="" style="background: #0f172a; color: #fff;">All Branches</option>
-                            </select>
-                        </div>
-
-                        <!-- Status Filter Dropdown Box -->
-                        <div style="min-width: 140px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; height: 46px;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
-                            <select id="member-filter-status" onchange="onMemberFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 6px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
-                                <option value="" style="background: #0f172a; color: #fff;">All</option>
-                                <option value="active" style="background: #0f172a; color: #fff;">Active</option>
-                                <option value="inactive" style="background: #0f172a; color: #fff;">Inactive</option>
-                            </select>
-                        </div>
+                        <select class="filter-select" id="member-filter-org" onchange="onMemberFilterChange()">
+                            <option value="">All Organizations</option>
+                        </select>
+                        <select class="filter-select" id="member-filter-branch" onchange="onMemberFilterChange()">
+                            <option value="">All Branches</option>
+                        </select>
+                        <select class="filter-select" id="member-filter-status" onchange="onMemberFilterChange()">
+                            <option value="">All Status</option>
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                        </select>
                     </div>
 
                     <!-- Member List Table -->
@@ -233,8 +136,7 @@
                                 </tr>
                             </tbody>
                         </table>
-                    </div>
-
+                        </div>
                     <!-- Server-Side Pagination Controls -->
                     <div id="member-pagination-container"></div>
                 </div>
@@ -341,8 +243,8 @@
                 </div>
 
                 <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
-                    <button type="button" onclick="closeMemberModal()" style="padding: 10px 24px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.9rem; cursor: pointer;">Cancel</button>
-                    <button type="submit" class="btn-save-profile" id="member-submit-btn" style="padding: 10px 28px; border-radius: 10px; font-weight: 700; font-size: 0.9rem;">Save HR</button>
+                    <button type="button" onclick="closeMemberModal()" class="btn btn-outline">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="member-submit-btn">Save HR</button>
                 </div>
             </form>
         </div>

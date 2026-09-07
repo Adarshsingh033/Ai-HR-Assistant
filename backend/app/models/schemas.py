@@ -477,4 +477,73 @@ class CompareCandidatesRequest(BaseModel):
     candidate2_id: str
 
 
+# ── Super Admin & Plans ───────────────────────────────────────────────────────
+class PlanStatusEnum(str, Enum):
+    active = "active"
+    inactive = "inactive"
 
+class CreatePlanRequest(BaseModel):
+    name: str
+    description: Optional[str] = None
+    max_organizations: int
+    max_branches: int
+    max_hr_users: int
+    status: Optional[PlanStatusEnum] = PlanStatusEnum.active
+
+class UpdatePlanRequest(BaseModel):
+    name: Optional[str] = None
+    description: Optional[str] = None
+    max_organizations: Optional[int] = None
+    max_branches: Optional[int] = None
+    max_hr_users: Optional[int] = None
+    status: Optional[PlanStatusEnum] = None
+
+class PlanResponse(BaseModel):
+    plan_id: str
+    name: str
+    description: Optional[str] = None
+    max_organizations: int
+    max_branches: int
+    max_hr_users: int
+    status: str
+    created_at: str
+
+class CreateAdminRequest(BaseModel):
+    full_name: str
+    username: str
+    email: EmailStr
+    password: str
+    confirm_password: str
+    plan_id: str
+
+class UpdateAdminPlanRequest(BaseModel):
+    plan_id: str
+
+class UpdateAdminStatusRequest(BaseModel):
+    status: str # 'active' or 'inactive'
+
+class UpdateAdminRequest(BaseModel):
+    full_name: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+
+
+class AdminManagementResponse(BaseModel):
+    admin_id: str
+    username: str
+    email: str
+    full_name: str
+    status: str
+    plan_id: Optional[str] = None
+    plan_name: Optional[str] = None
+    created_at: str
+
+class AuditLogResponse(BaseModel):
+    log_id: str
+    user_id: str
+    user_type: str
+    action: str
+    resource_type: str
+    resource_id: Optional[str] = None
+    details: Optional[str] = None
+    created_at: str

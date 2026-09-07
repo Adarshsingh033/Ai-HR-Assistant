@@ -19,6 +19,27 @@ def authenticate_user(username: str, password: str) -> dict | None:
     """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
+            # Check Super Admin table first
+            cur.execute(
+                "SELECT id, username, password, email, full_name FROM super_admin WHERE username = %s LIMIT 1",
+                (username,),
+            )
+            super_admin = cur.fetchone()
+            if super_admin:
+                if super_admin[2] == password:
+                    logger.info("Super Admin '%s' authenticated successfully.", username)
+                    return {
+                        "user_id": str(super_admin[0]),
+                        "username": super_admin[1],
+                        "role": "super_admin",
+                        "org_id": "",
+                        "email": super_admin[3],
+                        "phone": "",
+                        "profile_image": "",
+                    }
+                logger.warning("Failed login attempt for Super Admin '%s'.", username)
+                return None
+
             # Check Admin table
             cur.execute(
                 "SELECT id, username, password, email, phone, profile_image FROM admin WHERE username = %s LIMIT 1",

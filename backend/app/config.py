@@ -39,6 +39,13 @@ LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
 DEFAULT_ADMIN_USERNAME = os.getenv("DEFAULT_ADMIN_USERNAME", "admin")
 DEFAULT_ADMIN_PASSWORD = os.getenv("DEFAULT_ADMIN_PASSWORD", "admin123")
 
+# ── Super Admin (seeded on first startup) ────────────────────────────────────
+SUPER_ADMIN_USERNAME = os.getenv("SUPER_ADMIN_USERNAME", "superadmin")
+SUPER_ADMIN_EMAIL = os.getenv("SUPER_ADMIN_EMAIL", "superadmin@example.com")
+SUPER_ADMIN_PASSWORD = os.getenv("SUPER_ADMIN_PASSWORD", "superadmin123")
+SUPER_ADMIN_FULL_NAME = os.getenv("SUPER_ADMIN_FULL_NAME", "Super Administrator")
+
+
 # ── AI / LLM ────────────────────────────────────────────────────────────────
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma2:9b")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")

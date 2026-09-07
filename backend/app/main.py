@@ -9,8 +9,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import auth, admin, hr, jobs, candidates, chatbot, emails, screening, comparison
-from app.seeders import seed_admin
+from app.routers import auth, admin, hr, jobs, candidates, chatbot, emails, screening, comparison, super_admin
+from app.seeders import seed_admin, seed_super_admin
 from app.database import init_db, close_pool
 from app.logger import get_logger
 
@@ -27,6 +27,7 @@ async def lifespan(app: FastAPI):
         if os.getenv("AUTO_MIGRATE", "false").lower() == "true":
             init_db()
         seed_admin()
+        seed_super_admin()
         logger.info("Application startup complete — server ready.")
     except Exception as e:
         logger.error("Error during application startup: %s", e, exc_info=True)
@@ -63,6 +64,7 @@ app.include_router(chatbot.router)
 app.include_router(emails.router)
 app.include_router(screening.router)
 app.include_router(comparison.router)
+app.include_router(super_admin.router)
 
 
 

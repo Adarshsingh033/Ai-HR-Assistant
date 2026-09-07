@@ -63,7 +63,6 @@ function showToast(message, type = 'info', duration = 3500) {
         setTimeout(() => toast.remove(), 300);
     }, duration);
 }
-
 /* ── API helper ───────────────────────────────────────── */
 async function apiRequest(method, path, body = null, isFormData = false) {
     const s = Session.get();
@@ -74,6 +73,9 @@ async function apiRequest(method, path, body = null, isFormData = false) {
         const adminId = s.user_id || s.id || s.admin_id;
         if (adminId) {
             headers['X-Admin-ID'] = adminId;
+            if (s.role === 'super_admin') {
+                headers['X-Super-Admin-ID'] = adminId;
+            }
         }
     }
 

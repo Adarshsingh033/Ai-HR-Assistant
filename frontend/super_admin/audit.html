@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Logs | AI HR Assistant</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-layout">
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div>
+                    <div class="logo-text">AI HR Assistant</div>
+                    <div class="logo-sub">Super Admin Portal</div>
+                </div>
+            </div>
+            <div class="nav-section-label">Main Menu</div>
+            <a href="dashboard.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>Dashboard</a>
+            <a href="plans.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-layer-group"></i></span>Plans</a>
+            <a href="admins.html" class="nav-item"><span class="nav-icon"><i class="fa-solid fa-users-gear"></i></span>Admins</a>
+            <a href="audit.html" class="nav-item active"><span class="nav-icon"><i class="fa-solid fa-list-check"></i></span>Audit Logs</a>
+            <div class="sidebar-footer" style="position:relative;">
+                <div class="user-menu-popover hidden" id="user-menu-popover">
+                    <a href="#" class="popover-item logout-item" onclick="logout()"><i class="fa-solid fa-right-from-bracket"></i> Logout</a>
+                </div>
+                <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">
+                    <div class="user-avatar" id="sidebar-avatar">SA</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-username">Super Admin</div>
+                        <div class="user-role" id="sidebar-role">Super Admin</div>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-title">Audit Logs</div>
+            </header>
+
+            <div class="page-content">
+                <!-- Page Header -->
+                <div class="page-header">
+                    <div class="page-header-text">
+                        <h2>System Audit Logs</h2>
+                        <p>A complete history of all platform-level actions performed by super admins and the system.</p>
+                    </div>
+                    <div class="page-header-actions">
+                        <button class="btn btn-outline" onclick="fetchLogs()">
+                            <i class="fa-solid fa-rotate-right"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filter Bar -->
+                <div class="filter-bar">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input" placeholder="Search by action or resource..." oninput="onSearchChange()">
+                    </div>
+                    <select class="filter-select" id="action-filter" onchange="onFilterChange()">
+                        <option value="">All Actions</option>
+                        <option value="CREATED">Created</option>
+                        <option value="UPDATED">Updated</option>
+                        <option value="DELETED">Deleted</option>
+                        <option value="STATUS_CHANGED">Status Changed</option>
+                    </select>
+                    <select class="filter-select" id="resource-filter" onchange="onFilterChange()">
+                        <option value="">All Resources</option>
+                        <option value="PLAN">Plan</option>
+                        <option value="ADMIN">Admin</option>
+                    </select>
+                </div>
+
+                <!-- Data Table -->
+                <!-- Data Table -->
+                <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 12px; overflow: visible;">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>Actor</th>
+                                    <th>Action</th>
+                                    <th>Resource</th>
+                                    <th>Details</th>
+                                </tr>
+                            </thead>
+                            <tbody id="logs-table-body">
+                                <tr><td colspan="5" style="text-align:center; padding:40px; color:var(--text-muted);">Loading audit logs...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- Server-Side Pagination Controls -->
+                    <div id="pagination-controls"></div>
+            </div>
+        </main>
+    </div>
+
+    <div class="toast-container" id="toast-container"></div>
+
+    <script src="../js/utils.js?v=2"></script>
+    <script src="js/super_admin.js?v=2"></script>
+    <script>
+        let currentPage = 1;
+        let totalPages  = 1;
+        let totalItems  = 0;
+        let searchTimeout = null;
+        let currentLimit = 15;
+
+        function onPageSizeChange(newSize) {
+            currentLimit = parseInt(newSize, 10) || 15;
+            currentPage = 1;
+            fetchLogs();
+        }
+
+        function goToPage(page) {
+            if (page < 1 || page > totalPages || page === currentPage) return;
+            currentPage = page;
+            fetchLogs();
+        }
+
+        async function fetchLogs() {
+            const action   = document.getElementById('action-filter').value;
+            const resource = document.getElementById('resource-filter').value;
+            let url = `/api/super-admin/audit-logs?page=${currentPage}&limit=${currentLimit}`;
+            if (action)   url += `&action=${action}`;
+            if (resource) url += `&resource_type=${resource}`;
+
+            try {
+                const data = await apiRequest('GET', url);
+                totalPages = data.total_pages;
+                totalItems = data.total;
+                renderPagination();
+                renderTable(data.audit_logs);
+            } catch (err) { showToast(err.message || 'Failed to load audit logs', 'error'); }
+        }
+
+        function onSearchChange() {
+            clearTimeout(searchTimeout);
+            // client-side search for current page results
+            searchTimeout = setTimeout(() => { currentPage = 1; fetchLogs(); }, 400);
+        }
+        function onFilterChange() { currentPage = 1; fetchLogs(); }
+
+        function renderPagination() {
+            const container = document.getElementById('pagination-controls');
+            if (totalItems === 0) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const startItem = (currentPage - 1) * currentLimit + 1;
+            const endItem = Math.min(currentPage * currentLimit, totalItems);
+
+            let pageBtns = '';
+            const maxVisiblePages = 7;
+            let startPage = 1;
+            let endPage = totalPages;
+
+            if (totalPages > maxVisiblePages) {
+                if (currentPage <= 4) {
+                    startPage = 1;
+                    endPage = 5;
+                } else if (currentPage >= totalPages - 3) {
+                    startPage = totalPages - 4;
+                    endPage = totalPages;
+                } else {
+                    startPage = currentPage - 2;
+                    endPage = currentPage + 2;
+                }
+            }
+
+            if (startPage > 1) {
+                pageBtns += `<button onclick="goToPage(1)" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">1</button>`;
+                if (startPage > 2) {
+                    pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">...</span>`;
+                }
+            }
+
+            for (let p = startPage; p <= endPage; p++) {
+                if (p === currentPage) {
+                    pageBtns += `<button style="width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);color:#fff;font-size:0.82rem;font-weight:700;cursor:default;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);">${p}</button>`;
+                } else {
+                    pageBtns += `<button onclick="goToPage(${p})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${p}</button>`;
+                }
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">...</span>`;
+                }
+                pageBtns += `<button onclick="goToPage(${totalPages})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${totalPages}</button>`;
+            }
+
+            const isPrevDisabled = currentPage <= 1;
+            const isNextDisabled = currentPage >= totalPages;
+
+            container.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding: 12px 20px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; flex-wrap: wrap; gap: 16px; backdrop-filter: blur(10px); font-family: 'Inter', sans-serif;">
+                    <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 500;">
+                        <span>${startItem}–${endItem} of ${totalItems} <span style="margin:0 4px;opacity:0.4;">·</span> Page ${currentPage} of ${totalPages}</span>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span>Rows per page:</span>
+                            <select onchange="onPageSizeChange(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 3px 8px; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;">
+                                <option value="10" ${currentLimit === 10 ? 'selected' : ''}>10</option>
+                                <option value="15" ${currentLimit === 15 ? 'selected' : ''}>15</option>
+                                <option value="25" ${currentLimit === 25 ? 'selected' : ''}>25</option>
+                                <option value="50" ${currentLimit === 50 ? 'selected' : ''}>50</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 4px 6px;">
+                        <button onclick="goToPage(1)" ${isPrevDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isPrevDisabled ? '0.3' : '1'};transition:all 0.15s;" title="First page">
+                            <i class="fa-solid fa-angles-left"></i>
+                        </button>
+                        <button onclick="goToPage(${currentPage - 1})" ${isPrevDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isPrevDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Previous page">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        ${pageBtns}
+                        <button onclick="goToPage(${currentPage + 1})" ${isNextDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isNextDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Next page">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                        <button onclick="goToPage(${totalPages})" ${isNextDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isNextDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Last page">
+                            <i class="fa-solid fa-angles-right"></i>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function actionBadge(action) {
+            if (action.includes('CREATED')) return `<span class="badge-active" style="background:rgba(16,185,129,0.12); color:#34d399;"><i class="fa-solid fa-plus" style="font-size:8px;"></i> ${action}</span>`;
+            if (action.includes('DELETED')) return `<span class="badge-inactive"><i class="fa-solid fa-trash" style="font-size:8px;"></i> ${action}</span>`;
+            if (action.includes('UPDATED') || action.includes('STATUS')) return `<span class="badge-pending"><i class="fa-solid fa-pen" style="font-size:8px;"></i> ${action}</span>`;
+            return `<span class="badge-draft">${action}</span>`;
+        }
+
+        function resourceBadge(type) {
+            const colors = {
+                PLAN:  { bg:'rgba(99,102,241,0.12)', color:'#a5b4fc' },
+                ADMIN: { bg:'rgba(249,115,22,0.12)',  color:'#fb923c' }
+            };
+            const c = colors[type] || { bg:'rgba(100,116,139,0.12)', color:'#94a3b8' };
+            return `<span style="display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:0.72rem; font-weight:700; background:${c.bg}; color:${c.color};">${type}</span>`;
+        }
+
+        function renderTable(logs) {
+            const tbody = document.getElementById('logs-table-body');
+            if (!logs || logs.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:48px; color:var(--text-muted);">
+                    <div style="font-size:2rem; margin-bottom:8px; opacity:0.4;"><i class="fa-solid fa-list-check"></i></div>
+                    <div>No audit log entries found.</div>
+                </td></tr>`;
+                return;
+            }
+            tbody.innerHTML = logs.map(log => {
+                const dt = new Date(log.created_at);
+                const date = dt.toLocaleDateString();
+                const time = dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+                const details = log.details ? JSON.stringify(log.details) : '—';
+                return `<tr>
+                    <td>
+                        <div style="font-size:0.85rem; font-weight:600;">${date}</div>
+                        <div style="font-size:0.76rem; color:var(--text-muted);">${time}</div>
+                    </td>
+                    <td>
+                        <div style="font-weight:600; font-size:0.85rem;">${log.user_type ? log.user_type.replace('_',' ').toUpperCase() : 'System'}</div>
+                    </td>
+                    <td>${actionBadge(log.action)}</td>
+                    <td>${resourceBadge(log.resource_type)}</td>
+                    <td>
+                        <span style="font-size:0.78rem; color:var(--text-muted); display:block; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${details}">${details}</span>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        document.addEventListener('DOMContentLoaded', fetchLogs);
+    </script>
+</body>
+</html>
