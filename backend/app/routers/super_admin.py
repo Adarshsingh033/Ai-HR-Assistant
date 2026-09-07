@@ -236,6 +236,31 @@ def update_plan(plan_id: str, payload: UpdatePlanRequest, x_super_admin_id: Opti
             )
 
 
+@router.delete("/plans/{plan_id}")
+def delete_plan(plan_id: str, x_super_admin_id: Optional[str] = Header(None, alias="X-Super-Admin-ID")):
+    if not x_super_admin_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT name FROM plans WHERE id = %s", (plan_id,))
+            plan = cur.fetchone()
+            if not plan:
+                raise HTTPException(status_code=404, detail="Plan not found")
+
+            # Check if plan is being used by any admin
+            cur.execute("SELECT COUNT(*) FROM admin WHERE plan_id = %s", (plan_id,))
+            if cur.fetchone()[0] > 0:
+                raise HTTPException(status_code=400, detail="Cannot delete plan. It is currently assigned to one or more admins.")
+
+            cur.execute("DELETE FROM plans WHERE id = %s", (plan_id,))
+            conn.commit()
+
+            log_audit(x_super_admin_id, "super_admin", "DELETED", "PLAN", plan_id, {"name": plan[0]})
+
+    return {"message": "Plan deleted successfully"}
+
+
 # ── Admins Management ────────────────────────────────────────────────────────
 
 @router.post("/admins", response_model=AdminManagementResponse)
@@ -459,6 +484,26 @@ def update_admin_status(admin_id: str, payload: UpdateAdminStatusRequest, x_supe
             log_audit(x_super_admin_id, "super_admin", "UPDATED_STATUS", "ADMIN", admin_id, {"new_status": payload.status})
 
     return {"message": f"Admin status updated to {payload.status}"}
+
+
+@router.delete("/admins/{admin_id}")
+def delete_admin(admin_id: str, x_super_admin_id: Optional[str] = Header(None, alias="X-Super-Admin-ID")):
+    if not x_super_admin_id:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT username FROM admin WHERE id = %s", (admin_id,))
+            admin = cur.fetchone()
+            if not admin:
+                raise HTTPException(status_code=404, detail="Admin not found")
+
+            cur.execute("DELETE FROM admin WHERE id = %s", (admin_id,))
+            conn.commit()
+
+            log_audit(x_super_admin_id, "super_admin", "DELETED", "ADMIN", admin_id, {"username": admin[0]})
+
+    return {"message": "Admin deleted successfully"}
 
 
 # ── Audit Logs ───────────────────────────────────────────────────────────────

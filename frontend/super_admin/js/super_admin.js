@@ -1,22 +1,5 @@
 const API_URL = '/api';
 
-// Open/Close Modal
-function openModal(id) {
-    const modal = document.getElementById(id);
-    if(modal) {
-        modal.style.display = 'flex';
-        setTimeout(() => modal.classList.add('active'), 10);
-    }
-}
-
-function closeModal(id) {
-    const modal = document.getElementById(id);
-    if(modal) {
-        modal.classList.remove('active');
-        setTimeout(() => modal.style.display = 'none', 300);
-    }
-}
-
 /* Toggle Sidebar User Menu Popover */
 function toggleUserMenu(e) {
     if (e) e.stopPropagation();

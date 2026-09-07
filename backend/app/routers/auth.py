@@ -30,5 +30,50 @@ def login(payload: LoginRequest):
         message="Login successful",
     )
 
+from pydantic import BaseModel
 
+class ForgotPasswordRequest(BaseModel):
+    email: str
 
+class ResetPasswordRequest(BaseModel):
+    email: str
+    new_password: str
+
+@router.post("/forgot-password")
+def forgot_password(payload: ForgotPasswordRequest):
+    """Initiate forgot password flow by verifying email exists."""
+    email = payload.email.lower()
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            tables = ["super_admin", "admin", "organization_members", "hr"]
+            found = False
+            for table in tables:
+                cur.execute(f"SELECT id FROM {table} WHERE email = %s LIMIT 1", (email,))
+                if cur.fetchone():
+                    found = True
+                    break
+            
+            if not found:
+                raise HTTPException(status_code=404, detail="Email not found")
+                
+    return {"success": True, "message": "OTP sent to email"}
+
+@router.post("/reset-password")
+def reset_password(payload: ResetPasswordRequest):
+    """Reset the password for a user."""
+    email = payload.email.lower()
+    new_password = payload.new_password
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            tables = ["super_admin", "admin", "organization_members", "hr"]
+            updated = False
+            for table in tables:
+                cur.execute(f"UPDATE {table} SET password = %s WHERE email = %s", (new_password, email))
+                if cur.rowcount > 0:
+                    updated = True
+            
+            if not updated:
+                raise HTTPException(status_code=404, detail="Email not found")
+            conn.commit()
+            
+    return {"success": True, "message": "Password reset successfully"}

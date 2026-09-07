@@ -21,8 +21,8 @@ def authenticate_user(username: str, password: str) -> dict | None:
         with conn.cursor() as cur:
             # Check Super Admin table first
             cur.execute(
-                "SELECT id, username, password, email, full_name FROM super_admin WHERE username = %s LIMIT 1",
-                (username,),
+                "SELECT id, username, password, email, full_name FROM super_admin WHERE username = %s OR email = %s LIMIT 1",
+                (username, username.lower()),
             )
             super_admin = cur.fetchone()
             if super_admin:
@@ -42,8 +42,8 @@ def authenticate_user(username: str, password: str) -> dict | None:
 
             # Check Admin table
             cur.execute(
-                "SELECT id, username, password, email, phone, profile_image FROM admin WHERE username = %s LIMIT 1",
-                (username,),
+                "SELECT id, username, password, email, phone, profile_image FROM admin WHERE username = %s OR email = %s LIMIT 1",
+                (username, username.lower()),
             )
             admin = cur.fetchone()
 
@@ -91,8 +91,8 @@ def authenticate_user(username: str, password: str) -> dict | None:
 
             # Check legacy HR table fallback
             cur.execute(
-                "SELECT id, username, password, email, org_id FROM hr WHERE username = %s LIMIT 1",
-                (username,),
+                "SELECT id, username, password, email, org_id FROM hr WHERE username = %s OR email = %s LIMIT 1",
+                (username, username.lower()),
             )
             hr = cur.fetchone()
 

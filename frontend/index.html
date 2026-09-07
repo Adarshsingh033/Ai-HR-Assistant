@@ -620,11 +620,11 @@
 
                 <form id="login-form" onsubmit="handleLogin(event)" autocomplete="off">
                     <div class="input-group-custom">
-                        <label class="input-label-custom" for="username">Username</label>
+                        <label class="input-label-custom" for="username">Username or Email</label>
                         <div class="input-field-wrap">
                             <span class="field-icon"><i class="fa-solid fa-user"></i></span>
                             <input type="text" id="username" class="form-control-custom"
-                                placeholder="Enter your username" autocomplete="off" required />
+                                placeholder="Enter your username or email" autocomplete="off" required />
                         </div>
                     </div>
 
@@ -638,6 +638,9 @@
                                 title="Show/Hide password">
                                 <i class="fa-regular fa-eye"></i>
                             </button>
+                        </div>
+                        <div style="text-align: right; margin-top: 8px;">
+                            <a href="javascript:void(0)" onclick="openForgotPasswordModal()" style="font-size: 0.82rem; color: #a5b4fc; text-decoration: none; font-weight: 600; transition: color 0.2s ease;">Forgot Password?</a>
                         </div>
                     </div>
 
@@ -658,8 +661,66 @@
     <!-- Toast Container -->
     <div class="toast-container" id="toast-container"></div>
 
-    <script src="js/utils.js?v=2"></script>
-    <script src="js/auth.js?v=2"></script>
+    <!-- Forgot Password - Email Modal -->
+    <div class="modal-overlay" id="fp-email-modal" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; backdrop-filter: blur(4px);">
+        <div class="modal-card" style="width: 100%; max-width: 400px; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
+            <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Forgot Password</h3>
+            <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px;">Enter your registered email address to receive an OTP.</p>
+            <form id="fp-email-form" onsubmit="handleFpEmailSubmit(event)">
+                <div class="input-group-custom">
+                    <label class="input-label-custom">Email Address</label>
+                    <input type="email" id="fp-email" class="form-control-custom" placeholder="name@company.com" required style="width:100%; height: 52px; padding: 0 16px; background: #15112e; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; color: #fff; box-sizing: border-box; font-family: inherit;" />
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end; margin-top: 24px;">
+                    <button type="button" onclick="closeFpModal('fp-email-modal')" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
+                    <button type="submit" id="fp-email-btn" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #4f46e5, #3b82f6); color: #fff; cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.35);">Send OTP</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- OTP Verification Modal -->
+    <div class="modal-overlay" id="fp-otp-modal" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; backdrop-filter: blur(4px);">
+        <div class="modal-card" style="width: 100%; max-width: 400px; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; text-align: center;">
+            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
+                <i class="fa-solid fa-envelope-open-text"></i>
+            </div>
+            <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Verify OTP</h3>
+            <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px;">Enter the 4-digit code sent to your email.</p>
+            <form id="fp-otp-form" onsubmit="handleFpOtpSubmit(event)">
+                <input type="text" id="fp-otp-input" placeholder="1234" maxlength="4" required style="width: 120px; height: 60px; text-align: center; font-size: 2rem; font-weight: 700; letter-spacing: 0.2em; background: #15112e; border: 1px solid #6366f1; border-radius: 12px; color: #fff; box-shadow: 0 0 15px rgba(99, 102, 241, 0.2); margin: 0 auto 24px; display: block; font-family: inherit;" />
+                <div style="display: flex; gap: 12px; justify-content: center;">
+                    <button type="button" onclick="closeFpModal('fp-otp-modal')" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
+                    <button type="submit" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #4f46e5, #3b82f6); color: #fff; cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(79, 70, 229, 0.35);">Verify</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reset Password Modal -->
+    <div class="modal-overlay" id="fp-reset-modal" style="display: none; align-items: center; justify-content: center; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; backdrop-filter: blur(4px);">
+        <div class="modal-card" style="width: 100%; max-width: 400px; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
+            <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Create New Password</h3>
+            <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px;">Your new password must be different from previous used passwords.</p>
+            <form id="fp-reset-form" onsubmit="handleFpResetSubmit(event)">
+                <div class="input-group-custom" style="margin-bottom: 16px;">
+                    <label class="input-label-custom">New Password</label>
+                    <input type="password" id="fp-new-pwd" class="form-control-custom" placeholder="Min. 6 characters" required style="width:100%; height: 52px; padding: 0 16px; background: #15112e; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; color: #fff; box-sizing: border-box; font-family: inherit;" />
+                </div>
+                <div class="input-group-custom" style="margin-bottom: 24px;">
+                    <label class="input-label-custom">Confirm Password</label>
+                    <input type="password" id="fp-confirm-pwd" class="form-control-custom" placeholder="Repeat password" required style="width:100%; height: 52px; padding: 0 16px; background: #15112e; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; color: #fff; box-sizing: border-box; font-family: inherit;" />
+                </div>
+                <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                    <button type="button" onclick="closeFpModal('fp-reset-modal')" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
+                    <button type="submit" id="fp-reset-btn" style="flex: 1; padding: 12px; border-radius: 12px; border: none; background: linear-gradient(90deg, #10b981, #059669); color: #fff; cursor: pointer; font-weight: 700; font-size: 1rem; box-shadow: 0 4px 15px rgba(16, 185, 129, 0.35);">Reset Password</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/utils.js?v=5"></script>
+    <script src="js/auth.js?v=5"></script>
     <script>document.addEventListener('DOMContentLoaded', initTheme);</script>
 </body>
 
