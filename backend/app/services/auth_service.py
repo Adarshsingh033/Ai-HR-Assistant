@@ -87,8 +87,8 @@ def authenticate_user(username: str, password: str) -> dict | None:
         with conn.cursor() as cur:
             # Check Super Admin table first
             cur.execute(
-                "SELECT id, username, password, email, full_name FROM super_admin WHERE username = %s OR email = %s LIMIT 1",
-                (username, username.lower()),
+                "SELECT id, username, password, email, full_name FROM super_admin WHERE LOWER(username) = LOWER(%s) OR LOWER(email) = LOWER(%s) LIMIT 1",
+                (username, username),
             )
             super_admin = cur.fetchone()
             if super_admin:
@@ -108,8 +108,8 @@ def authenticate_user(username: str, password: str) -> dict | None:
 
             # Check Admin table
             cur.execute(
-                "SELECT id, username, password, email, phone, profile_image FROM admin WHERE username = %s OR email = %s LIMIT 1",
-                (username, username.lower()),
+                "SELECT id, username, password, email, phone, profile_image FROM admin WHERE LOWER(username) = LOWER(%s) OR LOWER(email) = LOWER(%s) LIMIT 1",
+                (username, username),
             )
             admin = cur.fetchone()
 
@@ -128,10 +128,9 @@ def authenticate_user(username: str, password: str) -> dict | None:
                 logger.warning("Failed login attempt for admin '%s'.", username)
                 return None
 
-            # Check Organization Members (HR) table
             cur.execute(
-                "SELECT id, username, password, email, organization_id, branch_id, status, full_name, image, phone FROM organization_members WHERE username = %s OR email = %s LIMIT 1",
-                (username, username.lower()),
+                "SELECT id, username, password, email, organization_id, branch_id, status, full_name, image, phone FROM organization_members WHERE LOWER(username) = LOWER(%s) OR LOWER(email) = LOWER(%s) LIMIT 1",
+                (username, username),
             )
             member = cur.fetchone()
 
