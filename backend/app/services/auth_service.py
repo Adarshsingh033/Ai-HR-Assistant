@@ -4,19 +4,23 @@ Authentication service — validates user credentials against the database.
 
 import re
 from fastapi import HTTPException
+from app.database import get_db_connection
+from app.logger import get_logger
+
+logger = get_logger(__name__)
 
 def validate_hr_admin_phone(phone: str = None):
     """
-    Validates that Admin and HR phone numbers contain ONLY digits (0-9).
+    Validates that Admin and HR phone numbers contain EXACTLY 10 digits (0-9).
     No alphabets, spaces, plus (+), or special characters allowed.
     Candidates are explicitly exempt.
     """
     if phone and str(phone).strip():
         p = str(phone).strip()
-        if not re.match(r'^\d+$', p):
+        if not re.match(r'^\d{10}$', p):
             raise HTTPException(
                 status_code=400,
-                detail="Phone number must contain only digits (no letters, spaces, or '+' allowed)."
+                detail="Phone number must be exactly 10 digits."
             )
 
 def check_hr_admin_uniqueness(cur, username: str = None, email: str = None, phone: str = None, exclude_id: str = None):

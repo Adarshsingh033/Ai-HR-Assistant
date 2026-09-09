@@ -128,8 +128,8 @@ async function handleSaveProfile(e) {
         return;
     }
 
-    if (phone && !/^\d+$/.test(phone)) {
-        showToast('Phone number must contain only digits (no letters, spaces, or "+" allowed).', 'error');
+    if (phone && !/^\d{10}$/.test(phone)) {
+        showToast('Phone number must be exactly 10 digits.', 'error');
         return;
     }
 

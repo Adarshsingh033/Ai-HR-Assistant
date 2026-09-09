@@ -319,7 +319,8 @@ function toggleOrgActionMenu(e, orgId) {
             const spaceBelow = window.innerHeight - rect.bottom;
 
             targetMenu.style.position = 'fixed';
-            targetMenu.style.left = `${Math.max(10, rect.right - menuWidth)}px`;
+            targetMenu.style.right = 'auto';
+            targetMenu.style.left = `${Math.min(window.innerWidth - menuWidth - 16, Math.max(10, rect.right - menuWidth))}px`;
             targetMenu.style.zIndex = '99999';
 
             if (spaceBelow < menuHeight + 15 && rect.top > menuHeight + 15) {

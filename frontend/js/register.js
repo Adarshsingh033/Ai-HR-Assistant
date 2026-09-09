@@ -114,8 +114,8 @@ async function handleRegister(e) {
         return;
     }
 
-    if (phone && !/^\d+$/.test(phone)) {
-        showError('Phone number must contain only digits (no letters, spaces, or "+" allowed).');
+    if (phone && !/^\d{10}$/.test(phone)) {
+        showError('Phone number must be exactly 10 digits.');
         return;
     }
 

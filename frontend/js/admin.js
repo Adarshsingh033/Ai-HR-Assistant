@@ -157,6 +157,11 @@ async function handleSaveProfile(e) {
         return;
     }
 
+    if (phone && !/^\d{10}$/.test(phone)) {
+        showToast('Phone number must be exactly 10 digits.', 'error');
+        return;
+    }
+
     const btn = document.getElementById('save-profile-btn');
     if (btn) {
         btn.disabled = true;

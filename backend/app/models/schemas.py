@@ -34,8 +34,8 @@ class RegisterAdminRequest(BaseModel):
     def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and str(v).strip():
             val = str(v).strip()
-            if not val.isdigit():
-                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            if not (val.isdigit() and len(val) == 10):
+                raise ValueError("Phone number must be exactly 10 digits.")
             return val
         return v
 
@@ -98,8 +98,8 @@ class UpdateAdminProfileRequest(BaseModel):
     def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and str(v).strip():
             val = str(v).strip()
-            if not val.isdigit():
-                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            if not (val.isdigit() and len(val) == 10):
+                raise ValueError("Phone number must be exactly 10 digits.")
             return val
         return v
 
@@ -131,8 +131,8 @@ class UpdateHRProfileRequest(BaseModel):
     def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and str(v).strip():
             val = str(v).strip()
-            if not val.isdigit():
-                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            if not (val.isdigit() and len(val) == 10):
+                raise ValueError("Phone number must be exactly 10 digits.")
             return val
         return v
 
@@ -236,8 +236,8 @@ class CreateMemberRequest(BaseModel):
     def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and str(v).strip():
             val = str(v).strip()
-            if not val.isdigit():
-                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            if not (val.isdigit() and len(val) == 10):
+                raise ValueError("Phone number must be exactly 10 digits.")
             return val
         return v
 
@@ -258,8 +258,8 @@ class UpdateMemberRequest(BaseModel):
     def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
         if v is not None and str(v).strip():
             val = str(v).strip()
-            if not val.isdigit():
-                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            if not (val.isdigit() and len(val) == 10):
+                raise ValueError("Phone number must be exactly 10 digits.")
             return val
         return v
 

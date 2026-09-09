@@ -621,9 +621,18 @@ select.form-control {
 }
 
 select.form-control option,
+select.input-custom option,
 select option {
   background-color: #0f172a !important;
   color: #ffffff !important;
+}
+
+select option:disabled,
+select option[disabled],
+select.input-custom option:disabled,
+select.input-custom option[disabled] {
+  background-color: #0f172a !important;
+  color: rgba(255, 255, 255, 0.45) !important;
 }
 
 textarea.form-control {

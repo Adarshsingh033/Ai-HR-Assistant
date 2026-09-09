@@ -142,7 +142,7 @@ function renderScreeningTable() {
                     <i class="fa-solid ${getInterviewStatusIcon(interviewStatus)}"></i> ${escapeHtml(interviewStatus)}
                 </span>
             </td>
-            <td style="text-align:right;" class="action-cell">
+            <td style="text-align:right;padding-right:20px;" class="action-cell">
                 <button class="action-dots-btn" onclick="toggleActionMenu(event, '${cid}')" title="Actions">
                     <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
@@ -267,7 +267,7 @@ function getInterviewStatusIcon(status) {
     if (status === 'Passed') return 'fa-circle-check';
     if (status === 'Rejected') return 'fa-circle-xmark';
     if (status === 'On Hold') return 'fa-circle-pause';
-    return 'fa-spinner';
+    return 'fa-hourglass-half';
 }
 
 function toggleActionMenu(event, cid) {
@@ -282,12 +282,13 @@ function toggleActionMenu(event, cid) {
         if (event && event.currentTarget) {
             const btn = event.currentTarget;
             const rect = btn.getBoundingClientRect();
+            const menuWidth = targetMenu.offsetWidth || 160;
             const menuHeight = targetMenu.offsetHeight || 130;
-            const menuWidth = targetMenu.offsetWidth || 140;
             const spaceBelow = window.innerHeight - rect.bottom;
 
             targetMenu.style.position = 'fixed';
-            targetMenu.style.left = `${Math.max(10, rect.right - menuWidth)}px`;
+            targetMenu.style.right = 'auto';
+            targetMenu.style.left = `${Math.min(window.innerWidth - menuWidth - 16, Math.max(10, rect.right - menuWidth))}px`;
             targetMenu.style.zIndex = '99999';
 
             if (spaceBelow < menuHeight + 15 && rect.top > menuHeight + 15) {

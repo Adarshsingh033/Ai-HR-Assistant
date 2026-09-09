@@ -207,12 +207,12 @@
         }
 
         .input-custom:focus {
-            border-color: #6366f1;
-            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+            border-color: #f97316;
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.2);
         }
 
         .btn-save-profile {
-            background: linear-gradient(90deg, #6366f1, #4f46e5);
+            background: linear-gradient(90deg, #f97316, #ea580c);
             color: #ffffff;
             border: none;
             padding: 11px 28px;
@@ -222,12 +222,12 @@
             font-size: 0.9rem;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.35);
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.35);
         }
 
         .btn-save-profile:hover {
             transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(99, 102, 241, 0.45);
+            box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45);
         }
     </style>
 </head>
@@ -239,10 +239,11 @@
         <!-- Sidebar -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-logo">
-                <div class="logo-text">AI HR Assistant</div>
-                <div class="logo-sub">HR Portal</div>
+                <div>
+                    <div class="logo-text">AI HR Assistant</div>
+                    <div class="logo-sub">HR Portal</div>
+                </div>
             </div>
-    </div>
 
     <div class="nav-section-label">Main Menu</div>
     <a href="dashboard.html" class="nav-item">
@@ -379,7 +380,7 @@
                                 <div class="form-group-custom">
                                     <label class="label-custom">Phone Number</label>
                                     <input type="text" id="profile-phone" class="input-custom"
-                                        placeholder="e.g. 9876543210" oninput="this.value = this.value.replace(/\D/g, '')" />
+                                        placeholder="e.g. 9876543210" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" />
                                 </div>
                             </div>
 

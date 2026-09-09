@@ -214,7 +214,32 @@
         }
 
         .input-custom:focus {
-            border-color: #f97316;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px var(--accent-glow);
+        }
+
+        select.input-custom {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            padding-right: 40px !important;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a5b4fc' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
+            background-repeat: no-repeat !important;
+            background-position: right 14px center !important;
+            background-size: 16px !important;
+            cursor: pointer;
+        }
+
+        select.input-custom option {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            padding: 12px;
+        }
+
+        select.input-custom option:disabled,
+        select.input-custom option[disabled] {
+            color: rgba(255, 255, 255, 0.4) !important;
+            background-color: #0f172a !important;
         }
 
         .avatar-upload-row {
@@ -366,7 +391,7 @@
                 <div class="topbar-title" id="page-title">Organization</div>
             </header>
 
-            <div class="page-content">
+            <div class="page-content scrollable">
 
                 <!-- 1. DASHBOARD MODULE -->
                 <div id="section-dashboard" class="module-section hidden">
