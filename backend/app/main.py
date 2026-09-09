@@ -37,6 +37,8 @@ async def lifespan(app: FastAPI):
     logger.info("Application shutdown complete.")
 
 
+from app.middleware.audit_middleware import AuditLoggingMiddleware
+
 # ── App ──────────────────────────────────────────────────────────────────────
 app = FastAPI(
     title="AI Recruitment System",
@@ -53,6 +55,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+app.add_middleware(AuditLoggingMiddleware)
 
 # ── Routers ──────────────────────────────────────────────────────────────────
 app.include_router(auth.router)

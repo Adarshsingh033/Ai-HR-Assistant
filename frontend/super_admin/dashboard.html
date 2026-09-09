@@ -102,7 +102,7 @@
                 <div class="topbar-title">Platform Dashboard</div>
             </header>
 
-            <div class="page-content">
+            <div class="page-content dashboard-page">
 
                 <!-- ── KPI Stat Cards ── -->
                 <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));">
@@ -198,15 +198,15 @@
                         </a>
                     </div>
                     <div class="table-wrap">
-                        <table>
+                        <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                             <thead>
                                 <tr>
-                                    <th>Admin</th>
-                                    <th>Plan</th>
-                                    <th>Organizations</th>
-                                    <th>Branches</th>
-                                    <th>HR Users</th>
-                                    <th>Status</th>
+                                    <th style="width: 26%; padding-left: 24px;">Admin</th>
+                                    <th style="width: 13%;">Plan</th>
+                                    <th style="width: 17%;">Organizations</th>
+                                    <th style="width: 17%;">Branches</th>
+                                    <th style="width: 17%;">HR Users</th>
+                                    <th style="width: 10%; padding-right: 24px;">Status</th>
                                 </tr>
                             </thead>
                             <tbody id="usage-table-body">
@@ -426,7 +426,7 @@
                     ? '<span class="badge-active"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Active</span>'
                     : '<span class="badge-inactive"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Inactive</span>';
                 return `<tr class="usage-row">
-                    <td>
+                    <td style="padding-left: 24px;">
                         <div class="admin-name-cell">${a.full_name}</div>
                         <div class="admin-email-cell">@${a.username}</div>
                     </td>
@@ -440,7 +440,7 @@
                     <td>
                         <div class="usage-bar-wrap">${usageBar(hrUsed, hrMax === '∞' ? null : parseInt(hrMax))}</div>
                     </td>
-                    <td>${badge}</td>
+                    <td style="padding-right: 24px;">${badge}</td>
                 </tr>`;
             }).join('');
         }

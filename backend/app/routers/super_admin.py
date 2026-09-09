@@ -13,6 +13,7 @@ from app.models.schemas import (
 )
 from app.database import get_db_connection
 from app.services.audit_service import log_audit
+from app.services.auth_service import check_hr_admin_uniqueness
 from app.logger import get_logger
 
 logger = get_logger(__name__)
@@ -146,6 +147,7 @@ def create_plan(payload: CreatePlanRequest, x_super_admin_id: Optional[str] = He
 def list_plans(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
+    status: Optional[str] = Query(None),
     x_super_admin_id: Optional[str] = Header(None, alias="X-Super-Admin-ID")
 ):
     if not x_super_admin_id:
@@ -153,11 +155,32 @@ def list_plans(
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM plans")
+            filters = []
+            params_count = []
+            params_data = []
+
+            if status:
+                filters.append("status = %s")
+                params_count.append(status)
+                params_data.append(status)
+
+            where_clause = ("WHERE " + " AND ".join(filters)) if filters else ""
+
+            cur.execute(f"SELECT COUNT(*) FROM plans {where_clause}", params_count)
             total = cur.fetchone()[0]
             
             offset = (page - 1) * limit
-            cur.execute("SELECT id, name, description, max_organizations, max_branches, max_hr_users, status, created_at FROM plans ORDER BY created_at DESC LIMIT %s OFFSET %s", (limit, offset))
+            params_data.extend([limit, offset])
+            cur.execute(
+                f"""
+                SELECT id, name, description, max_organizations, max_branches, max_hr_users, status, created_at
+                FROM plans
+                {where_clause}
+                ORDER BY created_at DESC
+                LIMIT %s OFFSET %s
+                """,
+                params_data
+            )
             rows = cur.fetchall()
             plans = [
                 PlanResponse(
@@ -275,14 +298,8 @@ def create_admin(payload: CreateAdminRequest, x_super_admin_id: Optional[str] = 
     
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # Check unique constraints
-            cur.execute("SELECT id FROM admin WHERE username = %s LIMIT 1", (payload.username,))
-            if cur.fetchone():
-                raise HTTPException(status_code=400, detail="Username already exists")
-                
-            cur.execute("SELECT id FROM admin WHERE email = %s LIMIT 1", (payload.email,))
-            if cur.fetchone():
-                raise HTTPException(status_code=400, detail="Email already exists")
+            # Check unique username & email across Admin & HR users
+            check_hr_admin_uniqueness(cur, username=payload.username, email=payload.email)
                 
             # Verify plan
             cur.execute("SELECT name FROM plans WHERE id = %s", (payload.plan_id,))
@@ -313,6 +330,8 @@ def create_admin(payload: CreateAdminRequest, x_super_admin_id: Optional[str] = 
 def list_admins(
     page: int = Query(1, ge=1),
     limit: int = Query(20, ge=1, le=100),
+    status: Optional[str] = Query(None),
+    plan_id: Optional[str] = Query(None),
     x_super_admin_id: Optional[str] = Header(None, alias="X-Super-Admin-ID")
 ):
     if not x_super_admin_id:
@@ -320,12 +339,29 @@ def list_admins(
 
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM admin")
+            filters = []
+            params_count = []
+            params_data = []
+
+            if status:
+                filters.append("a.status = %s")
+                params_count.append(status)
+                params_data.append(status)
+
+            if plan_id:
+                filters.append("a.plan_id = %s")
+                params_count.append(plan_id)
+                params_data.append(plan_id)
+
+            where_clause = ("WHERE " + " AND ".join(filters)) if filters else ""
+
+            cur.execute(f"SELECT COUNT(*) FROM admin a {where_clause}", params_count)
             total = cur.fetchone()[0]
             
             offset = (page - 1) * limit
+            params_data.extend([limit, offset])
             cur.execute(
-                """
+                f"""
                 SELECT a.id, a.username, a.email, a.full_name, a.status, a.plan_id, p.name, a.created_at,
                        (SELECT COUNT(*) FROM organization o WHERE o.admin_id = a.id) as org_count,
                        (SELECT COUNT(*) FROM branches b WHERE b.created_by_admin_id = a.id) as branch_count,
@@ -333,10 +369,11 @@ def list_admins(
                        p.max_organizations, p.max_branches, p.max_hr_users
                 FROM admin a
                 LEFT JOIN plans p ON a.plan_id = p.id
+                {where_clause}
                 ORDER BY a.created_at DESC
                 LIMIT %s OFFSET %s
                 """,
-                (limit, offset)
+                params_data
             )
             rows = cur.fetchall()
             admins = []
@@ -425,16 +462,8 @@ def update_admin_details(admin_id: str, payload: UpdateAdminRequest, x_super_adm
             new_username = payload.username if payload.username else current[1]
             new_email = payload.email if payload.email else current[2]
 
-            # Check uniqueness if username or email changed
-            if new_username != current[1]:
-                cur.execute("SELECT id FROM admin WHERE username = %s", (new_username,))
-                if cur.fetchone():
-                    raise HTTPException(status_code=400, detail="Username already in use")
-            
-            if new_email != current[2]:
-                cur.execute("SELECT id FROM admin WHERE email = %s", (new_email,))
-                if cur.fetchone():
-                    raise HTTPException(status_code=400, detail="Email already in use")
+            # Check unique username & email across Admin & HR users
+            check_hr_admin_uniqueness(cur, username=new_username, email=new_email, exclude_id=admin_id)
 
             cur.execute(
                 "UPDATE admin SET full_name = %s, username = %s, email = %s WHERE id = %s",
@@ -514,6 +543,8 @@ def list_audit_logs(
     limit: int = Query(20, ge=1, le=100),
     action: Optional[str] = Query(None),
     resource_type: Optional[str] = Query(None),
+    user_type: Optional[str] = Query(None),
+    search: Optional[str] = Query(None),
     x_super_admin_id: Optional[str] = Header(None, alias="X-Super-Admin-ID")
 ):
     if not x_super_admin_id:
@@ -530,9 +561,17 @@ def list_audit_logs(
                 params_count.append(f"%{action}%")
                 params_data.append(f"%{action}%")
             if resource_type:
-                filters.append("resource_type = %s")
-                params_count.append(resource_type)
-                params_data.append(resource_type)
+                filters.append("resource_type ILIKE %s")
+                params_count.append(f"%{resource_type}%")
+                params_data.append(f"%{resource_type}%")
+            if user_type:
+                filters.append("user_type ILIKE %s")
+                params_count.append(f"%{user_type}%")
+                params_data.append(f"%{user_type}%")
+            if search:
+                filters.append("(action ILIKE %s OR resource_type ILIKE %s OR user_type ILIKE %s OR details ILIKE %s)")
+                params_count.extend([f"%{search}%"] * 4)
+                params_data.extend([f"%{search}%"] * 4)
 
             where_clause = ("WHERE " + " AND ".join(filters)) if filters else ""
 
@@ -553,11 +592,21 @@ def list_audit_logs(
             )
             rows = cur.fetchall()
             logs = []
+            import json as _json
             for r in rows:
-                import json as _json
-                det = r[6]
-                if det and not isinstance(det, str):
-                    det = _json.dumps(det)
+                raw_det = r[6]
+                parsed_det = None
+                if raw_det:
+                    if isinstance(raw_det, str):
+                        try:
+                            parsed_det = _json.loads(raw_det)
+                            if isinstance(parsed_det, str):
+                                parsed_det = _json.loads(parsed_det)
+                        except Exception:
+                            parsed_det = {"info": raw_det}
+                    else:
+                        parsed_det = raw_det
+
                 logs.append({
                     "log_id": str(r[0]),
                     "user_id": str(r[1]),
@@ -565,7 +614,7 @@ def list_audit_logs(
                     "action": r[3],
                     "resource_type": r[4],
                     "resource_id": r[5],
-                    "details": det,
+                    "details": parsed_det,
                     "created_at": str(r[7])
                 })
 

@@ -79,7 +79,8 @@
         /* ── Table Card ── */
         .table-card {
             background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); overflow: visible; box-shadow: var(--shadow-md);
+            border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-md);
+            flex: 0 1 auto; max-height: 100%; display: flex; flex-direction: column; min-height: 0;
         }
         .table-header-row {
             display: flex; align-items: center; justify-content: space-between;
@@ -307,11 +308,11 @@
         <div class="sidebar-footer" style="position:relative;">
             <div class="user-menu-popover hidden" id="user-menu-popover">
                 <a href="profile.html" class="popover-item">
-                    <i class="fa-solid fa-user" style="color: #818cf8;"></i> Profile
+                    <i class="fa-solid fa-user" style="color: #3b82f6;"></i> Profile
                 </a>
                 <div class="popover-divider"></div>
                 <a href="change_password.html" class="popover-item">
-                    <i class="fa-solid fa-lock" style="color: #f97316;"></i> Change Password
+                    <i class="fa-solid fa-lock" style="color: #3b82f6;"></i> Change Password
                 </a>
                 <div class="popover-divider"></div>
                 <a href="#" class="popover-item" onclick="logout()">
@@ -349,7 +350,7 @@
             <!-- ════════════════════════════════════════════════════════════
                  CANDIDATES SCREENING LIST TABLE
             ════════════════════════════════════════════════════════════ -->
-            <div id="subtab-view-candidates">
+            <div id="subtab-view-candidates" style="flex: 1; display: flex; flex-direction: column; min-height: 0; overflow: hidden;">
                 <!-- Filter Bar -->
                 <div class="filter-bar">
                     <select class="filter-select" id="screen-filter-job" onchange="loadScreeningCandidates()">
@@ -395,7 +396,7 @@
                         </div>
                     </div>
 
-                    <div style="overflow:visible;display:none;" id="screen-table-wrap">
+                    <div class="table-wrap" style="display:none; flex: 0 1 auto;" id="screen-table-wrap">
                         <table class="candidates-table" style="table-layout:fixed;width:100%;">
                             <thead>
                                 <tr>

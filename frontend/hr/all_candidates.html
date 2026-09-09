@@ -107,7 +107,12 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 16px;
-            overflow: visible;
+            overflow: hidden;
+            flex: 0 1 auto;
+            max-height: 100%;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
         .table-header-row {
             display: flex;
@@ -446,11 +451,11 @@
         <div class="sidebar-footer" style="position:relative;">
             <div class="user-menu-popover hidden" id="user-menu-popover">
                 <a href="profile.html" class="popover-item">
-                    <i class="fa-solid fa-user" style="color: #818cf8;"></i> Profile
+                    <i class="fa-solid fa-user" style="color: #3b82f6;"></i> Profile
                 </a>
                 <div class="popover-divider"></div>
                 <a href="change_password.html" class="popover-item">
-                    <i class="fa-solid fa-lock" style="color: #f97316;"></i> Change Password
+                    <i class="fa-solid fa-lock" style="color: #3b82f6;"></i> Change Password
                 </a>
                 <div class="popover-divider"></div>
                 <a href="#" class="popover-item" onclick="logout()">
@@ -550,7 +555,7 @@
                     <span style="font-size:0.78rem;opacity:0.6;">Try adjusting the filters or upload new resumes.</span>
                 </div>
 
-                <div style="overflow:visible;" id="table-wrap" style="display:none;">
+                <div id="table-wrap" class="table-wrap" style="display:none; flex: 0 1 auto;">
                     <table class="candidates-table" id="candidates-table">
                         <thead>
                             <tr>

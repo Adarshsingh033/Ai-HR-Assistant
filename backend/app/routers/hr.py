@@ -5,6 +5,7 @@ from fastapi import APIRouter, HTTPException, Header
 
 from app.models.schemas import HRProfileResponse, UpdateHRProfileRequest, ChangePasswordRequest
 from app.database import get_db_connection
+from app.services.auth_service import check_hr_admin_uniqueness
 from app.logger import get_logger
 
 logger = get_logger(__name__)
@@ -200,14 +201,8 @@ def update_hr_profile(
                 new_phone = payload.phone.strip() if payload.phone is not None else (curr[4] or "")
                 new_image = payload.profile_image if payload.profile_image is not None else curr[5]
 
-                # Check unique username/email if changed
-                if new_email != curr[2] or new_username != curr[1]:
-                    cur.execute(
-                        "SELECT id FROM organization_members WHERE (email = %s OR username = %s) AND id != %s LIMIT 1",
-                        (new_email, new_username, x_user_id),
-                    )
-                    if cur.fetchone():
-                        raise HTTPException(status_code=400, detail="Username or email address is already in use.")
+                # Check unique username, email, phone across Admin & HR users
+                check_hr_admin_uniqueness(cur, username=new_username, email=new_email, phone=new_phone, exclude_id=x_user_id)
 
                 cur.execute(
                     """

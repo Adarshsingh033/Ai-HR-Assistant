@@ -319,17 +319,41 @@ function renderMemberTable() {
 /* Action Menu Toggle */
 function toggleMemberActionMenu(e, id) {
     e.stopPropagation();
-    document.querySelectorAll('.member-action-dropdown').forEach(m => {
-        if (m.id !== `member-action-menu-${id}`) m.classList.add('hidden');
-    });
+    const targetMenu = document.getElementById(`member-action-menu-${id}`);
+    const isCurrentlyHidden = !targetMenu || targetMenu.classList.contains('hidden');
 
-    const menu = document.getElementById(`member-action-menu-${id}`);
-    if (menu) menu.classList.toggle('hidden');
+    document.querySelectorAll('.member-action-dropdown').forEach(m => m.classList.add('hidden'));
+
+    if (targetMenu && isCurrentlyHidden) {
+        targetMenu.classList.remove('hidden');
+        if (e && e.currentTarget) {
+            const btn = e.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            const menuHeight = targetMenu.offsetHeight || 150;
+            const menuWidth = targetMenu.offsetWidth || 140;
+            const spaceBelow = window.innerHeight - rect.bottom;
+
+            targetMenu.style.position = 'fixed';
+            targetMenu.style.left = `${Math.max(10, rect.right - menuWidth)}px`;
+            targetMenu.style.zIndex = '99999';
+
+            if (spaceBelow < menuHeight + 15 && rect.top > menuHeight + 15) {
+                targetMenu.style.top = `${rect.top - menuHeight - 4}px`;
+                targetMenu.style.bottom = 'auto';
+            } else {
+                targetMenu.style.top = `${rect.bottom + 4}px`;
+                targetMenu.style.bottom = 'auto';
+            }
+        }
+    }
 }
 
 document.addEventListener('click', () => {
     document.querySelectorAll('.member-action-dropdown').forEach(m => m.classList.add('hidden'));
 });
+window.addEventListener('scroll', () => {
+    document.querySelectorAll('.member-action-dropdown').forEach(m => m.classList.add('hidden'));
+}, true);
 
 function changeMemberLimit(newLimit) {
     memberState.limit = parseInt(newLimit, 10) || 10;
@@ -563,6 +587,11 @@ async function handleSaveMember(e) {
 
     if (!memberId && !password) {
         showToast('Password is required for new HR member.', 'error');
+        return;
+    }
+
+    if (phone && !/^\d+$/.test(phone)) {
+        showToast('Phone number must contain only digits (no letters, spaces, or "+" allowed).', 'error');
         return;
     }
 

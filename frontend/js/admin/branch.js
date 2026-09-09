@@ -193,20 +193,41 @@ function renderBranchTable() {
 /* Toggle Branch Action Menu */
 function toggleBranchActionMenu(e, branchId) {
     if (e) e.stopPropagation();
-    document.querySelectorAll('.branch-action-dropdown').forEach(el => {
-        if (el.id !== `branch-action-menu-${branchId}`) {
-            el.classList.add('hidden');
+    const targetMenu = document.getElementById(`branch-action-menu-${branchId}`);
+    const isCurrentlyHidden = !targetMenu || targetMenu.classList.contains('hidden');
+
+    document.querySelectorAll('.branch-action-dropdown').forEach(el => el.classList.add('hidden'));
+
+    if (targetMenu && isCurrentlyHidden) {
+        targetMenu.classList.remove('hidden');
+        if (e && e.currentTarget) {
+            const btn = e.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            const menuHeight = targetMenu.offsetHeight || 130;
+            const menuWidth = targetMenu.offsetWidth || 140;
+            const spaceBelow = window.innerHeight - rect.bottom;
+
+            targetMenu.style.position = 'fixed';
+            targetMenu.style.left = `${Math.max(10, rect.right - menuWidth)}px`;
+            targetMenu.style.zIndex = '99999';
+
+            if (spaceBelow < menuHeight + 15 && rect.top > menuHeight + 15) {
+                targetMenu.style.top = `${rect.top - menuHeight - 4}px`;
+                targetMenu.style.bottom = 'auto';
+            } else {
+                targetMenu.style.top = `${rect.bottom + 4}px`;
+                targetMenu.style.bottom = 'auto';
+            }
         }
-    });
-    const menu = document.getElementById(`branch-action-menu-${branchId}`);
-    if (menu) {
-        menu.classList.toggle('hidden');
     }
 }
 
 document.addEventListener('click', () => {
     document.querySelectorAll('.branch-action-dropdown').forEach(el => el.classList.add('hidden'));
 });
+window.addEventListener('scroll', () => {
+    document.querySelectorAll('.branch-action-dropdown').forEach(el => el.classList.add('hidden'));
+}, true);
 
 /* Render Branch Pagination Controls */
 function renderBranchPagination() {

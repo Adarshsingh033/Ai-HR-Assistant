@@ -29,6 +29,16 @@ class RegisterAdminRequest(BaseModel):
     phone: Optional[str] = None
     profile_image: Optional[str] = None
 
+    @field_validator('phone')
+    @classmethod
+    def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and str(v).strip():
+            val = str(v).strip()
+            if not val.isdigit():
+                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            return val
+        return v
+
     @field_validator('username')
     @classmethod
     def username_alphanumeric(cls, v: str) -> str:
@@ -83,6 +93,16 @@ class UpdateAdminProfileRequest(BaseModel):
     phone: Optional[str] = None
     profile_image: Optional[str] = None
 
+    @field_validator('phone')
+    @classmethod
+    def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and str(v).strip():
+            val = str(v).strip()
+            if not val.isdigit():
+                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            return val
+        return v
+
 
 class HRProfileResponse(BaseModel):
     user_id: str
@@ -105,6 +125,16 @@ class UpdateHRProfileRequest(BaseModel):
     email: Optional[str] = None
     phone: Optional[str] = None
     profile_image: Optional[str] = None
+
+    @field_validator('phone')
+    @classmethod
+    def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and str(v).strip():
+            val = str(v).strip()
+            if not val.isdigit():
+                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            return val
+        return v
 
 
 
@@ -201,6 +231,16 @@ class CreateMemberRequest(BaseModel):
     image: Optional[str] = None
     status: Optional[str] = "active"
 
+    @field_validator('phone')
+    @classmethod
+    def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and str(v).strip():
+            val = str(v).strip()
+            if not val.isdigit():
+                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            return val
+        return v
+
 
 class UpdateMemberRequest(BaseModel):
     organization_id: Optional[str] = None
@@ -212,6 +252,16 @@ class UpdateMemberRequest(BaseModel):
     phone: Optional[str] = None
     image: Optional[str] = None
     status: Optional[str] = None
+
+    @field_validator('phone')
+    @classmethod
+    def phone_digits_only(cls, v: Optional[str]) -> Optional[str]:
+        if v is not None and str(v).strip():
+            val = str(v).strip()
+            if not val.isdigit():
+                raise ValueError("Phone number must contain only digits (no letters, spaces, or '+' allowed)")
+            return val
+        return v
 
 
 class MemberResponse(BaseModel):

@@ -304,17 +304,32 @@ function renderOrgPagination(data) {
 /* Toggle Popover Dropdown Menu for Organization Action */
 function toggleOrgActionMenu(e, orgId) {
     if (e) e.stopPropagation();
-    
-    // Close any other open menus
-    document.querySelectorAll('.org-action-dropdown').forEach(el => {
-        if (el.id !== `org-action-menu-${orgId}`) {
-            el.classList.add('hidden');
-        }
-    });
+    const targetMenu = document.getElementById(`org-action-menu-${orgId}`);
+    const isCurrentlyHidden = !targetMenu || targetMenu.classList.contains('hidden');
 
-    const menu = document.getElementById(`org-action-menu-${orgId}`);
-    if (menu) {
-        menu.classList.toggle('hidden');
+    document.querySelectorAll('.org-action-dropdown').forEach(el => el.classList.add('hidden'));
+
+    if (targetMenu && isCurrentlyHidden) {
+        targetMenu.classList.remove('hidden');
+        if (e && e.currentTarget) {
+            const btn = e.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            const menuHeight = targetMenu.offsetHeight || 130;
+            const menuWidth = targetMenu.offsetWidth || 140;
+            const spaceBelow = window.innerHeight - rect.bottom;
+
+            targetMenu.style.position = 'fixed';
+            targetMenu.style.left = `${Math.max(10, rect.right - menuWidth)}px`;
+            targetMenu.style.zIndex = '99999';
+
+            if (spaceBelow < menuHeight + 15 && rect.top > menuHeight + 15) {
+                targetMenu.style.top = `${rect.top - menuHeight - 4}px`;
+                targetMenu.style.bottom = 'auto';
+            } else {
+                targetMenu.style.top = `${rect.bottom + 4}px`;
+                targetMenu.style.bottom = 'auto';
+            }
+        }
     }
 }
 
@@ -326,6 +341,9 @@ document.addEventListener('click', (e) => {
         }
     });
 });
+window.addEventListener('scroll', () => {
+    document.querySelectorAll('.org-action-dropdown').forEach(el => el.classList.add('hidden'));
+}, true);
 
 /* Open View Organization Details Modal */
 async function openViewOrgModal(orgId) {

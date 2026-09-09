@@ -563,11 +563,11 @@
                 <!-- Popover Menu (Profile, Change Password & Logout) -->
                 <div class="user-menu-popover hidden" id="user-menu-popover">
                     <a href="profile.html" class="popover-item">
-                        <i class="fa-solid fa-user" style="color: #818cf8;"></i> Profile
+                        <i class="fa-solid fa-user" style="color: #3b82f6;"></i> Profile
                     </a>
                     <div class="popover-divider"></div>
                     <a href="change_password.html" class="popover-item">
-                        <i class="fa-solid fa-lock" style="color: #f97316;"></i> Change Password
+                        <i class="fa-solid fa-lock" style="color: #3b82f6;"></i> Change Password
                     </a>
                     <div class="popover-divider"></div>
                     <a href="#" class="popover-item" onclick="logout()">
@@ -589,11 +589,8 @@
         <!-- Main Content Area -->
         <main class="main-content">
             <!-- Topbar -->
-            <header class="topbar" style="display: flex; align-items: center; justify-content: space-between;">
+            <header class="topbar">
                 <div class="topbar-title">Job Vacancies</div>
-                <button class="btn btn-primary" onclick="openCreateJobModal()" style="display: flex; align-items: center; gap: 8px; padding: 10px 20px;">
-                    <i class="fa-solid fa-plus"></i> Create Job Vacancy
-                </button>
             </header>
 
             <div class="page-content">
@@ -605,15 +602,22 @@
                         <p style="font-size: 0.85rem; color: rgba(255, 255, 255, 0.6);">Manage job postings, positions, work modes, and status lifecycles.</p>
                     </div>
 
-                    <!-- Status Filter Only -->
-                    <div style="min-width: 160px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; padding-left: 12px; height: 42px;">
-                        <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS •</span>
-                        <select id="job-filter-status" onchange="onJobFilterChange()" class="input-custom" style="height: 40px; background: transparent; border: none; color: #fff; font-weight: 600; font-size: 0.85rem; padding-left: 6px; flex: 1;">
-                            <option value="">All Status</option>
-                            <option value="draft">Draft</option>
-                            <option value="active">Active</option>
-                            <option value="closed">Closed</option>
-                        </select>
+                    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <!-- Status Filter Only -->
+                        <div style="min-width: 160px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; padding-left: 12px; height: 42px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS •</span>
+                            <select id="job-filter-status" onchange="onJobFilterChange()" class="input-custom" style="height: 40px; background: transparent; border: none; color: #fff; font-weight: 600; font-size: 0.85rem; padding-left: 6px; flex: 1;">
+                                <option value="">All Status</option>
+                                <option value="draft">Draft</option>
+                                <option value="active">Active</option>
+                                <option value="closed">Closed</option>
+                            </select>
+                        </div>
+
+                        <!-- Create Job Vacancy Button -->
+                        <button class="btn btn-primary" onclick="openCreateJobModal()" style="display: flex; align-items: center; gap: 8px; padding: 0 20px; height: 42px; border-radius: 12px; font-weight: 700;">
+                            <i class="fa-solid fa-plus"></i> Create Job Vacancy
+                        </button>
                     </div>
                 </div>
 

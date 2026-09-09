@@ -128,6 +128,11 @@ async function handleSaveProfile(e) {
         return;
     }
 
+    if (phone && !/^\d+$/.test(phone)) {
+        showToast('Phone number must contain only digits (no letters, spaces, or "+" allowed).', 'error');
+        return;
+    }
+
     const btn = document.getElementById('save-profile-btn');
     if (btn) {
         btn.disabled = true;

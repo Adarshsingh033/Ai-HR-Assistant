@@ -205,3 +205,23 @@ function escapeHtml(str) {
     if (!str && str !== 0) return '';
     return String(str).replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[m]);
 }
+
+/* ── Toggle Password Visibility ─────────────────────────── */
+function togglePasswordVisibility(inputId, btn) {
+    const input = typeof inputId === 'string' ? document.getElementById(inputId) : inputId;
+    if (!input) return;
+    const targetBtn = btn || (input.parentElement ? input.parentElement.querySelector('.eye-toggle-btn, .pwd-toggle-btn') : null);
+    const icon = targetBtn ? targetBtn.querySelector('i') : null;
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        if (icon) {
+            icon.className = 'fa-regular fa-eye-slash';
+        }
+    } else {
+        input.type = 'password';
+        if (icon) {
+            icon.className = 'fa-regular fa-eye';
+        }
+    }
+}

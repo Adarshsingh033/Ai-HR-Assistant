@@ -705,11 +705,17 @@
             <form id="fp-reset-form" onsubmit="handleFpResetSubmit(event)">
                 <div class="input-group-custom" style="margin-bottom: 16px;">
                     <label class="input-label-custom">New Password</label>
-                    <input type="password" id="fp-new-pwd" class="form-control-custom" placeholder="Min. 6 characters" required style="width:100%; height: 52px; padding: 0 16px; background: #15112e; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; color: #fff; box-sizing: border-box; font-family: inherit;" />
+                    <div class="input-field-wrap">
+                        <input type="password" id="fp-new-pwd" class="form-control-custom" placeholder="Min. 6 characters" required style="width:100%; height: 52px; padding: 0 46px 0 16px; background: #15112e; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; color: #fff; box-sizing: border-box; font-family: inherit;" />
+                        <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('fp-new-pwd', this)" title="Show/Hide password"><i class="fa-regular fa-eye"></i></button>
+                    </div>
                 </div>
                 <div class="input-group-custom" style="margin-bottom: 24px;">
                     <label class="input-label-custom">Confirm Password</label>
-                    <input type="password" id="fp-confirm-pwd" class="form-control-custom" placeholder="Repeat password" required style="width:100%; height: 52px; padding: 0 16px; background: #15112e; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; color: #fff; box-sizing: border-box; font-family: inherit;" />
+                    <div class="input-field-wrap">
+                        <input type="password" id="fp-confirm-pwd" class="form-control-custom" placeholder="Repeat password" required style="width:100%; height: 52px; padding: 0 46px 0 16px; background: #15112e; border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 12px; color: #fff; box-sizing: border-box; font-family: inherit;" />
+                        <button type="button" class="pwd-toggle-btn" onclick="togglePasswordVisibility('fp-confirm-pwd', this)" title="Show/Hide password"><i class="fa-regular fa-eye"></i></button>
+                    </div>
                 </div>
                 <div style="display: flex; gap: 12px; justify-content: flex-end;">
                     <button type="button" onclick="closeFpModal('fp-reset-modal')" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>

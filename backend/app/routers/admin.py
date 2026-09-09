@@ -14,6 +14,7 @@ from app.models.schemas import (
 )
 from app.database import get_db_connection
 from app.logger import get_logger
+from app.services.auth_service import check_hr_admin_uniqueness
 
 logger = get_logger(__name__)
 
@@ -241,17 +242,8 @@ def update_admin_profile(
             new_phone = payload.phone.strip() if payload.phone is not None else current[4]
             new_profile_image = payload.profile_image if payload.profile_image is not None else current[5]
 
-            # Check unique username if changing
-            if new_username != current[1]:
-                cur.execute("SELECT id FROM admin WHERE username = %s AND id != %s LIMIT 1", (new_username, x_admin_id))
-                if cur.fetchone():
-                    raise HTTPException(status_code=400, detail="Username is already taken by another admin.")
-
-            # Check unique email if changing
-            if new_email != current[2]:
-                cur.execute("SELECT id FROM admin WHERE email = %s AND id != %s LIMIT 1", (new_email, x_admin_id))
-                if cur.fetchone():
-                    raise HTTPException(status_code=400, detail="Email is already taken by another admin.")
+            # Check uniqueness across Admin & HR users (username, email, phone)
+            check_hr_admin_uniqueness(cur, username=new_username, email=new_email, phone=new_phone, exclude_id=x_admin_id)
 
             cur.execute(
                 """
@@ -520,15 +512,8 @@ def create_hr(
                 if current_hr >= max_hr:
                     raise HTTPException(status_code=403, detail=f"HR user limit reached. Your current plan allows a maximum of {max_hr} HR users.")
             
-            # Unique username check
-            cur.execute("SELECT id FROM hr WHERE username = %s LIMIT 1", (payload.username,))
-            if cur.fetchone():
-                raise HTTPException(status_code=400, detail="HR username already exists")
-
-            # Unique email check
-            cur.execute("SELECT id FROM hr WHERE email = %s LIMIT 1", (payload.email,))
-            if cur.fetchone():
-                raise HTTPException(status_code=400, detail="HR email already exists")
+            # Check uniqueness across Admin & HR users
+            check_hr_admin_uniqueness(cur, username=payload.username, email=payload.email)
 
             cur.execute(
                 """
@@ -935,13 +920,8 @@ def create_member(
                 if current_hr >= max_hr:
                     raise HTTPException(status_code=403, detail=f"HR user limit reached. Your current plan allows a maximum of {max_hr} HR users.")
 
-            # 1. Check unique email/username
-            cur.execute(
-                "SELECT id FROM organization_members WHERE (email = %s OR username = %s) LIMIT 1",
-                (payload.email.lower().strip(), payload.username.strip()),
-            )
-            if cur.fetchone():
-                raise HTTPException(status_code=400, detail="An HR member with this email or username already exists.")
+            # 1. Check unique username, email, phone across Admin & HR users
+            check_hr_admin_uniqueness(cur, username=payload.username, email=payload.email, phone=payload.phone)
 
             # 2. Verify organization
             cur.execute(
@@ -1174,14 +1154,8 @@ def update_member(
             new_image = payload.image if payload.image is not None else curr[8]
             new_status = payload.status if payload.status is not None else curr[9]
 
-            # Uniqueness check for email/username if changed
-            if new_email != curr[5] or new_username != curr[4]:
-                cur.execute(
-                    "SELECT id FROM organization_members WHERE (email = %s OR username = %s) AND id != %s LIMIT 1",
-                    (new_email, new_username, member_id),
-                )
-                if cur.fetchone():
-                    raise HTTPException(status_code=400, detail="Another HR member already uses this email or username.")
+            # Uniqueness check for username, email, phone across Admin & HR users
+            check_hr_admin_uniqueness(cur, username=new_username, email=new_email, phone=new_phone, exclude_id=member_id)
 
             # Get names
             cur.execute("SELECT COALESCE(organization_name, company_name, '') FROM organization WHERE id = %s LIMIT 1", (new_org_id,))

@@ -52,33 +52,52 @@
                 <div class="filter-bar">
                     <div class="search-bar">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="search-input" placeholder="Search by action or resource..." oninput="onSearchChange()">
+                        <input type="text" id="search-input" placeholder="Search by endpoint path, method, or action..." oninput="onSearchChange()">
                     </div>
+                    <select class="filter-select" id="role-filter" onchange="onFilterChange()">
+                        <option value="">All Roles</option>
+                        <option value="super_admin">Super Admin</option>
+                        <option value="admin">Admin</option>
+                        <option value="hr">HR Manager</option>
+                        <option value="auth">Auth</option>
+                        <option value="system">System</option>
+                    </select>
                     <select class="filter-select" id="action-filter" onchange="onFilterChange()">
-                        <option value="">All Actions</option>
-                        <option value="CREATED">Created</option>
-                        <option value="UPDATED">Updated</option>
-                        <option value="DELETED">Deleted</option>
-                        <option value="STATUS_CHANGED">Status Changed</option>
+                        <option value="">All Methods / Actions</option>
+                        <option value="GET">GET</option>
+                        <option value="POST">POST</option>
+                        <option value="PUT">PUT</option>
+                        <option value="DELETE">DELETE</option>
+                        <option value="PATCH">PATCH</option>
+                        <option value="CREATED">CREATED</option>
+                        <option value="UPDATED">UPDATED</option>
+                        <option value="DELETED">DELETED</option>
                     </select>
                     <select class="filter-select" id="resource-filter" onchange="onFilterChange()">
                         <option value="">All Resources</option>
                         <option value="PLAN">Plan</option>
                         <option value="ADMIN">Admin</option>
+                        <option value="ORGANIZATION">Organization</option>
+                        <option value="BRANCH">Branch</option>
+                        <option value="HR_MEMBER">HR Member</option>
+                        <option value="JOB">Job</option>
+                        <option value="CANDIDATE">Candidate</option>
+                        <option value="SCREENING">Screening</option>
+                        <option value="EMAIL">Email</option>
+                        <option value="AUTH">Auth</option>
                     </select>
                 </div>
 
                 <!-- Data Table -->
-                <!-- Data Table -->
-                <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; padding: 12px; overflow: visible;">
-                        <table>
+                <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; flex: 0 1 auto;">
+                        <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                             <thead>
                                 <tr>
-                                    <th>Timestamp</th>
-                                    <th>Actor</th>
-                                    <th>Action</th>
-                                    <th>Resource</th>
-                                    <th>Details</th>
+                                    <th style="width: 15%; padding-left: 24px;">Timestamp</th>
+                                    <th style="width: 13%;">Role / Actor</th>
+                                    <th style="width: 11%;">HTTP Method</th>
+                                    <th style="width: 13%;">Resource</th>
+                                    <th style="width: 48%; padding-right: 24px;">API Call & Details</th>
                                 </tr>
                             </thead>
                             <tbody id="logs-table-body">
@@ -131,11 +150,16 @@
         }
 
         async function fetchLogs() {
+            const role     = document.getElementById('role-filter').value;
             const action   = document.getElementById('action-filter').value;
             const resource = document.getElementById('resource-filter').value;
+            const search   = document.getElementById('search-input').value.trim();
+
             let url = `/api/super-admin/audit-logs?page=${currentPage}&limit=${currentLimit}`;
-            if (action)   url += `&action=${action}`;
-            if (resource) url += `&resource_type=${resource}`;
+            if (role)     url += `&user_type=${encodeURIComponent(role)}`;
+            if (action)   url += `&action=${encodeURIComponent(action)}`;
+            if (resource) url += `&resource_type=${encodeURIComponent(resource)}`;
+            if (search)   url += `&search=${encodeURIComponent(search)}`;
 
             try {
                 const data = await apiRequest('GET', url);
@@ -148,8 +172,7 @@
 
         function onSearchChange() {
             clearTimeout(searchTimeout);
-            // client-side search for current page results
-            searchTimeout = setTimeout(() => { currentPage = 1; fetchLogs(); }, 400);
+            searchTimeout = setTimeout(() => { currentPage = 1; fetchLogs(); }, 350);
         }
         function onFilterChange() { currentPage = 1; fetchLogs(); }
 
@@ -241,19 +264,71 @@
         }
 
         function actionBadge(action) {
-            if (action.includes('CREATED')) return `<span class="badge-active" style="background:rgba(16,185,129,0.12); color:#34d399;"><i class="fa-solid fa-plus" style="font-size:8px;"></i> ${action}</span>`;
-            if (action.includes('DELETED')) return `<span class="badge-inactive"><i class="fa-solid fa-trash" style="font-size:8px;"></i> ${action}</span>`;
-            if (action.includes('UPDATED') || action.includes('STATUS')) return `<span class="badge-pending"><i class="fa-solid fa-pen" style="font-size:8px;"></i> ${action}</span>`;
-            return `<span class="badge-draft">${action}</span>`;
+            const act = (action || '').toUpperCase();
+            if (act === 'GET') return `<span style="padding:3px 8px; border-radius:6px; background:rgba(59,130,246,0.15); color:#60a5fa; font-weight:700; font-size:0.75rem;"><i class="fa-solid fa-arrow-down-short-wide" style="font-size:9px; margin-right:3px;"></i> GET</span>`;
+            if (act === 'POST' || act.includes('CREATED')) return `<span style="padding:3px 8px; border-radius:6px; background:rgba(16,185,129,0.15); color:#34d399; font-weight:700; font-size:0.75rem;"><i class="fa-solid fa-plus" style="font-size:9px; margin-right:3px;"></i> ${act}</span>`;
+            if (act === 'PUT' || act.includes('UPDATED') || act.includes('STATUS')) return `<span style="padding:3px 8px; border-radius:6px; background:rgba(245,158,11,0.15); color:#fbbf24; font-weight:700; font-size:0.75rem;"><i class="fa-solid fa-pen" style="font-size:9px; margin-right:3px;"></i> ${act}</span>`;
+            if (act === 'DELETE' || act.includes('DELETED')) return `<span style="padding:3px 8px; border-radius:6px; background:rgba(239,68,68,0.15); color:#f87171; font-weight:700; font-size:0.75rem;"><i class="fa-solid fa-trash" style="font-size:9px; margin-right:3px;"></i> ${act}</span>`;
+            if (act === 'PATCH') return `<span style="padding:3px 8px; border-radius:6px; background:rgba(168,85,247,0.15); color:#c084fc; font-weight:700; font-size:0.75rem;"><i class="fa-solid fa-code-commit" style="font-size:9px; margin-right:3px;"></i> PATCH</span>`;
+            return `<span style="padding:3px 8px; border-radius:6px; background:rgba(100,116,139,0.15); color:#94a3b8; font-weight:700; font-size:0.75rem;">${act}</span>`;
         }
 
         function resourceBadge(type) {
             const colors = {
-                PLAN:  { bg:'rgba(99,102,241,0.12)', color:'#a5b4fc' },
-                ADMIN: { bg:'rgba(249,115,22,0.12)',  color:'#fb923c' }
+                PLAN:        { bg:'rgba(99,102,241,0.12)',  color:'#a5b4fc', icon:'fa-layer-group' },
+                ADMIN:       { bg:'rgba(249,115,22,0.12)',  color:'#fb923c', icon:'fa-user-shield' },
+                ORGANIZATION:{ bg:'rgba(16,185,129,0.12)',  color:'#34d399', icon:'fa-building' },
+                BRANCH:      { bg:'rgba(56,189,248,0.12)',  color:'#38bdf8', icon:'fa-code-branch' },
+                HR_MEMBER:   { bg:'rgba(236,72,153,0.12)',  color:'#f472b6', icon:'fa-user-tie' },
+                JOB:         { bg:'rgba(139,92,246,0.12)',  color:'#c084fc', icon:'fa-briefcase' },
+                CANDIDATE:   { bg:'rgba(245,158,11,0.12)',  color:'#fbbf24', icon:'fa-users' },
+                SCREENING:   { bg:'rgba(20,184,166,0.12)',  color:'#2dd4bf', icon:'fa-clipboard-check' },
+                EMAIL:       { bg:'rgba(14,165,233,0.12)',  color:'#38bdf8', icon:'fa-envelope' },
+                AUTH:        { bg:'rgba(225,29,72,0.12)',   color:'#fb7185', icon:'fa-lock' }
             };
-            const c = colors[type] || { bg:'rgba(100,116,139,0.12)', color:'#94a3b8' };
-            return `<span style="display:inline-flex; align-items:center; padding:3px 10px; border-radius:99px; font-size:0.72rem; font-weight:700; background:${c.bg}; color:${c.color};">${type}</span>`;
+            const c = colors[type] || { bg:'rgba(100,116,139,0.12)', color:'#94a3b8', icon:'fa-database' };
+            return `<span style="display:inline-flex; align-items:center; gap:5px; padding:3px 10px; border-radius:99px; font-size:0.72rem; font-weight:700; background:${c.bg}; color:${c.color};"><i class="fa-solid ${c.icon}"></i> ${type}</span>`;
+        }
+
+        function formatAuditDetails(det, log) {
+            if (!det) return '<span style="color:rgba(255,255,255,0.4);">—</span>';
+
+            let parsed = det;
+            if (typeof det === 'string') {
+                try {
+                    parsed = JSON.parse(det);
+                    if (typeof parsed === 'string') parsed = JSON.parse(parsed);
+                } catch (e) {
+                    return `<span style="font-size:0.82rem; color:#e2e8f0;">${escapeHtml(det)}</span>`;
+                }
+            }
+
+            if (typeof parsed === 'object' && parsed !== null) {
+                // Check if it's an API request log (has method & path)
+                if (parsed.path) {
+                    const statusClass = parsed.status >= 400 ? '#ef4444' : parsed.status >= 300 ? '#f59e0b' : '#10b981';
+                    let html = `<div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">`;
+                    html += `<code style="font-family:monospace; font-weight:700; color:#a5b4fc; font-size:0.82rem; background:rgba(99,102,241,0.1); padding:2px 6px; border-radius:4px;">${escapeHtml(parsed.path)}</code>`;
+                    if (parsed.status) {
+                        html += `<span style="font-size:0.74rem; font-weight:800; color:${statusClass};">${parsed.status}</span>`;
+                    }
+                    if (parsed.query) {
+                        html += `<span style="font-size:0.74rem; color:var(--text-muted); font-family:monospace;">?${escapeHtml(parsed.query)}</span>`;
+                    }
+                    html += `</div>`;
+                    return html;
+                }
+
+                // Custom details key-value chips
+                const pairs = Object.entries(parsed).map(([k, v]) => {
+                    const valStr = typeof v === 'object' ? JSON.stringify(v) : String(v);
+                    return `<span style="display:inline-flex; align-items:center; gap:4px; padding:2px 8px; border-radius:6px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.08); font-size:0.76rem; color:rgba(255,255,255,0.85);"><span style="color:var(--text-muted); font-weight:600;">${escapeHtml(k)}:</span> <strong>${escapeHtml(valStr)}</strong></span>`;
+                }).join(' ');
+
+                return `<div style="display:flex; gap:6px; flex-wrap:wrap;">${pairs}</div>`;
+            }
+
+            return `<span style="font-size:0.82rem; color:#e2e8f0;">${escapeHtml(String(parsed))}</span>`;
         }
 
         function renderTable(logs) {
@@ -267,21 +342,24 @@
             }
             tbody.innerHTML = logs.map(log => {
                 const dt = new Date(log.created_at);
-                const date = dt.toLocaleDateString();
-                const time = dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
-                const details = log.details ? JSON.stringify(log.details) : '—';
+                const date = dt.toLocaleDateString('en-IN', { day:'2-digit', month:'short', year:'numeric' });
+                const time = dt.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+                const formattedDetails = formatAuditDetails(log.details, log);
+                const tooltipText = typeof log.details === 'object' ? JSON.stringify(log.details, null, 2) : String(log.details || '');
+                const userBadgeClass = log.user_type === 'super_admin' ? '#f97316' : log.user_type === 'admin' ? '#38bdf8' : log.user_type === 'hr' ? '#ec4899' : '#94a3b8';
+
                 return `<tr>
-                    <td>
-                        <div style="font-size:0.85rem; font-weight:600;">${date}</div>
-                        <div style="font-size:0.76rem; color:var(--text-muted);">${time}</div>
+                    <td style="padding-left: 24px; vertical-align:middle; white-space:nowrap;">
+                        <div style="font-size:0.85rem; font-weight:600; color:#fff;">${date}</div>
+                        <div style="font-size:0.75rem; color:var(--text-muted); font-family:monospace;">${time}</div>
                     </td>
-                    <td>
-                        <div style="font-weight:600; font-size:0.85rem;">${log.user_type ? log.user_type.replace('_',' ').toUpperCase() : 'System'}</div>
+                    <td style="vertical-align:middle; white-space:nowrap;">
+                        <div style="font-weight:700; font-size:0.82rem; color:${userBadgeClass}; text-transform:uppercase; letter-spacing:0.04em;">${log.user_type ? log.user_type.replace('_',' ') : 'System'}</div>
                     </td>
-                    <td>${actionBadge(log.action)}</td>
-                    <td>${resourceBadge(log.resource_type)}</td>
-                    <td>
-                        <span style="font-size:0.78rem; color:var(--text-muted); display:block; max-width:260px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;" title="${details}">${details}</span>
+                    <td style="vertical-align:middle; white-space:nowrap;">${actionBadge(log.action)}</td>
+                    <td style="vertical-align:middle; white-space:nowrap;">${resourceBadge(log.resource_type)}</td>
+                    <td style="padding-right: 24px; vertical-align:middle;" title="${escapeHtml(tooltipText)}">
+                        ${formattedDetails}
                     </td>
                 </tr>`;
             }).join('');

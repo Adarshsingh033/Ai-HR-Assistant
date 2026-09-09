@@ -2,10 +2,72 @@
 Authentication service — validates user credentials against the database.
 """
 
-from app.database import get_db_connection
-from app.logger import get_logger
+import re
+from fastapi import HTTPException
 
-logger = get_logger(__name__)
+def validate_hr_admin_phone(phone: str = None):
+    """
+    Validates that Admin and HR phone numbers contain ONLY digits (0-9).
+    No alphabets, spaces, plus (+), or special characters allowed.
+    Candidates are explicitly exempt.
+    """
+    if phone and str(phone).strip():
+        p = str(phone).strip()
+        if not re.match(r'^\d+$', p):
+            raise HTTPException(
+                status_code=400,
+                detail="Phone number must contain only digits (no letters, spaces, or '+' allowed)."
+            )
+
+def check_hr_admin_uniqueness(cur, username: str = None, email: str = None, phone: str = None, exclude_id: str = None):
+    """
+    Ensures username, email, and phone number (if provided) are unique across Admin and HR accounts.
+    Candidates and Super Admin accounts are explicitly exempt from these unique constraints.
+    Also validates that Admin and HR phone numbers contain ONLY digits (0-9).
+    """
+    ex_id = str(exclude_id) if exclude_id else '00000000-0000-0000-0000-000000000000'
+
+    # 1. Username Uniqueness Check
+    if username and str(username).strip():
+        u = str(username).strip().lower()
+        cur.execute("SELECT id FROM admin WHERE LOWER(username) = %s AND id != %s LIMIT 1", (u, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Username is already in use by an Admin or HR user.")
+
+        cur.execute("SELECT id FROM organization_members WHERE LOWER(username) = %s AND id != %s LIMIT 1", (u, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Username is already in use by an Admin or HR user.")
+
+        cur.execute("SELECT id FROM hr WHERE LOWER(username) = %s AND id != %s LIMIT 1", (u, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Username is already in use by an Admin or HR user.")
+
+    # 2. Email Uniqueness Check
+    if email and str(email).strip():
+        e = str(email).strip().lower()
+        cur.execute("SELECT id FROM admin WHERE LOWER(email) = %s AND id != %s LIMIT 1", (e, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Email address is already in use by an Admin or HR user.")
+
+        cur.execute("SELECT id FROM organization_members WHERE LOWER(email) = %s AND id != %s LIMIT 1", (e, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Email address is already in use by an Admin or HR user.")
+
+        cur.execute("SELECT id FROM hr WHERE LOWER(email) = %s AND id != %s LIMIT 1", (e, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Email address is already in use by an Admin or HR user.")
+
+    # 3. Phone Digits Only & Uniqueness Check
+    if phone and str(phone).strip():
+        p = str(phone).strip()
+        validate_hr_admin_phone(p)
+        cur.execute("SELECT id FROM admin WHERE phone = %s AND id != %s LIMIT 1", (p, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Phone number is already in use by an Admin or HR user.")
+
+        cur.execute("SELECT id FROM organization_members WHERE phone = %s AND id != %s LIMIT 1", (p, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Phone number is already in use by an Admin or HR user.")
 
 
 def authenticate_user(username: str, password: str) -> dict | None:

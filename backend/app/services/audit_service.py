@@ -6,8 +6,10 @@ from app.logger import get_logger
 
 logger = get_logger(__name__)
 
+SYSTEM_UUID = "00000000-0000-0000-0000-000000000000"
+
 def log_audit(
-    user_id: str,
+    user_id: Optional[str],
     user_type: str,
     action: str,
     resource_type: str,
@@ -15,17 +17,26 @@ def log_audit(
     details: Optional[Dict[str, Any]] = None
 ):
     """
-    Log an action to the audit_logs table.
+    Log an action to the audit_logs table safely.
     
-    :param user_id: ID of the user performing the action (super_admin or admin ID)
-    :param user_type: Type of user ('super_admin', 'admin', etc.)
-    :param action: Action performed (e.g., 'CREATED', 'UPDATED', 'DELETED', 'LIMIT_REACHED')
-    :param resource_type: Resource affected (e.g., 'ADMIN', 'PLAN', 'ORGANIZATION', 'BRANCH', 'HR_USER')
-    :param resource_id: ID of the resource affected (optional)
-    :param details: Additional details as a dictionary (optional)
+    :param user_id: ID of the user performing the action (super_admin, admin, hr, or system)
+    :param user_type: Type of user ('super_admin', 'admin', 'hr', 'auth', etc.)
+    :param action: Action performed (HTTP method e.g. 'GET', 'POST', 'PUT', 'DELETE', 'PATCH' or action keyword)
+    :param resource_type: Resource affected (e.g., 'PLAN', 'ADMIN', 'ORGANIZATION', 'BRANCH', 'HR_MEMBER', 'JOB', 'CANDIDATE')
+    :param resource_id: ID or path of the resource affected (optional)
+    :param details: Additional details dictionary (optional)
     """
     try:
         log_id = str(uuid.uuid4())
+        
+        # Ensure valid UUID string for PostgreSQL UUID column
+        valid_user_uuid = SYSTEM_UUID
+        if user_id:
+            try:
+                valid_user_uuid = str(uuid.UUID(str(user_id)))
+            except (ValueError, AttributeError, TypeError):
+                valid_user_uuid = SYSTEM_UUID
+
         details_str = json.dumps(details) if details else None
         
         with get_db_connection() as conn:
@@ -35,7 +46,7 @@ def log_audit(
                     INSERT INTO audit_logs (id, user_id, user_type, action, resource_type, resource_id, details)
                     VALUES (%s, %s, %s, %s, %s, %s, %s)
                     """,
-                    (log_id, user_id, user_type, action, resource_type, resource_id, details_str)
+                    (log_id, valid_user_uuid, user_type, action, resource_type, resource_id, details_str)
                 )
                 conn.commit()
     except Exception as e:

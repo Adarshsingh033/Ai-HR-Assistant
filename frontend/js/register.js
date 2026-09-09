@@ -114,6 +114,11 @@ async function handleRegister(e) {
         return;
     }
 
+    if (phone && !/^\d+$/.test(phone)) {
+        showError('Phone number must contain only digits (no letters, spaces, or "+" allowed).');
+        return;
+    }
+
     if (password.length < 6) {
         showError('Password must be at least 6 characters long.');
         return;

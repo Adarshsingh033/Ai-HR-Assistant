@@ -325,11 +325,33 @@ function downloadResume(cid) {
 
 function toggleActionMenu(event, cid) {
     event.stopPropagation();
-    document.querySelectorAll('.action-dropdown.open').forEach(el => {
-        if (el.id !== `amenu-${cid}`) el.classList.remove('open');
-    });
-    const menu = document.getElementById(`amenu-${cid}`);
-    if (menu) menu.classList.toggle('open');
+    const targetMenu = document.getElementById(`amenu-${cid}`);
+    const isCurrentlyOpen = targetMenu && targetMenu.classList.contains('open');
+
+    document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
+
+    if (targetMenu && !isCurrentlyOpen) {
+        targetMenu.classList.add('open');
+        if (event && event.currentTarget) {
+            const btn = event.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            const menuHeight = targetMenu.offsetHeight || 150;
+            const menuWidth = targetMenu.offsetWidth || 140;
+            const spaceBelow = window.innerHeight - rect.bottom;
+
+            targetMenu.style.position = 'fixed';
+            targetMenu.style.left = `${Math.max(10, rect.right - menuWidth)}px`;
+            targetMenu.style.zIndex = '99999';
+
+            if (spaceBelow < menuHeight + 15 && rect.top > menuHeight + 15) {
+                targetMenu.style.top = `${rect.top - menuHeight - 4}px`;
+                targetMenu.style.bottom = 'auto';
+            } else {
+                targetMenu.style.top = `${rect.bottom + 4}px`;
+                targetMenu.style.bottom = 'auto';
+            }
+        }
+    }
 }
 
 function handleAction(action, cid, name = '') {
@@ -349,6 +371,9 @@ function handleAction(action, cid, name = '') {
 document.addEventListener('click', () => {
     document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
 });
+window.addEventListener('scroll', () => {
+    document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
+}, true);
 
 /* ── Relative Time ───────────────────────────────────────── */
 function relativeTime(iso) {
