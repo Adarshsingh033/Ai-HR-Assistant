@@ -1,33 +1,3 @@
-/* ========================================================
-   hr_common.js – HR Common Session, Navigation & Modals
-   ======================================================== */
-
-window.addEventListener('DOMContentLoaded', async () => {
-    const session = Session.get();
-    if (!session || (session.role !== 'hr' && session.role !== 'admin')) {
-        location.href = '../index.html';
-        return;
-    }
-
-    // Populate sidebar user chip dynamically across all HR pages
-    await loadHRProfileForSidebar();
-});
-
-/* Fetch Profile Data for Sidebar Chip */
-async function loadHRProfileForSidebar() {
-    try {
-        const data = await apiRequest('GET', '/api/hr/profile');
-        if (data) {
-            updateSidebarUserChip(data.full_name || data.username, data.profile_image, data.organization_name || data.branch_name || 'HR Manager');
-        }
-    } catch (err) {
-        const session = Session.get();
-        if (session) {
-            updateSidebarUserChip(session.full_name || session.username || 'HR User', session.profile_image || '', 'HR Manager');
-        }
-    }
-}
-
 function updateSidebarUserChip(name, profileImg, roleText = 'HR Manager') {
     const sidebarName = document.getElementById('sidebar-name');
     const sidebarOrg = document.getElementById('sidebar-org');
@@ -42,6 +12,53 @@ function updateSidebarUserChip(name, profileImg, roleText = 'HR Manager') {
             const initials = (name || 'H').substring(0, 2).toUpperCase();
             sidebarAvatar.textContent = initials;
         }
+    }
+}
+
+// Immediate synchronous render from local Session storage (0ms delay, no flash!)
+function syncHRSidebarFromSession() {
+    try {
+        if (typeof Session !== 'undefined') {
+            const session = Session.get();
+            if (session) {
+                updateSidebarUserChip(session.full_name || session.username || 'HR User', session.profile_image || '', 'HR Manager');
+            }
+        }
+    } catch (e) {}
+}
+
+// Execute sync right away if script executes after DOM elements
+syncHRSidebarFromSession();
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const session = Session.get();
+    if (!session || (session.role !== 'hr' && session.role !== 'admin')) {
+        location.href = '../index.html';
+        return;
+    }
+
+    // Render immediately from session cache
+    syncHRSidebarFromSession();
+
+    // Background sync from backend profile API
+    await loadHRProfileForSidebar();
+});
+
+/* Fetch Profile Data for Sidebar Chip */
+async function loadHRProfileForSidebar() {
+    try {
+        const data = await apiRequest('GET', '/api/hr/profile');
+        if (data) {
+            updateSidebarUserChip(data.full_name || data.username, data.profile_image, data.organization_name || data.branch_name || 'HR Manager');
+            const session = Session.get();
+            if (session) {
+                session.full_name = data.full_name || session.full_name;
+                session.profile_image = data.profile_image || session.profile_image;
+                Session.set(session);
+            }
+        }
+    } catch (err) {
+        syncHRSidebarFromSession();
     }
 }
 

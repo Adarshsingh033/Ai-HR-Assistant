@@ -208,6 +208,7 @@
         }
 
         select.input-custom {
+            color-scheme: dark;
             appearance: none;
             -webkit-appearance: none;
             -moz-appearance: none;
@@ -220,6 +221,7 @@
         }
 
         select.input-custom option {
+            color-scheme: dark;
             background-color: #0f172a !important;
             color: #ffffff !important;
             padding: 12px;
@@ -227,6 +229,7 @@
 
         select.input-custom option:disabled,
         select.input-custom option[disabled] {
+            color-scheme: dark;
             color: rgba(255, 255, 255, 0.4) !important;
             background-color: #0f172a !important;
         }
@@ -399,47 +402,47 @@
                     </div>
 
                     <!-- Top Metrics Grid (3 Stat Cards) -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; margin-bottom: 32px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;">
                         
                         <!-- Metric Card 1: Organizations -->
-                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px; position: relative; overflow: hidden;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                                <span style="font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em;">Organizations</span>
-                                <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px; position: relative; overflow: hidden;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <span style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em;">Organizations</span>
+                                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
                                     <i class="fa-solid fa-building"></i>
                                 </div>
                             </div>
-                            <div style="font-size: 2.2rem; font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-orgs">—</div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; font-size: 0.78rem; color: rgba(255,255,255,0.5);">
+                            <div style="font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-orgs">—</div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);">
                                 <span>Active: <strong id="dash-stat-active-orgs" style="color: #10b981;">—</strong></span>
                                 <span>Inactive: <strong id="dash-stat-inactive-orgs" style="color: #ef4444;">—</strong></span>
                             </div>
                         </div>
 
                         <!-- Metric Card 2: Total Branches -->
-                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px; position: relative; overflow: hidden;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                                <span style="font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em;">Total Branches</span>
-                                <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px; position: relative; overflow: hidden;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <span style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em;">Total Branches</span>
+                                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
                                     <i class="fa-solid fa-code-branch"></i>
                                 </div>
                             </div>
-                            <div style="font-size: 2.2rem; font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-branches">—</div>
-                            <div style="margin-top: 14px; font-size: 0.78rem; color: rgba(255,255,255,0.5);">
+                            <div style="font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-branches">—</div>
+                            <div style="margin-top: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);">
                                 Distributed across registered organizations
                             </div>
                         </div>
 
                         <!-- Metric Card 3: HR Managers -->
-                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px; position: relative; overflow: hidden;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
-                                <span style="font-size: 0.8rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em;">HR Managers</span>
-                                <div style="width: 42px; height: 42px; border-radius: 12px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;">
+                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px; position: relative; overflow: hidden;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                                <span style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em;">HR Managers</span>
+                                <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
                                     <i class="fa-solid fa-users"></i>
                                 </div>
                             </div>
-                            <div style="font-size: 2.2rem; font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-hrs">—</div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; font-size: 0.78rem; color: rgba(255,255,255,0.5);">
+                            <div style="font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-hrs">—</div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);">
                                 <span>Active: <strong id="dash-stat-active-hrs" style="color: #10b981;">—</strong></span>
                                 <span>Inactive: <strong id="dash-stat-inactive-hrs" style="color: #ef4444;">—</strong></span>
                             </div>
@@ -448,30 +451,30 @@
                     </div>
 
                     <!-- Interactive Analytics Graphs Row -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(340px, 1fr)); gap: 24px; margin-bottom: 32px;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-bottom: 20px;">
                         
                         <!-- Graph 1: Branches per Organization -->
-                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                                <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                                <h3 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
                                     <i class="fa-solid fa-chart-column" style="color: #818cf8;"></i> Branches per Organization
                                 </h3>
-                                <span style="font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase;">Branch Count</span>
+                                <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase;">Branch Count</span>
                             </div>
-                            <div style="position: relative; height: 230px; width: 100%;">
+                            <div style="position: relative; height: 170px; width: 100%;">
                                 <canvas id="chart-branches-per-org"></canvas>
                             </div>
                         </div>
 
                         <!-- Graph 2: HR Managers per Branch -->
-                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px;">
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                                <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 10px;">
+                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px;">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
+                                <h3 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
                                     <i class="fa-solid fa-chart-bar" style="color: #10b981;"></i> HR Managers per Branch
                                 </h3>
-                                <span style="font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase;">HR Count</span>
+                                <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase;">HR Count</span>
                             </div>
-                            <div style="position: relative; height: 230px; width: 100%;">
+                            <div style="position: relative; height: 170px; width: 100%;">
                                 <canvas id="chart-hrs-per-branch"></canvas>
                             </div>
                         </div>
@@ -746,39 +749,36 @@
     <!-- Create / Edit Organization Modal -->
     <div class="modal-overlay" id="org-modal">
         <div class="modal-card"
-            style="max-width: 760px; width: 94%; padding: 40px 36px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
-            <div class="flex items-center justify-between mb-4">
+            style="max-width: 680px; width: 94%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+            <div class="flex items-center justify-between mb-3" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; flex-shrink: 0;">
                 <div>
-                    <h3 style="font-size: 1.5rem; font-weight: 800; color: #fff;" id="org-modal-title">Create
-                        Organization</h3>
-                    <p style="font-size: 0.85rem; color: rgba(255,255,255,0.6); margin-top: 2px;">Fill in the
-                        organization details below to create a company profile.</p>
+                    <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0;" id="org-modal-title">Create Organization</h3>
                 </div>
                 <button type="button" onclick="closeOrgModal()"
-                    style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.3rem; cursor: pointer; transition: all 0.2s ease;">×</button>
+                    style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;">×</button>
             </div>
 
-            <form id="org-form" onsubmit="handleSaveOrganization(event)" style="margin-top: 20px;">
+            <form id="org-form" onsubmit="handleSaveOrganization(event)" style="display: flex; flex-direction: column;">
                 <input type="hidden" id="org-id-hidden" value="" />
 
                 <!-- Circular Logo Upload Button at Top -->
                 <div class="avatar-upload-wrap"
-                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 24px;">
+                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 16px; flex-shrink: 0;">
                     <div class="avatar-upload-circle" onclick="document.getElementById('org-logo-file').click()"
                         data-tooltip="Click to upload logo"
-                        style="width: 90px; height: 90px; border-radius: 50%; background: #15112e; border: 2px dashed rgba(99, 102, 241, 0.5); position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.35); transition: all 0.2s ease;">
+                        style="width: 70px; height: 70px; border-radius: 50%; background: #15112e; border: 2px dashed rgba(99, 102, 241, 0.5); position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.35); transition: all 0.2s ease;">
                         <div id="org-circle-preview"
-                            style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; color: rgba(255,255,255,0.5); overflow: hidden;">
+                            style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: rgba(255,255,255,0.5); overflow: hidden;">
                             <i class="fa-solid fa-building"></i>
                         </div>
                         <div
-                            style="position: absolute; bottom: 0; right: 0; width: 26px; height: 26px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; border: 2px solid #080614;">
+                            style="position: absolute; bottom: 0; right: 0; width: 22px; height: 22px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid #080614;">
                             <i class="fa-solid fa-plus"></i>
                         </div>
                     </div>
                     <input type="file" id="org-logo-file" accept="image/*" class="hidden"
                         onchange="onOrgLogoFileChange(event)" />
-                    <div style="font-size: 0.8rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-top: 10px;">Upload organization logo</div>
+                    <div style="font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-top: 6px;">Upload organization logo</div>
                 </div>
 
                 <!-- Row 1: Organization Name & Industry -->
@@ -931,57 +931,57 @@
 
     <!-- Create / Edit Branch Modal -->
     <div class="modal-overlay" id="branch-modal">
-        <div class="modal-card" style="max-width: 660px; width: 92%; padding: 32px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 24px;">
-                <h3 style="font-size: 1.35rem; font-weight: 800; color: #fff; margin: 0;" id="branch-modal-title">Create Branch</h3>
-                <button type="button" onclick="closeBranchModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; cursor: pointer;" title="Close">×</button>
+        <div class="modal-card" style="max-width: 660px; width: 92%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; flex-shrink: 0;">
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0;" id="branch-modal-title">Create Branch</h3>
+                <button type="button" onclick="closeBranchModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer;" title="Close">×</button>
             </div>
 
-            <form id="branch-form" onsubmit="handleSaveBranch(event)">
+            <form id="branch-form" onsubmit="handleSaveBranch(event)" style="display: flex; flex-direction: column;">
                 <input type="hidden" id="branch-id-hidden" />
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 18px; margin-bottom: 24px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-bottom: 16px;">
                     <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 8px; display: block; letter-spacing: 0.02em;">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
                             ORGANIZATION <span style="color: #ef4444;">*</span>
                         </label>
-                        <select id="branch-org-select" class="input-custom" required style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; cursor: pointer; padding: 0 14px; outline: none; width: 100%;">
+                        <select id="branch-org-select" class="input-custom" required style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; cursor: pointer; padding: 0 12px; outline: none; width: 100%;">
                             <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization</option>
                         </select>
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 8px; display: block; letter-spacing: 0.02em;">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
                             BRANCH NAME <span style="color: #ef4444;">*</span>
                         </label>
-                        <input type="text" id="branch-name-input" class="input-custom" placeholder="e.g. Headquarters / NYC Branch" required style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; padding: 0 14px; outline: none; width: 100%;" />
+                        <input type="text" id="branch-name-input" class="input-custom" placeholder="e.g. Headquarters / NYC Branch" required style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 8px; display: block; letter-spacing: 0.02em;">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
                             CITY
                         </label>
-                        <input type="text" id="branch-city-input" class="input-custom" placeholder="e.g. New York" style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; padding: 0 14px; outline: none; width: 100%;" />
+                        <input type="text" id="branch-city-input" class="input-custom" placeholder="e.g. New York" style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 8px; display: block; letter-spacing: 0.02em;">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
                             STATE / PROVINCE
                         </label>
-                        <input type="text" id="branch-state-input" class="input-custom" placeholder="e.g. NY" style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; padding: 0 14px; outline: none; width: 100%;" />
+                        <input type="text" id="branch-state-input" class="input-custom" placeholder="e.g. NY" style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.82rem; margin-bottom: 8px; display: block; letter-spacing: 0.02em;">
+                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
                             COUNTRY
                         </label>
-                        <input type="text" id="branch-country-input" class="input-custom" placeholder="e.g. United States" style="height: 46px; border-radius: 12px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.9rem; padding: 0 14px; outline: none; width: 100%;" />
+                        <input type="text" id="branch-country-input" class="input-custom" placeholder="e.g. United States" style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
-                    <button type="button" onclick="closeBranchModal()" style="padding: 10px 24px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.9rem; cursor: pointer;">Cancel</button>
-                    <button type="submit" class="btn-save-profile" id="branch-submit-btn" style="padding: 10px 28px; border-radius: 10px; font-weight: 700; font-size: 0.9rem;">Save Branch</button>
+                <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 4px; flex-shrink: 0;">
+                    <button type="button" onclick="closeBranchModal()" style="padding: 8px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.85rem; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="btn-save-profile" id="branch-submit-btn" style="padding: 8px 22px; border-radius: 10px; font-weight: 700; font-size: 0.85rem;">Save Branch</button>
                 </div>
             </form>
         </div>

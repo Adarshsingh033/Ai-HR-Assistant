@@ -20,13 +20,26 @@ document.addEventListener('click', (e) => {
     }
 });
 
+function syncSuperAdminSidebar() {
+    try {
+        if (typeof Session !== 'undefined') {
+            const session = Session.get();
+            if (session) {
+                const usernameDisplay = document.getElementById('sidebar-username');
+                if (usernameDisplay) {
+                    usernameDisplay.textContent = session.full_name || session.username || 'Super Admin';
+                }
+            }
+        }
+    } catch (e) {}
+}
+
+syncSuperAdminSidebar();
+
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
     const session = Session.require('super_admin');
     if (!session) return;
     
-    const usernameDisplay = document.getElementById('sidebar-username');
-    if (usernameDisplay) {
-        usernameDisplay.textContent = session.username || 'Super Admin';
-    }
+    syncSuperAdminSidebar();
 });

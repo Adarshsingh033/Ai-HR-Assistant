@@ -17,7 +17,7 @@
 
         .login-container {
             min-height: 100vh;
-            width: 100vw;
+            width: 100%;
             display: grid;
             grid-template-columns: 1.1fr 0.9fr;
             position: relative;
@@ -33,7 +33,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 48px 60px;
+            padding: 32px 40px;
             position: relative;
             z-index: 2;
         }
@@ -72,31 +72,31 @@
 
         .card-1 {
             top: 0px;
-            left: -20px;
-            transform: scale(0.85) rotate(-4deg);
+            left: -10px;
+            transform: scale(0.78) rotate(-3deg);
             z-index: 1;
             animation: floatCard1 7s ease-in-out infinite;
         }
 
         .card-2 {
-            top: 150px;
-            right: -20px;
-            transform: scale(0.9) rotate(3deg);
+            top: 90px;
+            right: -10px;
+            transform: scale(0.82) rotate(2deg);
             z-index: 2;
             animation: floatCard2 6s ease-in-out infinite 1s;
         }
 
         .card-3 {
-            top: 300px;
-            left: 10px;
-            transform: scale(0.95) rotate(-1deg);
+            top: 180px;
+            left: 5px;
+            transform: scale(0.85) rotate(-1deg);
             z-index: 3;
             animation: floatCard3 8s ease-in-out infinite 0.5s;
         }
 
-        @keyframes floatCard1 { 0%, 100% { transform: scale(0.85) rotate(-4deg) translateY(0px); } 50% { transform: scale(0.85) rotate(-4deg) translateY(-12px); } }
-        @keyframes floatCard2 { 0%, 100% { transform: scale(0.9) rotate(3deg) translateY(0px); } 50% { transform: scale(0.9) rotate(3deg) translateY(-10px); } }
-        @keyframes floatCard3 { 0%, 100% { transform: scale(0.95) rotate(-1deg) translateY(0px); } 50% { transform: scale(0.95) rotate(-1deg) translateY(-15px); } }
+        @keyframes floatCard1 { 0%, 100% { transform: scale(0.78) rotate(-3deg) translateY(0px); } 50% { transform: scale(0.78) rotate(-3deg) translateY(-8px); } }
+        @keyframes floatCard2 { 0%, 100% { transform: scale(0.82) rotate(2deg) translateY(0px); } 50% { transform: scale(0.82) rotate(2deg) translateY(-6px); } }
+        @keyframes floatCard3 { 0%, 100% { transform: scale(0.85) rotate(-1deg) translateY(0px); } 50% { transform: scale(0.85) rotate(-1deg) translateY(-10px); } }
 
         .card-glass-header {
             display: flex;
@@ -258,9 +258,9 @@
         }
 
         .hero-main-title {
-            font-size: 2.8rem;
+            font-size: 1.85rem;
             font-weight: 900;
-            line-height: 1.15;
+            line-height: 1.2;
             letter-spacing: 0.02em;
             color: #ffffff;
             text-transform: uppercase;
@@ -274,11 +274,11 @@
         }
 
         .hero-subtitle {
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.65);
-            margin-top: 12px;
+            margin-top: 10px;
             max-width: 440px;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         /* ── Right Form Side ── */
@@ -286,23 +286,23 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 48px;
+            padding: 32px;
             position: relative;
             z-index: 2;
         }
 
         .form-card {
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
         }
 
         .form-title {
-            font-size: 2.8rem;
+            font-size: 2.2rem;
             font-weight: 900;
             letter-spacing: 0.04em;
             color: #ffffff;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
 
         .form-subtitle {
@@ -518,7 +518,7 @@
             </div>
 
             <!-- AI HR Feature Showcase Card Graphic -->
-            <div class="visual-graphic-container" style="height: 540px; max-width: 520px; margin: 0 auto; position: relative;">
+            <div class="visual-graphic-container" style="height: 320px; max-width: 440px; margin: 12px auto; position: relative;">
                 
                 <!-- CARD 1: AI MATCHING ENGINE -->
                 <div class="ai-showcase-card card-1">

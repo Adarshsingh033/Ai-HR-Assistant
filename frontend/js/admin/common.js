@@ -13,21 +13,6 @@ window.addEventListener('DOMContentLoaded', async () => {
     await loadAdminProfileForSidebar();
 });
 
-/* Fetch Profile Data for Sidebar Chip */
-async function loadAdminProfileForSidebar() {
-    try {
-        const data = await apiRequest('GET', '/api/admin/profile');
-        if (data) {
-            updateSidebarUserChip(data.full_name || data.username, data.profile_image);
-        }
-    } catch (err) {
-        const session = Session.get();
-        if (session) {
-            updateSidebarUserChip(session.username || 'Admin', session.profile_image || '');
-        }
-    }
-}
-
 function updateSidebarUserChip(name, profileImg) {
     const sidebarName = document.getElementById('sidebar-name');
     const sidebarRole = document.getElementById('sidebar-role');
@@ -42,6 +27,53 @@ function updateSidebarUserChip(name, profileImg) {
             const initials = (name || 'A').substring(0, 2).toUpperCase();
             sidebarAvatar.textContent = initials;
         }
+    }
+}
+
+// Immediate synchronous render from local Session storage (0ms delay, no flash!)
+function syncAdminSidebarFromSession() {
+    try {
+        if (typeof Session !== 'undefined') {
+            const session = Session.get();
+            if (session) {
+                updateSidebarUserChip(session.full_name || session.username || 'Admin', session.profile_image || '');
+            }
+        }
+    } catch (e) {}
+}
+
+// Execute sync right away if script executes after DOM elements
+syncAdminSidebarFromSession();
+
+window.addEventListener('DOMContentLoaded', async () => {
+    const session = Session.get();
+    if (!session || session.role !== 'admin') {
+        location.href = '../index.html';
+        return;
+    }
+
+    // Render immediately from session cache
+    syncAdminSidebarFromSession();
+
+    // Background sync from backend profile API
+    await loadAdminProfileForSidebar();
+});
+
+/* Fetch Profile Data for Sidebar Chip */
+async function loadAdminProfileForSidebar() {
+    try {
+        const data = await apiRequest('GET', '/api/admin/profile');
+        if (data) {
+            updateSidebarUserChip(data.full_name || data.username, data.profile_image);
+            const session = Session.get();
+            if (session) {
+                session.full_name = data.full_name || session.full_name;
+                session.profile_image = data.profile_image || session.profile_image;
+                Session.set(session);
+            }
+        }
+    } catch (err) {
+        syncAdminSidebarFromSession();
     }
 }
 

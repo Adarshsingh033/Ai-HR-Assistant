@@ -230,7 +230,12 @@
             cursor: pointer;
         }
 
+        select.input-custom {
+            color-scheme: dark;
+        }
+
         select.input-custom option {
+            color-scheme: dark;
             background-color: #0f172a !important;
             color: #ffffff !important;
             padding: 12px;
@@ -238,6 +243,7 @@
 
         select.input-custom option:disabled,
         select.input-custom option[disabled] {
+            color-scheme: dark;
             color: rgba(255, 255, 255, 0.4) !important;
             background-color: #0f172a !important;
         }
@@ -501,37 +507,37 @@
 
     <!-- Create / Edit Organization Modal -->
     <div class="modal-overlay" id="org-modal">
-        <div class="modal-card" style="max-width: 760px; width: 92%; padding: 40px 36px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
-            <div class="flex items-center justify-between pb-3 mb-6" style="border-bottom: 1px solid rgba(255,255,255,0.08);">
-                <h3 style="font-size: 1.45rem; font-weight: 800; color: #fff;" id="org-modal-title">Create Organization</h3>
-                <button type="button" onclick="closeOrgModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;">×</button>
+        <div class="modal-card" style="max-width: 680px; width: 92%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+            <div class="flex items-center justify-between pb-3 mb-4" style="border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+                <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0;" id="org-modal-title">Create Organization</h3>
+                <button type="button" onclick="closeOrgModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer;">×</button>
             </div>
 
-            <form id="org-form" onsubmit="handleSaveOrganization(event)">
+            <form id="org-form" onsubmit="handleSaveOrganization(event)" style="display: flex; flex-direction: column;">
                 <input type="hidden" id="org-id-hidden" />
 
                 <!-- Circular Logo Uploader at Top Center -->
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 32px;">
-                    <div class="profile-circle-uploader" onclick="document.getElementById('org-logo-file').click()" data-tooltip="Click to upload logo" style="width: 90px; height: 90px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="org-circle-preview">
+                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 16px; flex-shrink: 0;">
+                    <div class="profile-circle-uploader" onclick="document.getElementById('org-logo-file').click()" data-tooltip="Click to upload logo" style="width: 70px; height: 70px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="org-circle-preview">
                         <i class="fa-solid fa-building"></i>
                     </div>
-                    <span style="font-size: 0.8rem; color: rgba(255, 255, 255, 0.55); margin-top: 10px; font-weight: 500;">Upload organization logo</span>
+                    <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.55); margin-top: 6px; font-weight: 500;">Upload organization logo</span>
                     <input type="file" id="org-logo-file" accept="image/*" style="display: none;" onchange="onOrgLogoFileChange(event)" />
                 </div>
 
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-bottom: 16px;">
                     <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 8px; display: block;">
+                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.82rem; margin-bottom: 4px; display: block;">
                             Organization Name <span style="color: #ef4444;">*</span>
                         </label>
-                        <input type="text" id="org-name-input" class="input-custom" placeholder="e.g. Acme Corporation" required style="height: 48px; font-size: 0.95rem;" />
+                        <input type="text" id="org-name-input" class="input-custom" placeholder="e.g. Acme Corporation" required style="height: 40px; font-size: 0.88rem;" />
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 8px; display: block;">
+                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.82rem; margin-bottom: 4px; display: block;">
                             Industry Type <span style="color: #ef4444;">*</span>
                         </label>
-                        <select id="org-industry-select" class="input-custom" required style="height: 48px; font-size: 0.95rem; cursor: pointer;">
+                        <select id="org-industry-select" class="input-custom" required style="height: 40px; font-size: 0.88rem; cursor: pointer;">
                             <option value="" disabled selected>Select Industry</option>
                             <option value="information_technology">Information Technology</option>
                             <option value="financial_services">Financial Services</option>
@@ -542,10 +548,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 8px; display: block;">
+                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.82rem; margin-bottom: 4px; display: block;">
                             Company Size <span style="color: #ef4444;">*</span>
                         </label>
-                        <select id="org-size-select" class="input-custom" required style="height: 48px; font-size: 0.95rem; cursor: pointer;">
+                        <select id="org-size-select" class="input-custom" required style="height: 40px; font-size: 0.88rem; cursor: pointer;">
                             <option value="" disabled selected>Select Company Size</option>
                             <option value="1-10">1-10 employees</option>
                             <option value="11-50">11-50 employees</option>
@@ -557,22 +563,22 @@
                     </div>
 
                     <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.9rem; margin-bottom: 6px; display: block;">
+                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.82rem; margin-bottom: 4px; display: block;">
                             Status
                         </label>
-                        <div style="display: inline-flex; align-items: center; gap: 12px; padding: 4px 0;">
-                            <label style="position: relative; display: inline-block; width: 48px; height: 26px; margin: 0; cursor: pointer;">
+                        <div style="display: inline-flex; align-items: center; gap: 10px; padding: 4px 0;">
+                            <label style="position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; cursor: pointer;">
                                 <input type="checkbox" id="org-status-toggle" checked onchange="updateOrgStatusToggleUI(this.checked)" style="opacity: 0; width: 0; height: 0;" />
                                 <span class="status-toggle-slider"></span>
                             </label>
-                            <span id="org-status-text" style="font-size: 0.95rem; font-weight: 700; color: #10b981;">Active</span>
+                            <span id="org-status-text" style="font-size: 0.88rem; font-weight: 700; color: #10b981;">Active</span>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
-                    <button type="button" onclick="closeOrgModal()" style="padding: 12px 26px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.92rem; cursor: pointer;">Cancel</button>
-                    <button type="submit" class="btn-save-profile" id="org-submit-btn" style="padding: 12px 32px; border-radius: 12px; font-weight: 700; font-size: 0.92rem;">Save Organization</button>
+                <div class="flex justify-end gap-3" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 4px; flex-shrink: 0;">
+                    <button type="button" onclick="closeOrgModal()" style="padding: 9px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.85rem; cursor: pointer;">Cancel</button>
+                    <button type="submit" class="btn-save-profile" id="org-submit-btn" style="padding: 9px 24px; border-radius: 10px; font-weight: 700; font-size: 0.85rem;">Save Organization</button>
                 </div>
             </form>
         </div>
@@ -580,7 +586,7 @@
 
     <!-- View Organization Modal -->
     <div class="modal-overlay" id="view-org-modal">
-        <div class="modal-card" style="max-width: 520px; width: 92%; padding: 36px 32px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
+        <div class="modal-card" style="max-width: 480px; width: 92%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
                 <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff;">Organization Details</h3>
                 <button type="button" onclick="closeViewOrgModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;" title="Close">×</button>
