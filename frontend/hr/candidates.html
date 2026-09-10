@@ -172,10 +172,10 @@
                 <div class="flex items-center gap-3">
                     <a href="jobs.html" class="btn btn-secondary btn-sm">← Back</a>
                     <button id="toggle-top-10" class="btn btn-secondary btn-sm" onclick="toggleTop10()">
-                        <i class="fa-solid fa-star"></i> Top 10 Matches
+                        <i class="fa-solid fa-star"></i> Top 10 ATS Matches
                     </button>
                     <button class="btn btn-primary btn-sm" onclick="openTopMatchListModal()">
-                        <i class="fa-solid fa-list-check"></i> View Top Match List
+                        <i class="fa-solid fa-list-check"></i> View Top ATS Match List
                     </button>
                     <div class="topbar-title">Candidates: <span id="job-title-display">Loading...</span></div>
                 </div>
@@ -292,8 +292,8 @@
         <div class="modal" style="width: 1000px; max-width: 95vw;">
             <div class="modal-header">
                 <div>
-                    <h3 class="card-title">Best Match Candidates List</h3>
-                    <p class="text-secondary text-sm">Ranked by similarity percentage with the Job Description</p>
+                    <h3 class="card-title">Best ATS Match Candidates List</h3>
+                    <p class="text-secondary text-sm">Ranked by ATS score with the Job Description</p>
                 </div>
                 <button class="modal-close" onclick="closeTopMatchListModal()">×</button>
             </div>
@@ -306,7 +306,7 @@
                             <th style="width: 70px;">Reached</th>
                             <th style="width: 150px;">Candidate Name</th>
                             <th style="width: 180px;">Contact Info</th>
-                            <th style="width: 80px;">Match %</th>
+                            <th style="width: 80px;">ATS Score</th>
                             <th>Remarks & Notes</th>
                         </tr>
                     </thead>

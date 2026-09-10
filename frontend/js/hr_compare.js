@@ -79,8 +79,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     currentOrgId = session.org_id;
     currentHrId = session.user_id;
 
-    document.getElementById('sidebar-name').textContent = session.username || 'HR User';
-    document.getElementById('sidebar-avatar').textContent = (session.username || 'H').charAt(0).toUpperCase();
+    syncHRSidebarFromSession();
 
     await loadJobs();
 
@@ -305,7 +304,7 @@ function renderProfileCard(prefix, candidate) {
     const recBadgeEl = document.getElementById(`${prefix}-rec-badge`);
     if (recBadgeEl) {
         if (candidate.is_recommended) {
-            recBadgeEl.innerHTML = `<span class="rec-badge-winner"><i class="fa-solid fa-trophy"></i> BETTER MATCH / RECOMMENDED</span>`;
+            recBadgeEl.innerHTML = `<span class="rec-badge-winner"><i class="fa-solid fa-trophy"></i> BETTER ATS MATCH / RECOMMENDED</span>`;
         } else {
             recBadgeEl.innerHTML = `<span style="font-size:0.75rem;color:var(--text-muted);margin-top:12px;display:inline-block;">Alternative Candidate</span>`;
         }

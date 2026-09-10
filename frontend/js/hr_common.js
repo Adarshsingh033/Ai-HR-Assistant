@@ -21,7 +21,8 @@ function syncHRSidebarFromSession() {
         if (typeof Session !== 'undefined') {
             const session = Session.get();
             if (session) {
-                updateSidebarUserChip(session.full_name || session.username || 'HR User', session.profile_image || '', 'HR Manager');
+                const org = session.organization_name || session.org_name || session.branch_name;
+                updateSidebarUserChip(session.full_name || session.username || 'HR User', session.profile_image || '', org || 'HR Manager');
             }
         }
     } catch (e) {}
@@ -49,11 +50,13 @@ async function loadHRProfileForSidebar() {
     try {
         const data = await apiRequest('GET', '/api/hr/profile');
         if (data) {
-            updateSidebarUserChip(data.full_name || data.username, data.profile_image, data.organization_name || data.branch_name || 'HR Manager');
+            const orgName = data.organization_name || data.branch_name || 'HR Manager';
+            updateSidebarUserChip(data.full_name || data.username, data.profile_image, orgName);
             const session = Session.get();
             if (session) {
                 session.full_name = data.full_name || session.full_name;
                 session.profile_image = data.profile_image || session.profile_image;
+                session.organization_name = orgName;
                 Session.set(session);
             }
         }

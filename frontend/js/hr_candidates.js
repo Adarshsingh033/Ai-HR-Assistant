@@ -14,8 +14,7 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // Populate user info
-    document.getElementById('sidebar-name').textContent = session.username;
-    document.getElementById('sidebar-avatar').textContent = session.username.charAt(0).toUpperCase();
+    syncHRSidebarFromSession();
 
     // Get Job ID from URL
     const params = new URLSearchParams(window.location.search);
@@ -115,7 +114,7 @@ async function loadCandidates(jobId = null, orgId = null) {
                             </div>
                         </div>
                         <div class="match-badge ${cand.match_percentage >= 70 ? 'match-high' : cand.match_percentage >= 40 ? 'match-mid' : 'match-low'}">
-                            ${cand.match_percentage || 0}% Match
+                            ${cand.match_percentage || 0}% ATS Score
                         </div>
                     </div>
                 </div>
@@ -166,10 +165,10 @@ function toggleTop10() {
     const btn = document.getElementById('toggle-top-10');
     if (showTop10) {
         btn.classList.replace('btn-secondary', 'btn-primary');
-        btn.innerHTML = '<i class="fa-solid fa-star"></i> Showing Top 10';
+        btn.innerHTML = '<i class="fa-solid fa-star"></i> Showing Top 10 ATS Matches';
     } else {
         btn.classList.replace('btn-primary', 'btn-secondary');
-        btn.innerHTML = '<i class="fa-solid fa-star"></i> Top 10 Matches';
+        btn.innerHTML = '<i class="fa-solid fa-star"></i> Top 10 ATS Matches';
     }
     const session = Session.get();
     loadCandidates(currentJobId, currentJobId ? null : session.org_id);
@@ -218,7 +217,7 @@ async function openTopMatchListModal() {
                 </td>
                 <td>
                     <div class="match-badge ${cand.match_percentage >= 70 ? 'match-high' : cand.match_percentage >= 40 ? 'match-mid' : 'match-low'}">
-                        ${cand.match_percentage || 0}%
+                        ${cand.match_percentage || 0}% ATS Score
                     </div>
                 </td>
                 <td>
@@ -274,8 +273,8 @@ function openViewCandidateModal(cand) {
     matchSection.innerHTML = `
         <div class="mt-4 p-3 rounded bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)]">
             <div class="flex items-center justify-between mb-2">
-                <span class="text-sm font-semibold">JD Match Analysis</span>
-                <span class="match-badge ${cand.match_percentage >= 70 ? 'match-high' : cand.match_percentage >= 40 ? 'match-mid' : 'match-low'}">${cand.match_percentage || 0}% Match</span>
+                <span class="text-sm font-semibold">ATS Match Analysis</span>
+                <span class="match-badge ${cand.match_percentage >= 70 ? 'match-high' : cand.match_percentage >= 40 ? 'match-mid' : 'match-low'}">${cand.match_percentage || 0}% ATS Score</span>
             </div>
             <p class="text-xs text-muted leading-relaxed">${cand.match_explanation || 'No analysis available.'}</p>
         </div>

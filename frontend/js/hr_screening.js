@@ -20,8 +20,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     currentOrgId = session.org_id;
     currentHrId = session.user_id;
 
-    document.getElementById('sidebar-name').textContent = session.username || 'HR User';
-    document.getElementById('sidebar-avatar').textContent = (session.username || 'H').charAt(0).toUpperCase();
+    syncHRSidebarFromSession();
 
     await loadJobs();
     await loadScreeningCandidates();

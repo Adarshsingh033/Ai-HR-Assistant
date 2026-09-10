@@ -6,10 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     // Set user details in sidebar
-    if (document.getElementById('sidebar-name')) {
-        document.getElementById('sidebar-name').innerText = user.full_name || user.username;
-        document.getElementById('sidebar-avatar').innerText = (user.full_name || user.username).charAt(0).toUpperCase();
-    }
+    syncHRSidebarFromSession();
 
     // Initialize UI
     initMailingUI();
