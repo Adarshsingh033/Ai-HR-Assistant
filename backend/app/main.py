@@ -74,6 +74,20 @@ def health():
     return {"status": "ok", "service": "AI Recruitment System"}
 
 
+@app.get("/api/config")
+def public_config():
+    """Return runtime public configuration for clients."""
+    from app.config import APP_PORT, APP_HOST
+    return {
+        "app_name": "AI HR Assistant",
+        "app_version": "1.0.0",
+        "port": APP_PORT,
+        "host": APP_HOST,
+        "status": "online"
+    }
+
+
+
 # ── Static Frontend ──────────────────────────────────────────────────────────
 FRONTEND_DIR = os.path.normpath(
     os.path.join(os.path.dirname(__file__), "..", "..", "frontend")

@@ -10,7 +10,7 @@ const API = _configuredApi
     ? _configuredApi.replace(/\/+$/, '')
     : ((window.location.protocol && window.location.protocol.startsWith('http'))
         ? window.location.origin
-        : 'http://localhost:8000');
+        : 'http://localhost:8002');
 
 
 /* ── Theme (Dark / Light) ─────────────────────────────── */
