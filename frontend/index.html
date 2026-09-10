@@ -16,16 +16,20 @@
         }
 
         .login-container {
+            height: 100vh;
             min-height: 100vh;
-            width: 100vw;
+            width: 100%;
+            max-width: 100%;
             display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
+            grid-template-columns: 1.15fr 0.85fr;
             position: relative;
             background: #080614;
             background-image:
                 radial-gradient(circle at 10% 20%, rgba(59, 130, 246, 0.25) 0%, transparent 45%),
                 radial-gradient(circle at 40% 60%, rgba(99, 102, 241, 0.2) 0%, transparent 50%),
                 radial-gradient(circle at 85% 30%, rgba(139, 92, 246, 0.22) 0%, transparent 50%);
+            overflow: hidden;
+            box-sizing: border-box;
         }
 
         /* ── Left Hero Side ── */
@@ -33,14 +37,17 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 48px 60px;
+            padding: clamp(24px, 3.8vh, 48px) clamp(28px, 4vw, 56px);
             position: relative;
             z-index: 2;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow: hidden;
         }
 
         .brand-logo-wrap img {
-            max-height: 44px;
-            max-width: 220px;
+            max-height: clamp(34px, 4.2vh, 44px);
+            max-width: 200px;
             filter: brightness(0) invert(1);
             object-fit: contain;
         }
@@ -49,20 +56,21 @@
         .visual-graphic-container {
             position: relative;
             width: 100%;
-            height: 340px;
+            max-width: 440px;
+            height: clamp(250px, 35vh, 320px);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 24px 0;
+            margin: auto 0;
         }
 
         .ai-showcase-card {
             width: 100%;
-            max-width: 380px;
+            max-width: 340px;
             background: rgba(23, 19, 46, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.12);
-            border-radius: 20px;
-            padding: 24px;
+            border-radius: 16px;
+            padding: clamp(12px, 1.8vh, 18px);
             backdrop-filter: blur(20px);
             box-shadow:
                 0 20px 50px rgba(0, 0, 0, 0.5),
@@ -72,58 +80,58 @@
 
         .card-1 {
             top: 0px;
-            left: -20px;
-            transform: scale(0.85) rotate(-4deg);
+            left: 0px;
+            transform: scale(0.86) rotate(-4deg);
             z-index: 1;
             animation: floatCard1 7s ease-in-out infinite;
         }
 
         .card-2 {
-            top: 150px;
-            right: -20px;
+            top: clamp(65px, 8.5vh, 85px);
+            right: 0px;
             transform: scale(0.9) rotate(3deg);
             z-index: 2;
             animation: floatCard2 6s ease-in-out infinite 1s;
         }
 
         .card-3 {
-            top: 300px;
-            left: 10px;
+            top: clamp(125px, 17vh, 165px);
+            left: 15px;
             transform: scale(0.95) rotate(-1deg);
             z-index: 3;
             animation: floatCard3 8s ease-in-out infinite 0.5s;
         }
 
-        @keyframes floatCard1 { 0%, 100% { transform: scale(0.85) rotate(-4deg) translateY(0px); } 50% { transform: scale(0.85) rotate(-4deg) translateY(-12px); } }
-        @keyframes floatCard2 { 0%, 100% { transform: scale(0.9) rotate(3deg) translateY(0px); } 50% { transform: scale(0.9) rotate(3deg) translateY(-10px); } }
-        @keyframes floatCard3 { 0%, 100% { transform: scale(0.95) rotate(-1deg) translateY(0px); } 50% { transform: scale(0.95) rotate(-1deg) translateY(-15px); } }
+        @keyframes floatCard1 { 0%, 100% { transform: scale(0.86) rotate(-4deg) translateY(0px); } 50% { transform: scale(0.86) rotate(-4deg) translateY(-8px); } }
+        @keyframes floatCard2 { 0%, 100% { transform: scale(0.9) rotate(3deg) translateY(0px); } 50% { transform: scale(0.9) rotate(3deg) translateY(-8px); } }
+        @keyframes floatCard3 { 0%, 100% { transform: scale(0.95) rotate(-1deg) translateY(0px); } 50% { transform: scale(0.95) rotate(-1deg) translateY(-10px); } }
 
         .card-glass-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 20px;
+            margin-bottom: 12px;
         }
 
         .ai-badge {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 6px 14px;
+            gap: 6px;
+            padding: 4px 12px;
             border-radius: 99px;
             background: rgba(99, 102, 241, 0.18);
             border: 1px solid rgba(99, 102, 241, 0.35);
             color: #a5b4fc;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 700;
         }
 
         .ai-pulse-dot {
-            width: 8px;
-            height: 8px;
+            width: 7px;
+            height: 7px;
             border-radius: 50%;
             background: #10b981;
-            box-shadow: 0 0 10px #10b981;
+            box-shadow: 0 0 8px #10b981;
             animation: pulse 2s infinite;
         }
 
@@ -143,8 +151,8 @@
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #fff;
             font-weight: 800;
-            font-size: 0.85rem;
-            padding: 6px 14px;
+            font-size: 0.78rem;
+            padding: 4px 12px;
             border-radius: 99px;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
         }
@@ -152,35 +160,35 @@
         .candidate-preview-box {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 14px;
+            gap: 10px;
+            padding: 10px 12px;
             background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 14px;
-            margin-bottom: 16px;
+            border-radius: 12px;
+            margin-bottom: 10px;
         }
 
         .candidate-avatar {
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
             background: linear-gradient(135deg, #6366f1, #4f46e5);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #fff;
             flex-shrink: 0;
         }
 
         .cand-name {
-            font-size: 0.95rem;
+            font-size: 0.88rem;
             font-weight: 700;
             color: #ffffff;
         }
 
         .cand-status {
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             color: rgba(255, 255, 255, 0.55);
             margin-top: 2px;
         }
@@ -188,44 +196,44 @@
         .skills-tags-row {
             display: flex;
             flex-wrap: wrap;
-            gap: 8px;
+            gap: 6px;
         }
 
         .skill-pill {
-            padding: 4px 10px;
-            border-radius: 8px;
+            padding: 3px 8px;
+            border-radius: 6px;
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.08);
             color: rgba(255, 255, 255, 0.8);
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             font-weight: 500;
         }
 
         .floating-badge {
             position: absolute;
-            padding: 8px 16px;
-            border-radius: 12px;
+            padding: 6px 12px;
+            border-radius: 10px;
             background: rgba(15, 12, 34, 0.92);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
-            font-size: 0.8rem;
+            font-size: 0.72rem;
             font-weight: 600;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
         }
 
         .badge-top-right {
-            top: -18px;
-            right: -16px;
+            top: -12px;
+            right: -10px;
             animation: floatBadge1 5s ease-in-out infinite;
         }
 
         .badge-bottom-left {
-            bottom: -18px;
-            left: -16px;
+            bottom: -12px;
+            left: -10px;
             animation: floatBadge2 5s ease-in-out infinite 0.5s;
         }
 
@@ -237,7 +245,7 @@
             }
 
             50% {
-                transform: translateY(-6px);
+                transform: translateY(-4px);
             }
         }
 
@@ -249,7 +257,7 @@
             }
 
             50% {
-                transform: translateY(6px);
+                transform: translateY(4px);
             }
         }
 
@@ -258,7 +266,7 @@
         }
 
         .hero-main-title {
-            font-size: 2.8rem;
+            font-size: clamp(1.6rem, 2.2vw, 2.3rem);
             font-weight: 900;
             line-height: 1.15;
             letter-spacing: 0.02em;
@@ -274,11 +282,11 @@
         }
 
         .hero-subtitle {
-            font-size: 0.95rem;
+            font-size: clamp(0.78rem, 0.95vw, 0.88rem);
             color: rgba(255, 255, 255, 0.65);
-            margin-top: 12px;
+            margin-top: 8px;
             max-width: 440px;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         /* ── Right Form Side ── */
@@ -286,41 +294,44 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 48px;
+            padding: clamp(24px, 4vh, 48px) clamp(24px, 4vw, 56px);
             position: relative;
             z-index: 2;
+            height: 100vh;
+            box-sizing: border-box;
+            overflow-y: auto;
         }
 
         .form-card {
             width: 100%;
-            max-width: 400px;
+            max-width: 380px;
         }
 
         .form-title {
-            font-size: 2.8rem;
+            font-size: clamp(1.8rem, 2.5vw, 2.4rem);
             font-weight: 900;
             letter-spacing: 0.04em;
             color: #ffffff;
             text-transform: uppercase;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
         }
 
         .form-subtitle {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 32px;
+            margin-bottom: clamp(16px, 2.5vh, 26px);
         }
 
         .input-group-custom {
-            margin-bottom: 22px;
+            margin-bottom: clamp(12px, 1.8vh, 18px);
         }
 
         .input-label-custom {
             display: block;
-            font-size: 0.8rem;
+            font-size: 0.78rem;
             font-weight: 600;
             color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
             letter-spacing: 0.05em;
         }
@@ -331,26 +342,27 @@
 
         .input-field-wrap .field-icon {
             position: absolute;
-            left: 16px;
+            left: 14px;
             top: 50%;
             transform: translateY(-50%);
             color: rgba(255, 255, 255, 0.4);
-            font-size: 1rem;
+            font-size: 0.95rem;
             pointer-events: none;
         }
 
         .input-field-wrap .form-control-custom {
             width: 100%;
-            height: 52px;
-            padding: 0 46px 0 46px;
+            height: clamp(44px, 5.2vh, 48px);
+            padding: 0 42px 0 42px;
             background: #15112e;
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 12px;
             color: #ffffff;
             font-family: inherit;
-            font-size: 0.95rem;
+            font-size: 0.92rem;
             outline: none;
             transition: all 0.2s ease;
+            box-sizing: border-box;
         }
 
         .input-field-wrap .form-control-custom:focus {
@@ -376,14 +388,14 @@
 
         .input-field-wrap .pwd-toggle-btn {
             position: absolute;
-            right: 16px;
+            right: 14px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             color: rgba(255, 255, 255, 0.4);
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 0.95rem;
             transition: color 0.2s ease;
         }
 
@@ -393,13 +405,13 @@
 
         .btn-signin-custom {
             width: 100%;
-            height: 52px;
+            height: clamp(44px, 5.2vh, 48px);
             border: none;
             border-radius: 12px;
             background: linear-gradient(90deg, #4f46e5 0%, #3b82f6 100%);
             color: #ffffff;
             font-family: inherit;
-            font-size: 1.05rem;
+            font-size: 1rem;
             font-weight: 700;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -407,7 +419,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 28px;
+            margin-top: clamp(16px, 2.2vh, 22px);
         }
 
         .btn-signin-custom:hover {
@@ -426,21 +438,21 @@
             background: rgba(239, 68, 68, 0.12);
             border: 1px solid rgba(239, 68, 68, 0.35);
             border-radius: 10px;
-            padding: 10px 14px;
-            font-size: 0.85rem;
+            padding: 8px 12px;
+            font-size: 0.82rem;
             color: #fca5a5;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .success-alert {
             background: rgba(16, 185, 129, 0.16);
             border: 1px solid rgba(16, 185, 129, 0.45);
             border-radius: 12px;
-            padding: 12px 16px;
-            font-size: 0.92rem;
+            padding: 10px 14px;
+            font-size: 0.88rem;
             font-weight: 600;
             color: #34d399;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
             display: flex;
             align-items: center;
             gap: 10px;
@@ -450,8 +462,8 @@
 
         .form-footer-custom {
             text-align: center;
-            margin-top: 28px;
-            font-size: 0.88rem;
+            margin-top: clamp(14px, 2vh, 22px);
+            font-size: 0.82rem;
             color: rgba(255, 255, 255, 0.5);
         }
 
@@ -491,7 +503,16 @@
             }
         }
 
-        @media (max-width: 900px) {
+        @media (max-width: 1024px) {
+            .login-container {
+                grid-template-columns: 1fr 1fr;
+            }
+            .hero-main-title {
+                font-size: 1.8rem;
+            }
+        }
+
+        @media (max-width: 850px) {
             .login-container {
                 grid-template-columns: 1fr;
             }
@@ -502,6 +523,21 @@
 
             .login-form-side {
                 padding: 32px 24px;
+            }
+        }
+
+        @media (max-height: 600px) {
+            .login-container {
+                height: auto;
+                min-height: 100vh;
+                overflow-y: auto;
+            }
+            .login-hero, .login-form-side {
+                height: auto;
+                padding: 20px;
+            }
+            .visual-graphic-container {
+                height: 220px;
             }
         }
     </style>
@@ -518,7 +554,7 @@
             </div>
 
             <!-- AI HR Feature Showcase Card Graphic -->
-            <div class="visual-graphic-container" style="height: 540px; max-width: 520px; margin: 0 auto; position: relative;">
+            <div class="visual-graphic-container">
                 
                 <!-- CARD 1: AI MATCHING ENGINE -->
                 <div class="ai-showcase-card card-1">

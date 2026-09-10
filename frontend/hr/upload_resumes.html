@@ -16,7 +16,8 @@
             display: grid;
             grid-template-columns: 300px 1fr;
             gap: 20px;
-            height: calc(100vh - 120px);
+            min-height: calc(100vh - 140px);
+            height: auto;
         }
 
         /* ── Left panel — Job selector ── */
@@ -484,7 +485,7 @@
             <div class="topbar-title">Upload Resumes</div>
         </header>
 
-        <div class="page-content" style="padding-bottom:0;">
+        <div class="page-content scrollable" style="padding-bottom: 40px;">
             <div class="upload-layout">
 
                 <!-- ── LEFT: Job selector panel ── -->

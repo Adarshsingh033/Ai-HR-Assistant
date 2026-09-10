@@ -1122,22 +1122,47 @@ textarea.form-control {
 }
 
 /* ── Tables ─────────────────────────────────────────────────── */
-.table-wrap, .table-card {
-  flex: 0 1 auto;
-  max-height: 590px !important;
-  min-height: 0 !important;
-  display: block !important;
-  overflow-y: auto !important;
-  overflow-x: hidden !important;
+.table-wrap {
+  width: 100%;
+  overflow-x: auto !important;
+  overflow-y: visible;
   border-radius: var(--radius-md);
   background: var(--bg-card);
   border: 1px solid var(--border);
+  margin-bottom: 16px;
+  -webkit-overflow-scrolling: touch;
 }
 
-.table-wrap::-webkit-scrollbar:horizontal,
-.table-card::-webkit-scrollbar:horizontal {
-  height: 0px !important;
-  display: none !important;
+.table-card {
+  border-radius: var(--radius-md);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.table-card .table-wrap {
+  border: none;
+  border-radius: 0;
+  margin-bottom: 0;
+}
+
+.table-wrap::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.table-wrap::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(99, 102, 241, 0.35);
+  border-radius: 99px;
+}
+
+.table-wrap::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
 }
 
 table {
@@ -1190,7 +1215,8 @@ tbody tr:last-child td {
 .app-layout {
   display: flex;
   height: 100vh;
-  width: 100vw;
+  width: 100%;
+  max-width: 100%;
   overflow: hidden;
 }
 
@@ -1404,8 +1430,9 @@ tbody tr:last-child td {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  min-width: 0;
+  width: calc(100% - 260px);
   overflow: hidden;
-  width: calc(100vw - 260px);
 }
 
 .topbar {
@@ -1428,10 +1455,11 @@ tbody tr:last-child td {
 .page-content {
   padding: 24px 32px;
   flex: 1;
-  display: flex;
-  flex-direction: column;
+  display: block;
   min-height: 0;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding-bottom: 60px;
 }
 
 .page-content.dashboard-page,
@@ -1439,7 +1467,7 @@ tbody tr:last-child td {
   display: block !important;
   overflow-y: auto !important;
   overflow-x: hidden !important;
-  padding-bottom: 80px !important;
+  padding-bottom: 60px !important;
 }
 
 .page-content.dashboard-page > *,
