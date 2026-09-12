@@ -604,7 +604,7 @@
 
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                         <!-- Status Filter Only -->
-                        <div style="min-width: 160px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; padding-left: 12px; height: 42px;">
+                        <div style="flex: 1; min-width: 130px; max-width: 200px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; padding-left: 12px; height: 42px;">
                             <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS •</span>
                             <select id="job-filter-status" onchange="onJobFilterChange()" class="input-custom" style="height: 40px; background: transparent; border: none; color: #fff; font-weight: 600; font-size: 0.85rem; padding-left: 6px; flex: 1;">
                                 <option value="">All Status</option>
@@ -630,7 +630,7 @@
                 </div>
 
                 <!-- Vacancies Grid -->
-                <div id="jobs-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 28px;">
+                <div id="jobs-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: clamp(16px, 2vw, 28px);">
                     <div style="grid-column: 1 / -1; text-align: center; color: var(--text-muted); padding: 40px;">
                         Loading job vacancies...
                     </div>
