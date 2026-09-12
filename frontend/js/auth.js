@@ -110,64 +110,49 @@ async function handleLogin(e) {
    Forgot Password Logic
    ======================================================== */
 let fpEmailAddress = '';
+let fpOtpCode = '';   // stores the OTP returned from the server
 
 function openForgotPasswordModal() {
-    console.log("openForgotPasswordModal triggered");
-    try {
-        const form = document.getElementById('fp-email-form');
-        if (form) form.reset();
-        
-        const modal = document.getElementById('fp-email-modal');
-        if (modal) {
-            modal.style.display = 'flex';
-        } else {
-            console.error("fp-email-modal not found in DOM");
-            alert("Error: Modal not found in HTML. Did you hard refresh?");
-        }
-    } catch (e) {
-        console.error("Error in openForgotPasswordModal:", e);
-        alert("Error opening modal: " + e.message);
-    }
+    const form = document.getElementById('fp-email-form');
+    if (form) form.reset();
+    document.getElementById('fp-email-modal')?.classList.add('open');
 }
 
 function closeFpModal(id) {
-    document.getElementById(id).style.display = 'none';
+    document.getElementById(id)?.classList.remove('open');
 }
 
 async function handleFpEmailSubmit(e) {
     e.preventDefault();
-    console.log("handleFpEmailSubmit triggered");
-    
-    const emailInput = document.getElementById('fp-email');
-    if (!emailInput) {
-        console.error("fp-email input not found");
-        return;
-    }
-    
-    const email = emailInput.value.trim();
-    console.log("Email entered:", email);
+
+    const email = (document.getElementById('fp-email')?.value || '').trim();
     if (!email) return;
 
     const btn = document.getElementById('fp-email-btn');
     if (btn) setLoading(btn, true);
 
     try {
-        console.log("Making API request to /api/auth/forgot-password...");
         const data = await apiRequest('POST', '/api/auth/forgot-password', { email });
-        console.log("API response received:", data);
-        
+
         if (data.success) {
             fpEmailAddress = email;
+            fpOtpCode = data.otp || '';   // server returns the OTP
+
+            // Show the OTP email address in the second modal
+            const emailDisplay = document.getElementById('fp-otp-email-display');
+            if (emailDisplay) emailDisplay.textContent = email;
+
             closeFpModal('fp-email-modal');
-            const otpForm = document.getElementById('fp-otp-form');
-            if (otpForm) otpForm.reset();
-            const otpModal = document.getElementById('fp-otp-modal');
-            if (otpModal) otpModal.style.display = 'flex';
-            showToast('OTP is sent to the email (1234)', 'success', 4000);
+            document.getElementById('fp-otp-form')?.reset();
+            document.getElementById('fp-otp-modal')?.classList.add('open');
+
+            const hint = fpOtpCode
+                ? `OTP is sent to your email! <strong>${fpOtpCode}</strong>`
+                : `OTP is sent to your email! <strong>123456</strong>`;
+            showToast(hint, 'success', 6000);
         }
     } catch (err) {
-        console.error("API error:", err);
-        showToast(err.message || 'Email not found', 'error');
+        showToast(err.message || 'No account found with that email.', 'error');
     } finally {
         if (btn) setLoading(btn, false);
     }
@@ -175,13 +160,18 @@ async function handleFpEmailSubmit(e) {
 
 function handleFpOtpSubmit(e) {
     e.preventDefault();
-    const otp = document.getElementById('fp-otp-input').value.trim();
-    if (otp === '1234') {
+    const enteredOtp = (document.getElementById('fp-otp-input')?.value || '').trim();
+
+    // Validate against server-returned OTP (or fallback demo OTP)
+    const validOtp = fpOtpCode || '123456';
+    if (enteredOtp === validOtp) {
         closeFpModal('fp-otp-modal');
-        document.getElementById('fp-reset-form').reset();
-        document.getElementById('fp-reset-modal').style.display = 'flex';
+        document.getElementById('fp-reset-form')?.reset();
+        document.getElementById('fp-reset-modal')?.classList.add('open');
     } else {
-        showToast('Invalid OTP. Please try again.', 'error');
+        showToast('Invalid code. Please check your email and try again.', 'error');
+        document.getElementById('fp-otp-input').value = '';
+        document.getElementById('fp-otp-input').focus();
     }
 }
 
@@ -190,30 +180,37 @@ async function handleFpResetSubmit(e) {
     const newPwd = document.getElementById('fp-new-pwd').value;
     const confirmPwd = document.getElementById('fp-confirm-pwd').value;
 
+    if (newPwd.length < 6) {
+        showToast('Password must be at least 6 characters.', 'error');
+        return;
+    }
     if (newPwd !== confirmPwd) {
-        showToast('Passwords do not match', 'error');
+        showToast('Passwords do not match.', 'error');
         return;
     }
 
     const btn = document.getElementById('fp-reset-btn');
-    setLoading(btn, true);
+    if (btn) setLoading(btn, true);
 
     try {
-        const data = await apiRequest('POST', '/api/auth/reset-password', { 
-            email: fpEmailAddress, 
-            new_password: newPwd 
+        const data = await apiRequest('POST', '/api/auth/reset-password', {
+            email: fpEmailAddress,
+            new_password: newPwd
         });
-        
+
         if (data.success) {
             closeFpModal('fp-reset-modal');
-            showToast('Password reset successfully. You can now log in.', 'success', 4000);
-            
-            // pre-fill the email for convenience
-            document.getElementById('username').value = fpEmailAddress;
+            showToast('Password reset successfully! You can now sign in.', 'success', 4500);
+            // Pre-fill username/email on login form for convenience
+            const usernameEl = document.getElementById('username');
+            if (usernameEl) usernameEl.value = fpEmailAddress;
+            // Reset state
+            fpEmailAddress = '';
+            fpOtpCode = '';
         }
     } catch (err) {
-        showToast(err.message || 'Failed to reset password', 'error');
+        showToast(err.message || 'Failed to reset password. Please try again.', 'error');
     } finally {
-        setLoading(btn, false);
+        if (btn) setLoading(btn, false);
     }
 }
