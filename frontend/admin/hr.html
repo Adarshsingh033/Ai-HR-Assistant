@@ -79,7 +79,7 @@
                 <div class="topbar-title" id="page-title">HR</div>
             </header>
 
-            <div class="page-content scrollable">
+            <div class="page-content">
 
                 <!-- ── HR MODULE ── -->
                 <div id="section-hr" class="module-section">
@@ -115,17 +115,17 @@
                     </div>
 
                     <!-- Member List Table -->
-                    <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; flex: 0 1 auto;">
-                        <table>
+                    <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; flex: 0 1 auto; max-height: 100%; min-height: 0; overflow-y: auto; overflow-x: hidden;">
+                        <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                             <thead>
                                 <tr>
-                                    <th style="width: 55px; padding-left: 16px;">Photo</th>
-                                    <th>HR Member</th>
-                                    <th>Email & Phone</th>
-                                    <th>Organization</th>
-                                    <th>Branch</th>
-                                    <th>Status</th>
-                                    <th style="text-align: right; width: 100px;">Actions</th>
+                                    <th style="width: 55px; padding-left: 20px;">Photo</th>
+                                    <th style="width: 20%;">HR Member</th>
+                                    <th style="width: 24%;">Email & Phone</th>
+                                    <th style="width: 20%;">Organization</th>
+                                    <th style="width: 15%;">Branch</th>
+                                    <th style="width: 11%;">Status</th>
+                                    <th style="width: 80px; text-align: right; padding-right: 20px;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="member-table-body">
@@ -147,104 +147,108 @@
 
     <!-- Create / Edit Member Modal -->
     <div class="modal-overlay" id="member-modal">
-        <div class="modal-card" style="max-width: 680px; width: 92%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; flex-shrink: 0;">
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0;" id="member-modal-title">Create HR Member</h3>
-                <button type="button" onclick="closeMemberModal()" data-tooltip="Close" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer;">×</button>
+        <div class="modal-card" style="max-width: 660px; width: 92%; max-height: 88vh; padding: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.14); border-radius: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow: hidden;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #fff; margin: 0; letter-spacing: -0.01em;" id="member-modal-title">Create HR Member</h3>
+                <button type="button" onclick="closeMemberModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.7)';">×</button>
             </div>
 
-            <form id="member-form" onsubmit="handleSaveMember(event)" style="display: flex; flex-direction: column;">
+            <form id="member-form" onsubmit="handleSaveMember(event)" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;">
                 <input type="hidden" id="member-id-hidden" />
 
-                <!-- Profile Photo Uploader -->
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 16px; flex-shrink: 0;">
-                    <div onclick="document.getElementById('member-photo-file').click()" data-tooltip="Click to upload profile photo" style="width: 70px; height: 70px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="member-circle-preview">
-                        <i class="fa-solid fa-user"></i>
-                    </div>
-                    <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.55); margin-top: 6px; font-weight: 500;">Upload HR photo</span>
-                    <input type="file" id="member-photo-file" accept="image/*" style="display: none;" onchange="onMemberPhotoChange(event)" />
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-bottom: 16px;">
-                    <!-- Organization & Branch -->
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            ORGANIZATION <span style="color: #ef4444;">*</span>
-                        </label>
-                        <select id="member-org-select" onchange="onModalOrgChange(this.value)" class="input-custom" required style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; cursor: pointer; padding: 0 12px; outline: none; width: 100%;">
-                            <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            BRANCH <span style="color: #ef4444;">*</span>
-                        </label>
-                        <select id="member-branch-select" class="input-custom" required disabled style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; cursor: pointer; padding: 0 12px; outline: none; width: 100%;">
-                            <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization First</option>
-                        </select>
-                    </div>
-
-                    <!-- Full Name & Username -->
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            FULL NAME <span style="color: #ef4444;">*</span>
-                        </label>
-                        <input type="text" id="member-fullname-input" placeholder="e.g. John Doe" required style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            USERNAME <span style="color: #ef4444;">*</span>
-                        </label>
-                        <input type="text" id="member-username-input" placeholder="e.g. johndoe" required style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
-                    </div>
-
-                    <!-- Email & Phone -->
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            EMAIL ADDRESS <span style="color: #ef4444;">*</span>
-                        </label>
-                        <input type="email" id="member-email-input" placeholder="john@example.com" required style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            PHONE NUMBER
-                        </label>
-                        <input type="text" id="member-phone-input" placeholder="e.g. 9876543210" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
-                    </div>
-
-                    <!-- Password & Status -->
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            PASSWORD <span id="member-password-req" style="color: #ef4444;">*</span>
-                        </label>
-                        <div style="position: relative; display: flex; align-items: center;">
-                            <input type="password" id="member-password-input" placeholder="Set password" style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 40px 0 12px; outline: none; width: 100%;" />
-                            <button type="button" onclick="toggleMemberPasswordVisibility()" data-tooltip="Show/Hide password" style="position: absolute; right: 10px; background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">
-                                <i class="fa-regular fa-eye" id="member-password-toggle-icon"></i>
-                            </button>
+                <!-- Scrollable Body -->
+                <div class="modal-body" style="padding: 20px 28px;">
+                    <!-- Profile Photo Uploader -->
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 20px; flex-shrink: 0;">
+                        <div onclick="document.getElementById('member-photo-file').click()" data-tooltip="Click to upload profile photo" style="width: 76px; height: 76px; border-radius: 50%; background: rgba(99, 102, 241, 0.12); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="member-circle-preview">
+                            <i class="fa-solid fa-user"></i>
                         </div>
+                        <span style="font-size: 0.78rem; color: rgba(255, 255, 255, 0.55); margin-top: 8px; font-weight: 500;">Upload HR photo</span>
+                        <input type="file" id="member-photo-file" accept="image/*" style="display: none;" onchange="onMemberPhotoChange(event)" />
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.82rem; margin-bottom: 4px; display: block;">
-                            STATUS
-                        </label>
-                        <div style="display: inline-flex; align-items: center; gap: 10px; padding: 4px 0;">
-                            <label style="position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; cursor: pointer;">
-                                <input type="checkbox" id="member-status-toggle" checked onchange="updateMemberStatusToggleUI(this.checked)" style="opacity: 0; width: 0; height: 0;" />
-                                <span class="status-toggle-slider"></span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <!-- Organization & Branch -->
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                ORGANIZATION <span style="color: #ef4444;">*</span>
                             </label>
-                            <span id="member-status-text" style="font-size: 0.88rem; font-weight: 700; color: #10b981;">Active</span>
+                            <select id="member-org-select" onchange="onModalOrgChange(this.value)" class="input-custom" required style="height: 46px; font-size: 0.9rem; cursor: pointer;">
+                                <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                BRANCH <span style="color: #ef4444;">*</span>
+                            </label>
+                            <select id="member-branch-select" class="input-custom" required disabled style="height: 46px; font-size: 0.9rem; cursor: pointer;">
+                                <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization First</option>
+                            </select>
+                        </div>
+
+                        <!-- Full Name & Username -->
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                FULL NAME <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input type="text" id="member-fullname-input" placeholder="e.g. John Doe" required style="height: 46px; font-size: 0.9rem;" class="input-custom" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                USERNAME <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input type="text" id="member-username-input" placeholder="e.g. johndoe" required style="height: 46px; font-size: 0.9rem;" class="input-custom" />
+                        </div>
+
+                        <!-- Email & Phone -->
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                EMAIL ADDRESS <span style="color: #ef4444;">*</span>
+                            </label>
+                            <input type="email" id="member-email-input" placeholder="john@example.com" required style="height: 46px; font-size: 0.9rem;" class="input-custom" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                PHONE NUMBER
+                            </label>
+                            <input type="text" id="member-phone-input" placeholder="e.g. 9876543210" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" style="height: 46px; font-size: 0.9rem;" class="input-custom" />
+                        </div>
+
+                        <!-- Password & Status -->
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                PASSWORD <span id="member-password-req" style="color: #ef4444;">*</span>
+                            </label>
+                            <div style="position: relative; display: flex; align-items: center;">
+                                <input type="password" id="member-password-input" placeholder="Set password" style="height: 46px; font-size: 0.9rem; padding-right: 44px;" class="input-custom" />
+                                <button type="button" onclick="toggleMemberPasswordVisibility()" data-tooltip="Show/Hide password" style="position: absolute; right: 12px; background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">
+                                    <i class="fa-regular fa-eye" id="member-password-toggle-icon"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                STATUS
+                            </label>
+                            <div style="display: inline-flex; align-items: center; gap: 10px; padding: 4px 0;">
+                                <label style="position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; cursor: pointer;">
+                                    <input type="checkbox" id="member-status-toggle" checked onchange="updateMemberStatusToggleUI(this.checked)" style="opacity: 0; width: 0; height: 0;" />
+                                    <span class="status-toggle-slider"></span>
+                                </label>
+                                <span id="member-status-text" style="font-size: 0.88rem; font-weight: 700; color: #10b981;">Active</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 4px; flex-shrink: 0;">
-                    <button type="button" onclick="closeMemberModal()" class="btn btn-outline" style="padding: 8px 18px; font-size: 0.85rem;">Cancel</button>
-                    <button type="submit" class="btn btn-primary" id="member-submit-btn" style="padding: 8px 22px; font-size: 0.85rem;">Save HR</button>
+                <!-- Pinned Footer -->
+                <div class="modal-footer" style="padding: 16px 28px;">
+                    <button type="button" onclick="closeMemberModal()" style="padding: 10px 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease;">Cancel</button>
+                    <button type="submit" id="member-submit-btn" style="padding: 10px 26px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: none; color: #fff; box-shadow: 0 4px 18px rgba(249, 115, 22, 0.4); cursor: pointer; transition: all 0.2s ease;">Save HR</button>
                 </div>
             </form>
         </div>

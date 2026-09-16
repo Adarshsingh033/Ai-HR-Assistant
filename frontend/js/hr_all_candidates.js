@@ -59,14 +59,12 @@ async function loadCandidates(byMatch = false) {
 
     try {
         const jobId = document.getElementById('filter-job')?.value || '';
-        const contacted = document.getElementById('filter-contacted')?.value || '';
-        const location = document.getElementById('filter-location')?.value?.trim() || '';
-        const search = document.getElementById('filter-search')?.value?.trim() || '';
+        const contacted = document.getElementById('filter-status')?.value || document.getElementById('filter-contacted')?.value || '';
+        const search = document.getElementById('search-input')?.value?.trim() || document.getElementById('filter-search')?.value?.trim() || '';
 
         let url = `/api/candidates?org_id=${currentOrgId}`;
         if (jobId) url += `&job_id=${encodeURIComponent(jobId)}`;
-        if (contacted) url += `&contacted=${encodeURIComponent(contacted)}`;
-        if (location) url += `&location=${encodeURIComponent(location)}`;
+        if (contacted !== '') url += `&contacted=${encodeURIComponent(contacted)}`;
         if (search) url += `&search=${encodeURIComponent(search)}`;
         if (byMatch) url += `&sort_by_match=true`;
 
@@ -88,12 +86,35 @@ function applyFilters() {
     applyFilters._t = setTimeout(() => loadCandidates(sortByMatch), 350);
 }
 
-function resetFilters() {
+/* ── Filter Handlers (Called by all_candidates.html controls) ── */
+function onSearchInput(val) {
+    applyFilters();
+}
+
+function onJobFilterChange(val) {
+    loadCandidates(sortByMatch);
+}
+
+function onStatusFilterChange(val) {
+    loadCandidates(sortByMatch);
+}
+
+function onMinAtsFilterChange(val) {
+    candidateState.page = 1;
+    renderTable();
+}
+
+function clearAllFilters() {
+    if (document.getElementById('search-input')) document.getElementById('search-input').value = '';
     if (document.getElementById('filter-job')) document.getElementById('filter-job').value = '';
+    if (document.getElementById('filter-status')) document.getElementById('filter-status').value = '';
     if (document.getElementById('filter-contacted')) document.getElementById('filter-contacted').value = '';
-    if (document.getElementById('filter-location')) document.getElementById('filter-location').value = '';
-    if (document.getElementById('filter-search')) document.getElementById('filter-search').value = '';
+    if (document.getElementById('filter-min-ats')) document.getElementById('filter-min-ats').value = '0';
     loadCandidates(false);
+}
+
+function resetFilters() {
+    clearAllFilters();
 }
 
 /* ── Stats ──────────────────────────────────────────────── */
@@ -101,15 +122,18 @@ function renderStats() {
     const total = allCandidates.length;
     const now = new Date();
     const month = allCandidates.filter(c => {
+        if (!c.created_at) return false;
         const d = new Date(c.created_at);
         return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
     }).length;
-    const reached = allCandidates.filter(c => c.reached).length;
+    const reached = allCandidates.filter(c => c.reached === true || c.reached === 'true').length;
 
     const totalEl = document.getElementById('stat-total');
     if (totalEl) totalEl.textContent = total;
     const monthEl = document.getElementById('stat-month');
     if (monthEl) monthEl.textContent = month;
+    const cntEl = document.getElementById('stat-contacted');
+    if (cntEl) cntEl.textContent = reached;
     const rchEl = document.getElementById('stat-reached');
     if (rchEl) rchEl.textContent = reached;
 }
@@ -123,7 +147,14 @@ function renderTable() {
 
     if (!tbody) return;
 
-    if (allCandidates.length === 0) {
+    // Filter by Min ATS score if selected
+    const minAts = parseInt(document.getElementById('filter-min-ats')?.value || '0', 10);
+    let displayList = allCandidates;
+    if (minAts > 0) {
+        displayList = displayList.filter(c => (c.match_percentage || 0) >= minAts);
+    }
+
+    if (displayList.length === 0) {
         if (empty) empty.style.display = 'block';
         if (wrap) wrap.style.display = 'none';
         if (count) count.textContent = '0 candidates';
@@ -132,15 +163,15 @@ function renderTable() {
 
     if (empty) empty.style.display = 'none';
     if (wrap) wrap.style.display = 'block';
-    if (count) count.textContent = `${allCandidates.length} candidate${allCandidates.length !== 1 ? 's' : ''}`;
+    if (count) count.textContent = `${displayList.length} candidate${displayList.length !== 1 ? 's' : ''}`;
 
-    const total = allCandidates.length;
+    const total = displayList.length;
     const totalPages = Math.ceil(total / candidateState.limit) || 1;
     if (candidateState.page > totalPages) candidateState.page = totalPages;
     if (candidateState.page < 1) candidateState.page = 1;
 
     const startIdx = (candidateState.page - 1) * candidateState.limit;
-    const pagedCandidates = allCandidates.slice(startIdx, startIdx + candidateState.limit);
+    const pagedCandidates = displayList.slice(startIdx, startIdx + candidateState.limit);
 
     tbody.innerHTML = pagedCandidates.map((c, index) => {
         const rank = startIdx + index + 1;

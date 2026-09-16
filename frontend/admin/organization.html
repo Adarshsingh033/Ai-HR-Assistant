@@ -5,6 +5,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Organization - AI HR Assistant Admin</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <link rel="stylesheet" href="../css/main.css" />
     <style>
         /* Modern Clean Admin Dashboard Aesthetics */
@@ -403,7 +404,7 @@
                 <div class="topbar-title" id="page-title">Organization</div>
             </header>
 
-            <div class="page-content scrollable">
+            <div class="page-content">
 
                 <!-- 1. DASHBOARD MODULE -->
                 <div id="section-dashboard" class="module-section hidden">
@@ -468,17 +469,17 @@
                     </div>
 
                     <!-- Organization List Table -->
-                    <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; flex: 0 1 auto;">
-                        <table>
+                    <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; flex: 0 1 auto; max-height: 100%; min-height: 0; overflow-y: auto; overflow-x: hidden;">
+                        <table style="width: 100%; table-layout: fixed; border-collapse: collapse;">
                             <thead>
                                 <tr>
-                                    <th style="width: 65px; text-align: left; padding-left: 16px;">Logo</th>
-                                    <th>Organization</th>
-                                    <th>Industry</th>
-                                    <th>Company Size</th>
-                                    <th>Status</th>
-                                    <th>Created At</th>
-                                    <th style="text-align: right; width: 100px;">Actions</th>
+                                    <th style="width: 60px; text-align: left; padding-left: 20px;">Logo</th>
+                                    <th style="width: 24%;">Organization</th>
+                                    <th style="width: 20%;">Industry</th>
+                                    <th style="width: 18%;">Company Size</th>
+                                    <th style="width: 12%;">Status</th>
+                                    <th style="width: 14%;">Created At</th>
+                                    <th style="width: 80px; text-align: right; padding-right: 20px;">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="org-table-body">
@@ -513,78 +514,82 @@
 
     <!-- Create / Edit Organization Modal -->
     <div class="modal-overlay" id="org-modal">
-        <div class="modal-card" style="max-width: 680px; width: 92%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
-            <div class="flex items-center justify-between pb-3 mb-4" style="border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0;" id="org-modal-title">Create Organization</h3>
-                <button type="button" onclick="closeOrgModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer;">×</button>
+        <div class="modal-card" style="max-width: 620px; width: 92%; max-height: 88vh; padding: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.14); border-radius: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow: hidden;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: #fff; margin: 0; letter-spacing: -0.01em;" id="org-modal-title">Create Organization</h3>
+                <button type="button" onclick="closeOrgModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.7)';">×</button>
             </div>
 
-            <form id="org-form" onsubmit="handleSaveOrganization(event)" style="display: flex; flex-direction: column;">
+            <form id="org-form" onsubmit="handleSaveOrganization(event)" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;">
                 <input type="hidden" id="org-id-hidden" />
 
-                <!-- Circular Logo Uploader at Top Center -->
-                <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 16px; flex-shrink: 0;">
-                    <div class="profile-circle-uploader" onclick="document.getElementById('org-logo-file').click()" data-tooltip="Click to upload logo" style="width: 70px; height: 70px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="org-circle-preview">
-                        <i class="fa-solid fa-building"></i>
-                    </div>
-                    <span style="font-size: 0.75rem; color: rgba(255, 255, 255, 0.55); margin-top: 6px; font-weight: 500;">Upload organization logo</span>
-                    <input type="file" id="org-logo-file" accept="image/*" style="display: none;" onchange="onOrgLogoFileChange(event)" />
-                </div>
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-bottom: 16px;">
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.82rem; margin-bottom: 4px; display: block;">
-                            Organization Name <span style="color: #ef4444;">*</span>
-                        </label>
-                        <input type="text" id="org-name-input" class="input-custom" placeholder="e.g. Acme Corporation" required style="height: 40px; font-size: 0.88rem;" />
+                <!-- Scrollable Body -->
+                <div class="modal-body" style="padding: 20px 28px;">
+                    <!-- Circular Logo Uploader at Top Center -->
+                    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 20px; flex-shrink: 0;">
+                        <div class="profile-circle-uploader" onclick="document.getElementById('org-logo-file').click()" data-tooltip="Click to upload logo" style="width: 76px; height: 76px; border-radius: 50%; background: rgba(99, 102, 241, 0.12); border: 2px dashed rgba(99, 102, 241, 0.4); display: flex; align-items: center; justify-content: center; font-size: 1.6rem; color: #818cf8; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden;" id="org-circle-preview">
+                            <i class="fa-solid fa-building"></i>
+                        </div>
+                        <span style="font-size: 0.78rem; color: rgba(255, 255, 255, 0.55); margin-top: 8px; font-weight: 500;">Upload organization logo</span>
+                        <input type="file" id="org-logo-file" accept="image/*" style="display: none;" onchange="onOrgLogoFileChange(event)" />
                     </div>
 
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.82rem; margin-bottom: 4px; display: block;">
-                            Industry Type <span style="color: #ef4444;">*</span>
-                        </label>
-                        <select id="org-industry-select" class="input-custom" required style="height: 40px; font-size: 0.88rem; cursor: pointer;">
-                            <option value="" disabled selected>Select Industry</option>
-                            <option value="information_technology">Information Technology</option>
-                            <option value="financial_services">Financial Services</option>
-                            <option value="healthcare">Healthcare</option>
-                            <option value="education">Education</option>
-                            <option value="manufacturing">Manufacturing</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.82rem; margin-bottom: 4px; display: block;">
-                            Company Size <span style="color: #ef4444;">*</span>
-                        </label>
-                        <select id="org-size-select" class="input-custom" required style="height: 40px; font-size: 0.88rem; cursor: pointer;">
-                            <option value="" disabled selected>Select Company Size</option>
-                            <option value="1-10">1-10 employees</option>
-                            <option value="11-50">11-50 employees</option>
-                            <option value="51-200">51-200 employees</option>
-                            <option value="201-500">201-500 employees</option>
-                            <option value="501-1000">501-1000 employees</option>
-                            <option value="1000+">1000+ employees</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 600; color: rgba(255,255,255,0.9); font-size: 0.82rem; margin-bottom: 4px; display: block;">
-                            Status
-                        </label>
-                        <div style="display: inline-flex; align-items: center; gap: 10px; padding: 4px 0;">
-                            <label style="position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; cursor: pointer;">
-                                <input type="checkbox" id="org-status-toggle" checked onchange="updateOrgStatusToggleUI(this.checked)" style="opacity: 0; width: 0; height: 0;" />
-                                <span class="status-toggle-slider"></span>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                Organization Name <span style="color: #ef4444;">*</span>
                             </label>
-                            <span id="org-status-text" style="font-size: 0.88rem; font-weight: 700; color: #10b981;">Active</span>
+                            <input type="text" id="org-name-input" class="input-custom" placeholder="e.g. Acme Corporation" required style="height: 46px; font-size: 0.9rem;" />
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                Industry Type <span style="color: #ef4444;">*</span>
+                            </label>
+                            <select id="org-industry-select" class="input-custom" required style="height: 46px; font-size: 0.9rem; cursor: pointer;">
+                                <option value="" disabled selected>Select Industry</option>
+                                <option value="information_technology">Information Technology</option>
+                                <option value="financial_services">Financial Services</option>
+                                <option value="healthcare">Healthcare</option>
+                                <option value="education">Education</option>
+                                <option value="manufacturing">Manufacturing</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                Company Size <span style="color: #ef4444;">*</span>
+                            </label>
+                            <select id="org-size-select" class="input-custom" required style="height: 46px; font-size: 0.9rem; cursor: pointer;">
+                                <option value="" disabled selected>Select Company Size</option>
+                                <option value="1-10">1-10 employees</option>
+                                <option value="11-50">11-50 employees</option>
+                                <option value="51-200">51-200 employees</option>
+                                <option value="201-500">201-500 employees</option>
+                                <option value="501-1000">501-1000 employees</option>
+                                <option value="1000+">1000+ employees</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" style="grid-column: span 2;">
+                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                                Status
+                            </label>
+                            <div style="display: inline-flex; align-items: center; gap: 10px; padding: 4px 0;">
+                                <label style="position: relative; display: inline-block; width: 44px; height: 24px; margin: 0; cursor: pointer;">
+                                    <input type="checkbox" id="org-status-toggle" checked onchange="updateOrgStatusToggleUI(this.checked)" style="opacity: 0; width: 0; height: 0;" />
+                                    <span class="status-toggle-slider"></span>
+                                </label>
+                                <span id="org-status-text" style="font-size: 0.88rem; font-weight: 700; color: #10b981;">Active</span>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex justify-end gap-3" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 4px; flex-shrink: 0;">
-                    <button type="button" onclick="closeOrgModal()" style="padding: 9px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.85rem; cursor: pointer;">Cancel</button>
-                    <button type="submit" class="btn-save-profile" id="org-submit-btn" style="padding: 9px 24px; border-radius: 10px; font-weight: 700; font-size: 0.85rem;">Save Organization</button>
+                <!-- Pinned Footer -->
+                <div class="modal-footer" style="padding: 16px 28px;">
+                    <button type="button" onclick="closeOrgModal()" style="padding: 10px 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease;">Cancel</button>
+                    <button type="submit" class="btn-save-profile" id="org-submit-btn" style="padding: 10px 26px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: none; color: #fff; box-shadow: 0 4px 18px rgba(249, 115, 22, 0.4); cursor: pointer; transition: all 0.2s ease;">Save Organization</button>
                 </div>
             </form>
         </div>

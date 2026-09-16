@@ -11,23 +11,25 @@
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: clamp(16px, 1.8vw, 24px);
+            padding: clamp(14px, 1.6vw, 22px);
+            display: flex;
+            flex-direction: column;
         }
         .chart-card-title {
-            font-size: 0.9rem;
+            font-size: clamp(0.85rem, 0.95vw, 0.95rem);
             font-weight: 700;
             color: var(--text-primary);
-            margin-bottom: 4px;
+            margin-bottom: 3px;
         }
         .chart-card-sub {
-            font-size: 0.76rem;
+            font-size: 0.74rem;
             color: var(--text-muted);
-            margin-bottom: 20px;
+            margin-bottom: clamp(12px, 1.4vw, 18px);
         }
         .charts-row {
             display: grid;
-            gap: clamp(12px, 1.5vw, 20px);
-            margin-bottom: clamp(12px, 1.5vw, 20px);
+            gap: clamp(10px, 1.2vw, 18px);
+            margin-bottom: clamp(10px, 1.2vw, 18px);
         }
         .charts-row.two-col {
             grid-template-columns: 1fr 1fr;
@@ -41,26 +43,22 @@
                 grid-template-columns: 1fr;
             }
         }
-        @media (max-width: 900px) {
-            .charts-row.two-col,
-            .charts-row.three-col {
-                grid-template-columns: 1fr;
-            }
+        /* Chart canvas wrapper — height scales with viewport */
+        .chart-canvas-wrap {
+            position: relative;
+            width: 100%;
+            height: clamp(160px, 20vh, 240px);
         }
         /* Usage table row */
         .usage-row td { vertical-align: middle; }
-        .admin-name-cell { font-weight: 600; font-size: 0.88rem; }
-        .admin-email-cell { font-size: 0.76rem; color: var(--text-muted); }
+        .admin-name-cell { font-weight: 600; font-size: 0.86rem; }
+        .admin-email-cell { font-size: 0.74rem; color: var(--text-muted); }
         .usage-group { display: flex; flex-direction: column; gap: 5px; }
         .near-limit { color: var(--warning) !important; }
         .at-limit   { color: var(--danger)  !important; }
         /* Admin usage table responsive */
-        .usage-table-wrap {
-            overflow-x: auto;
-        }
-        .usage-table-wrap table {
-            min-width: 600px;
-        }
+        .usage-table-wrap { overflow-x: auto; }
+        .usage-table-wrap table { min-width: 560px; }
     </style>
 </head>
 <body>

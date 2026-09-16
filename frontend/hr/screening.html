@@ -335,7 +335,7 @@
             <div class="topbar-title">Candidate Screening & Evaluation</div>
         </header>
 
-        <div class="page-content scrollable">
+        <div class="page-content">
 
             <!-- ════════════════════════════════════════════════════════════
                  PAGE HEADER & TITLE
@@ -396,16 +396,16 @@
                         </div>
                     </div>
 
-                    <div class="table-wrap" style="display:none; flex: 0 1 auto;" id="screen-table-wrap">
-                        <table class="candidates-table" style="table-layout:fixed;width:100%;">
+                    <div class="table-wrap" style="display:none; flex: 0 1 auto; max-height: 100%; min-height: 0; overflow-y: auto; overflow-x: hidden;" id="screen-table-wrap">
+                        <table class="candidates-table" style="table-layout:fixed;width:100%; border-collapse: collapse;">
                             <thead>
                                 <tr>
-                                    <th style="width:20%;">Candidate Name</th>
-                                    <th style="width:24%;">Email</th>
-                                    <th style="width:17%;white-space:nowrap;">Phone Number</th>
+                                    <th style="width:20%; padding-left: 20px;">Candidate Name</th>
+                                    <th style="width:23%;">Email</th>
+                                    <th style="width:16%;">Phone Number</th>
                                     <th style="width:20%;">Round Step</th>
                                     <th style="width:12%;">Interview Status</th>
-                                    <th style="width:7%;text-align:right;padding-right:20px;">Action</th>
+                                    <th style="width:9%; text-align:right; padding-right:20px;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="screen-tbody"></tbody>

@@ -8,22 +8,23 @@
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
     <style>
+        /* ── Welcome Banner ── */
         .welcome-banner {
-            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(79, 70, 229, 0.25) 100%);
-            border: 1px solid rgba(99, 102, 241, 0.3);
+            background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(79,70,229,0.25) 100%);
+            border: 1px solid rgba(99,102,241,0.3);
             border-radius: var(--radius-md);
-            padding: 18px 24px;
-            margin-bottom: 18px;
+            padding: clamp(14px, 1.6vw, 20px) clamp(16px, 1.8vw, 24px);
+            margin-bottom: clamp(12px, 1.4vw, 18px);
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
-            gap: 12px;
+            gap: 10px;
         }
 
         .welcome-text h2 {
-            font-size: 1.5rem;
-            margin-bottom: 4px;
+            font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+            margin-bottom: 3px;
             background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -32,69 +33,26 @@
 
         .welcome-text p {
             color: var(--text-secondary);
-            font-size: 0.88rem;
+            font-size: clamp(0.78rem, 0.9vw, 0.88rem);
         }
 
-        /* User Menu Popover Above Sidebar Chip */
-        .user-menu-popover {
-            position: absolute;
-            bottom: 75px;
-            left: 16px;
-            right: 16px;
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 8px 0;
-            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.45);
-            z-index: 200;
-            animation: popoverUp 0.2s ease forwards;
-        }
-
-        @keyframes popoverUp {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .popover-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 16px;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            font-weight: 500;
-            text-decoration: none;
-            transition: background 0.2s ease;
-            cursor: pointer;
-        }
-
-        .popover-item:hover {
-            background: rgba(255, 255, 255, 0.07);
-        }
-
+        /* ── Dashboard Stats Grid ── */
         .dashboard-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
-            gap: 14px;
-            margin-bottom: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
+            gap: clamp(10px, 1.2vw, 14px);
+            margin-bottom: clamp(12px, 1.4vw, 18px);
         }
 
         .stat-card {
-            background: rgba(30, 41, 59, 0.7);
+            background: rgba(30,41,59,0.7);
             backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            padding: 16px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: var(--radius-md);
+            padding: clamp(12px, 1.4vw, 18px);
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: clamp(10px, 1.2vw, 14px);
             transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
             position: relative;
             overflow: hidden;
@@ -109,162 +67,151 @@
             transition: opacity 0.3s ease;
         }
 
-        .stat-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
-            border-color: rgba(99, 102, 241, 0.3);
-        }
-
-        .stat-card:hover::before {
-            opacity: 1;
-        }
+        .stat-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(0,0,0,0.35); border-color: rgba(99,102,241,0.3); }
+        .stat-card:hover::before { opacity: 1; }
 
         .stat-icon {
-            width: 42px;
-            height: 42px;
+            width: clamp(36px, 3.5vw, 44px);
+            height: clamp(36px, 3.5vw, 44px);
             border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(1rem, 1.2vw, 1.2rem);
             flex-shrink: 0;
         }
 
-        .stat-icon.primary { background: rgba(99, 102, 241, 0.15); color: #818cf8; border: 1px solid rgba(99, 102, 241, 0.2); }
-        .stat-icon.success { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16, 185, 129, 0.2); }
-        .stat-icon.warning { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.2); }
-        .stat-icon.info { background: rgba(56, 189, 248, 0.15); color: #7dd3fc; border: 1px solid rgba(56, 189, 248, 0.2); }
+        .stat-icon.primary { background: rgba(99,102,241,0.15); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
+        .stat-icon.success { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.2); }
+        .stat-icon.warning { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.2); }
+        .stat-icon.info    { background: rgba(56,189,248,0.15);  color: #7dd3fc; border: 1px solid rgba(56,189,248,0.2); }
 
-        .stat-details {
-            flex: 1;
-        }
+        .stat-details { flex: 1; min-width: 0; }
 
         .stat-title {
             color: var(--text-muted);
-            font-size: 0.78rem;
+            font-size: clamp(0.68rem, 0.8vw, 0.78rem);
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.04em;
             margin-bottom: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .stat-value {
-            font-size: 1.6rem;
+            font-size: clamp(1.3rem, 1.8vw, 1.7rem);
             font-weight: 800;
             color: #fff;
             line-height: 1;
         }
 
+        /* ── Main Dashboard Grid (Chart + Jobs List) ── */
         .dashboard-main-grid {
             display: grid;
             grid-template-columns: 2fr 1fr;
-            gap: clamp(12px, 1.5vw, 16px);
-            margin-bottom: 18px;
+            gap: clamp(10px, 1.4vw, 16px);
         }
 
         @media (max-width: 1100px) {
-            .dashboard-main-grid {
-                grid-template-columns: 1fr;
-            }
+            .dashboard-main-grid { grid-template-columns: 1fr; }
         }
 
         .chart-card, .list-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 14px;
-            padding: 16px;
+            border-radius: var(--radius-md);
+            padding: clamp(14px, 1.5vw, 18px);
             display: flex;
             flex-direction: column;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         }
 
         .card-header-fancy {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 14px;
+            margin-bottom: clamp(10px, 1.2vw, 14px);
+            flex-wrap: wrap;
+            gap: 7px;
         }
 
         .card-header-fancy h3 {
-            font-size: 1rem;
+            font-size: clamp(0.88rem, 1vw, 1rem);
             font-weight: 700;
             color: #fff;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 7px;
         }
 
-        .card-header-fancy h3 i {
-            color: #818cf8;
-        }
+        .card-header-fancy h3 i { color: #818cf8; }
 
+        /* Responsive chart container – height scales with viewport */
         .chart-container {
-            flex: 1;
             position: relative;
-            min-height: 180px;
-            max-height: 210px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            height: clamp(160px, 20vh, 240px);
+            width: 100%;
         }
 
-        /* Recent Jobs List */
+        /* Recent Jobs */
         .job-list {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: clamp(8px, 1vw, 12px);
+            overflow-y: auto;
+            flex: 1;
         }
 
         .job-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 16px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 10px;
+            padding: clamp(10px, 1.2vw, 14px);
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
             transition: background 0.2s;
+            flex-shrink: 0;
         }
 
-        .job-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-        }
+        .job-item:hover { background: rgba(255,255,255,0.06); }
 
-        .job-info {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
+        .job-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
 
         .job-title {
             font-weight: 600;
             color: #fff;
-            font-size: 0.95rem;
+            font-size: clamp(0.82rem, 0.95vw, 0.94rem);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .job-meta {
-            font-size: 0.8rem;
+            font-size: clamp(0.72rem, 0.82vw, 0.8rem);
             color: var(--text-muted);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         .job-candidates {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(99, 102, 241, 0.15);
+            background: rgba(99,102,241,0.15);
             color: #818cf8;
-            border: 1px solid rgba(99, 102, 241, 0.3);
+            border: 1px solid rgba(99,102,241,0.3);
             border-radius: 20px;
-            padding: 4px 10px;
-            font-size: 0.75rem;
+            padding: 3px 9px;
+            font-size: 0.72rem;
             font-weight: 700;
+            flex-shrink: 0;
         }
 
-        .badge-active { color: #10b981; background: rgba(16, 185, 129, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;}
-        .badge-closed { color: #ef4444; background: rgba(239, 68, 68, 0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600;}
+        .badge-active { color: #10b981; background: rgba(16,185,129,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
+        .badge-closed { color: #ef4444; background: rgba(239,68,68,0.1);  padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
