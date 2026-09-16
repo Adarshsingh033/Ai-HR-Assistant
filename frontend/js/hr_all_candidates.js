@@ -291,7 +291,7 @@ function renderCandidatePagination(total, totalPages, startIdx, pagedCount) {
     }
 
     container.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 20px; border-top: 1px solid var(--border); background: var(--bg-card); border-bottom-left-radius: 16px; border-bottom-right-radius: 16px; font-family: 'Inter', sans-serif;">
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding: 12px 20px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border); border-radius: 14px; flex-wrap: wrap; gap: 16px; backdrop-filter: blur(10px); font-family: 'Inter', sans-serif;">
             <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 500;">
                 <span>${startItem}–${endItem} of ${total} <span style="margin:0 4px;opacity:0.4;">·</span> Page ${currentPage} of ${totalPages}</span>
                 <div style="display: flex; align-items: center; gap: 8px;">

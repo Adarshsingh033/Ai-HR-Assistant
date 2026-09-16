@@ -610,6 +610,7 @@ textarea.form-control {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  margin-top: 20px;
   padding: 12px clamp(14px, 1.5vw, 22px);
   border-top: 1px solid var(--border);
   gap: 10px;
