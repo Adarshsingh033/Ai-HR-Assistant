@@ -13,35 +13,7 @@ const API = _configuredApi
         : 'http://localhost:8000');
 
 
-/* ── Theme (Dark / Light) ─────────────────────────────── */
-function initTheme() {
-    const saved = localStorage.getItem('recruit_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', saved);
-    _updateThemeButtons(saved);
-}
 
-function toggleTheme() {
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('recruit_theme', next);
-    _updateThemeButtons(next);
-}
-
-function _updateThemeButtons(theme) {
-    document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
-        const icon = btn.querySelector('.toggle-icon');
-        const label = btn.querySelector('.toggle-label');
-        if (icon) icon.textContent = theme === 'dark' ? '🌙' : '☀️';
-        if (label) label.textContent = theme === 'dark' ? 'Dark' : 'Light';
-    });
-}
-
-// Apply theme as early as possible (before full DOM load)
-(function () {
-    const t = localStorage.getItem('recruit_theme') || 'dark';
-    document.documentElement.setAttribute('data-theme', t);
-})();
 
 /* ── Session ──────────────────────────────────────────── */
 const Session = {

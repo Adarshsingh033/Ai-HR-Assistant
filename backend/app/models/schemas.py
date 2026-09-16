@@ -430,16 +430,6 @@ class UpdateCandidateRequest(BaseModel):
     remark: Optional[str] = None
 
 
-# ── Chatbot ───────────────────────────────────────────────────────────────────
-class ChatRequest(BaseModel):
-    query: str
-    hr_id: Optional[str] = None
-
-
-class ChatResponse(BaseModel):
-    response: str
-    context_used: Optional[List[str]] = None
-
 
 # ── Emails ────────────────────────────────────────────────────────────────────
 class GenerateEmailRequest(BaseModel):

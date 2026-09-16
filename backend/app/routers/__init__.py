@@ -1,3 +1,3 @@
-from . import auth, admin, hr, jobs, candidates, chatbot, emails
+from . import auth, admin, hr, jobs, candidates, emails
 
-__all__ = ["auth", "admin", "hr", "jobs", "candidates", "chatbot", "emails"]
+__all__ = ["auth", "admin", "hr", "jobs", "candidates", "emails"]

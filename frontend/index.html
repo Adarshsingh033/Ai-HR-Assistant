@@ -255,6 +255,9 @@
 
         .hero-title-group {
             margin-top: auto;
+            position: relative;
+            z-index: 10;
+            padding-top: 20px;
         }
 
         .hero-main-title {
@@ -504,6 +507,19 @@
                 padding: 32px 24px;
             }
         }
+
+        /* Responsive scaling for small laptop heights */
+        @media (max-height: 800px) {
+            .visual-graphic-container {
+                transform: scale(0.85);
+                transform-origin: center top;
+            }
+        }
+        @media (max-height: 700px) {
+            .visual-graphic-container {
+                transform: scale(0.75);
+            }
+        }
     </style>
 </head>
 
@@ -518,7 +534,7 @@
             </div>
 
             <!-- AI HR Feature Showcase Card Graphic -->
-            <div class="visual-graphic-container" style="height: 320px; max-width: 440px; margin: 12px auto; position: relative;">
+            <div class="visual-graphic-container" style="min-height: 420px; max-width: 440px; margin: 12px auto; position: relative;">
                 
                 <!-- CARD 1: AI MATCHING ENGINE -->
                 <div class="ai-showcase-card card-1">
@@ -779,7 +795,6 @@
     <script src="js/config.js?v=1"></script>
     <script src="js/utils.js?v=5"></script>
     <script src="js/auth.js?v=5"></script>
-    <script>document.addEventListener('DOMContentLoaded', initTheme);</script>
 </body>
 
 </html>
