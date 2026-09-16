@@ -95,9 +95,41 @@
             animation: floatCard3 8s ease-in-out infinite 0.5s;
         }
 
-        @keyframes floatCard1 { 0%, 100% { transform: scale(0.95) rotate(-3deg) translateY(0px); } 50% { transform: scale(0.95) rotate(-3deg) translateY(-8px); } }
-        @keyframes floatCard2 { 0%, 100% { transform: scale(1.0) rotate(2deg) translateY(0px); } 50% { transform: scale(1.0) rotate(2deg) translateY(-6px); } }
-        @keyframes floatCard3 { 0%, 100% { transform: scale(1.05) rotate(-1deg) translateY(0px); } 50% { transform: scale(1.05) rotate(-1deg) translateY(-10px); } }
+        @keyframes floatCard1 {
+
+            0%,
+            100% {
+                transform: scale(0.95) rotate(-3deg) translateY(0px);
+            }
+
+            50% {
+                transform: scale(0.95) rotate(-3deg) translateY(-8px);
+            }
+        }
+
+        @keyframes floatCard2 {
+
+            0%,
+            100% {
+                transform: scale(1.0) rotate(2deg) translateY(0px);
+            }
+
+            50% {
+                transform: scale(1.0) rotate(2deg) translateY(-6px);
+            }
+        }
+
+        @keyframes floatCard3 {
+
+            0%,
+            100% {
+                transform: scale(1.05) rotate(-1deg) translateY(0px);
+            }
+
+            50% {
+                transform: scale(1.05) rotate(-1deg) translateY(-10px);
+            }
+        }
 
         .card-glass-header {
             display: flex;
@@ -516,6 +548,7 @@
                 transform-origin: center top;
             }
         }
+
         @media (max-height: 700px) {
             .visual-graphic-container {
                 transform: scale(0.75);
@@ -535,8 +568,9 @@
             </div>
 
             <!-- AI HR Feature Showcase Card Graphic -->
-            <div class="visual-graphic-container" style="min-height: 420px; max-width: 440px; margin: 12px auto; position: relative;">
-                
+            <div class="visual-graphic-container"
+                style="min-height: 420px; max-width: 440px; margin: 12px auto; position: relative;">
+
                 <!-- CARD 1: AI MATCHING ENGINE -->
                 <div class="ai-showcase-card card-1">
                     <div class="card-glass-header">
@@ -566,26 +600,34 @@
                 <!-- CARD 2: COMPARE CANDIDATES -->
                 <div class="ai-showcase-card card-2" style="max-width: 340px;">
                     <div class="card-glass-header">
-                        <div class="ai-badge" style="background: rgba(236, 72, 153, 0.18); border-color: rgba(236, 72, 153, 0.35); color: #f472b6;">
+                        <div class="ai-badge"
+                            style="background: rgba(236, 72, 153, 0.18); border-color: rgba(236, 72, 153, 0.35); color: #f472b6;">
                             <i class="fa-solid fa-code-compare"></i>
                             <span>Compare Candidates</span>
                         </div>
                     </div>
                     <div class="candidate-preview-box" style="padding: 10px; margin-bottom: 8px;">
-                        <div class="candidate-avatar" style="width: 36px; height: 36px; font-size: 0.9rem; background: linear-gradient(135deg, #ec4899, #db2777);"><i class="fa-solid fa-user"></i></div>
+                        <div class="candidate-avatar"
+                            style="width: 36px; height: 36px; font-size: 0.9rem; background: linear-gradient(135deg, #ec4899, #db2777);">
+                            <i class="fa-solid fa-user"></i></div>
                         <div class="candidate-info">
-                            <div class="cand-name" style="font-size: 0.85rem;">Alex M. - <span style="color:#10b981;">95%</span></div>
+                            <div class="cand-name" style="font-size: 0.85rem;">Alex M. - <span
+                                    style="color:#10b981;">95%</span></div>
                             <div class="cand-status" style="font-size: 0.7rem;">Backend Specialist</div>
                         </div>
                     </div>
                     <div class="candidate-preview-box" style="padding: 10px; margin-bottom: 0;">
-                        <div class="candidate-avatar" style="width: 36px; height: 36px; font-size: 0.9rem; background: linear-gradient(135deg, #8b5cf6, #7c3aed);"><i class="fa-solid fa-user"></i></div>
+                        <div class="candidate-avatar"
+                            style="width: 36px; height: 36px; font-size: 0.9rem; background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                            <i class="fa-solid fa-user"></i></div>
                         <div class="candidate-info">
-                            <div class="cand-name" style="font-size: 0.85rem;">Sarah T. - <span style="color:#10b981;">92%</span></div>
+                            <div class="cand-name" style="font-size: 0.85rem;">Sarah T. - <span
+                                    style="color:#10b981;">92%</span></div>
                             <div class="cand-status" style="font-size: 0.7rem;">Frontend Expert</div>
                         </div>
                     </div>
-                    <div class="floating-badge badge-bottom-left" style="background: rgba(15, 12, 34, 0.95); animation-delay: 1.5s;">
+                    <div class="floating-badge badge-bottom-left"
+                        style="background: rgba(15, 12, 34, 0.95); animation-delay: 1.5s;">
                         <i class="fa-solid fa-scale-balanced" style="color: #ec4899;"></i> Unbiased Analysis
                     </div>
                 </div>
@@ -593,14 +635,17 @@
                 <!-- CARD 3: AI INTERVIEW SCREENING -->
                 <div class="ai-showcase-card card-3">
                     <div class="card-glass-header">
-                        <div class="ai-badge" style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.35); color: #34d399;">
+                        <div class="ai-badge"
+                            style="background: rgba(16, 185, 129, 0.18); border-color: rgba(16, 185, 129, 0.35); color: #34d399;">
                             <i class="fa-solid fa-clipboard-check"></i>
                             <span>Automated Screening</span>
                         </div>
-                        <div class="score-ring" style="background: linear-gradient(135deg, #f59e0b, #d97706);">Round 2</div>
+                        <div class="score-ring" style="background: linear-gradient(135deg, #f59e0b, #d97706);">Round 2
+                        </div>
                     </div>
                     <div class="candidate-preview-box">
-                        <div class="candidate-avatar" style="background: linear-gradient(135deg, #10b981, #059669);"><i class="fa-solid fa-microphone"></i></div>
+                        <div class="candidate-avatar" style="background: linear-gradient(135deg, #10b981, #059669);"><i
+                                class="fa-solid fa-microphone"></i></div>
                         <div class="candidate-info">
                             <div class="cand-name">Technical Interview</div>
                             <div class="cand-status">In Progress...</div>
@@ -657,7 +702,9 @@
                             </button>
                         </div>
                         <div style="text-align: right; margin-top: 8px;">
-                            <a href="javascript:void(0)" onclick="openForgotPasswordModal()" style="font-size: 0.82rem; color: #a5b4fc; text-decoration: none; font-weight: 600; transition: color 0.2s ease;">Forgot Password?</a>
+                            <a href="javascript:void(0)" onclick="openForgotPasswordModal()"
+                                style="font-size: 0.82rem; color: #a5b4fc; text-decoration: none; font-weight: 600; transition: color 0.2s ease;">Forgot
+                                Password?</a>
                         </div>
                     </div>
 
@@ -680,26 +727,33 @@
 
     <!-- Forgot Password - Email Modal -->
     <div class="modal-overlay" id="fp-email-modal">
-        <div class="modal-card" style="width: min(420px, 95vw); padding: 32px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
+        <div class="modal-card"
+            style="width: min(420px, 95vw); padding: 32px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
             <div style="display:flex; align-items:center; gap:14px; margin-bottom:20px;">
-                <div style="width:44px;height:44px;border-radius:12px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">
+                <div
+                    style="width:44px;height:44px;border-radius:12px;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex-shrink:0;">
                     <i class="fa-solid fa-envelope"></i>
                 </div>
                 <div>
-                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0 0 3px;">Forgot Password?</h3>
-                    <p style="font-size: 0.83rem; color: rgba(255, 255, 255, 0.55); margin: 0;">Enter your registered email to receive a reset code.</p>
+                    <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin: 0 0 3px;">Forgot Password?
+                    </h3>
                 </div>
             </div>
             <form id="fp-email-form" onsubmit="handleFpEmailSubmit(event)">
                 <div style="margin-bottom: 20px;">
-                    <label style="display:block; font-size:0.78rem; font-weight:600; color:rgba(255,255,255,0.7); margin-bottom:8px;">Email Address</label>
+                    <label
+                        style="display:block; font-size:0.78rem; font-weight:600; color:rgba(255,255,255,0.7); margin-bottom:8px;">Email
+                        Address</label>
                     <input type="email" id="fp-email" placeholder="name@company.com" required
                         style="width:100%; height:48px; padding:0 16px; background:rgba(255,255,255,0.04); border:1px solid rgba(255,255,255,0.15); border-radius:12px; color:#fff; box-sizing:border-box; font-family:inherit; font-size:0.9rem; outline:none; transition:border-color 0.2s;"
-                        onfocus="this.style.borderColor='rgba(99,102,241,0.6)'" onblur="this.style.borderColor='rgba(255,255,255,0.15)'" />
+                        onfocus="this.style.borderColor='rgba(99,102,241,0.6)'"
+                        onblur="this.style.borderColor='rgba(255,255,255,0.15)'" />
                 </div>
                 <div style="display: flex; gap: 10px; justify-content: flex-end;">
-                    <button type="button" onclick="closeFpModal('fp-email-modal')" style="padding:10px 20px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); color:#fff; cursor:pointer; font-weight:600; font-size:0.88rem;">Cancel</button>
-                    <button type="submit" id="fp-email-btn" style="padding:10px 22px; border-radius:10px; border:none; background:linear-gradient(90deg,#4f46e5,#3b82f6); color:#fff; cursor:pointer; font-weight:700; font-size:0.88rem; box-shadow:0 4px 15px rgba(79,70,229,0.35); display:flex; align-items:center; gap:8px;">
+                    <button type="button" onclick="closeFpModal('fp-email-modal')"
+                        style="padding:10px 20px; border-radius:10px; border:1px solid rgba(255,255,255,0.15); background:rgba(255,255,255,0.06); color:#fff; cursor:pointer; font-weight:600; font-size:0.88rem;">Cancel</button>
+                    <button type="submit" id="fp-email-btn"
+                        style="padding:10px 22px; border-radius:10px; border:none; background:linear-gradient(90deg,#4f46e5,#3b82f6); color:#fff; cursor:pointer; font-weight:700; font-size:0.88rem; box-shadow:0 4px 15px rgba(79,70,229,0.35); display:flex; align-items:center; gap:8px;">
                         <i class="fa-solid fa-paper-plane"></i> Send Reset Code
                     </button>
                 </div>
@@ -709,19 +763,26 @@
 
     <!-- OTP Verification Modal -->
     <div class="modal-overlay" id="fp-otp-modal">
-        <div class="modal-card" style="width: min(420px, 95vw); padding: 32px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; text-align: center;">
-            <div style="width:56px;height:56px;border-radius:50%;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;">
+        <div class="modal-card"
+            style="width: min(420px, 95vw); padding: 32px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; text-align: center;">
+            <div
+                style="width:56px;height:56px;border-radius:50%;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;">
                 <i class="fa-solid fa-envelope-open-text"></i>
             </div>
             <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin-bottom: 6px;">Check Your Email</h3>
-            <p style="font-size: 0.86rem; color: rgba(255,255,255,0.55); margin-bottom: 8px;">A 6-digit reset code was sent to</p>
-            <p id="fp-otp-email-display" style="font-size: 0.9rem; font-weight: 700; color: #a5b4fc; margin-bottom: 24px;"></p>
+            <p style="font-size: 0.86rem; color: rgba(255,255,255,0.55); margin-bottom: 8px;">A 6-digit reset code was
+                sent to</p>
+            <p id="fp-otp-email-display"
+                style="font-size: 0.9rem; font-weight: 700; color: #a5b4fc; margin-bottom: 24px;"></p>
             <form id="fp-otp-form" onsubmit="handleFpOtpSubmit(event)">
                 <input type="text" id="fp-otp-input" placeholder="000000" maxlength="6" inputmode="numeric" required
                     style="width:150px;height:60px;text-align:center;font-size:2rem;font-weight:700;letter-spacing:0.25em;background:#15112e;border:2px solid #6366f1;border-radius:14px;color:#fff;box-shadow:0 0 20px rgba(99,102,241,0.2);margin:0 auto 24px;display:block;font-family:inherit;outline:none;" />
                 <div style="display:flex;gap:10px;justify-content:center;">
-                    <button type="button" onclick="closeFpModal('fp-otp-modal')" style="padding:10px 20px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:600;font-size:0.88rem;">Cancel</button>
-                    <button type="submit" style="padding:10px 22px;border-radius:10px;border:none;background:linear-gradient(90deg,#4f46e5,#3b82f6);color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;box-shadow:0 4px 15px rgba(79,70,229,0.35);">Verify Code</button>
+                    <button type="button" onclick="closeFpModal('fp-otp-modal')"
+                        style="padding:10px 20px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:600;font-size:0.88rem;">Cancel</button>
+                    <button type="submit"
+                        style="padding:10px 22px;border-radius:10px;border:none;background:linear-gradient(90deg,#4f46e5,#3b82f6);color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;box-shadow:0 4px 15px rgba(79,70,229,0.35);">Verify
+                        Code</button>
                 </div>
             </form>
         </div>
@@ -729,30 +790,37 @@
 
     <!-- Reset Password Modal -->
     <div class="modal-overlay" id="fp-reset-modal">
-        <div class="modal-card" style="width: min(440px, 95vw); padding: 32px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 24px; box-shadow: 0 25px 60px rgba(0,0,0,0.7);">
+        <div class="modal-card"
+            style="width: min(440px, 95vw); padding: 32px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 24px; box-shadow: 0 25px 60px rgba(0,0,0,0.7);">
             <!-- Header -->
             <div style="display:flex; align-items:center; gap:14px; margin-bottom:24px;">
-                <div style="width:46px;height:46px;border-radius:13px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0;box-shadow:0 4px 16px rgba(16,185,129,0.2);">
+                <div
+                    style="width:46px;height:46px;border-radius:13px;background:rgba(16,185,129,0.15);border:1px solid rgba(16,185,129,0.35);color:#10b981;display:flex;align-items:center;justify-content:center;font-size:1.15rem;flex-shrink:0;box-shadow:0 4px 16px rgba(16,185,129,0.2);">
                     <i class="fa-solid fa-shield-halved"></i>
                 </div>
                 <div>
                     <h3 style="font-size:1.2rem;font-weight:800;color:#fff;margin:0 0 3px;">Create New Password</h3>
-                    <p style="font-size:0.82rem;color:rgba(255,255,255,0.45);margin:0;">Choose a strong password for your account.</p>
+                    <p style="font-size:0.82rem;color:rgba(255,255,255,0.45);margin:0;">Choose a strong password for
+                        your account.</p>
                 </div>
             </div>
 
             <form id="fp-reset-form" onsubmit="handleFpResetSubmit(event)">
                 <!-- New Password -->
                 <div style="margin-bottom:16px;">
-                    <label style="display:block;font-size:0.76rem;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">New Password</label>
+                    <label
+                        style="display:block;font-size:0.76rem;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">New
+                        Password</label>
                     <div style="position:relative;display:flex;align-items:center;">
                         <input type="password" id="fp-new-pwd" placeholder="Min. 6 characters" required
                             style="width:100%;height:50px;padding:0 50px 0 16px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;color:#fff;box-sizing:border-box;font-family:inherit;font-size:0.92rem;outline:none;transition:border-color 0.2s,box-shadow 0.2s;"
                             onfocus="this.style.borderColor='rgba(16,185,129,0.6)';this.style.boxShadow='0 0 0 3px rgba(16,185,129,0.12)'"
                             onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.boxShadow='none'" />
-                        <button type="button" onclick="togglePasswordVisibility('fp-new-pwd', this)" title="Show/Hide password"
+                        <button type="button" onclick="togglePasswordVisibility('fp-new-pwd', this)"
+                            title="Show/Hide password"
                             style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:color 0.2s;"
-                            onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">
+                            onmouseover="this.style.color='rgba(255,255,255,0.8)'"
+                            onmouseout="this.style.color='rgba(255,255,255,0.4)'">
                             <i class="fa-regular fa-eye"></i>
                         </button>
                     </div>
@@ -760,15 +828,19 @@
 
                 <!-- Confirm Password -->
                 <div style="margin-bottom:28px;">
-                    <label style="display:block;font-size:0.76rem;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Confirm Password</label>
+                    <label
+                        style="display:block;font-size:0.76rem;font-weight:700;color:rgba(255,255,255,0.6);text-transform:uppercase;letter-spacing:0.05em;margin-bottom:8px;">Confirm
+                        Password</label>
                     <div style="position:relative;display:flex;align-items:center;">
                         <input type="password" id="fp-confirm-pwd" placeholder="Repeat your password" required
                             style="width:100%;height:50px;padding:0 50px 0 16px;background:rgba(255,255,255,0.05);border:1.5px solid rgba(255,255,255,0.12);border-radius:12px;color:#fff;box-sizing:border-box;font-family:inherit;font-size:0.92rem;outline:none;transition:border-color 0.2s,box-shadow 0.2s;"
                             onfocus="this.style.borderColor='rgba(16,185,129,0.6)';this.style.boxShadow='0 0 0 3px rgba(16,185,129,0.12)'"
                             onblur="this.style.borderColor='rgba(255,255,255,0.12)';this.style.boxShadow='none'" />
-                        <button type="button" onclick="togglePasswordVisibility('fp-confirm-pwd', this)" title="Show/Hide password"
+                        <button type="button" onclick="togglePasswordVisibility('fp-confirm-pwd', this)"
+                            title="Show/Hide password"
                             style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:rgba(255,255,255,0.4);cursor:pointer;padding:4px;display:flex;align-items:center;justify-content:center;font-size:1rem;transition:color 0.2s;"
-                            onmouseover="this.style.color='rgba(255,255,255,0.8)'" onmouseout="this.style.color='rgba(255,255,255,0.4)'">
+                            onmouseover="this.style.color='rgba(255,255,255,0.8)'"
+                            onmouseout="this.style.color='rgba(255,255,255,0.4)'">
                             <i class="fa-regular fa-eye"></i>
                         </button>
                     </div>
@@ -778,7 +850,8 @@
                 <div style="display:flex;gap:10px;">
                     <button type="button" onclick="closeFpModal('fp-reset-modal')"
                         style="padding:12px 20px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.8);cursor:pointer;font-weight:600;font-size:0.88rem;font-family:inherit;transition:background 0.2s;"
-                        onmouseover="this.style.background='rgba(255,255,255,0.1)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                        onmouseover="this.style.background='rgba(255,255,255,0.1)'"
+                        onmouseout="this.style.background='rgba(255,255,255,0.06)'">
                         Cancel
                     </button>
                     <button type="submit" id="fp-reset-btn"

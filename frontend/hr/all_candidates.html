@@ -47,8 +47,8 @@
         .filter-bar {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 14px;
+            margin-bottom: 22px;
             width: 100%;
         }
         .filter-select {
@@ -57,49 +57,61 @@
             -webkit-appearance: none;
             -moz-appearance: none;
             border: 1px solid var(--border);
-            border-radius: 11px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
+            font-weight: 500;
             font-family: 'Inter', sans-serif;
             padding: 0 38px 0 16px;
             outline: none;
             transition: all 0.2s;
-            height: 42px;
-            width: 240px;
+            height: 44px;
+            width: 220px;
             flex-shrink: 0;
             cursor: pointer;
         }
+        .filter-select:hover {
+            border-color: rgba(255,255,255,0.25);
+        }
         .filter-select:focus {
-            border-color: rgba(99,102,241,0.6);
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+            border-color: rgba(249, 115, 22, 0.6);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
         }
         .filter-select option { background: #1e293b; color: #fff; }
-        .search-wrap {
+
+        .search-bar, .search-wrap {
             position: relative;
+            flex: 1;
+            min-width: 280px;
         }
-        .search-wrap i {
-            position: absolute; left: 14px; top: 50%;
+        .search-bar i, .search-wrap i {
+            position: absolute; left: 16px; top: 50%;
             transform: translateY(-50%);
-            color: rgba(255,255,255,0.4); font-size: 0.84rem;
+            color: rgba(255,255,255,0.45); font-size: 0.9rem;
             pointer-events: none;
+            z-index: 2;
         }
-        .search-wrap input {
+        .search-bar input, .search-wrap input {
             background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 11px;
+            border-radius: 12px;
             color: #fff;
-            font-size: 0.85rem;
+            font-size: 0.88rem;
+            font-weight: 500;
             font-family: 'Inter', sans-serif;
-            padding: 0 14px 0 38px;
+            padding: 0 16px 0 44px;
             outline: none;
             transition: all 0.2s;
-            height: 42px;
+            height: 44px;
             width: 100%;
             box-sizing: border-box;
         }
-        .search-wrap input:focus {
-            border-color: rgba(99,102,241,0.6);
-            box-shadow: 0 0 0 3px rgba(99,102,241,0.15);
+        .search-bar input:hover, .search-wrap input:hover {
+            border-color: rgba(255,255,255,0.25);
+        }
+        .search-bar input:focus, .search-wrap input:focus {
+            border-color: rgba(249, 115, 22, 0.6);
+            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
         }
 
         /* ── Table ── */
@@ -510,14 +522,6 @@
                     </div>
                 </div>
             </div>
-            <!-- Header Section -->
-            <div class="page-header">
-                <div class="page-header-text">
-                    <h2>Candidates Directory</h2>
-                    <p>Browse all candidates uploaded across job vacancies, filter by score, and contact applicants.</p>
-                </div>
-            </div>
-
             <!-- Main Filter Controls Bar -->
             <div class="filter-bar">
                 <div class="search-bar">
@@ -532,23 +536,10 @@
                     <option value="true">Contacted Only</option>
                     <option value="false">Not Contacted</option>
                 </select>
-                <select class="filter-select" id="filter-min-ats" onchange="onMinAtsFilterChange(this.value)">
-                    <option value="0">All ATS Scores</option>
-                    <option value="90">90%+ Match (Top Tier)</option>
-                    <option value="80">80%+ Match (Strong)</option>
-                    <option value="70">70%+ Match (Good)</option>
-                    <option value="60">60%+ Match (Fair)</option>
-                </select>
             </div>
 
             <!-- Table Card Container -->
             <div class="table-card" style="display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;">
-                <div style="display:flex; align-items:center; justify-content:space-between; padding:16px 20px; border-bottom:1px solid var(--border);">
-                    <div>
-                        <div class="table-title">All Candidates</div>
-                        <div class="table-subtitle" id="table-count">Loading…</div>
-                    </div>
-                </div>
 
                 <div id="table-skeleton" style="padding:8px 0;">
                     <div class="skeleton-row"></div>

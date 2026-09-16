@@ -197,36 +197,6 @@
                     </div>
                 </div>
 
-                <!-- ── Admin Usage at a Glance ── -->
-                    <div class="data-card" style="margin-top: 4px;">
-                    <div class="data-card-header">
-                        <div>
-                            <div class="data-card-title">Admin Usage at a Glance</div>
-                            <div style="font-size:0.76rem; color:var(--text-muted); margin-top:2px;">Plan resource consumption per admin. <span style="color:var(--warning);">Orange</span> = near limit (≥80%), <span style="color:var(--danger);">Red</span> = at limit.</div>
-                        </div>
-                        <a href="admins.html" class="btn btn-outline btn-sm">
-                            View All Admins <i class="fa-solid fa-arrow-right"></i>
-                        </a>
-                    </div>
-                    <div class="usage-table-wrap">
-                        <table style="width: 100%; min-width: 600px; table-layout: fixed; border-collapse: collapse;">
-                            <thead>
-                                <tr>
-                                    <th style="min-width: 160px; padding-left: 24px;">Admin</th>
-                                    <th style="min-width: 80px;">Plan</th>
-                                    <th style="min-width: 100px;">Organizations</th>
-                                    <th style="min-width: 100px;">Branches</th>
-                                    <th style="min-width: 100px;">HR Users</th>
-                                    <th style="min-width: 60px; padding-right: 24px;">Status</th>
-                                </tr>
-                            </thead>
-                            <tbody id="usage-table-body">
-                                <tr><td colspan="6" style="text-align:center; padding:32px; color:var(--text-muted);">Loading...</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
             </div><!-- /page-content -->
         </main>
     </div>
@@ -426,6 +396,7 @@
 
         function renderUsageTable(admins) {
             const tbody = document.getElementById('usage-table-body');
+            if (!tbody) return;
             if (!admins || admins.length === 0) {
                 tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">No admins found.</td></tr>';
                 return;

@@ -536,8 +536,7 @@ textarea.form-control {
 .search-bar {
   position: relative;
   flex: 1;
-  min-width: 180px;
-  max-width: 340px;
+  min-width: 220px;
 }
 
 .search-bar i {
