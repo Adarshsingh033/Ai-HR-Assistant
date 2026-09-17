@@ -47,7 +47,7 @@ SUPER_ADMIN_FULL_NAME = os.getenv("SUPER_ADMIN_FULL_NAME", "Super Administrator"
 
 
 # ── AI / LLM ────────────────────────────────────────────────────────────────
-OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "gemma2:9b")
+OLLAMA_MODEL = os.getenv("OLLAMA_MODEL", "")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY", "")
 GROQ_MODEL = os.getenv("GROQ_MODEL", "groq/compound-mini")
 

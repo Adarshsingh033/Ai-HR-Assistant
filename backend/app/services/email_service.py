@@ -83,10 +83,10 @@ def draft_email_content(
     system_prompt = ChatPromptTemplate.from_messages([
         ("system", """
             You are an expert HR Assistant. Your task is to write a professional email based on the user's instructions.
-            
-
-            IMPORTANT STRUCTURAL RULES:
+            IMPORTANT FORMATTING & STRUCTURAL RULES:
             - Write clear, professional, and convincing content.
+            - DO NOT use any Markdown formatting syntax (such as **bold**, *italics*, # headings, markdown bullets, or markdown links).
+            - Output clean, professional plain text with standard line breaks suitable for direct email text.
             - Do not include any placeholder brackets like [Your Name] or [Company Name].
             - DO NOT include markers like "Dear Candidate" if you don't know the name; use professional greetings.
             - MUST conclude the email with exactly this signature:
