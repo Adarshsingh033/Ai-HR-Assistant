@@ -12,27 +12,15 @@
         /* ── Page-level overrides ── */
         body { font-family: 'Inter', sans-serif; }
 
-        /* ── Stats bar ── */
-        .stats-strip {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 16px;
-            margin-bottom: 22px;
-        }
-        @media (max-width: 900px) {
-            .stats-strip { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 550px) {
-            .stats-strip { grid-template-columns: 1fr; }
-        }
         .stat-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: 14px;
-            padding: 16px 20px;
+            padding: clamp(12px, 1.4vw, 18px) clamp(14px, 1.6vw, 20px);
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: clamp(10px, 1.1vw, 14px);
+            min-width: 0;
         }
         .stat-icon {
             width: 42px; height: 42px;
@@ -41,90 +29,14 @@
             font-size: 1.05rem; flex-shrink: 0;
         }
         .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.45); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
-        .stat-value { font-size: 1.55rem; font-weight: 900; color: #fff; line-height: 1.1; }
-
-        /* ── Filter bar ── */
-        .filter-bar {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            margin-bottom: 22px;
-            width: 100%;
-        }
-        .filter-select {
-            background: var(--bg-card) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.55)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") no-repeat right 16px center / 14px 14px;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 0.88rem;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            padding: 0 38px 0 16px;
-            outline: none;
-            transition: all 0.2s;
-            height: 44px;
-            width: 220px;
-            flex-shrink: 0;
-            cursor: pointer;
-        }
-        .filter-select:hover {
-            border-color: rgba(255,255,255,0.25);
-        }
-        .filter-select:focus {
-            border-color: rgba(249, 115, 22, 0.6);
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
-        }
-        .filter-select option { background: #1e293b; color: #fff; }
-
-        .search-bar, .search-wrap {
-            position: relative;
-            flex: 1;
-            min-width: 280px;
-        }
-        .search-bar i, .search-wrap i {
-            position: absolute; left: 16px; top: 50%;
-            transform: translateY(-50%);
-            color: rgba(255,255,255,0.45); font-size: 0.9rem;
-            pointer-events: none;
-            z-index: 2;
-        }
-        .search-bar input, .search-wrap input {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            color: #fff;
-            font-size: 0.88rem;
-            font-weight: 500;
-            font-family: 'Inter', sans-serif;
-            padding: 0 16px 0 44px;
-            outline: none;
-            transition: all 0.2s;
-            height: 44px;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        .search-bar input:hover, .search-wrap input:hover {
-            border-color: rgba(255,255,255,0.25);
-        }
-        .search-bar input:focus, .search-wrap input:focus {
-            border-color: rgba(249, 115, 22, 0.6);
-            box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
-        }
+        .stat-value { font-size: clamp(1.2rem, 1.7vw, 1.55rem); font-weight: 900; color: #fff; line-height: 1.1; }
 
         /* ── Table ── */
+        /* Inherits colours/border from main.css; the inner wrap does the scrolling. */
         .table-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
             border-radius: 16px;
             overflow: hidden;
-            flex: 0 1 auto;
-            max-height: 100%;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
+            min-width: 0;
         }
         .table-header-row {
             display: flex;
@@ -139,7 +51,7 @@
         .candidates-table thead th {
             background: rgba(255,255,255,0.03);
             text-align: left;
-            padding: 14px 18px;
+            padding: clamp(11px, 1.2vw, 14px) clamp(10px, 1.3vw, 18px);
             font-size: 0.72rem;
             font-weight: 800;
             text-transform: uppercase;
@@ -157,7 +69,7 @@
         .candidates-table tbody tr:last-child { border-bottom: none; }
         .candidates-table tbody tr:hover { background: rgba(255,255,255,0.03); }
         .candidates-table tbody td {
-            padding: 14px 18px;
+            padding: clamp(11px, 1.2vw, 14px) clamp(10px, 1.3vw, 18px);
             font-size: 0.83rem;
             color: rgba(255,255,255,0.78);
             vertical-align: middle;
@@ -178,11 +90,13 @@
         .cand-file { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 1px; }
 
         /* ── Match badge ── */
+        /* Fluid so the "NN% ATS Score" label stays inside its column at 1024px. */
         .match-badge {
             display: inline-flex; align-items: center;
-            padding: 3px 10px;
+            padding: 3px clamp(6px, 0.8vw, 10px);
             border-radius: 99px;
-            font-size: 0.76rem; font-weight: 800;
+            font-size: clamp(0.64rem, 0.72vw, 0.76rem); font-weight: 800;
+            white-space: nowrap;
         }
         .match-high   { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
         .match-medium { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
@@ -271,34 +185,11 @@
         }
         .table-empty i { font-size: 2.5rem; display: block; margin-bottom: 14px; color: rgba(99,102,241,0.35); }
 
-        /* ── User menu popover ── */
-        .user-menu-popover {
-            position: absolute; bottom: 75px; left: 16px; right: 16px;
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: 16px; padding: 8px 0;
-            box-shadow: 0 12px 35px rgba(0,0,0,0.45);
-            z-index: 200; animation: popoverUp 0.2s ease forwards;
-        }
-        @keyframes popoverUp {
-            from { opacity:0; transform:translateY(10px); }
-            to   { opacity:1; transform:translateY(0); }
-        }
-        .popover-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 10px 16px; color: var(--text-primary);
-            font-size: 0.9rem; font-weight: 500;
-            text-decoration: none; transition: background 0.2s; cursor: pointer;
-        }
-        .popover-item:hover { background: rgba(255,255,255,0.07); }
-        .popover-divider { height: 1px; background: var(--border); margin: 4px 0; }
-
-        /* ── View Modal ── */
-        .modal-overlay { position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);z-index:900;display:none;align-items:center;justify-content:center; }
-        .modal-overlay.open { display:flex; }
         .modal-xl {
             background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:22px;
-            width:860px; max-width:96vw; max-height:92vh;
-            display:flex; flex-direction:column; overflow:hidden; padding:28px 32px 20px 32px;
+            width:min(860px, 94vw); max-height:min(92vh, calc(100vh - 32px));
+            display:flex; flex-direction:column; overflow:hidden;
+            padding:clamp(18px, 2vw, 28px) clamp(18px, 2.2vw, 32px) clamp(14px, 1.5vw, 20px);
         }
         .modal-fixed-top { flex-shrink:0; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:14px; }
         .modal-fixed-top .modal-top { margin-bottom:0; }
@@ -310,8 +201,9 @@
         .modal-bottom-actions { flex-shrink:0; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:flex-end; }
         .modal-lg {
             background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:22px;
-            width:860px; max-width:96vw; max-height:92vh;
-            display:flex; flex-direction:column; overflow:hidden; padding:28px 32px 20px 32px;
+            width:min(860px, 94vw); max-height:min(92vh, calc(100vh - 32px));
+            display:flex; flex-direction:column; overflow:hidden;
+            padding:clamp(18px, 2vw, 28px) clamp(18px, 2.2vw, 32px) clamp(14px, 1.5vw, 20px);
         }
 
         .modal-top { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px; }
@@ -342,7 +234,7 @@
         }
 
         /* Info grid */
-        .info-grid { display:grid;grid-template-columns:1fr 1fr;gap:10px; }
+        .info-grid { display:grid;grid-template-columns:repeat(auto-fit, minmax(min(220px, 100%), 1fr));gap:10px; }
         .info-item {
             background:rgba(255,255,255,0.04);
             border:1px solid rgba(255,255,255,0.07);
@@ -372,13 +264,13 @@
             line-height:1.7;
             white-space:pre-wrap;
             word-break:break-word;
-            max-height:280px;
+            max-height:min(280px, 34vh);
             overflow-y:auto;
             font-family:'Inter',monospace;
         }
 
         /* Edit form */
-        .form-grid { display:grid;grid-template-columns:1fr 1fr;gap:14px; }
+        .form-grid { display:grid;grid-template-columns:repeat(auto-fit, minmax(min(220px, 100%), 1fr));gap:14px; }
         .form-group { display:flex;flex-direction:column;gap:6px; }
         .form-group.full { grid-column:1/-1; }
         .form-label { font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.04em; }
@@ -403,7 +295,7 @@
         }
 
         /* Delete confirm */
-        .del-modal { background:#0f172a;border:1px solid rgba(255,255,255,0.12);border-radius:22px;width:400px;max-width:96vw;padding:36px 28px;text-align:center; }
+        .del-modal { background:#0f172a;border:1px solid rgba(255,255,255,0.12);border-radius:22px;width:min(400px, 92vw);padding:clamp(24px, 3vw, 36px) clamp(20px, 2.2vw, 28px);text-align:center; }
 
         /* Loader skeleton */
         @keyframes shimmer { to { background-position: -200% 0; } }
@@ -539,7 +431,7 @@
             </div>
 
             <!-- Table Card Container -->
-            <div class="table-card" style="display:flex; flex-direction:column; flex:1; min-height:0; overflow:hidden;">
+            <div class="table-card">
 
                 <div id="table-skeleton" style="padding:8px 0;">
                     <div class="skeleton-row"></div>
@@ -554,18 +446,18 @@
                     <span style="font-size:0.78rem;opacity:0.6;">Try adjusting the filters or upload new resumes.</span>
                 </div>
 
-                <div id="table-wrap" class="table-wrap" style="display:none; flex: 0 1 auto; max-height: 100%; min-height: 0; overflow-y: auto; overflow-x: hidden;">
-                    <table class="candidates-table" id="candidates-table" style="width: 100%; table-layout: fixed; border-collapse: collapse;">
+                <div id="table-wrap" class="table-wrap" style="display:none;">
+                    <table class="candidates-table" id="candidates-table">
                         <thead>
                             <tr>
-                                <th style="width:60px;text-align:center;padding-left:12px;">Rank</th>
-                                <th style="width:18%;">Name</th>
-                                <th style="width:23%;">Email</th>
-                                <th style="width:14%;">Phone Number</th>
-                                <th style="width:13%;">Location</th>
-                                <th style="width:130px;text-align:center;">ATS Score</th>
-                                <th style="width:110px;text-align:center;">Contacted</th>
-                                <th style="width:70px;text-align:right;padding-right:16px;">Action</th>
+                                <th style="width:6%;text-align:center;">Rank</th>
+                                <th style="width:19%;">Name</th>
+                                <th style="width:20%;">Email</th>
+                                <th style="width:12%;">Phone Number</th>
+                                <th style="width:12%;">Location</th>
+                                <th style="width:14%;text-align:center;">ATS Score</th>
+                                <th style="width:10%;text-align:center;">Contacted</th>
+                                <th style="width:7%;text-align:right;">Action</th>
                             </tr>
                         </thead>
                         <tbody id="candidates-tbody"></tbody>
@@ -654,7 +546,7 @@
 
             <div class="sec-label">Original Uploaded Resume Preview</div>
             <div id="vm-preview-wrap" style="margin-top:8px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;background:#0f172a;">
-                <iframe id="vm-preview-frame" style="width:100%;height:380px;border:none;display:none;background:#fff;"></iframe>
+                <iframe id="vm-preview-frame" style="width:100%;height:clamp(260px, 42vh, 420px);border:none;display:none;background:#fff;"></iframe>
                 <div class="resume-preview" id="vm-resume-text" style="display:none;">No resume text available.</div>
             </div>
         </div>

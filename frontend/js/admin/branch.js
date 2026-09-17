@@ -235,86 +235,15 @@ function renderBranchPagination() {
     const container = document.getElementById('branch-pagination-container');
     if (!container) return;
 
-    const startItem = branchState.total === 0 ? 0 : (branchState.page - 1) * branchState.limit + 1;
-    const endItem = Math.min(branchState.page * branchState.limit, branchState.total);
-    const totalPages = branchState.total_pages || 1;
-    const currentPage = branchState.page;
-
-    let pageBtns = '';
-    const maxVisiblePages = 7;
-    let startPage = 1;
-    let endPage = totalPages;
-
-    if (totalPages > maxVisiblePages) {
-        if (currentPage <= 4) {
-            startPage = 1;
-            endPage = 5;
-        } else if (currentPage >= totalPages - 3) {
-            startPage = totalPages - 4;
-            endPage = totalPages;
-        } else {
-            startPage = currentPage - 2;
-            endPage = currentPage + 2;
-        }
-    }
-
-    if (startPage > 1) {
-        pageBtns += `<button onclick="goToBranchPage(1)" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">1</button>`;
-        if (startPage > 2) {
-            pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
-        }
-    }
-
-    for (let p = startPage; p <= endPage; p++) {
-        if (p === currentPage) {
-            pageBtns += `<button style="width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);color:#fff;font-size:0.82rem;font-weight:700;cursor:default;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);">${p}</button>`;
-        } else {
-            pageBtns += `<button onclick="goToBranchPage(${p})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${p}</button>`;
-        }
-    }
-
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
-        }
-        pageBtns += `<button onclick="goToBranchPage(${totalPages})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${totalPages}</button>`;
-    }
-
-    const isPrevDisabled = currentPage <= 1;
-    const isNextDisabled = currentPage >= totalPages;
-
-    container.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding: 12px 20px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; flex-wrap: wrap; gap: 16px; backdrop-filter: blur(10px); font-family: 'Inter', sans-serif;">
-            <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 500;">
-                <span>${startItem}–${endItem} of ${branchState.total} <span style="margin:0 4px;opacity:0.4;">·</span> Page ${currentPage} of ${totalPages}</span>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span>Rows per page:</span>
-                    <select onchange="onBranchLimitChange(event)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 3px 8px; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;">
-                        <option value="10" ${branchState.limit === 10 ? 'selected' : ''}>10</option>
-                        <option value="25" ${branchState.limit === 25 ? 'selected' : ''}>25</option>
-                        <option value="35" ${branchState.limit === 35 ? 'selected' : ''}>35</option>
-                        <option value="50" ${branchState.limit === 50 ? 'selected' : ''}>50</option>
-                    </select>
-                </div>
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 4px 6px;">
-                <button onclick="goToBranchPage(1)" ${isPrevDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isPrevDisabled ? '0.3' : '1'};transition:all 0.15s;" title="First page">
-                    <i class="fa-solid fa-angles-left"></i>
-                </button>
-                <button onclick="goToBranchPage(${currentPage - 1})" ${isPrevDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isPrevDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Previous page">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                ${pageBtns}
-                <button onclick="goToBranchPage(${currentPage + 1})" ${isNextDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isNextDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Next page">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-                <button onclick="goToBranchPage(${totalPages})" ${isNextDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isNextDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Last page">
-                    <i class="fa-solid fa-angles-right"></i>
-                </button>
-            </div>
-        </div>
-    `;
+    container.innerHTML = paginationBarHTML({
+        page: branchState.page,
+        totalPages: branchState.total_pages || 1,
+        total: branchState.total,
+        limit: branchState.limit,
+        onPage: 'goToBranchPage',
+        onPageSize: 'onBranchLimitChange',
+        pageSizes: [10, 25, 35, 50]
+    });
 }
 
 function goToBranchPage(page) {
@@ -323,8 +252,8 @@ function goToBranchPage(page) {
     loadBranches();
 }
 
-function onBranchLimitChange(e) {
-    branchState.limit = parseInt(e.target.value, 10);
+function onBranchLimitChange(newLimit) {
+    branchState.limit = parseInt(newLimit, 10) || 10;
     branchState.page = 1;
     loadBranches();
 }

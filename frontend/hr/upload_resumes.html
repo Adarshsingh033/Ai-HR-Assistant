@@ -14,13 +14,14 @@
         /* ── Two-column layout ── */
         .upload-layout {
             display: grid;
-            grid-template-columns: clamp(220px, 22%, 300px) 1fr;
+            grid-template-columns: clamp(220px, 22%, 300px) minmax(0, 1fr);
             gap: clamp(12px, 1.4vw, 20px);
+            align-items: start;
             min-height: 0;
         }
 
         @media (max-width: 900px) {
-            .upload-layout { grid-template-columns: 1fr; }
+            .upload-layout { grid-template-columns: minmax(0, 1fr); }
         }
 
         /* ── Left panel ── */
@@ -31,6 +32,18 @@
             display: flex;
             flex-direction: column;
             overflow: hidden;
+            /*
+              The page itself is the scroll container here, so the rail needs an
+              explicit bound – without it .job-list can never scroll internally
+              and the vacancy list stretches the whole page instead.
+            */
+            max-height: calc(100vh - var(--topbar-h) - clamp(56px, 7vh, 96px));
+            position: sticky;
+            top: 0;
+        }
+
+        @media (max-width: 900px) {
+            .job-panel { position: static; max-height: 60vh; }
         }
         .job-panel-header { padding: 16px 18px 12px; border-bottom: 1px solid var(--border); }
         .job-panel-title { font-size: clamp(0.92rem, 1.05vw, 1.05rem); font-weight: 900; color: #ffffff; letter-spacing: -0.01em; }

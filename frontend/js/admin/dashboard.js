@@ -67,7 +67,8 @@ function renderBranchesPerOrgChart(data) {
 
     // Create Gradient
     const chartCtx = ctx.getContext('2d');
-    const gradient = chartCtx.createLinearGradient(0, 0, 0, 240);
+    // Gradient spans the actual rendered height so it does not clip on smaller screens
+    const gradient = chartCtx.createLinearGradient(0, 0, 0, ctx.clientHeight || 240);
     gradient.addColorStop(0, 'rgba(99, 102, 241, 0.85)');
     gradient.addColorStop(1, 'rgba(99, 102, 241, 0.15)');
 
@@ -141,7 +142,8 @@ function renderHrsPerBranchChart(data) {
 
     // Create Gradient
     const chartCtx = ctx.getContext('2d');
-    const gradient = chartCtx.createLinearGradient(0, 0, 0, 240);
+    // Gradient spans the actual rendered height so it does not clip on smaller screens
+    const gradient = chartCtx.createLinearGradient(0, 0, 0, ctx.clientHeight || 240);
     gradient.addColorStop(0, 'rgba(16, 185, 129, 0.85)');
     gradient.addColorStop(1, 'rgba(16, 185, 129, 0.15)');
 

@@ -12,6 +12,8 @@
   --bg-secondary: #111827;
   --bg-card: #161d2e;
   --bg-card-hover: #1c2540;
+  /* Subtle surface used by inputs / soft panels */
+  --bg-subtle: rgba(255, 255, 255, 0.04);
   --border: rgba(255, 255, 255, 0.07);
   --border-active: rgba(99, 102, 241, 0.5);
 
@@ -19,6 +21,7 @@
   --accent-light: #818cf8;
   --accent-dark: #4f46e5;
   --accent-glow: rgba(99, 102, 241, 0.25);
+  --accent-active: rgba(99, 102, 241, 0.5);
 
   --primary: #f97316;
   --primary-dark: #ea580c;
@@ -31,6 +34,7 @@
   --info: #3b82f6;
 
   --text-primary: #ffffff;
+  --text-bright: #ffffff;
   --text-secondary: #cbd5e1;
   --text-muted: #94a3b8;
 
@@ -52,6 +56,14 @@
   --topbar-h: 52px;
   --page-padding-x: clamp(16px, 2vw, 28px);
   --page-padding-y: clamp(12px, 1.4vw, 22px);
+
+  /* Fluid component tokens – used instead of hard-coded pixel sizes */
+  --control-h: clamp(38px, 2.6vw, 46px);
+  --control-h-sm: clamp(34px, 2.3vw, 40px);
+  --card-pad: clamp(16px, 1.8vw, 28px);
+  --gap: clamp(10px, 1.1vw, 18px);
+  /* Comfortable reading/entry measure for single-line form fields */
+  --field-max: 32rem;
 }
 
 /* ── Reset ──────────────────────────────────────────────────── */
@@ -368,9 +380,9 @@ select.input-custom {
 
 .input-custom {
   width: 100%;
-  height: 46px;
-  padding: 0 16px;
-  background: rgba(255, 255, 255, 0.04);
+  height: var(--control-h);
+  padding: 0 clamp(12px, 1vw, 16px);
+  background: var(--bg-subtle);
   border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   color: var(--text-primary);
@@ -429,6 +441,7 @@ textarea.form-control {
   border-radius: 99px;
   font-size: 0.72rem;
   font-weight: 600;
+  white-space: nowrap;
 }
 
 .badge-accent  { background: rgba(99,102,241,0.15); color: var(--accent-light); }
@@ -441,11 +454,14 @@ textarea.form-control {
 .match-badge {
   display: inline-flex;
   align-items: center;
-  padding: 3px 10px;
+  padding: 3px clamp(7px, 0.8vw, 10px);
   border-radius: 99px;
-  font-size: 0.76rem;
+  font-size: clamp(0.66rem, 0.74vw, 0.76rem);
   font-weight: 700;
   border: 1px solid transparent;
+  /* Score pills sit in tight card headers and table cells: never wrap. */
+  white-space: nowrap;
+  flex: 0 0 auto;
 }
 
 .match-high {
@@ -533,13 +549,15 @@ textarea.form-control {
   margin-bottom: clamp(14px, 1.5vw, 20px);
 }
 
-.search-bar {
+.search-bar,
+.search-wrap {
   position: relative;
-  flex: 1;
-  min-width: 220px;
+  flex: 1 1 260px;
+  min-width: min(180px, 100%);
 }
 
-.search-bar i {
+.search-bar i,
+.search-wrap i {
   position: absolute;
   left: 12px;
   top: 50%;
@@ -549,9 +567,10 @@ textarea.form-control {
   pointer-events: none;
 }
 
-.search-bar input {
+.search-bar input,
+.search-wrap input {
   width: 100%;
-  height: 38px;
+  height: var(--control-h-sm);
   padding: 0 12px 0 36px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
@@ -563,18 +582,20 @@ textarea.form-control {
   transition: var(--transition);
 }
 
-.search-bar input:focus {
+.search-bar input:focus,
+.search-wrap input:focus {
   border-color: var(--primary);
   background: rgba(249, 115, 22, 0.04);
   box-shadow: 0 0 0 3px var(--primary-glow);
 }
 
-.search-bar input::placeholder {
+.search-bar input::placeholder,
+.search-wrap input::placeholder {
   color: var(--text-muted);
 }
 
 .filter-select {
-  height: 38px;
+  height: var(--control-h-sm);
   padding: 0 32px 0 11px;
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid var(--border);
@@ -610,59 +631,104 @@ textarea.form-control {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-top: 20px;
-  padding: 12px clamp(14px, 1.5vw, 22px);
-  border-top: 1px solid var(--border);
-  gap: 10px;
+  margin-top: clamp(10px, 1.1vw, 16px);
+  padding: clamp(8px, 0.9vw, 12px) clamp(12px, 1.4vw, 20px);
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-md);
+  backdrop-filter: blur(10px);
+  gap: clamp(10px, 1.2vw, 16px);
   flex-wrap: wrap;
+  flex-shrink: 0;
 }
 
 .pagination-info {
-  font-size: 0.78rem;
-  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: clamp(10px, 1.1vw, 16px);
+  flex-wrap: wrap;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.pagination-size {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   white-space: nowrap;
+}
+
+.pagination-size select {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  border-radius: var(--radius-sm);
+  padding: 3px 8px;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 600;
+  outline: none;
+  cursor: pointer;
 }
 
 .pagination-controls {
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 2px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-sm);
+  padding: 4px 6px;
+  flex-wrap: wrap;
 }
 
 .page-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 30px;
-  height: 30px;
-  padding: 0 7px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--border);
+  min-width: clamp(26px, 2vw, 30px);
+  height: clamp(26px, 2vw, 30px);
+  padding: 0 6px;
+  border-radius: 50%;
+  border: none;
   background: transparent;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   font-family: inherit;
-  font-size: 0.78rem;
+  font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
 }
 
-.page-btn:hover:not(:disabled) {
-  background: rgba(249, 115, 22, 0.1);
-  border-color: var(--primary);
-  color: var(--primary-light);
+.page-btn.nav-btn {
+  border-radius: var(--radius-sm);
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+}
+
+.page-btn:hover:not(:disabled):not(.active) {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
 }
 
 .page-btn.active {
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  border-color: var(--primary);
+  background: rgba(255, 255, 255, 0.18);
   color: #fff;
-  box-shadow: 0 2px 8px var(--primary-glow);
+  font-weight: 700;
+  cursor: default;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
 }
 
 .page-btn:disabled {
-  opacity: 0.35;
+  opacity: 0.3;
   cursor: not-allowed;
+}
+
+.page-ellipsis {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 0.8rem;
+  padding: 0 2px;
 }
 
 /* ── Action Menu ────────────────────────────────────────── */
@@ -722,6 +788,8 @@ textarea.form-control {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.04em;
+  /* Status pills must never break across lines in a narrow table column. */
+  white-space: nowrap;
 }
 
 .badge-active  { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
@@ -735,6 +803,14 @@ textarea.form-control {
   grid-template-columns: repeat(auto-fit, minmax(min(160px, 100%), 1fr));
   gap: clamp(10px, 1.2vw, 16px);
   margin-bottom: clamp(12px, 1.4vw, 20px);
+}
+
+/* KPI strip used by the HR pages – wider cards, same fluid behaviour */
+.stats-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+  gap: clamp(10px, 1.2vw, 16px);
+  margin-bottom: clamp(14px, 1.6vw, 22px);
 }
 
 .stat-card {
@@ -828,7 +904,9 @@ textarea.form-control {
   box-sizing: border-box;
 }
 
-@media (max-width: 767px) {
+/* Matches the layout breakpoint below so tables gain horizontal scroll
+   at exactly the width the sidebar collapses. */
+@media (max-width: 768px) {
   .table-wrap,
   .table-card {
     overflow-x: auto;
@@ -1095,6 +1173,20 @@ tbody tr:last-child td {
   flex-shrink: 0;
 }
 
+/* Long names / organisation names must not grow the chip to six lines.
+   min-width:0 lets the flex child shrink so the ellipsis can kick in. */
+.user-info {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.user-info .user-name,
+.user-info .user-role {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .user-info .user-name {
   font-size: 0.8rem;
   font-weight: 600;
@@ -1133,12 +1225,19 @@ tbody tr:last-child td {
   gap: 10px;
 }
 
+/* Topbar children must be shrinkable, otherwise a long page title plus a few
+   action buttons pushes the right-hand button past the viewport edge. */
+.topbar > * {
+  min-width: 0;
+}
+
 .topbar-title {
   font-size: clamp(0.9rem, 1.1vw, 1.05rem);
   font-weight: 700;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* ── Page Content ──────────────────────────────────────────── */
@@ -1192,12 +1291,17 @@ tbody tr:last-child td {
   display: block !important;
 }
 
-/* Non-scrollable page-content: table-wrap fits content height dynamically up to available max height */
+/*
+  Non-scrollable page-content: the table card consumes exactly the height left
+  over by its siblings (page header, filter bar, pagination) and scrolls inside.
+  `max-height: 100%` is deliberately NOT used here – it resolves against the
+  full page-content box and ignores those siblings, which produces a nested
+  double scrollbar once the rows overflow.
+*/
 .page-content:not(.dashboard-page):not(.scrollable) .table-wrap,
 .page-content:not(.dashboard-page):not(.scrollable) .table-card {
   flex: 0 1 auto;
   min-height: 0;
-  max-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
 }
@@ -1244,9 +1348,24 @@ tbody tr:last-child td {
   transition: var(--transition);
   display: flex !important;
   flex-direction: column !important;
-  overflow: hidden !important;
+  /*
+    Not !important: cards that hold their content directly (no .modal-body)
+    rely on their own `overflow-y: auto` to stay reachable on short screens.
+  */
+  overflow: hidden;
   scrollbar-width: none;
   -ms-overflow-style: none;
+}
+
+/*
+  Confirmation-style cards usually hold their content directly instead of
+  using a .modal-body, so they must be able to scroll themselves; otherwise
+  their action buttons are unreachable on short laptop screens.
+  Cards that delegate to .modal-body set `overflow: hidden` inline.
+*/
+.modal-card,
+.modal-scroll {
+  overflow-y: auto;
 }
 
 .modal form,
@@ -1516,9 +1635,229 @@ tbody tr:last-child td {
 }
 
 /* ── Grid Utilities ─────────────────────────────────────────── */
-.grid-2 { display: grid; grid-template-columns: repeat(2, 1fr); gap: clamp(10px, 1.4vw, 18px); }
-.grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(10px, 1.4vw, 18px); }
-.grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(10px, 1.4vw, 18px); }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 18px); }
+.grid-3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 18px); }
+.grid-4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: clamp(10px, 1.4vw, 18px); }
+
+/* Auto-flowing card grid – fills wide screens instead of stretching cards */
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
+  gap: clamp(12px, 1.4vw, 20px);
+}
+
+/* ── Shared Page Layout Components ─────────────────────────── */
+/*
+  One fluid definition each, so pages stop re-declaring these with
+  fixed pixel tracks that cannot adapt between 1024px and 2560px.
+*/
+.profile-grid {
+  display: grid;
+  grid-template-columns: clamp(240px, 24%, 320px) minmax(0, 1fr);
+  gap: clamp(16px, 1.6vw, 24px);
+  align-items: start;
+}
+
+.form-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(12px, 1.2vw, 18px);
+}
+
+.password-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(12px, 1.3vw, 20px);
+}
+
+/* Split view: fixed-ish rail + fluid main area */
+.split-layout {
+  display: grid;
+  grid-template-columns: clamp(200px, 20%, 280px) minmax(0, 1fr);
+  gap: clamp(12px, 1.4vw, 20px);
+  min-height: 0;
+}
+
+/* Chart containers scale with the viewport instead of a frozen pixel height */
+.chart-box {
+  position: relative;
+  width: 100%;
+  height: clamp(170px, 22vh, 280px);
+}
+
+/* Keeps a single-line form field readable instead of stretching to 500px+ */
+.field-capped { max-width: var(--field-max); }
+
+/*
+  Form field wrappers and the orange "save" button used by the admin/HR
+  profile, password and modal forms. Previously re-declared (with different
+  fixed pixel values) on six separate pages.
+*/
+.form-group-custom {
+  margin-bottom: clamp(12px, 1.5vw, 18px);
+}
+
+.label-custom {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.btn-save-profile,
+.btn-save-password {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #f97316, #ea580c);
+  color: #ffffff;
+  border: none;
+  padding: clamp(9px, 1vw, 12px) clamp(18px, 2.2vw, 30px);
+  border-radius: 10px;
+  font-family: inherit;
+  font-weight: 700;
+  font-size: clamp(0.82rem, 0.9vw, 0.92rem);
+  cursor: pointer;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(249, 115, 22, 0.35);
+  white-space: nowrap;
+}
+
+.btn-save-profile:hover,
+.btn-save-password:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.45);
+}
+
+/*
+  Profile summary card (left rail) and details card (right column), shared by
+  the admin and HR profile pages.
+*/
+.profile-header-title {
+  font-size: clamp(1.15rem, 1.6vw, 1.5rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.profile-header-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: clamp(16px, 1.8vw, 24px);
+}
+
+.profile-left-card,
+.profile-right-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  min-width: 0;
+}
+
+.profile-left-card {
+  padding: clamp(16px, 1.8vw, 24px);
+  text-align: center;
+}
+
+.profile-right-card {
+  padding: clamp(18px, 2vw, 28px);
+}
+
+.profile-avatar-large {
+  width: clamp(72px, 7vw, 96px);
+  height: clamp(72px, 7vw, 96px);
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  background: var(--bg-subtle);
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(1.6rem, 2.2vw, 2.2rem);
+  font-weight: 800;
+  border: 2px solid var(--border);
+  overflow: hidden;
+}
+
+.profile-card-name {
+  font-size: clamp(1.02rem, 1.2vw, 1.2rem);
+  font-weight: 800;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+  overflow-wrap: anywhere;
+}
+
+.profile-card-role {
+  font-size: 0.8rem;
+  color: var(--accent);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 12px;
+}
+
+.profile-card-email,
+.profile-card-phone {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.profile-card-phone {
+  margin-top: 4px;
+}
+
+.profile-card-stat-label,
+.org-details-label {
+  font-size: 0.74rem;
+  color: var(--text-muted);
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 16px;
+  overflow-wrap: anywhere;
+}
+
+.role-badge-pill {
+  display: inline-block;
+  padding: 4px 14px;
+  border-radius: 99px;
+  background: rgba(99, 102, 241, 0.15);
+  border: 1px solid rgba(99, 102, 241, 0.35);
+  color: #818cf8;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-top: 16px;
+}
+
+.section-subtitle {
+  font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: clamp(14px, 1.6vw, 20px);
+}
+
+/* Table cell truncation helper */
+.td-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 1100px) {
+  .password-grid-3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+@media (max-width: 900px) {
+  .profile-grid,
+  .form-grid-2,
+  .password-grid-3,
+  .split-layout { grid-template-columns: minmax(0, 1fr); }
+}
 
 /* ── Flex Utilities ─────────────────────────────────────────── */
 .flex            { display: flex !important; }
@@ -1556,6 +1895,14 @@ tbody tr:last-child td {
 .font-bold      { font-weight: 700; }
 .font-semibold  { font-weight: 600; }
 .w-full         { width: 100%; }
+
+/* Two `w-full` buttons side by side in a flex row would each ask for 100% of
+   the row and overflow their container; as flex children they share it. */
+.flex > .w-full,
+.flex-center > .w-full {
+  flex: 1 1 0;
+  min-width: 0;
+}
 
 .hidden { display: none !important; }
 
@@ -1751,7 +2098,8 @@ input:checked + .status-toggle-slider:before {
   .data-card-header { padding: 14px 18px; }
 
   .filter-bar { gap: 8px; }
-  .search-bar { min-width: 160px; max-width: 280px; }
+  .search-bar,
+  .search-wrap { min-width: 160px; }
 }
 
 /* ─── Small Laptop / Narrow Desktop (769px – 1099px) ─── */
@@ -1797,7 +2145,8 @@ input:checked + .status-toggle-slider:before {
   .page-header-text h2 { font-size: clamp(1rem, 1.8vw, 1.3rem); }
 
   .filter-bar { gap: 7px; }
-  .search-bar { min-width: 150px; max-width: 230px; }
+  .search-bar,
+  .search-wrap { min-width: 150px; }
 
   .filter-select {
     font-size: 0.78rem;
@@ -1868,7 +2217,8 @@ input:checked + .status-toggle-slider:before {
   }
 
   .filter-bar { gap: 8px; }
-  .search-bar { min-width: 0; max-width: 100%; }
+  .search-bar,
+  .search-wrap { min-width: 0; max-width: 100%; }
 }
 
 @media (max-width: 480px) {

@@ -17,217 +17,6 @@
             to   { opacity: 1; transform: translateY(0); }
         }
 
-        /* ── Profile Section ── */
-        .profile-header-title {
-            font-size: clamp(1.15rem, 1.6vw, 1.5rem);
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .profile-header-sub {
-            font-size: 0.82rem;
-            color: var(--text-muted);
-            margin-bottom: clamp(14px, 1.8vw, 24px);
-        }
-
-        .profile-grid {
-            display: grid;
-            grid-template-columns: clamp(200px, 22%, 280px) 1fr;
-            gap: clamp(14px, 1.8vw, 24px);
-            align-items: start;
-        }
-
-        @media (max-width: 900px) {
-            .profile-grid { grid-template-columns: 1fr; }
-        }
-
-        .profile-left-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: clamp(22px, 2.5vw, 36px) clamp(14px, 1.8vw, 20px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-        }
-
-        .profile-avatar-large {
-            width: clamp(72px, 7vw, 100px);
-            height: clamp(72px, 7vw, 100px);
-            border-radius: 50%;
-            background: linear-gradient(135deg, #6366f1, #3b82f6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(1.6rem, 2.2vw, 2.5rem);
-            font-weight: 800;
-            color: #ffffff;
-            margin-bottom: clamp(10px, 1.2vw, 16px);
-            box-shadow: 0 8px 25px rgba(99,102,241,0.35);
-        }
-
-        .profile-card-name {
-            font-size: clamp(1rem, 1.2vw, 1.2rem);
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 3px;
-        }
-
-        .profile-card-email {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-
-        .role-badge-pill {
-            display: inline-block;
-            padding: 3px 12px;
-            border-radius: 99px;
-            background: rgba(249,115,22,0.15);
-            border: 1px solid rgba(249,115,22,0.35);
-            color: #f97316;
-            font-size: 0.72rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            margin-top: 14px;
-        }
-
-        .profile-right-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: clamp(18px, 2vw, 28px);
-        }
-
-        .section-subtitle {
-            font-size: clamp(0.95rem, 1.1vw, 1.1rem);
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: clamp(14px, 1.6vw, 20px);
-        }
-
-        .form-grid-2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: clamp(12px, 1.4vw, 16px);
-            margin-bottom: clamp(12px, 1.4vw, 16px);
-        }
-
-        @media (max-width: 680px) {
-            .form-grid-2 { grid-template-columns: 1fr; gap: 12px; }
-        }
-
-        .form-group-custom {
-            margin-bottom: clamp(12px, 1.5vw, 18px);
-        }
-
-        .label-custom {
-            display: block;
-            font-size: 0.76rem;
-            font-weight: 600;
-            color: var(--text-secondary);
-            margin-bottom: 7px;
-        }
-
-        .input-custom {
-            width: 100%;
-            height: clamp(38px, 4vw, 44px);
-            padding: 0 13px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            color: var(--text-primary);
-            font-family: inherit;
-            font-size: clamp(0.82rem, 0.92vw, 0.9rem);
-            outline: none;
-            transition: var(--transition);
-        }
-
-        select.input-custom {
-            color-scheme: dark;
-            appearance: none;
-            -webkit-appearance: none;
-            -moz-appearance: none;
-            padding-right: 38px !important;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23a5b4fc' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E") !important;
-            background-repeat: no-repeat !important;
-            background-position: right 13px center !important;
-            background-size: 15px !important;
-            cursor: pointer;
-        }
-
-        select.input-custom option {
-            color-scheme: dark;
-            background-color: #0f172a !important;
-            color: #ffffff !important;
-            padding: 10px;
-        }
-
-        select.input-custom option:disabled,
-        select.input-custom option[disabled] {
-            color-scheme: dark;
-            color: rgba(255,255,255,0.4) !important;
-            background-color: #0f172a !important;
-        }
-
-        .input-custom:focus {
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px var(--accent-glow);
-        }
-
-        .input-custom[readonly] {
-            opacity: 0.7;
-            cursor: not-allowed;
-        }
-
-        /* Avatar upload */
-        .profile-img-preview-box { display: flex; flex-direction: column; gap: 7px; margin-top: 7px; }
-
-        .img-thumb-wrap { position: relative; width: 60px; height: 60px; }
-
-        .img-thumb-wrap img,
-        .img-thumb-wrap .thumb-fallback {
-            width: 100%; height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--border);
-        }
-
-        .thumb-close-btn {
-            position: absolute; top: -4px; right: -4px;
-            width: 19px; height: 19px;
-            border-radius: 50%; background: #ef4444; color: #fff;
-            border: none; font-size: 0.72rem; font-weight: 700;
-            cursor: pointer; display: flex; align-items: center; justify-content: center;
-        }
-
-        .img-hint-text { font-size: 0.73rem; color: var(--text-muted); line-height: 1.4; }
-
-        .change-img-link {
-            color: #f97316; font-size: 0.82rem; font-weight: 600;
-            cursor: pointer; text-decoration: none; display: inline-block; margin-top: 3px;
-        }
-
-        .change-img-link:hover { text-decoration: underline; }
-
-        /* Save button */
-        .btn-save-profile {
-            background: linear-gradient(90deg, #f97316, #ea580c);
-            color: #ffffff; border: none;
-            padding: clamp(9px, 1vw, 11px) clamp(18px, 2.2vw, 28px);
-            border-radius: 10px; font-family: inherit; font-weight: 700;
-            font-size: clamp(0.82rem, 0.9vw, 0.9rem);
-            cursor: pointer; transition: all 0.2s ease;
-            box-shadow: 0 4px 15px rgba(249,115,22,0.35);
-            display: inline-flex; align-items: center; gap: 7px;
-        }
-
-        .btn-save-profile:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 6px 20px rgba(249,115,22,0.45);
-        }
     </style>
 </head>
 
@@ -302,23 +91,25 @@
                 <!-- 1. DASHBOARD MODULE -->
                 <div id="section-dashboard" class="module-section">
                     <!-- Dashboard Header -->
-                    <div style="margin-bottom: 28px;">
-                        <h2 style="font-size: 1.65rem; font-weight: 800; color: #fff; margin: 0 0 6px 0;">Executive Overview</h2>
-                        <p style="font-size: 0.88rem; color: rgba(255,255,255,0.6); margin: 0;">Real-time metrics and organizational activity across your enterprise.</p>
+                    <div class="page-header">
+                        <div class="page-header-text">
+                            <h2>Executive Overview</h2>
+                            <p>Real-time metrics and organizational activity across your enterprise.</p>
+                        </div>
                     </div>
 
                     <!-- Top Metrics Grid (3 Stat Cards) -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px;">
+                    <div class="stats-grid">
                         
                         <!-- Metric Card 1: Organizations -->
-                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px; position: relative; overflow: hidden;">
+                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: clamp(13px, 1.2vw, 18px); position: relative; overflow: hidden;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                 <span style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em;">Organizations</span>
                                 <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
                                     <i class="fa-solid fa-building"></i>
                                 </div>
                             </div>
-                            <div style="font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-orgs">—</div>
+                            <div style="font-size: clamp(1.35rem, 1.8vw, 1.9rem); font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-orgs">—</div>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);">
                                 <span>Active: <strong id="dash-stat-active-orgs" style="color: #10b981;">—</strong></span>
                                 <span>Inactive: <strong id="dash-stat-inactive-orgs" style="color: #ef4444;">—</strong></span>
@@ -326,28 +117,28 @@
                         </div>
 
                         <!-- Metric Card 2: Total Branches -->
-                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px; position: relative; overflow: hidden;">
+                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: clamp(13px, 1.2vw, 18px); position: relative; overflow: hidden;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                 <span style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em;">Total Branches</span>
                                 <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
                                     <i class="fa-solid fa-code-branch"></i>
                                 </div>
                             </div>
-                            <div style="font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-branches">—</div>
+                            <div style="font-size: clamp(1.35rem, 1.8vw, 1.9rem); font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-branches">—</div>
                             <div style="margin-top: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);">
                                 Distributed across registered organizations
                             </div>
                         </div>
 
                         <!-- Metric Card 3: HR Managers -->
-                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px; position: relative; overflow: hidden;">
+                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: clamp(13px, 1.2vw, 18px); position: relative; overflow: hidden;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                 <span style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.6); text-transform: uppercase; letter-spacing: 0.05em;">HR Managers</span>
                                 <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
                                     <i class="fa-solid fa-users"></i>
                                 </div>
                             </div>
-                            <div style="font-size: 1.7rem; font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-hrs">—</div>
+                            <div style="font-size: clamp(1.35rem, 1.8vw, 1.9rem); font-weight: 800; color: #fff; line-height: 1;" id="dash-stat-hrs">—</div>
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);">
                                 <span>Active: <strong id="dash-stat-active-hrs" style="color: #10b981;">—</strong></span>
                                 <span>Inactive: <strong id="dash-stat-inactive-hrs" style="color: #ef4444;">—</strong></span>
@@ -357,30 +148,30 @@
                     </div>
 
                     <!-- Interactive Analytics Graphs Row -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: clamp(12px, 1.5vw, 16px); margin-bottom: clamp(14px, 1.5vw, 20px);">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); gap: clamp(12px, 1.5vw, 16px); margin-bottom: clamp(14px, 1.5vw, 20px);">
                         
                         <!-- Graph 1: Branches per Organization -->
-                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px;">
+                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: clamp(13px, 1.3vw, 18px); min-width: 0;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
-                                <h3 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                <h3 style="font-size: clamp(0.9rem, 1vw, 1rem); font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
                                     <i class="fa-solid fa-chart-column" style="color: #818cf8;"></i> Branches per Organization
                                 </h3>
                                 <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase;">Branch Count</span>
                             </div>
-                            <div style="position: relative; height: 170px; width: 100%;">
+                            <div class="chart-box">
                                 <canvas id="chart-branches-per-org"></canvas>
                             </div>
                         </div>
 
                         <!-- Graph 2: HR Managers per Branch -->
-                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: 16px;">
+                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: clamp(13px, 1.3vw, 18px); min-width: 0;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px;">
-                                <h3 style="font-size: 1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
+                                <h3 style="font-size: clamp(0.9rem, 1vw, 1rem); font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 8px;">
                                     <i class="fa-solid fa-chart-bar" style="color: #10b981;"></i> HR Managers per Branch
                                 </h3>
                                 <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase;">HR Count</span>
                             </div>
-                            <div style="position: relative; height: 170px; width: 100%;">
+                            <div class="chart-box">
                                 <canvas id="chart-hrs-per-branch"></canvas>
                             </div>
                         </div>
@@ -388,12 +179,12 @@
                     </div>
 
                     <!-- Split View: Recent Organizations & Recent HR Managers -->
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: clamp(16px, 2vw, 24px); align-items: start;">
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); gap: clamp(16px, 2vw, 24px); align-items: start;">
 
                         <!-- Left Column: Recent Organizations -->
-                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px;">
+                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: clamp(16px, 1.7vw, 24px); min-width: 0;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
-                                <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 10px;">
+                                <h3 style="font-size: clamp(0.95rem, 1.1vw, 1.1rem); font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 10px;">
                                     <i class="fa-solid fa-building" style="color: #818cf8;"></i> Organizations Overview
                                 </h3>
                                 <a href="organization.html" style="font-size: 0.8rem; font-weight: 700; color: #818cf8; text-decoration: none;">View All <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem;"></i></a>
@@ -405,9 +196,9 @@
                         </div>
 
                         <!-- Right Column: Recent HR Managers -->
-                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: 24px;">
+                        <div style="background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px; padding: clamp(16px, 1.7vw, 24px); min-width: 0;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 18px;">
-                                <h3 style="font-size: 1.1rem; font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 10px;">
+                                <h3 style="font-size: clamp(0.95rem, 1.1vw, 1.1rem); font-weight: 800; color: #fff; margin: 0; display: flex; align-items: center; gap: 10px;">
                                     <i class="fa-solid fa-users" style="color: #10b981;"></i> Recent HR Managers
                                 </h3>
                                 <a href="hr.html" style="font-size: 0.8rem; font-weight: 700; color: #10b981; text-decoration: none;">View All <i class="fa-solid fa-arrow-right" style="font-size: 0.75rem;"></i></a>
@@ -421,388 +212,8 @@
                     </div>
                 </div>
 
-                <!-- 2. ORGANIZATION MODULE -->
-                <div id="section-org" class="module-section hidden">
-                    <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 20px;">
-                        <button class="btn-save-profile" onclick="openCreateOrgModal()" style="display: flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-plus"></i> Create Organization
-                        </button>
-                    </div>
-
-                    <!-- Search & Filter Controls Bar -->
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; width: 100%;">
-                        <!-- 1. Search Bar Input (Expands across left side) -->
-                        <div style="flex: 1; min-width: 260px; position: relative; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); overflow: hidden; display: flex; align-items: center; height: 46px; transition: all 0.2s ease;">
-                            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: rgba(255, 255, 255, 0.4); font-size: 0.88rem; pointer-events: none;"></i>
-                            <input type="text" id="org-search-input" placeholder="Search by organization name..." oninput="onOrgFilterChange()" style="width: 100%; height: 44px; padding-left: 40px; padding-right: 12px; background: transparent; border: none; color: #fff; font-size: 0.88rem; outline: none;" onfocus="this.parentElement.style.borderColor='rgba(249,115,22,0.6)';this.parentElement.style.boxShadow='0 0 0 3px rgba(249,115,22,0.15)';" onblur="this.parentElement.style.borderColor='rgba(255,255,255,0.15)';this.parentElement.style.boxShadow='none';" />
-                        </div>
-
-                        <!-- 2. Industry Filter Dropdown Box -->
-                        <div style="border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; padding-right: 4px; height: 46px; min-width: 170px;">
-                            <span style="font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">INDUSTRY <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
-                            <select id="org-filter-industry" onchange="onOrgFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 4px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
-                                <option value="" style="background: #0f172a; color: #fff;">All</option>
-                                <option value="information_technology" style="background: #0f172a; color: #fff;">Information Technology</option>
-                                <option value="financial_services" style="background: #0f172a; color: #fff;">Financial Services</option>
-                                <option value="healthcare" style="background: #0f172a; color: #fff;">Healthcare</option>
-                                <option value="education" style="background: #0f172a; color: #fff;">Education</option>
-                                <option value="manufacturing" style="background: #0f172a; color: #fff;">Manufacturing</option>
-                            </select>
-                        </div>
-
-                        <!-- 3. Company Size Dropdown Box -->
-                        <div style="border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; padding-right: 4px; height: 46px; min-width: 150px;">
-                            <span style="font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">SIZE <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
-                            <select id="org-filter-size" onchange="onOrgFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 4px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
-                                <option value="" style="background: #0f172a; color: #fff;">All</option>
-                                <option value="1-10" style="background: #0f172a; color: #fff;">1-10 employees</option>
-                                <option value="11-50" style="background: #0f172a; color: #fff;">11-50 employees</option>
-                                <option value="51-200" style="background: #0f172a; color: #fff;">51-200 employees</option>
-                                <option value="201-500" style="background: #0f172a; color: #fff;">201-500 employees</option>
-                                <option value="501-1000" style="background: #0f172a; color: #fff;">501-1000 employees</option>
-                                <option value="1000+" style="background: #0f172a; color: #fff;">1000+ employees</option>
-                            </select>
-                        </div>
-
-                        <!-- 4. Status Dropdown Box -->
-                        <div style="border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; padding-right: 4px; height: 46px; min-width: 140px;">
-                            <span style="font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
-                            <select id="org-filter-status" onchange="onOrgFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 4px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
-                                <option value="" style="background: #0f172a; color: #fff;">All</option>
-                                <option value="active" style="background: #0f172a; color: #fff;">Active</option>
-                                <option value="inactive" style="background: #0f172a; color: #fff;">Inactive</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Organization List Table -->
-                    <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; flex: 0 1 auto;">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="width: 65px; text-align: left; padding-left: 16px;">Logo</th>
-                                    <th>Organization</th>
-                                    <th>Industry</th>
-                                    <th>Company Size</th>
-                                    <th>Status</th>
-                                    <th>Created At</th>
-                                    <th style="text-align: right; width: 100px;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="org-table-body">
-                                <tr>
-                                    <td colspan="7" style="text-align: center; color: var(--text-muted); padding: 32px;">
-                                        Loading organizations...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Server-Side Pagination Controls -->
-                    <div id="org-pagination-container"></div>
-                </div>
-
-                <!-- 2. BRANCH MODULE -->
-                <div id="section-branch" class="module-section hidden">
-                    <div style="display: flex; align-items: center; justify-content: flex-end; margin-bottom: 20px;">
-                        <button class="btn-save-profile" onclick="openCreateBranchModal()" style="display: flex; align-items: center; gap: 8px;">
-                            <i class="fa-solid fa-plus"></i> Create Branch
-                        </button>
-                    </div>
-
-                    <!-- Search & Filter Controls Bar -->
-                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; width: 100%;">
-                        <div style="flex: 1; min-width: 260px; position: relative; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); overflow: hidden; display: flex; align-items: center; height: 46px; transition: all 0.2s ease;">
-                            <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 14px; color: rgba(255, 255, 255, 0.4); font-size: 0.88rem; pointer-events: none;"></i>
-                            <input type="text" id="branch-search-input" placeholder="Search by branch name, code, city..." oninput="onBranchFilterChange()" style="width: 100%; height: 44px; padding-left: 40px; padding-right: 12px; background: transparent; border: none; color: #fff; font-size: 0.88rem; outline: none;" onfocus="this.parentElement.style.borderColor='rgba(249,115,22,0.6)';this.parentElement.style.boxShadow='0 0 0 3px rgba(249,115,22,0.15)';" onblur="this.parentElement.style.borderColor='rgba(255,255,255,0.15)';this.parentElement.style.boxShadow='none';" />
-                        </div>
-
-                        <div style="border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; background: rgba(255, 255, 255, 0.03); display: flex; align-items: center; padding-left: 12px; padding-right: 4px; height: 46px; min-width: 200px;">
-                            <span style="font-size: 0.75rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">ORGANIZATION <span style="color: rgba(255,255,255,0.3); margin: 0 4px;">•</span></span>
-                            <select id="branch-filter-org" onchange="onBranchFilterChange()" style="height: 44px; background: transparent; border: none; color: #fff; font-size: 0.88rem; font-weight: 600; cursor: pointer; padding-left: 4px; padding-right: 28px; width: 100%; outline: none; appearance: none; -webkit-appearance: none; background-image: url('data:image/svg+xml;utf8,<svg fill=\'%23ffffff\' height=\'16\' viewBox=\'0 0 24 24\' width=\'16\' xmlns=\'http://www.w3.org/2000/svg\'><path d=\'M7 10l5 5 5-5z\'/></svg>'); background-repeat: no-repeat; background-position: right 8px center;">
-                                <option value="" style="background: #0f172a; color: #fff;">All Organizations</option>
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Branch List Table -->
-                    <div class="table-wrap" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 16px; flex: 0 1 auto;">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th style="padding-left: 16px;">Branch Name</th>
-                                    <th>Code</th>
-                                    <th>Organization</th>
-                                    <th>Location</th>
-                                    <th>Created At</th>
-                                    <th style="text-align: right; width: 100px;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="branch-table-body">
-                                <tr>
-                                    <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 32px;">
-                                        Loading branches...
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <!-- Pagination Controls -->
-                    <div id="branch-pagination-container"></div>
-                </div>
-
-                <!-- 3. HR MODULE -->
-                <div id="section-hr" class="module-section hidden">
-                </div>
-
-                <!-- 4. PROFILE MODULE -->
-                <div id="section-profile" class="module-section hidden">
-                    <div class="profile-grid">
-                        <!-- Left Column: Avatar & Role -->
-                        <div class="profile-left-card">
-                            <div class="profile-avatar-large" id="profile-avatar-large">AD</div>
-                            <div class="profile-card-name" id="profile-card-name">Admin</div>
-                            <div class="profile-card-email" id="profile-card-email">admin@example.com</div>
-                        </div>
-
-                        <!-- Right Column: Personal Details Form -->
-                        <div class="profile-right-card">
-                            <div class="section-subtitle">Personal Details</div>
-
-                            <form id="profile-form" onsubmit="handleSaveProfile(event)">
-                                <div class="form-grid-2">
-                                    <div class="form-group-custom">
-                                        <label class="label-custom">Full Name <span
-                                                style="color:#ef4444;">*</span></label>
-                                        <input type="text" id="profile-full-name" class="input-custom"
-                                            placeholder="e.g. John Doe" required />
-                                    </div>
-                                    <div class="form-group-custom">
-                                        <label class="label-custom">Username <span
-                                                style="color:#ef4444;">*</span></label>
-                                        <input type="text" id="profile-username" class="input-custom"
-                                            placeholder="e.g. john_admin" required />
-                                    </div>
-                                </div>
-
-                                <div class="form-grid-2">
-                                    <div class="form-group-custom">
-                                        <label class="label-custom">Email Address <span
-                                                style="color:#ef4444;">*</span></label>
-                                        <input type="email" id="profile-email" class="input-custom"
-                                            placeholder="admin@company.com" required />
-                                    </div>
-                                    <div class="form-group-custom">
-                                        <label class="label-custom">Phone Number</label>
-                                        <input type="text" id="profile-phone" class="input-custom"
-                                            placeholder="e.g. 9876543210" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" />
-                                    </div>
-                                </div>
-
-                                <div class="form-group-custom" style="margin-top: 14px;">
-                                    <label class="label-custom">Profile Image</label>
-                                    <div class="flex items-center gap-4 mt-2">
-                                        <div class="avatar-upload-circle"
-                                            onclick="document.getElementById('profile-upload-file').click()"
-                                            title="Click circle to upload profile picture"
-                                            style="width: 82px; height: 82px; border-radius: 50%; background: #15112e; border: 2px dashed rgba(99, 102, 241, 0.5); position: relative; cursor: pointer; flex-shrink: 0; transition: all 0.2s ease;">
-                                            <div id="profile-circle-preview"
-                                                style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: 800; color: #fff; background: linear-gradient(135deg, #6366f1, #3b82f6); overflow: hidden;">
-                                                AD
-                                            </div>
-                                            <div
-                                                style="position: absolute; bottom: 0; right: 0; width: 24px; height: 24px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid #0f172a;">
-                                                <i class="fa-solid fa-plus"></i>
-                                            </div>
-                                        </div>
-                                        <input type="file" id="profile-upload-file" accept="image/*" class="hidden"
-                                            onchange="onProfileImageFileChange(event)" />
-                                        <div>
-                                            <a href="#" class="change-img-link"
-                                                onclick="event.preventDefault(); document.getElementById('profile-upload-file').click();">Upload
-                                                new photo</a>
-                                            <div class="img-hint-text mt-1">Accepted: JPG, JPEG, PNG, WEBP (Max 2MB)
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div class="flex justify-end mt-4">
-                                    <button type="submit" class="btn-save-profile" id="save-profile-btn">Save
-                                        Changes</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
             </div>
         </main>
-    </div>
-
-    <!-- Create / Edit Organization Modal -->
-    <div class="modal-overlay" id="org-modal">
-        <div class="modal-card"
-            style="max-width: 680px; width: 94%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
-            <div class="flex items-center justify-between mb-3" style="border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; flex-shrink: 0;">
-                <div>
-                    <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0;" id="org-modal-title">Create Organization</h3>
-                </div>
-                <button type="button" onclick="closeOrgModal()"
-                    style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;">×</button>
-            </div>
-
-            <form id="org-form" onsubmit="handleSaveOrganization(event)" style="display: flex; flex-direction: column;">
-                <input type="hidden" id="org-id-hidden" value="" />
-
-                <!-- Circular Logo Upload Button at Top -->
-                <div class="avatar-upload-wrap"
-                    style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-bottom: 16px; flex-shrink: 0;">
-                    <div class="avatar-upload-circle" onclick="document.getElementById('org-logo-file').click()"
-                        data-tooltip="Click to upload logo"
-                        style="width: 70px; height: 70px; border-radius: 50%; background: #15112e; border: 2px dashed rgba(99, 102, 241, 0.5); position: relative; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 6px 20px rgba(0,0,0,0.35); transition: all 0.2s ease;">
-                        <div id="org-circle-preview"
-                            style="width: 100%; height: 100%; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: rgba(255,255,255,0.5); overflow: hidden;">
-                            <i class="fa-solid fa-building"></i>
-                        </div>
-                        <div
-                            style="position: absolute; bottom: 0; right: 0; width: 22px; height: 22px; border-radius: 50%; background: #4f46e5; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; border: 2px solid #080614;">
-                            <i class="fa-solid fa-plus"></i>
-                        </div>
-                    </div>
-                    <input type="file" id="org-logo-file" accept="image/*" class="hidden"
-                        onchange="onOrgLogoFileChange(event)" />
-                    <div style="font-size: 0.75rem; font-weight: 600; color: rgba(255,255,255,0.7); margin-top: 6px;">Upload organization logo</div>
-                </div>
-
-                <!-- Row 1: Organization Name & Industry -->
-                <div class="form-grid-2"
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px;">
-                    <div class="form-group-custom">
-                        <label class="label-custom"
-                            style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Organization
-                            Name <span style="color:#ef4444;">*</span></label>
-                        <input type="text" id="org-name-input" class="input-custom" placeholder="e.g. Acme Corporation"
-                            style="height: 46px; font-size: 0.92rem;" required />
-                    </div>
-
-                    <div class="form-group-custom">
-                        <label class="label-custom"
-                            style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Industry
-                            <span style="color:#ef4444;">*</span></label>
-                        <select id="org-industry-select" class="input-custom"
-                            style="height: 46px; font-size: 0.92rem; cursor: pointer;" required>
-                            <option value="" disabled selected>Select Industry</option>
-                            <option value="information_technology">Information Technology</option>
-                            <option value="financial_services">Financial Services</option>
-                            <option value="healthcare">Healthcare</option>
-                            <option value="education">Education</option>
-                            <option value="manufacturing">Manufacturing</option>
-                        </select>
-                    </div>
-                </div>
-
-                <!-- Row 2: Company Size -->
-                <div class="form-grid-2"
-                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 28px;">
-                    <div class="form-group-custom">
-                        <label class="label-custom"
-                            style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 8px;">Company
-                            Size <span style="color:#ef4444;">*</span></label>
-                        <select id="org-size-select" class="input-custom"
-                            style="height: 46px; font-size: 0.92rem; cursor: pointer;" required>
-                            <option value="" disabled selected>Select Company Size</option>
-                            <option value="1-10">1-10 employees</option>
-                            <option value="11-50">11-50 employees</option>
-                            <option value="51-200">51-200 employees</option>
-                            <option value="201-500">201-500 employees</option>
-                            <option value="501-1000">501-1000 employees</option>
-                            <option value="1000+">1000+ employees</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group-custom" style="grid-column: span 2;">
-                        <label class="label-custom"
-                            style="font-size: 0.78rem; font-weight: 700; color: rgba(255,255,255,0.85); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 6px;">Status</label>
-                        <div style="display: inline-flex; align-items: center; gap: 12px; padding: 4px 0;">
-                            <label style="position: relative; display: inline-block; width: 48px; height: 26px; margin: 0; cursor: pointer;">
-                                <input type="checkbox" id="org-status-toggle" checked onchange="updateOrgStatusToggleUI(this.checked)" style="opacity: 0; width: 0; height: 0;" />
-                                <span class="status-toggle-slider"></span>
-                            </label>
-                            <span id="org-status-text" style="font-size: 0.95rem; font-weight: 700; color: #10b981;">Active</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Footer Action Buttons -->
-                <div class="flex justify-end gap-3"
-                    style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 20px;">
-                    <button type="button" onclick="closeOrgModal()"
-                        style="padding: 12px 26px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.92rem; cursor: pointer;">Cancel</button>
-                    <button type="submit" class="btn-save-profile" id="org-submit-btn"
-                        style="padding: 12px 32px; border-radius: 12px; font-weight: 700; font-size: 0.92rem;">Save
-                        Organization</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- View Organization Modal -->
-    <div class="modal-overlay" id="view-org-modal">
-        <div class="modal-card" style="max-width: 520px; width: 92%; padding: 36px 32px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff;">Organization Details</h3>
-                <button type="button" onclick="closeViewOrgModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;" title="Close">×</button>
-            </div>
-
-            <div style="text-align: center; margin-bottom: 24px;">
-                <div id="view-org-logo" style="width: 86px; height: 86px; border-radius: 50%; margin: 0 auto 16px; background: rgba(99,102,241,0.15); border: 2px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #818cf8; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
-                    <i class="fa-solid fa-building"></i>
-                </div>
-                <h2 id="view-org-name" style="font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 4px;">—</h2>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Industry:</span>
-                    <span id="view-org-industry" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 0.8rem; font-weight: 700;">—</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Company Size:</span>
-                    <span id="view-org-size" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.8rem; font-weight: 700;">—</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Status:</span>
-                    <span id="view-org-status" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 0.8rem; font-weight: 700;">Active</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Created Date:</span>
-                    <span id="view-org-date" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Organization Modal -->
-    <div class="modal-overlay" id="delete-org-modal">
-        <div class="modal-card"
-            style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
-            <div
-                style="width: 56px; height: 56px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
-                <i class="fa-solid fa-trash-can"></i>
-            </div>
-            <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Delete Organization</h3>
-            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px;">Are you sure you want
-                to delete this organization? This action cannot be undone.</p>
-            <div style="display: flex; gap: 12px; justify-content: center;">
-                <button type="button" onclick="closeDeleteOrgModal()"
-                    style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; cursor: pointer;">Cancel</button>
-                <button type="button" id="confirm-delete-org-btn" onclick="confirmDeleteOrgAction()"
-                    style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Delete</button>
-            </div>
-        </div>
     </div>
 
     <!-- Modern Website Logout Confirmation Modal -->
@@ -825,119 +236,11 @@
         </div>
     </div>
 
-    <!-- Create / Edit Branch Modal -->
-    <div class="modal-overlay" id="branch-modal">
-        <div class="modal-card" style="max-width: 660px; width: 92%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 12px; flex-shrink: 0;">
-                <h3 style="font-size: 1.3rem; font-weight: 800; color: #fff; margin: 0;" id="branch-modal-title">Create Branch</h3>
-                <button type="button" onclick="closeBranchModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer;" title="Close">×</button>
-            </div>
-
-            <form id="branch-form" onsubmit="handleSaveBranch(event)" style="display: flex; flex-direction: column;">
-                <input type="hidden" id="branch-id-hidden" />
-
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px 16px; margin-bottom: 16px;">
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            ORGANIZATION <span style="color: #ef4444;">*</span>
-                        </label>
-                        <select id="branch-org-select" class="input-custom" required style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; cursor: pointer; padding: 0 12px; outline: none; width: 100%;">
-                            <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            BRANCH NAME <span style="color: #ef4444;">*</span>
-                        </label>
-                        <input type="text" id="branch-name-input" class="input-custom" placeholder="e.g. Headquarters / NYC Branch" required style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            CITY
-                        </label>
-                        <input type="text" id="branch-city-input" class="input-custom" placeholder="e.g. New York" style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
-                    </div>
-
-                    <div class="form-group">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            STATE / PROVINCE
-                        </label>
-                        <input type="text" id="branch-state-input" class="input-custom" placeholder="e.g. NY" style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
-                    </div>
-
-                    <div class="form-group" style="grid-column: span 2;">
-                        <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.85); font-size: 0.78rem; margin-bottom: 4px; display: block; letter-spacing: 0.02em;">
-                            COUNTRY
-                        </label>
-                        <input type="text" id="branch-country-input" class="input-custom" placeholder="e.g. United States" style="height: 40px; border-radius: 10px; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.15); color: #fff; font-size: 0.85rem; padding: 0 12px; outline: none; width: 100%;" />
-                    </div>
-                </div>
-
-                <div style="display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top: 14px; margin-top: 4px; flex-shrink: 0;">
-                    <button type="button" onclick="closeBranchModal()" style="padding: 8px 18px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; font-size: 0.85rem; cursor: pointer;">Cancel</button>
-                    <button type="submit" class="btn-save-profile" id="branch-submit-btn" style="padding: 8px 22px; border-radius: 10px; font-weight: 700; font-size: 0.85rem;">Save Branch</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- View Branch Modal -->
-    <div class="modal-overlay" id="view-branch-modal">
-        <div class="modal-card" style="max-width: 500px; width: 92%; padding: 36px 32px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff;">Branch Details</h3>
-                <button type="button" onclick="closeViewBranchModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;" title="Close">×</button>
-            </div>
-
-            <div style="text-align: center; margin-bottom: 24px;">
-                <div style="width: 76px; height: 76px; border-radius: 50%; margin: 0 auto 16px; background: rgba(99,102,241,0.15); border: 2px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; color: #818cf8; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
-                    <i class="fa-solid fa-code-branch"></i>
-                </div>
-                <h2 id="view-branch-name" style="font-size: 1.4rem; font-weight: 800; color: #fff; margin-bottom: 4px;">—</h2>
-            </div>
-
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Organization:</span>
-                    <span id="view-branch-org" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 0.8rem; font-weight: 700;">—</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Location:</span>
-                    <span id="view-branch-location" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
-                </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Created Date:</span>
-                    <span id="view-branch-date" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Delete Branch Modal -->
-    <div class="modal-overlay" id="delete-branch-modal">
-        <div class="modal-card" style="max-width: 400px; text-align: center; padding: 32px 24px; background: #0f172a; border: 1px solid rgba(255,255,255,0.12); border-radius: 20px;">
-            <div style="width: 56px; height: 56px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; margin: 0 auto 16px;">
-                <i class="fa-solid fa-trash-can"></i>
-            </div>
-            <h3 style="font-size: 1.25rem; font-weight: 800; color: #fff; margin-bottom: 8px;">Delete Branch</h3>
-            <p style="font-size: 0.88rem; color: rgba(255, 255, 255, 0.65); margin-bottom: 24px;">Are you sure you want to delete this branch? This action cannot be undone.</p>
-            <div style="display: flex; gap: 12px; justify-content: center;">
-                <button type="button" onclick="closeDeleteBranchModal()" style="padding: 10px 22px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(255,255,255,0.06); color: #fff; font-weight: 600; cursor: pointer;">Cancel</button>
-                <button type="button" id="confirm-delete-branch-btn" onclick="confirmDeleteBranchAction()" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; font-weight: 700; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Delete</button>
-            </div>
-        </div>
-    </div>
-
     <!-- Toast container -->
     <div class="toast-container" id="toast-container"></div>
 
     <script src="../js/config.js?v=1"></script>
     <script src="../js/utils.js"></script>
-    <script src="../js/admin/organization.js"></script>
-    <script src="../js/admin/branch.js"></script>
-    <script src="../js/admin/profile.js"></script>
     <script src="../js/admin/dashboard.js"></script>
     <script src="../js/admin/common.js"></script>
 </body>

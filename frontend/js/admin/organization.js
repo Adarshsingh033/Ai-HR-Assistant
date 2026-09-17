@@ -116,7 +116,7 @@ function renderOrganizationsTable(orgs) {
         return `
             <tr style="position: relative;">
                 <!-- 1. Logo Column -->
-                <td style="width: 65px; padding-left: 16px;">
+                <td>
                     <div style="display: flex; align-items: center;">
                         ${logoContent}
                     </div>
@@ -156,7 +156,7 @@ function renderOrganizationsTable(orgs) {
                     </button>
 
                     <!-- Popover Dropdown Menu (View, Edit, Delete Only) -->
-                    <div id="org-action-menu-${org.org_id}" class="org-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; width: 140px; background: #0f172a; border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
+                    <div id="org-action-menu-${org.org_id}" class="org-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; min-width: 140px; background: #0f172a; border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
                         <button type="button" onclick="openViewOrgModal('${org.org_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #fff; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">
                             <i class="fa-regular fa-eye" style="color: #60a5fa; width: 14px;"></i> View
                         </button>
@@ -221,84 +221,15 @@ function renderOrgPagination(data) {
         return;
     }
 
-    const startItem = (page - 1) * limit + 1;
-    const endItem = Math.min(page * limit, total);
-
-    let pageButtons = '';
-    const maxVisiblePages = 7;
-    let startPage = 1;
-    let endPage = totalPages;
-
-    if (totalPages > maxVisiblePages) {
-        if (page <= 4) {
-            startPage = 1;
-            endPage = 5;
-        } else if (page >= totalPages - 3) {
-            startPage = totalPages - 4;
-            endPage = totalPages;
-        } else {
-            startPage = page - 2;
-            endPage = page + 2;
-        }
-    }
-
-    if (startPage > 1) {
-        pageButtons += `<button onclick="loadOrganizations(1)" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">1</button>`;
-        if (startPage > 2) {
-            pageButtons += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
-        }
-    }
-
-    for (let p = startPage; p <= endPage; p++) {
-        if (p === page) {
-            pageButtons += `<button style="width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);color:#fff;font-size:0.82rem;font-weight:700;cursor:default;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);">${p}</button>`;
-        } else {
-            pageButtons += `<button onclick="loadOrganizations(${p})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${p}</button>`;
-        }
-    }
-
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            pageButtons += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
-        }
-        pageButtons += `<button onclick="loadOrganizations(${totalPages})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${totalPages}</button>`;
-    }
-
-    const isPrevDisabled = page <= 1;
-    const isNextDisabled = page >= totalPages;
-
-    container.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding: 12px 20px; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; flex-wrap: wrap; gap: 16px; backdrop-filter: blur(10px); font-family: 'Inter', sans-serif;">
-            <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 500;">
-                <span>${startItem}–${endItem} of ${total} <span style="margin:0 4px;opacity:0.4;">·</span> Page ${page} of ${totalPages}</span>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span>Rows per page:</span>
-                    <select id="org-page-size-select" onchange="onOrgPageSizeChange(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 3px 8px; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;">
-                        <option value="10" ${limit === 10 ? 'selected' : ''}>10</option>
-                        <option value="25" ${limit === 25 ? 'selected' : ''}>25</option>
-                        <option value="35" ${limit === 35 ? 'selected' : ''}>35</option>
-                        <option value="50" ${limit === 50 ? 'selected' : ''}>50</option>
-                    </select>
-                </div>
-            </div>
-
-            <div style="display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 4px 6px;">
-                <button onclick="loadOrganizations(1)" ${isPrevDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isPrevDisabled ? '0.3' : '1'};transition:all 0.15s;" title="First page">
-                    <i class="fa-solid fa-angles-left"></i>
-                </button>
-                <button onclick="loadOrganizations(${page - 1})" ${isPrevDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isPrevDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Previous page">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                ${pageButtons}
-                <button onclick="loadOrganizations(${page + 1})" ${isNextDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isNextDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Next page">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-                <button onclick="loadOrganizations(${totalPages})" ${isNextDisabled ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${isNextDisabled ? '0.3' : '1'};transition:all 0.15s;" title="Last page">
-                    <i class="fa-solid fa-angles-right"></i>
-                </button>
-            </div>
-        </div>
-    `;
+    container.innerHTML = paginationBarHTML({
+        page: page,
+        totalPages: totalPages,
+        total: total,
+        limit: limit,
+        onPage: 'loadOrganizations',
+        onPageSize: 'onOrgPageSizeChange',
+        pageSizes: [10, 25, 35, 50]
+    });
 }
 
 /* Toggle Popover Dropdown Menu for Organization Action */

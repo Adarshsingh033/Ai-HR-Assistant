@@ -128,12 +128,12 @@ function renderScreeningTable() {
 
         return `
         <tr>
-            <td style="font-weight:600;color:var(--text-bright);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(c.name || 'Unknown')}</td>
-            <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(c.email || '—')}</td>
+            <td class="td-truncate" style="font-weight:600;color:var(--text-bright);">${escapeHtml(c.name || 'Unknown')}</td>
+            <td class="td-truncate">${escapeHtml(c.email || '—')}</td>
             <td style="white-space:nowrap;">${escapeHtml(c.phone || '—')}</td>
-            <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                <span class="round-step-badge">
-                    <i class="fa-solid fa-diagram-next"></i> ${escapeHtml(roundStep)}
+            <td class="td-truncate">
+                <span class="round-step-badge" title="${escapeHtml(roundStep)}">
+                    <i class="fa-solid fa-diagram-next"></i> <span>${escapeHtml(roundStep)}</span>
                 </span>
             </td>
             <td style="white-space:nowrap;">
@@ -358,6 +358,8 @@ async function openViewProgressModal(candidateId) {
         if (rounds.length === 0) {
             stepper.innerHTML = `<div style="color:rgba(255,255,255,0.5);font-size:0.85rem;">No interview rounds configured for this vacancy.</div>`;
         } else {
+            // The connector line is inset by half a step, so it needs the step count
+            stepper.style.setProperty('--step-count', rounds.length);
             stepper.innerHTML = rounds.map(r => {
                 const order = r.round_order || 1;
                 let stepClass = '';

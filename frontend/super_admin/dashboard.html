@@ -32,33 +32,18 @@
             margin-bottom: clamp(10px, 1.2vw, 18px);
         }
         .charts-row.two-col {
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
         }
         .charts-row.three-col {
-            grid-template-columns: 2fr 1fr;
+            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
         }
-        @media (max-width: 1100px) {
+        /* 1099px so it does not collide with the 1100px desktop band in main.css */
+        @media (max-width: 1099px) {
             .charts-row.two-col,
             .charts-row.three-col {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1fr);
             }
         }
-        /* Chart canvas wrapper — height scales with viewport */
-        .chart-canvas-wrap {
-            position: relative;
-            width: 100%;
-            height: clamp(160px, 20vh, 240px);
-        }
-        /* Usage table row */
-        .usage-row td { vertical-align: middle; }
-        .admin-name-cell { font-weight: 600; font-size: 0.86rem; }
-        .admin-email-cell { font-size: 0.74rem; color: var(--text-muted); }
-        .usage-group { display: flex; flex-direction: column; gap: 5px; }
-        .near-limit { color: var(--warning) !important; }
-        .at-limit   { color: var(--danger)  !important; }
-        /* Admin usage table responsive */
-        .usage-table-wrap { overflow-x: auto; }
-        .usage-table-wrap table { min-width: 560px; }
     </style>
 </head>
 <body>
@@ -116,7 +101,7 @@
             <div class="page-content dashboard-page">
 
                 <!-- ── KPI Stat Cards ── -->
-                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));">
+                <div class="stats-grid">
                     <div class="stat-card blue">
                         <div class="stat-icon blue"><i class="fa-solid fa-users-gear"></i></div>
                         <div class="stat-value" id="stat-admins">—</div>
@@ -174,12 +159,12 @@
                     <div class="chart-card">
                         <div class="chart-card-title">Admin Growth Trend</div>
                         <div class="chart-card-sub">New admin registrations over the last 6 months</div>
-                        <canvas id="adminTrendChart" style="max-height: 170px;"></canvas>
+                        <div class="chart-box"><canvas id="adminTrendChart"></canvas></div>
                     </div>
                     <div class="chart-card">
                         <div class="chart-card-title">Plan Distribution</div>
                         <div class="chart-card-sub">Admins per subscription plan</div>
-                        <canvas id="planDistChart" style="max-height: 170px;"></canvas>
+                        <div class="chart-box"><canvas id="planDistChart"></canvas></div>
                     </div>
                 </div>
 
@@ -188,12 +173,12 @@
                     <div class="chart-card">
                         <div class="chart-card-title">Resource Utilization</div>
                         <div class="chart-card-sub">Active vs Inactive — Organizations & HR Users</div>
-                        <canvas id="resourceChart" style="max-height: 170px;"></canvas>
+                        <div class="chart-box"><canvas id="resourceChart"></canvas></div>
                     </div>
                     <div class="chart-card">
                         <div class="chart-card-title">Admin Status Breakdown</div>
                         <div class="chart-card-sub">Active vs inactive admins on platform</div>
-                        <canvas id="adminStatusChart" style="max-height: 170px;"></canvas>
+                        <div class="chart-box"><canvas id="adminStatusChart"></canvas></div>
                     </div>
                 </div>
 
@@ -367,65 +352,6 @@
                 console.error('Dashboard stats failed:', err);
                 showToast('Failed to load dashboard stats', 'error');
             }
-
-            // Admin usage table
-            try {
-                const res = await apiRequest('GET', '/api/super-admin/admins?page=1&limit=10');
-                renderUsageTable(res.admins);
-            } catch (e) {
-                console.error('Usage table failed:', e);
-            }
-        }
-
-        function usageBar(usedStr, max) {
-            if (!max || max === '∞' || usedStr === undefined) {
-                return `<div class="usage-bar-label"><span>${usedStr}</span><span>Unlimited</span></div>`;
-            }
-            const used = parseInt(usedStr);
-            const pct  = max > 0 ? Math.min(100, Math.round((used / max) * 100)) : 0;
-            const cls  = pct >= 100 ? 'danger' : pct >= 80 ? 'warning' : 'safe';
-            return `
-                <div class="usage-bar-label">
-                    <span class="${pct >= 100 ? 'at-limit' : pct >= 80 ? 'near-limit' : ''}">${used}/${max}</span>
-                    <span style="font-size:0.68rem;">${pct}%</span>
-                </div>
-                <div class="usage-bar-track">
-                    <div class="usage-bar-fill ${cls}" style="width:${pct}%"></div>
-                </div>`;
-        }
-
-        function renderUsageTable(admins) {
-            const tbody = document.getElementById('usage-table-body');
-            if (!tbody) return;
-            if (!admins || admins.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">No admins found.</td></tr>';
-                return;
-            }
-            tbody.innerHTML = admins.map(a => {
-                const [orgUsed, orgMax]   = (a.usage.organizations || '0/0').split('/');
-                const [brUsed, brMax]     = (a.usage.branches || '0/0').split('/');
-                const [hrUsed, hrMax]     = (a.usage.hr_users || '0/0').split('/');
-                const badge = a.status === 'active'
-                    ? '<span class="badge-active"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Active</span>'
-                    : '<span class="badge-inactive"><i class="fa-solid fa-circle" style="font-size:6px;"></i> Inactive</span>';
-                return `<tr class="usage-row">
-                    <td style="padding-left: 24px;">
-                        <div class="admin-name-cell">${a.full_name}</div>
-                        <div class="admin-email-cell">@${a.username}</div>
-                    </td>
-                    <td><span style="font-weight:600; color:var(--primary-light); font-size:0.85rem;">${a.plan_name || '—'}</span></td>
-                    <td>
-                        <div class="usage-bar-wrap">${usageBar(orgUsed, orgMax === '∞' ? null : parseInt(orgMax))}</div>
-                    </td>
-                    <td>
-                        <div class="usage-bar-wrap">${usageBar(brUsed, brMax === '∞' ? null : parseInt(brMax))}</div>
-                    </td>
-                    <td>
-                        <div class="usage-bar-wrap">${usageBar(hrUsed, hrMax === '∞' ? null : parseInt(hrMax))}</div>
-                    </td>
-                    <td style="padding-right: 24px;">${badge}</td>
-                </tr>`;
-            }).join('');
         }
 
         document.addEventListener('DOMContentLoaded', loadDashboard);

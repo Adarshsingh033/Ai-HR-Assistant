@@ -120,20 +120,20 @@ async function loadCandidates(jobId = null, orgId = null) {
                 </div>
 
                 <div class="candidate-meta">
-                    <div class="candidate-meta-item" title="Email">
-                        <span>✉️</span> ${cand.email || 'N/A'}
+                    <div class="candidate-meta-item" title="Email: ${cand.email || 'N/A'}">
+                        <span>✉️</span> <span class="meta-value">${cand.email || 'N/A'}</span>
                     </div>
-                    <div class="candidate-meta-item" title="Phone">
-                        <span><i class="fa-solid fa-mobile-screen"></i></span> ${cand.phone || 'N/A'}
+                    <div class="candidate-meta-item" title="Phone: ${cand.phone || 'N/A'}">
+                        <span><i class="fa-solid fa-mobile-screen"></i></span> <span class="meta-value">${cand.phone || 'N/A'}</span>
                     </div>
-                    <div class="candidate-meta-item" title="Location">
-                        <span><i class="fa-solid fa-location-dot"></i></span> ${cand.address || 'N/A'}
+                    <div class="candidate-meta-item" title="Location: ${cand.address || 'N/A'}">
+                        <span><i class="fa-solid fa-location-dot"></i></span> <span class="meta-value">${cand.address || 'N/A'}</span>
                     </div>
-                    <div class="candidate-meta-item" title="Gender">
-                        <span><i class="fa-solid fa-user"></i></span> ${cand.gender || 'N/A'}
+                    <div class="candidate-meta-item" title="Gender: ${cand.gender || 'N/A'}">
+                        <span><i class="fa-solid fa-user"></i></span> <span class="meta-value">${cand.gender || 'N/A'}</span>
                     </div>
                     <div class="candidate-meta-item" title="Uploaded">
-                        <span><i class="fa-solid fa-calendar"></i></span> ${formatDate(cand.created_at)}
+                        <span><i class="fa-solid fa-calendar"></i></span> <span class="meta-value">${formatDate(cand.created_at)}</span>
                     </div>
                 </div>
 

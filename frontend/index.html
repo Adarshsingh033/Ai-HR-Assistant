@@ -10,17 +10,48 @@
     <link rel="stylesheet" href="css/main.css" />
     <style>
         /* ── Seamless Single Canvas Dark Theme Login ── */
+
+        /* main.css sets html/body to height:100% + overflow:hidden so the app
+           shell can own scrolling. This page has no app shell, and that rule
+           silently clips the hero on short laptop viewports. Re-enable flow. */
+        html,
+        body {
+            height: auto;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+
         body {
             background-color: #080614 !important;
             color: #ffffff !important;
-            overflow-x: hidden;
         }
 
         .login-container {
+            /* --stack-scale drives both the graphic's transform and the box it
+               reserves in flow, so changing it genuinely reflows the hero
+               instead of leaving a fixed-height hole behind. Width and height
+               constraints are tracked separately and combined with min() so
+               the two sets of media queries stay order-independent. */
+            --stack-w: 420px;
+            --stack-h: 600px;
+            --stack-scale-w: 1;
+            --stack-scale-h: 1;
+            --stack-scale: min(var(--stack-scale-w), var(--stack-scale-h));
+
+            --hero-pad-y: clamp(18px, 2.6vh, 34px);
+            --hero-pad-x: clamp(22px, 2.4vw, 46px);
+            --hero-gap: clamp(10px, 1.8vh, 26px);
+            --logo-h: clamp(32px, 4vh, 44px);
+
+            --field-h: clamp(44px, 6vh, 52px);
+            --field-gap: clamp(12px, 2.2vh, 22px);
+
             min-height: 100vh;
+            min-height: 100dvh;
             width: 100%;
             display: grid;
-            grid-template-columns: 1.1fr 0.9fr;
+            grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
             position: relative;
             background: #080614;
             background-image:
@@ -33,33 +64,58 @@
         .login-hero {
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            padding: 32px 40px;
+            gap: var(--hero-gap);
+            padding: var(--hero-pad-y) var(--hero-pad-x);
             position: relative;
             z-index: 2;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .brand-logo-wrap {
+            flex: 0 0 auto;
         }
 
         .brand-logo-wrap img {
-            max-height: 44px;
+            height: var(--logo-h);
             max-width: 220px;
             filter: brightness(0) invert(1);
             object-fit: contain;
+            object-position: left center;
         }
 
-        /* Center AI HR Showcase Card Graphic */
+        /* Center AI HR Showcase Card Graphic.
+           The container reserves exactly the scaled size of the stack; the
+           stack itself keeps fixed design coordinates and is scaled into it. */
         .visual-graphic-container {
-            position: relative;
-            width: 100%;
-            height: 340px;
+            flex: 1 1 auto;
+            min-height: 0;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin: 24px 0;
+        }
+
+        .showcase-scaler {
+            width: calc(var(--stack-w) * var(--stack-scale));
+            height: calc(var(--stack-h) * var(--stack-scale));
+            position: relative;
+            flex: 0 0 auto;
+        }
+
+        .showcase-stack {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: var(--stack-w);
+            height: var(--stack-h);
+            /* Fixed base so the cards' intrinsic heights stay predictable
+               regardless of main.css's fluid root font size. */
+            font-size: 16px;
+            transform: scale(var(--stack-scale));
+            transform-origin: top left;
         }
 
         .ai-showcase-card {
-            width: 100%;
-            max-width: 380px;
             background: rgba(23, 19, 46, 0.7);
             border: 1px solid rgba(255, 255, 255, 0.12);
             border-radius: 20px;
@@ -71,26 +127,32 @@
             position: absolute;
         }
 
+        /* Offsets are deliberate: each card is overlapped only below its
+           header + primary row, so the card beneath reads as a complete unit
+           and only its tail tucks behind the next one. */
         .card-1 {
-            top: 0px;
-            left: -20px;
-            transform: scale(0.95) rotate(-3deg);
+            top: 20px;
+            left: 0;
+            width: 350px;
+            transform: rotate(-3deg);
             z-index: 1;
             animation: floatCard1 7s ease-in-out infinite;
         }
 
         .card-2 {
-            top: 90px;
-            right: -20px;
-            transform: scale(1.0) rotate(2deg);
+            top: 176px;
+            right: 0;
+            width: 320px;
+            transform: rotate(2deg);
             z-index: 2;
             animation: floatCard2 6s ease-in-out infinite 1s;
         }
 
         .card-3 {
-            top: 190px;
-            left: -5px;
-            transform: scale(1.05) rotate(-1deg);
+            top: 376px;
+            left: 8px;
+            width: 350px;
+            transform: rotate(-1deg);
             z-index: 3;
             animation: floatCard3 8s ease-in-out infinite 0.5s;
         }
@@ -99,11 +161,11 @@
 
             0%,
             100% {
-                transform: scale(0.95) rotate(-3deg) translateY(0px);
+                transform: rotate(-3deg) translateY(0px);
             }
 
             50% {
-                transform: scale(0.95) rotate(-3deg) translateY(-8px);
+                transform: rotate(-3deg) translateY(-8px);
             }
         }
 
@@ -111,11 +173,11 @@
 
             0%,
             100% {
-                transform: scale(1.0) rotate(2deg) translateY(0px);
+                transform: rotate(2deg) translateY(0px);
             }
 
             50% {
-                transform: scale(1.0) rotate(2deg) translateY(-6px);
+                transform: rotate(2deg) translateY(-6px);
             }
         }
 
@@ -123,11 +185,11 @@
 
             0%,
             100% {
-                transform: scale(1.05) rotate(-1deg) translateY(0px);
+                transform: rotate(-1deg) translateY(0px);
             }
 
             50% {
-                transform: scale(1.05) rotate(-1deg) translateY(-10px);
+                transform: rotate(-1deg) translateY(-10px);
             }
         }
 
@@ -147,8 +209,9 @@
             background: rgba(99, 102, 241, 0.18);
             border: 1px solid rgba(99, 102, 241, 0.35);
             color: #a5b4fc;
-            font-size: 0.8rem;
+            font-size: 0.8em;
             font-weight: 700;
+            white-space: nowrap;
         }
 
         .ai-pulse-dot {
@@ -176,10 +239,11 @@
             background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: #fff;
             font-weight: 800;
-            font-size: 0.85rem;
+            font-size: 0.85em;
             padding: 6px 14px;
             border-radius: 99px;
             box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+            white-space: nowrap;
         }
 
         .candidate-preview-box {
@@ -201,19 +265,26 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.2rem;
+            font-size: 1.2em;
             color: #fff;
             flex-shrink: 0;
         }
 
+        .candidate-info {
+            min-width: 0;
+        }
+
         .cand-name {
-            font-size: 0.95rem;
+            font-size: 0.95em;
             font-weight: 700;
             color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .cand-status {
-            font-size: 0.78rem;
+            font-size: 0.78em;
             color: rgba(255, 255, 255, 0.55);
             margin-top: 2px;
         }
@@ -230,8 +301,9 @@
             background: rgba(255, 255, 255, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.08);
             color: rgba(255, 255, 255, 0.8);
-            font-size: 0.78rem;
+            font-size: 0.78em;
             font-weight: 500;
+            white-space: nowrap;
         }
 
         .floating-badge {
@@ -241,13 +313,14 @@
             background: rgba(15, 12, 34, 0.92);
             border: 1px solid rgba(255, 255, 255, 0.15);
             color: #fff;
-            font-size: 0.8rem;
+            font-size: 0.8em;
             font-weight: 600;
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(10px);
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
         }
 
         .badge-top-right {
@@ -258,6 +331,15 @@
 
         .badge-bottom-left {
             bottom: -18px;
+            left: -16px;
+            animation: floatBadge2 5s ease-in-out infinite 0.5s;
+        }
+
+        /* card-2's badge has to live up here: card-2 carries z-index:2, which
+           makes it a stacking context, so a badge on its lower edge can never
+           paint above card-3 and would simply disappear behind it. */
+        .badge-top-left {
+            top: -16px;
             left: -16px;
             animation: floatBadge2 5s ease-in-out infinite 0.5s;
         }
@@ -287,14 +369,13 @@
         }
 
         .hero-title-group {
-            margin-top: auto;
+            flex: 0 0 auto;
             position: relative;
             z-index: 10;
-            padding-top: 20px;
         }
 
         .hero-main-title {
-            font-size: 1.85rem;
+            font-size: clamp(1.25rem, 1.1rem + 0.9vh, 1.85rem);
             font-weight: 900;
             line-height: 1.2;
             letter-spacing: 0.02em;
@@ -310,9 +391,9 @@
         }
 
         .hero-subtitle {
-            font-size: 0.9rem;
+            font-size: clamp(0.78rem, 0.7rem + 0.4vh, 0.9rem);
             color: rgba(255, 255, 255, 0.65);
-            margin-top: 10px;
+            margin-top: clamp(6px, 1.2vh, 12px);
             max-width: 440px;
             line-height: 1.5;
         }
@@ -322,9 +403,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 32px;
+            padding: clamp(24px, 4vh, 40px) clamp(20px, 2.5vw, 40px);
             position: relative;
             z-index: 2;
+            min-width: 0;
         }
 
         .form-card {
@@ -333,7 +415,7 @@
         }
 
         .form-title {
-            font-size: 2.2rem;
+            font-size: clamp(1.6rem, 1.3rem + 1.1vh, 2.2rem);
             font-weight: 900;
             letter-spacing: 0.04em;
             color: #ffffff;
@@ -342,13 +424,13 @@
         }
 
         .form-subtitle {
-            font-size: 0.9rem;
+            font-size: clamp(0.8rem, 0.72rem + 0.35vh, 0.9rem);
             color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 32px;
+            margin-bottom: clamp(18px, 4vh, 32px);
         }
 
         .input-group-custom {
-            margin-bottom: 22px;
+            margin-bottom: var(--field-gap);
         }
 
         .input-label-custom {
@@ -377,7 +459,7 @@
 
         .input-field-wrap .form-control-custom {
             width: 100%;
-            height: 52px;
+            height: var(--field-h);
             padding: 0 46px 0 46px;
             background: #15112e;
             border: 1px solid rgba(255, 255, 255, 0.12);
@@ -429,7 +511,7 @@
 
         .btn-signin-custom {
             width: 100%;
-            height: 52px;
+            height: var(--field-h);
             border: none;
             border-radius: 12px;
             background: linear-gradient(90deg, #4f46e5 0%, #3b82f6 100%);
@@ -443,7 +525,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 28px;
+            margin-top: clamp(16px, 3.5vh, 28px);
         }
 
         .btn-signin-custom:hover {
@@ -527,31 +609,135 @@
             }
         }
 
-        @media (max-width: 900px) {
+        .btn-signin-custom:focus-visible,
+        .input-field-wrap .form-control-custom:focus-visible,
+        .pwd-toggle-btn:focus-visible {
+            outline: 2px solid #a5b4fc;
+            outline-offset: 2px;
+        }
+
+        /* ═══════════════════════════════════════════════════════════
+           Responsive: width controls the column split, height controls
+           how much room the hero graphic is allowed to claim.
+           ═══════════════════════════════════════════════════════════ */
+
+        /* Wide desktops / 17" laptops — give the hero a bit more canvas. */
+        @media (min-width: 1600px) {
             .login-container {
-                grid-template-columns: 1fr;
+                grid-template-columns: minmax(0, 1.1fr) minmax(460px, 0.9fr);
+            }
+
+            .form-card {
+                max-width: 400px;
+            }
+        }
+
+        /* 13"–14" laptops around 1280–1366 logical px. */
+        @media (max-width: 1279px) {
+            .login-container {
+                --stack-scale-w: 0.9;
+            }
+        }
+
+        /* Narrow laptops / split-screen windows: protect the form column. */
+        @media (max-width: 1149px) {
+            .login-container {
+                --stack-scale-w: 0.82;
+                grid-template-columns: minmax(0, 1fr) minmax(400px, 1fr);
+            }
+        }
+
+        /* Below this the hero can no longer earn its space. */
+        @media (max-width: 959px) {
+            .login-container {
+                grid-template-columns: minmax(0, 1fr);
             }
 
             .login-hero {
                 display: none;
             }
+        }
 
-            .login-form-side {
-                padding: 32px 24px;
+        /* ── Height steps: 1080p → 768p → short/scaled laptop viewports ──
+           Each step is sized so the 600px stack plus the logo, hero title and
+           padding still clear the viewport with room to spare. */
+        @media (max-height: 940px) {
+            .login-container {
+                --stack-scale-h: 0.92;
             }
         }
 
-        /* Responsive scaling for small laptop heights */
+        @media (max-height: 880px) {
+            .login-container {
+                --stack-scale-h: 0.85;
+            }
+        }
+
+        @media (max-height: 840px) {
+            .login-container {
+                --stack-scale-h: 0.8;
+            }
+        }
+
         @media (max-height: 800px) {
-            .visual-graphic-container {
-                transform: scale(0.85);
-                transform-origin: center top;
+            .login-container {
+                --stack-scale-h: 0.76;
             }
         }
 
+        @media (max-height: 780px) {
+            .login-container {
+                --stack-scale-h: 0.72;
+            }
+        }
+
+        @media (max-height: 740px) {
+            .login-container {
+                --stack-scale-h: 0.68;
+            }
+        }
+
+        /* 1366×768 with browser chrome lands here — the most common laptop. */
         @media (max-height: 700px) {
+            .login-container {
+                --stack-scale-h: 0.63;
+            }
+        }
+
+        @media (max-height: 660px) {
+            .login-container {
+                --stack-scale-h: 0.58;
+            }
+        }
+
+        @media (max-height: 620px) {
+            .login-container {
+                --stack-scale-h: 0.53;
+            }
+
+            .hero-subtitle {
+                display: none;
+            }
+        }
+
+        /* Very short viewports (125–150% OS scaling, half-height windows):
+           drop the decorative graphic so the form stays fully usable. */
+        @media (max-height: 580px) {
             .visual-graphic-container {
-                transform: scale(0.75);
+                display: none;
+            }
+
+            .login-hero {
+                justify-content: space-between;
+            }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .ai-showcase-card,
+            .floating-badge,
+            .ai-pulse-dot {
+                animation: none !important;
             }
         }
     </style>
@@ -568,8 +754,9 @@
             </div>
 
             <!-- AI HR Feature Showcase Card Graphic -->
-            <div class="visual-graphic-container"
-                style="min-height: 420px; max-width: 440px; margin: 12px auto; position: relative;">
+            <div class="visual-graphic-container">
+                <div class="showcase-scaler">
+                    <div class="showcase-stack" aria-hidden="true">
 
                 <!-- CARD 1: AI MATCHING ENGINE -->
                 <div class="ai-showcase-card card-1">
@@ -598,7 +785,7 @@
                 </div>
 
                 <!-- CARD 2: COMPARE CANDIDATES -->
-                <div class="ai-showcase-card card-2" style="max-width: 340px;">
+                <div class="ai-showcase-card card-2">
                     <div class="card-glass-header">
                         <div class="ai-badge"
                             style="background: rgba(236, 72, 153, 0.18); border-color: rgba(236, 72, 153, 0.35); color: #f472b6;">
@@ -611,9 +798,9 @@
                             style="width: 36px; height: 36px; font-size: 0.9rem; background: linear-gradient(135deg, #ec4899, #db2777);">
                             <i class="fa-solid fa-user"></i></div>
                         <div class="candidate-info">
-                            <div class="cand-name" style="font-size: 0.85rem;">Alex M. - <span
+                            <div class="cand-name" style="font-size: 0.85em;">Alex M. - <span
                                     style="color:#10b981;">95%</span></div>
-                            <div class="cand-status" style="font-size: 0.7rem;">Backend Specialist</div>
+                            <div class="cand-status" style="font-size: 0.7em;">Backend Specialist</div>
                         </div>
                     </div>
                     <div class="candidate-preview-box" style="padding: 10px; margin-bottom: 0;">
@@ -621,12 +808,12 @@
                             style="width: 36px; height: 36px; font-size: 0.9rem; background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
                             <i class="fa-solid fa-user"></i></div>
                         <div class="candidate-info">
-                            <div class="cand-name" style="font-size: 0.85rem;">Sarah T. - <span
+                            <div class="cand-name" style="font-size: 0.85em;">Sarah T. - <span
                                     style="color:#10b981;">92%</span></div>
-                            <div class="cand-status" style="font-size: 0.7rem;">Frontend Expert</div>
+                            <div class="cand-status" style="font-size: 0.7em;">Frontend Expert</div>
                         </div>
                     </div>
-                    <div class="floating-badge badge-bottom-left"
+                    <div class="floating-badge badge-top-left"
                         style="background: rgba(15, 12, 34, 0.95); animation-delay: 1.5s;">
                         <i class="fa-solid fa-scale-balanced" style="color: #ec4899;"></i> Unbiased Analysis
                     </div>
@@ -660,6 +847,8 @@
                     </div>
                 </div>
 
+                    </div>
+                </div>
             </div>
 
             <div class="hero-title-group">

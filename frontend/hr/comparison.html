@@ -42,8 +42,8 @@
         }
         .selector-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(min(210px, 100%), 1fr));
+            gap: clamp(12px, 1.4vw, 18px);
             align-items: flex-end;
         }
         .form-group { display: flex; flex-direction: column; gap: 7px; margin-bottom: 0; }
@@ -111,8 +111,8 @@
             top: -40%;
             left: 50%;
             transform: translateX(-50%);
-            width: 450px;
-            height: 320px;
+            width: min(450px, 90%);
+            height: clamp(200px, 30vh, 320px);
             background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.15) 50%, transparent 80%);
             pointer-events: none;
             filter: blur(40px);
@@ -161,7 +161,7 @@
             grid-template-columns: repeat(3, 1fr);
             gap: 16px;
             width: 100%;
-            max-width: 760px;
+            max-width: 760px; width: 100%;
         }
 
         @media (max-width: 768px) {
@@ -237,9 +237,11 @@
         }
         .donut-comparison-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px;
-            align-items: center;
+            grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+            gap: clamp(20px, 3vw, 40px);
+            /* start-aligned so both rings sit on the same baseline even when one
+               card carries the extra "recommended" badge */
+            align-items: start;
         }
         .donut-profile-card {
             display: flex;
@@ -256,8 +258,8 @@
             letter-spacing: -0.02em;
         }
         .donut-ring-wrap {
-            width: 140px;
-            height: 140px;
+            width: clamp(110px, 10vw, 140px);
+            height: clamp(110px, 10vw, 140px);
             border-radius: 50%;
             position: relative;
             display: flex;
@@ -269,8 +271,8 @@
             transition: all 0.5s ease;
         }
         .donut-inner-avatar {
-            width: 120px;
-            height: 120px;
+            width: calc(100% - 20px);
+            height: calc(100% - 20px);
             border-radius: 50%;
             background: #0f172a;
             border: 3px solid rgba(255,255,255,0.12);
@@ -331,8 +333,8 @@
 
         .side-by-side-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 32px;
+            grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+            gap: clamp(18px, 2.4vw, 32px);
         }
         .cand-criterion-block {
             display: flex;
@@ -356,10 +358,18 @@
         .bar-fill-cat-3 { background: linear-gradient(90deg, #14b8a6, #2dd4bf); }
         .bar-fill-cat-4 { background: linear-gradient(90deg, #06b6d4, #38bdf8); }
 
+        .crit-label-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
         .crit-status-tag {
             font-size: 0.75rem;
             font-weight: 800;
-            float: right;
+            white-space: nowrap;
         }
         .crit-detail-text {
             font-size: 0.83rem;
@@ -373,8 +383,8 @@
             background: linear-gradient(135deg, rgba(99,102,241,0.12), rgba(16,185,129,0.12));
             border: 1px solid rgba(99,102,241,0.35);
             border-radius: 20px;
-            padding: 28px;
-            margin-top: 28px;
+            padding: clamp(18px, 2.2vw, 28px);
+            margin-top: clamp(18px, 2.2vw, 28px);
             box-shadow: 0 10px 30px rgba(99,102,241,0.15);
         }
         .rec-panel-header {
@@ -584,7 +594,7 @@
                     <div class="category-title cat-01">Category 01 — Location Match</div>
                     <div class="side-by-side-grid">
                         <div class="cand-criterion-block">
-                            <div>
+                            <div class="crit-label-row">
                                 <strong style="color:#fff;" id="c1-name-cat1">Candidate A</strong>
                                 <span class="crit-status-tag" id="c1-loc-status">Location</span>
                             </div>
@@ -595,7 +605,7 @@
                         </div>
 
                         <div class="cand-criterion-block">
-                            <div>
+                            <div class="crit-label-row">
                                 <strong style="color:#fff;" id="c2-name-cat1">Candidate B</strong>
                                 <span class="crit-status-tag" id="c2-loc-status">Location</span>
                             </div>
@@ -612,7 +622,7 @@
                     <div class="category-title cat-02">Category 02 — Technical & Core Skills</div>
                     <div class="side-by-side-grid">
                         <div class="cand-criterion-block">
-                            <div>
+                            <div class="crit-label-row">
                                 <strong style="color:#fff;" id="c1-name-cat2">Candidate A</strong>
                                 <span class="crit-status-tag" id="c1-skills-status">Skills Match</span>
                             </div>
@@ -624,7 +634,7 @@
                         </div>
 
                         <div class="cand-criterion-block">
-                            <div>
+                            <div class="crit-label-row">
                                 <strong style="color:#fff;" id="c2-name-cat2">Candidate B</strong>
                                 <span class="crit-status-tag" id="c2-skills-status">Skills Match</span>
                             </div>
@@ -642,7 +652,7 @@
                     <div class="category-title cat-03">Category 03 — Education & Qualification</div>
                     <div class="side-by-side-grid">
                         <div class="cand-criterion-block">
-                            <div>
+                            <div class="crit-label-row">
                                 <strong style="color:#fff;" id="c1-name-cat3">Candidate A</strong>
                                 <span class="crit-status-tag" id="c1-edu-status">Education</span>
                             </div>
@@ -653,7 +663,7 @@
                         </div>
 
                         <div class="cand-criterion-block">
-                            <div>
+                            <div class="crit-label-row">
                                 <strong style="color:#fff;" id="c2-name-cat3">Candidate B</strong>
                                 <span class="crit-status-tag" id="c2-edu-status">Education</span>
                             </div>
@@ -670,7 +680,7 @@
                     <div class="category-title cat-04">Category 04 — Professional Experience</div>
                     <div class="side-by-side-grid">
                         <div class="cand-criterion-block">
-                            <div>
+                            <div class="crit-label-row">
                                 <strong style="color:#fff;" id="c1-name-cat4">Candidate A</strong>
                                 <span class="crit-status-tag" id="c1-exp-status">Experience</span>
                             </div>
@@ -681,7 +691,7 @@
                         </div>
 
                         <div class="cand-criterion-block">
-                            <div>
+                            <div class="crit-label-row">
                                 <strong style="color:#fff;" id="c2-name-cat4">Candidate B</strong>
                                 <span class="crit-status-tag" id="c2-exp-status">Experience</span>
                             </div>
@@ -719,7 +729,7 @@
 
 <!-- Logout Confirmation Modal -->
 <div class="modal-overlay" id="logout-confirm-modal">
-    <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.14);border-radius:22px;width:400px;max-width:96vw;padding:32px 28px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+    <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.14);border-radius:22px;width:min(400px, 92vw);padding:clamp(22px, 2.4vw, 32px) clamp(20px, 2.2vw, 28px);text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
         <div style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin:0 auto 16px;box-shadow:0 0 20px rgba(239,68,68,0.2);">
             <i class="fa-solid fa-right-from-bracket"></i>
         </div>

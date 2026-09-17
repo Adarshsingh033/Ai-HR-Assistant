@@ -81,6 +81,80 @@ async function apiRequest(method, path, body = null, isFormData = false) {
     return data;
 }
 
+/* ── Pagination bar ───────────────────────────────────────
+   Builds the shared pagination markup (.pagination-bar / .page-btn
+   from main.css) so every listing page renders an identical,
+   responsive control instead of its own inline-styled copy.
+
+   opts: { page, totalPages, total, limit, onPage, onPageSize, pageSizes }
+   `onPage` / `onPageSize` are names of global functions on the page.
+─────────────────────────────────────────────────────────── */
+function paginationBarHTML(opts) {
+    const page = Math.max(1, opts.page || 1);
+    const totalPages = Math.max(1, opts.totalPages || 1);
+    const total = opts.total || 0;
+    const limit = opts.limit || 10;
+    const onPage = opts.onPage || 'goToPage';
+    const onPageSize = opts.onPageSize || '';
+    const pageSizes = opts.pageSizes || [10, 15, 25, 50];
+
+    if (!total) return '';
+
+    const startItem = (page - 1) * limit + 1;
+    const endItem = Math.min(page * limit, total);
+
+    // Sliding window of page numbers
+    let startPage = 1;
+    let endPage = totalPages;
+    const maxVisible = 5;
+    if (totalPages > 7) {
+        if (page <= 4) { startPage = 1; endPage = maxVisible; }
+        else if (page >= totalPages - 3) { startPage = totalPages - 4; endPage = totalPages; }
+        else { startPage = page - 2; endPage = page + 2; }
+    }
+
+    let pageBtns = '';
+    if (startPage > 1) {
+        pageBtns += `<button type="button" class="page-btn" onclick="${onPage}(1)">1</button>`;
+        if (startPage > 2) pageBtns += `<span class="page-ellipsis">…</span>`;
+    }
+    for (let p = startPage; p <= endPage; p++) {
+        pageBtns += p === page
+            ? `<button type="button" class="page-btn active">${p}</button>`
+            : `<button type="button" class="page-btn" onclick="${onPage}(${p})">${p}</button>`;
+    }
+    if (endPage < totalPages) {
+        if (endPage < totalPages - 1) pageBtns += `<span class="page-ellipsis">…</span>`;
+        pageBtns += `<button type="button" class="page-btn" onclick="${onPage}(${totalPages})">${totalPages}</button>`;
+    }
+
+    const prevDisabled = page <= 1 ? 'disabled' : '';
+    const nextDisabled = page >= totalPages ? 'disabled' : '';
+
+    const sizeSelect = onPageSize ? `
+            <div class="pagination-size">
+                <span>Rows per page:</span>
+                <select onchange="${onPageSize}(this.value)">
+                    ${pageSizes.map(s => `<option value="${s}" ${limit === s ? 'selected' : ''}>${s}</option>`).join('')}
+                </select>
+            </div>` : '';
+
+    return `
+        <div class="pagination-bar">
+            <div class="pagination-info">
+                <span>${startItem}–${endItem} of ${total} <span style="margin:0 4px;opacity:0.4;">·</span> Page ${page} of ${totalPages}</span>
+                ${sizeSelect}
+            </div>
+            <div class="pagination-controls">
+                <button type="button" class="page-btn nav-btn" ${prevDisabled} onclick="${onPage}(1)" title="First page"><i class="fa-solid fa-angles-left"></i></button>
+                <button type="button" class="page-btn nav-btn" ${prevDisabled} onclick="${onPage}(${page - 1})" title="Previous page"><i class="fa-solid fa-chevron-left"></i></button>
+                ${pageBtns}
+                <button type="button" class="page-btn nav-btn" ${nextDisabled} onclick="${onPage}(${page + 1})" title="Next page"><i class="fa-solid fa-chevron-right"></i></button>
+                <button type="button" class="page-btn nav-btn" ${nextDisabled} onclick="${onPage}(${totalPages})" title="Last page"><i class="fa-solid fa-angles-right"></i></button>
+            </div>
+        </div>`;
+}
+
 /* ── Loading state on buttons ─────────────────────────── */
 function setLoading(btn, loading) {
     if (loading) {

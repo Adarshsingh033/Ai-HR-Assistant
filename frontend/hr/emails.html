@@ -9,10 +9,10 @@
     <style>
         .mail-layout {
             display: grid;
-            grid-template-columns: clamp(180px, 18%, 240px) 1fr;
+            grid-template-columns: clamp(180px, 18%, 240px) minmax(0, 1fr);
             gap: clamp(12px, 1.5vw, 20px);
-            height: calc(100vh - var(--topbar-h) - clamp(20px, 2.5vw, 40px));
-            min-height: 400px;
+            flex: 1 1 auto;
+            min-height: min(400px, 60vh);
             background: rgba(15, 23, 42, 0.4);
             border-radius: var(--radius-xl);
             border: 1px solid rgba(255, 255, 255, 0.05);
@@ -21,7 +21,7 @@
         }
 
         @media (max-width: 900px) {
-            .mail-layout { grid-template-columns: 1fr; height: auto; }
+            .mail-layout { grid-template-columns: minmax(0, 1fr); }
         }
 
         /* Mail Sidebar */
@@ -127,9 +127,9 @@
 
         .email-row {
             display: grid;
-            grid-template-columns: 40px 180px 1fr 100px;
+            grid-template-columns: 26px minmax(0, clamp(120px, 16%, 200px)) minmax(0, 1fr) minmax(0, auto);
             align-items: center;
-            padding: 16px 32px;
+            padding: clamp(12px, 1.3vw, 16px) clamp(16px, 2.2vw, 32px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.03);
             cursor: pointer;
             transition: all 0.2s ease;
@@ -236,24 +236,6 @@
             font-size: 0.95rem;
             white-space: pre-wrap;
         }
-        
-        .btn-icon {
-            background: rgba(255,255,255,0.05);
-            border: none;
-            color: var(--text-primary);
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-icon:hover {
-            background: rgba(255,255,255,0.1);
-        }
 
         /* Compose View */
         .compose-view {
@@ -289,7 +271,7 @@
             padding: 16px;
             font-size: 0.95rem;
             resize: vertical;
-            min-height: 250px;
+            min-height: min(250px, 30vh);
             margin-top: 10px;
         }
         
