@@ -278,3 +278,23 @@ function togglePasswordVisibility(inputId, btn) {
         }
     }
 }
+
+/* ── Restrict Spaces in Password Fields ──────────────────── */
+document.addEventListener('keydown', function (e) {
+    const target = e.target;
+    if (target && (target.type === 'password' || (target.id && /pass|pwd/i.test(target.id)))) {
+        if (e.key === ' ' || e.code === 'Space') {
+            e.preventDefault();
+        }
+    }
+}, true);
+
+document.addEventListener('input', function (e) {
+    const target = e.target;
+    if (target && (target.type === 'password' || (target.id && /pass|pwd/i.test(target.id)))) {
+        if (/\s/.test(target.value)) {
+            target.value = target.value.replace(/\s/g, '');
+        }
+    }
+}, true);
+

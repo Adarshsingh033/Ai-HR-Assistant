@@ -261,10 +261,9 @@ function renderMemberTable() {
                     ${avatarHtml}
                 </td>
 
-                <!-- 2. HR Member (Name & Username) -->
+                <!-- 2. HR Member (Name) -->
                 <td>
                     <div style="font-weight: 700; color: #fff; font-size: 0.94rem;">${escapeHtml(m.full_name)}</div>
-                    <div style="font-size: 0.78rem; color: #818cf8; font-weight: 600;">@${escapeHtml(m.username)}</div>
                 </td>
 
                 <!-- 3. Email & Phone -->
@@ -275,15 +274,15 @@ function renderMemberTable() {
 
                 <!-- 4. Organization -->
                 <td>
-                    <div style="font-weight: 600; color: #a5b4fc; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
-                        <i class="fa-solid fa-building" style="font-size: 0.78rem;"></i> ${escapeHtml(m.organization_name || '—')}
+                    <div style="font-weight: 600; color: #a5b4fc; font-size: 0.88rem;">
+                        ${escapeHtml(m.organization_name || '—')}
                     </div>
                 </td>
 
                 <!-- 5. Branch -->
                 <td>
-                    <div style="font-weight: 600; color: #38bdf8; font-size: 0.88rem; display: flex; align-items: center; gap: 6px;">
-                        <i class="fa-solid fa-code-branch" style="font-size: 0.75rem;"></i> ${escapeHtml(m.branch_name || '—')}
+                    <div style="font-weight: 600; color: #38bdf8; font-size: 0.88rem;">
+                        ${escapeHtml(m.branch_name || '—')}
                     </div>
                 </td>
 
@@ -517,6 +516,11 @@ async function handleSaveMember(e) {
 
     if (!memberId && !password) {
         showToast('Password is required for new HR member.', 'error');
+        return;
+    }
+
+    if (password && /\s/.test(password)) {
+        showToast('Password cannot contain spaces.', 'error');
         return;
     }
 

@@ -219,7 +219,7 @@
                                 PASSWORD <span id="member-password-req" style="color: #ef4444;">*</span>
                             </label>
                             <div style="position: relative; display: flex; align-items: center;">
-                                <input type="password" id="member-password-input" placeholder="Set password" style="height: 46px; font-size: 0.9rem; padding-right: 44px;" class="input-custom" />
+                                <input type="password" id="member-password-input" placeholder="Set password" oninput="this.value = this.value.replace(/\s/g, '')" style="height: 46px; font-size: 0.9rem; padding-right: 44px;" class="input-custom" />
                                 <button type="button" onclick="toggleMemberPasswordVisibility()" data-tooltip="Show/Hide password" style="position: absolute; right: 12px; background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">
                                     <i class="fa-regular fa-eye" id="member-password-toggle-icon"></i>
                                 </button>
