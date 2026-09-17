@@ -39,19 +39,19 @@
             --stack-scale-h: 1;
             --stack-scale: min(var(--stack-scale-w), var(--stack-scale-h));
 
-            --hero-pad-y: clamp(18px, 2.6vh, 34px);
-            --hero-pad-x: clamp(22px, 2.4vw, 46px);
-            --hero-gap: clamp(10px, 1.8vh, 26px);
-            --logo-h: clamp(32px, 4vh, 44px);
+            --hero-pad-y: clamp(14px, 2vh, 30px);
+            --hero-pad-x: clamp(18px, 2vw, 40px);
+            --hero-gap: clamp(8px, 1.4vh, 20px);
+            --logo-h: clamp(28px, 3.5vh, 40px);
 
-            --field-h: clamp(44px, 6vh, 52px);
-            --field-gap: clamp(12px, 2.2vh, 22px);
+            --field-h: clamp(42px, 5.5vh, 52px);
+            --field-gap: clamp(10px, 1.8vh, 20px);
 
             min-height: 100vh;
             min-height: 100dvh;
             width: 100%;
             display: grid;
-            grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+            grid-template-columns: minmax(0, 1.05fr) minmax(380px, 0.95fr);
             position: relative;
             background: #080614;
             background-image:
@@ -89,10 +89,13 @@
            stack itself keeps fixed design coordinates and is scaled into it. */
         .visual-graphic-container {
             flex: 1 1 auto;
-            min-height: 0;
+            /* Prevent the container from collapsing to zero on short viewports;
+               200px is the smallest height where the scaled stack is still useful. */
+            min-height: 200px;
             display: flex;
             align-items: center;
             justify-content: center;
+            overflow: visible;
         }
 
         .showcase-scaler {
@@ -100,6 +103,8 @@
             height: calc(var(--stack-h) * var(--stack-scale));
             position: relative;
             flex: 0 0 auto;
+            /* Allow floating badges that extend outside the scaler box to show */
+            overflow: visible;
         }
 
         .showcase-stack {
@@ -113,6 +118,7 @@
             font-size: 16px;
             transform: scale(var(--stack-scale));
             transform-origin: top left;
+            overflow: visible;
         }
 
         .ai-showcase-card {
@@ -632,18 +638,26 @@
             }
         }
 
-        /* 13"–14" laptops around 1280–1366 logical px. */
-        @media (max-width: 1279px) {
+        /* 14"–15" laptops at 1440px wide */
+        @media (max-width: 1439px) {
             .login-container {
-                --stack-scale-w: 0.9;
+                --stack-scale-w: 0.95;
             }
         }
 
-        /* Narrow laptops / split-screen windows: protect the form column. */
+        /* 13"–14" laptops around 1280–1366 logical px. */
+        @media (max-width: 1279px) {
+            .login-container {
+                --stack-scale-w: 0.85;
+                grid-template-columns: minmax(0, 1.05fr) minmax(360px, 0.95fr);
+            }
+        }
+
+        /* 1024px tablets / small laptops */
         @media (max-width: 1149px) {
             .login-container {
-                --stack-scale-w: 0.82;
-                grid-template-columns: minmax(0, 1fr) minmax(400px, 1fr);
+                --stack-scale-w: 0.75;
+                grid-template-columns: minmax(0, 1fr) minmax(340px, 1fr);
             }
         }
 
@@ -659,60 +673,74 @@
         }
 
         /* ── Height steps: 1080p → 768p → short/scaled laptop viewports ──
-           Each step is sized so the 600px stack plus the logo, hero title and
-           padding still clear the viewport with room to spare. */
+           The most common laptop viewport after browser chrome:
+           1366×768 → ~668px, 1280×800 → ~700px, 1920×1080 → ~980px.
+           Each step reduces --stack-scale-h so the graphic shrinks to fit
+           without overflow, while the container min-height keeps it visible. */
+        @media (max-height: 980px) {
+            .login-container {
+                --stack-scale-h: 0.94;
+            }
+        }
+
         @media (max-height: 940px) {
             .login-container {
-                --stack-scale-h: 0.92;
+                --stack-scale-h: 0.88;
             }
         }
 
         @media (max-height: 880px) {
             .login-container {
-                --stack-scale-h: 0.85;
+                --stack-scale-h: 0.82;
             }
         }
 
         @media (max-height: 840px) {
             .login-container {
-                --stack-scale-h: 0.8;
+                --stack-scale-h: 0.76;
             }
         }
 
         @media (max-height: 800px) {
             .login-container {
-                --stack-scale-h: 0.76;
+                --stack-scale-h: 0.71;
             }
         }
 
         @media (max-height: 780px) {
             .login-container {
-                --stack-scale-h: 0.72;
+                --stack-scale-h: 0.67;
             }
         }
 
-        @media (max-height: 740px) {
-            .login-container {
-                --stack-scale-h: 0.68;
-            }
-        }
-
-        /* 1366×768 with browser chrome lands here — the most common laptop. */
-        @media (max-height: 700px) {
+        @media (max-height: 750px) {
             .login-container {
                 --stack-scale-h: 0.63;
             }
         }
 
-        @media (max-height: 660px) {
+        /* 1366×768 with browser chrome lands here — the most common laptop. */
+        @media (max-height: 720px) {
             .login-container {
-                --stack-scale-h: 0.58;
+                --stack-scale-h: 0.59;
             }
         }
 
-        @media (max-height: 620px) {
+        @media (max-height: 690px) {
             .login-container {
-                --stack-scale-h: 0.53;
+                --stack-scale-h: 0.55;
+            }
+        }
+
+        @media (max-height: 660px) {
+            .login-container {
+                --stack-scale-h: 0.51;
+            }
+        }
+
+        @media (max-height: 630px) {
+            .login-container {
+                --stack-scale-h: 0.47;
             }
 
             .hero-subtitle {
@@ -720,15 +748,48 @@
             }
         }
 
+        @media (max-height: 600px) {
+            .login-container {
+                --stack-scale-h: 0.43;
+            }
+        }
+
         /* Very short viewports (125–150% OS scaling, half-height windows):
-           drop the decorative graphic so the form stays fully usable. */
-        @media (max-height: 580px) {
+           drop the decorative graphic so the form stays fully usable.
+           Raised from 580px to 520px so more laptop sizes keep the graphic. */
+        @media (max-height: 520px) {
             .visual-graphic-container {
                 display: none;
             }
 
             .login-hero {
                 justify-content: space-between;
+            }
+        }
+
+        /* ── Combined width+height for common laptop sizes ──
+           1366×768 is the single most prevalent laptop resolution worldwide.
+           At 125% OS scaling it reports as ~1093×614. At 150% → ~910×512.
+           These combined queries keep the graphic visible in all those cases. */
+        @media (max-width: 1400px) and (max-height: 800px) {
+            .login-container {
+                --stack-scale-w: 0.72;
+                --stack-scale-h: 0.65;
+            }
+        }
+
+        @media (max-width: 1200px) and (max-height: 800px) {
+            .login-container {
+                --stack-scale-w: 0.65;
+                --stack-scale-h: 0.60;
+                grid-template-columns: minmax(0, 1fr) minmax(320px, 0.9fr);
+            }
+        }
+
+        @media (max-width: 1100px) and (max-height: 750px) {
+            .login-container {
+                --stack-scale-w: 0.58;
+                --stack-scale-h: 0.55;
             }
         }
 
