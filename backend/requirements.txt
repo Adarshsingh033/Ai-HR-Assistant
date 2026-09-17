@@ -49,7 +49,6 @@ langchain==1.2.10
 langchain-classic==1.0.1
 langchain-community==0.4.1
 langchain-core==1.2.17
-langchain-ollama==1.0.1
 langchain-text-splitters==1.1.1
 langgraph==1.0.10
 langgraph-checkpoint==4.0.1
@@ -68,7 +67,6 @@ mypy_extensions==1.1.0
 networkx==3.6.1
 numpy==2.4.2
 oauthlib==3.3.1
-ollama==0.6.1
 onnxruntime==1.24.2
 opentelemetry-api==1.39.1
 opentelemetry-exporter-otlp-proto-common==1.39.1

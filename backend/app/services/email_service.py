@@ -11,7 +11,6 @@ from typing import Optional, List
 from langchain_core.prompts import ChatPromptTemplate
 
 from app.database import get_db_connection
-from app.services.ai_service import ollama_client
 from app.config import SMTP_SERVER, SMTP_PORT, SMTP_USER, SMTP_PASSWORD
 from app.logger import get_logger
 
@@ -103,41 +102,33 @@ def draft_email_content(
     ])
 
     try:
-        logger.info("Drafting email for HR '%s'.", hr_id)
-        chain = system_prompt | ollama_client
-        response = chain.invoke(input={
-            "hr_name": hr_info["hr_name"],
-            "org_name": hr_info["org_name"],
-            "prompt": prompt,
-        })
-        return response.content
-    except Exception as e:
-        logger.warning("Ollama email drafting failed: %s. Attempting Groq fallback...", e)
+        logger.info("Drafting email for HR '%s' using Groq.", hr_id)
         from app.services.ai_service import _build_groq_client, _invoke_groq_with_retry
-        try:
-            groq = _build_groq_client()
-            chain = system_prompt | groq
-            def _call() -> str:
-                res = chain.invoke(input={
-                    "hr_name": hr_info["hr_name"],
-                    "org_name": hr_info["org_name"],
-                    "prompt": prompt,
-                })
-                if res and res.content:
-                    return res.content
-                raise RuntimeError("Groq returned empty response.")
-            return _invoke_groq_with_retry(_call, context="Email drafting")
-        except Exception as groq_e:
-            logger.error("Groq fallback also failed for email drafting: %s", groq_e)
-            return (
-                f"SUBJECT: Communication from {hr_info['org_name']}\n"
-                f"BODY:\n"
-                f"Dear Candidate,\n\n"
-                f"We are writing to provide an update regarding your application. Please feel free to reach out if you have any questions.\n\n"
-                f"Best Regards,\n"
-                f"{hr_info['hr_name']}\n"
-                f"{hr_info['org_name']}"
-            )
+        groq = _build_groq_client()
+        chain = system_prompt | groq
+        
+        def _call() -> str:
+            res = chain.invoke(input={
+                "hr_name": hr_info["hr_name"],
+                "org_name": hr_info["org_name"],
+                "prompt": prompt,
+            })
+            if res and res.content:
+                return res.content
+            raise RuntimeError("Groq returned empty response.")
+            
+        return _invoke_groq_with_retry(_call, context="Email drafting")
+    except Exception as e:
+        logger.error("Groq failed for email drafting: %s", e)
+        return (
+            f"SUBJECT: Communication from {hr_info['org_name']}\n"
+            f"BODY:\n"
+            f"Dear Candidate,\n\n"
+            f"We are writing to provide an update regarding your application. Please feel free to reach out if you have any questions.\n\n"
+            f"Best Regards,\n"
+            f"{hr_info['hr_name']}\n"
+            f"{hr_info['org_name']}"
+        )
 
 
 def send_and_save_email(

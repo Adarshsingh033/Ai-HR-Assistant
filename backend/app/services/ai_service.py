@@ -1,23 +1,14 @@
 """
 AI service — LLM-powered functions for job descriptions, resume extraction, and candidate matching.
 
-Primary LLM  : Ollama (local, zero-cost)
-Fallback LLM : Groq – model: compound-beta-mini
-               Retries up to 5 times with a 5-second delay between attempts
-               to gracefully handle Groq's rate-limit responses.
+Primary LLM: Groq – model: compound-beta-mini
+             Retries up to 5 times with a 5-second delay between attempts
+             to gracefully handle Groq's rate-limit responses.
 """
 
 import os
 import time
 from typing import Optional, Callable, TypeVar, List
-
-try:
-    from langchain_ollama import ChatOllama
-except (ModuleNotFoundError, ImportError):
-    try:
-        from langchain_community.chat_models.ollama import ChatOllama
-    except (ModuleNotFoundError, ImportError):
-        from langchain_community.chat_models import ChatOllama
 
 try:
     from langchain_groq import ChatGroq
@@ -28,7 +19,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from dotenv import dotenv_values
 
-from app.config import OLLAMA_MODEL, GROQ_API_KEY, GROQ_MODEL
+from app.config import GROQ_API_KEY, GROQ_MODEL
 from app.logger import get_logger
 
 logger = get_logger(__name__)
@@ -131,19 +122,11 @@ class CompareCandidatesLLMSchema(BaseModel):
 
 # ── LLM Clients Initialization ───────────────────────────────────────────────
 
-logger.info("Initializing Ollama primary LLM client with model: %s", OLLAMA_MODEL)
-ollama_client = ChatOllama(model=OLLAMA_MODEL, temperature=0.0, num_gpu=1)
-llm_resume_data_extractor = ollama_client.with_structured_output(schema=ExtractResumeDataSchema)
-llm_matcher = ollama_client.with_structured_output(schema=MatchResultSchema)
-llm_is_resume_checker = ollama_client.with_structured_output(schema=IsResumeSchema)
-llm_comparator = ollama_client.with_structured_output(schema=CompareCandidatesLLMSchema)
-
 _groq_client: Optional["ChatGroq"] = None
 _groq_resume_data_extractor = None
 _groq_matcher = None
 _groq_is_resume_checker = None
 _groq_comparator = None
-
 
 
 # ── Groq helpers ─────────────────────────────────────────────────────────────
@@ -169,7 +152,7 @@ def _build_groq_client() -> "ChatGroq":
     if not api_key:
         raise RuntimeError(
             "GROQ_API_KEY is not set in backend/.env — "
-            "Groq fallback cannot be used."
+            "Groq cannot be used."
         )
     if ChatGroq is None:
         raise RuntimeError(
@@ -204,30 +187,30 @@ def _invoke_groq_with_retry(call: Callable[[], T], context: str = "") -> T:
     for attempt in range(1, GROQ_MAX_RETRIES + 1):
         try:
             logger.info(
-                "[Groq Fallback] %s — attempt %d/%d using model '%s'",
+                "[Groq] %s — attempt %d/%d using model '%s'",
                 context, attempt, GROQ_MAX_RETRIES, GROQ_MODEL_NAME,
             )
             result = call()
             logger.info(
-                "[Groq Fallback] %s — succeeded on attempt %d",
+                "[Groq] %s — succeeded on attempt %d",
                 context, attempt,
             )
             return result
         except Exception as e:
             last_error = e
             logger.warning(
-                "[Groq Fallback] %s — attempt %d/%d failed: %s",
+                "[Groq] %s — attempt %d/%d failed: %s",
                 context, attempt, GROQ_MAX_RETRIES, e,
             )
             if attempt < GROQ_MAX_RETRIES:
                 logger.info(
-                    "[Groq Fallback] Waiting %ds before retry %d/%d...",
+                    "[Groq] Waiting %ds before retry %d/%d...",
                     GROQ_RETRY_DELAY, attempt + 1, GROQ_MAX_RETRIES,
                 )
                 time.sleep(GROQ_RETRY_DELAY)
 
     raise RuntimeError(
-        f"[Groq Fallback] {context} — all {GROQ_MAX_RETRIES} attempts failed. "
+        f"[Groq] {context} — all {GROQ_MAX_RETRIES} attempts failed. "
         f"Last error: {last_error}"
     )
 
@@ -247,11 +230,11 @@ def get_groq_client():
         _groq_is_resume_checker = _groq_client.with_structured_output(schema=IsResumeSchema, method="json_mode")
         _groq_comparator = _groq_client.with_structured_output(schema=CompareCandidatesLLMSchema, method="json_mode")
         logger.info(
-            "Groq fallback LLM client initialized with model: %s", GROQ_MODEL_NAME
+            "Groq LLM client initialized with model: %s", GROQ_MODEL_NAME
         )
         return _groq_client, _groq_resume_data_extractor, _groq_matcher, _groq_comparator
     except Exception as e:
-        logger.warning("Could not initialize Groq fallback LLM client: %s", e)
+        logger.warning("Could not initialize Groq LLM client: %s", e)
         return None, None, None, None
 
 
@@ -267,7 +250,7 @@ def generate_job_description(
     salary: str,
     skills_required: list[str],
 ) -> str:
-    """Generate a professional job description using Ollama with Groq fallback."""
+    """Generate a professional job description using Groq."""
     skills_str = ", ".join(skills_required) if skills_required else "Not specified"
 
     prompt = f"""
@@ -310,20 +293,6 @@ Ensure the description is professional, engaging, and suitable for a company car
 Do not include any placeholder text — use the exact values provided above.
 """
 
-
-    # 1. Try Primary LLM (Ollama)
-    try:
-        logger.info("Generating job description via Ollama (%s) for: %s", OLLAMA_MODEL, title)
-        response = ollama_client.invoke(prompt)
-        if response and response.content:
-            return response.content
-    except Exception as e:
-        logger.warning(
-            "Ollama LLM generation failed for '%s': %s. Attempting Groq fallback...",
-            title, e,
-        )
-
-    # 2. Fallback: Groq with retry
     groq = _build_groq_client()   # raises clearly if key/package missing
 
     def _call() -> str:
@@ -374,24 +343,16 @@ def check_is_resume(text: str) -> tuple[bool, str]:
         """),
     ])
 
-    result = None
-
-    # 1. Try Ollama
+    _, _, _, _ = get_groq_client()  # ensure initialized
+    if _groq_is_resume_checker is None:
+        logger.warning("Groq is_resume checker not available, defaulting to True.")
+        return True, "LLM unavailable — assumed resume"
     try:
-        chain = prompt | llm_is_resume_checker
+        chain = prompt | _groq_is_resume_checker
         result = chain.invoke({"snippet": snippet})
     except Exception as e:
-        logger.warning("Ollama resume check failed: %s. Trying Groq fallback...", e)
-        _, _, _, _ = get_groq_client()  # ensure initialized
-        if _groq_is_resume_checker is None:
-            logger.warning("Groq is_resume checker not available, defaulting to True.")
-            return True, "LLM unavailable — assumed resume"
-        try:
-            chain = prompt | _groq_is_resume_checker
-            result = chain.invoke({"snippet": snippet})
-        except Exception as e2:
-            logger.warning("Groq resume check also failed: %s — defaulting to True.", e2)
-            return True, "LLM unavailable — assumed resume"
+        logger.warning("Groq resume check failed: %s — defaulting to True.", e)
+        return True, "LLM unavailable — assumed resume"
 
     if result is None:
         return True, "LLM returned no result — assumed resume"
@@ -403,7 +364,7 @@ def check_is_resume(text: str) -> tuple[bool, str]:
 # ── Resume Data Extraction ───────────────────────────────────────────────────
 
 def extract_candidate_info(text: str) -> dict:
-    """Uses LLM (Ollama with Groq fallback) to extract structured data from resume text."""
+    """Uses LLM (Groq) to extract structured data from resume text."""
     analysis_prompt = ChatPromptTemplate.from_messages([
         ("system", """
         You are a very skilled resume data extractor.
@@ -434,29 +395,16 @@ def extract_candidate_info(text: str) -> dict:
         """),
     ])
 
-    result = None
+    _, g_extractor, _, _ = get_groq_client()
+    if g_extractor is None:
+        raise RuntimeError("Groq client could not be initialized.")
 
-    # 1. Try Ollama primary
-    try:
-        logger.info("Extracting candidate info from resume text via Ollama.")
-        data_extraction_chain = analysis_prompt | llm_resume_data_extractor
-        result = data_extraction_chain.invoke(input={"resume_data": text})
-    except Exception as e:
-        logger.warning("Ollama candidate extraction failed: %s. Trying Groq fallback...", e)
+    chain = analysis_prompt | g_extractor
 
-        # 2. Groq fallback with retry
-        _, g_extractor, _, _ = get_groq_client()
-        if g_extractor is None:
-            raise RuntimeError(
-                "Ollama extraction failed and Groq client could not be initialized."
-            ) from e
+    def _call():
+        return chain.invoke(input={"resume_data": text})
 
-        chain = analysis_prompt | g_extractor
-
-        def _call():
-            return chain.invoke(input={"resume_data": text})
-
-        result = _invoke_groq_with_retry(_call, context="Resume extraction")
+    result = _invoke_groq_with_retry(_call, context="Resume extraction")
 
     candidate_name = result.candidate_name
     raw_text = (
@@ -490,7 +438,7 @@ def extract_candidate_info(text: str) -> dict:
 # ── Candidate–JD Matching ────────────────────────────────────────────────────
 
 def match_candidate_with_jd(candidate_data: dict, jd_text: str) -> dict:
-    """Uses LLM (Ollama with Groq fallback) to calculate match percentage and explanation."""
+    """Uses LLM (Groq) to calculate match percentage and explanation."""
     match_prompt = ChatPromptTemplate.from_messages([
         ("system", """
         You are an expert HR Talent Acquisition Specialist evaluating candidate fit for a job vacancy.
@@ -541,34 +489,19 @@ Skills: {skills}
 Location / Address: {loc}
 """
 
-    result = None
+    _, _, g_matcher, _ = get_groq_client()
+    if g_matcher is None:
+        raise RuntimeError("Groq client could not be initialized.")
 
-    # 1. Try Ollama primary
-    try:
-        matcher_chain = match_prompt | llm_matcher
-        result = matcher_chain.invoke(input={
+    chain = match_prompt | g_matcher
+
+    def _call():
+        return chain.invoke(input={
             "candidate_data": candidate_summary,
             "jd_text": jd_text,
         })
-    except Exception as e:
-        logger.warning("Ollama candidate matching failed: %s. Trying Groq fallback...", e)
 
-        # 2. Groq fallback with retry
-        _, _, g_matcher, _ = get_groq_client()
-        if g_matcher is None:
-            raise RuntimeError(
-                "Ollama matching failed and Groq client could not be initialized."
-            ) from e
-
-        chain = match_prompt | g_matcher
-
-        def _call():
-            return chain.invoke(input={
-                "candidate_data": candidate_summary,
-                "jd_text": jd_text,
-            })
-
-        result = _invoke_groq_with_retry(_call, context="Candidate-JD matching")
+    result = _invoke_groq_with_retry(_call, context="Candidate-JD matching")
 
     logger.info(
         "Candidate match score: %d%% for candidate data.",
@@ -584,7 +517,7 @@ Location / Address: {loc}
 
 def compare_two_candidates_with_llm(job_data: dict, c1: dict, c2: dict) -> Optional[dict]:
     """
-    Uses LLM (Ollama primary, Groq fallback) to compare two candidates against a Job Vacancy.
+    Uses LLM (Groq) to compare two candidates against a Job Vacancy.
     Returns structured evaluation with category scores, overall scores, and comparison summary reason.
     """
     prompt = ChatPromptTemplate.from_messages([
@@ -684,25 +617,18 @@ def compare_two_candidates_with_llm(job_data: dict, c1: dict, c2: dict) -> Optio
 
     result: Optional[CompareCandidatesLLMSchema] = None
 
-    # 1. Try Ollama primary
     try:
-        logger.info("Executing candidate comparison via Ollama LLM...")
-        chain = prompt | llm_comparator
-        result = chain.invoke(input=input_payload)
+        groq_res = get_groq_client()
+        g_comparator = groq_res[3] if groq_res and len(groq_res) > 3 else None
+        if g_comparator is not None:
+            chain = prompt | g_comparator
+            def _call():
+                return chain.invoke(input=input_payload)
+            result = _invoke_groq_with_retry(_call, context="Candidate comparison")
+        else:
+            logger.warning("Groq comparator could not be initialized.")
     except Exception as e:
-        logger.warning("Ollama candidate comparison failed: %s. Trying Groq fallback...", e)
-
-        # 2. Try Groq fallback
-        try:
-            groq_res = get_groq_client()
-            g_comparator = groq_res[3] if groq_res and len(groq_res) > 3 else None
-            if g_comparator is not None:
-                chain = prompt | g_comparator
-                def _call():
-                    return chain.invoke(input=input_payload)
-                result = _invoke_groq_with_retry(_call, context="Candidate comparison")
-        except Exception as e2:
-            logger.warning("Groq candidate comparison fallback failed: %s", e2)
+        logger.warning("Groq candidate comparison failed: %s", e)
 
     if result is None:
         logger.warning("LLM comparison returned no result.")
@@ -818,4 +744,3 @@ def compare_two_candidates_with_llm(job_data: dict, c1: dict, c2: dict) -> Optio
             "reason": result.comparison_summary_reason,
         }
     }
-
