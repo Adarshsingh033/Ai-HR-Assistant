@@ -327,27 +327,47 @@ async function startUpload() {
 async function resumeProcessing(sess) {
     // When restoring, we don't have File objects — mark remaining queued as failed with message
     const stillQueued = sess.items.filter(i => i.status === 'queued');
-    if (stillQueued.length === 0) {
-        sess.phase = 'done';
-        saveSession(sess);
-        showPhase('results');
-        renderResults(sess);
-        return;
-    }
-
     stillQueued.forEach(i => {
         i.status = 'failed';
         i.rejectionReason = 'Upload interrupted — please retry this file.';
     });
+
+    // We must poll items that were in 'parsing' state when we navigated away
+    const parsingItems = sess.items.filter(i => i.status === 'parsing');
+    
+    if (parsingItems.length > 0) {
+        showPhase('processing');
+        updateProcessingUI(sess);
+        
+        for (const item of parsingItems) {
+            if (item.task_id) {
+                const result = await _waitForTask(item.task_id);
+                if (result.status === 'completed') {
+                    const data = result.result_data;
+                    item.status = 'passed';
+                    item.result = data;
+                } else {
+                    item.status = 'failed';
+                    item.rejectionReason = result.error_message || 'Parse task failed or interrupted.';
+                }
+            } else {
+                item.status = 'failed';
+                item.rejectionReason = 'Task ID lost — please retry.';
+            }
+            saveSession(sess);
+            updateProcessingUI(sess);
+        }
+    }
+
     sess.phase = 'done';
     saveSession(sess);
-    updateProcessingUI(sess);
     await new Promise(r => setTimeout(r, 600));
     showPhase('results');
     renderResults(sess);
 }
 
 async function processItems(sess, fileMap) {
+    // Phase 1: Submit all queued files to get task_ids immediately
     for (let idx = 0; idx < sess.items.length; idx++) {
         const item = sess.items[idx];
         if (item.status !== 'queued') continue;
@@ -388,18 +408,30 @@ async function processItems(sess, fileMap) {
             if (!taskId) {
                 item.status = 'failed';
                 item.rejectionReason = 'Failed to queue parse task.';
-                saveSession(sess);
-                updateProcessingUI(sess);
-                updateProcRow(idx, item);
-                continue;
+            } else {
+                // Store task_id in session item for recovery
+                item.task_id = taskId;
             }
+        } catch (e) {
+            item.status = 'failed';
+            item.rejectionReason = `Error: ${e.message}`;
+        }
 
-            // Store task_id in session item for recovery
-            item.task_id = taskId;
-            saveSession(sess);
+        saveSession(sess);
+        updateProcessingUI(sess);
+        updateProcRow(idx, item);
+    }
 
+    // Phase 2: Poll all tasks sequentially until finished
+    for (let idx = 0; idx < sess.items.length; idx++) {
+        const item = sess.items[idx];
+        if (item.status !== 'parsing' || !item.task_id) continue;
+
+        const taskKey = `resume_parse_${sess.jobId}_${idx}`;
+
+        try {
             // Wait for task to complete by polling
-            const result = await _waitForTask(taskId);
+            const result = await _waitForTask(item.task_id);
 
             if (result.status === 'completed') {
                 const data = result.result_data;

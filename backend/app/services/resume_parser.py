@@ -308,9 +308,15 @@ def parse_resume(file_bytes: bytes, filename: str) -> dict:
     try:
         ai_parsed = ai_service.extract_candidate_info(resume_text)
         if ai_parsed:
+            name = ai_parsed.get("candidate_name", "").strip()
+            if not name:
+                raise ResumeRejected("Failed to extract candidate name. Please ensure the file is a valid resume.")
+            
             ai_parsed["resume_text"] = resume_text
             logger.info("AI extraction successful for '%s'.", filename)
             return ai_parsed
+    except ResumeRejected:
+        raise
     except Exception as e:
         logger.error("AI extraction failed for '%s': %s", filename, e, exc_info=True)
         raise ResumeRejected(f"AI extraction failed: {e}")

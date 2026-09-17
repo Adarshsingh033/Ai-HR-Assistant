@@ -25,9 +25,8 @@ logger = get_logger(__name__)
 
 router = APIRouter(prefix="/api/candidates", tags=["candidates"])
 
-UPLOAD_DIR = os.path.normpath(
-    os.path.join(os.path.dirname(__file__), "..", "..", "uploads", "resumes")
-)
+import tempfile
+UPLOAD_DIR = os.path.join(tempfile.gettempdir(), "ai_hr_resumes")
 os.makedirs(UPLOAD_DIR, exist_ok=True)
 
 

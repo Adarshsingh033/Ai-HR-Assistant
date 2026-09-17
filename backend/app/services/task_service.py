@@ -32,7 +32,7 @@ logger = get_logger(__name__)
 
 # ── Worker configuration ──────────────────────────────────────────────────────
 _POLL_INTERVAL_SECS = 3   # How often the worker checks for pending tasks
-_MAX_WORKERS = 3           # Concurrent AI task threads
+_MAX_WORKERS = 1           # Process tasks sequentially to avoid LLM rate limits
 _executor: Optional[ThreadPoolExecutor] = None
 _worker_thread: Optional[threading.Thread] = None
 _shutdown_event = threading.Event()
