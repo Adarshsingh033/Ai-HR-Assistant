@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Interviewees — AI HR Assistant Interviewer Portal</title>
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        /* ── Table ── */
+        .data-table { width: 100%; border-collapse: collapse; }
+        .data-table thead th {
+            background: rgba(255,255,255,0.02); text-align: left; padding: 14px 20px;
+            font-size: 0.72rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em;
+            color: var(--text-muted); border-bottom: 1px solid var(--border); white-space: nowrap;
+        }
+        .data-table thead th:last-child { text-align: right; }
+        .data-table tbody tr { border-bottom: 1px solid var(--border); transition: background 0.2s ease; }
+        .data-table tbody tr:hover { background: rgba(255,255,255,0.025); }
+        .data-table tbody td { padding: 14px 20px; font-size: 0.87rem; color: var(--text-secondary); vertical-align: middle; }
+
+        /* ── Empty State ── */
+        .table-empty {
+            padding: 64px 24px; text-align: center; display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+        }
+        .empty-icon-circle {
+            width: 64px; height: 64px; border-radius: 50%;
+            background: rgba(99,102,241,0.12); border: 1px solid rgba(99,102,241,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.6rem; color: #818cf8; margin-bottom: 16px;
+        }
+        
+        .btn-sm {
+            padding: 8px 16px; border-radius: 10px; font-size: 0.82rem; font-weight: 700;
+            cursor: pointer; transition: all 0.2s; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+        }
+        .btn-primary-sm { background: linear-gradient(135deg, #10b981, #059669); color: #fff; box-shadow: 0 4px 12px rgba(16,185,129,0.3); }
+        .btn-primary-sm:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(16,185,129,0.4); }
+
+        .btn-secondary-sm { background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.15); color: #fff; }
+        .btn-secondary-sm:hover { background: rgba(255,255,255,0.12); }
+        
+        .round-badge {
+            background: rgba(99,102,241,0.15); color: #a5b4fc; border: 1px solid rgba(99,102,241,0.3);
+            padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 700; display: inline-block;
+        }
+        .score-badge {
+            background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3);
+            padding: 4px 10px; border-radius: 8px; font-size: 0.75rem; font-weight: 800; display: inline-block;
+        }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div>
+                <div class="logo-text">AI HR Assistant</div>
+                <div class="logo-sub">Interviewer Portal</div>
+            </div>
+        </div>
+
+        <div class="nav-section-label">Main Menu</div>
+        <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+            Dashboard
+        </a>
+        <a href="my_interviewees.html" class="nav-item active">
+            <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+            My Interviewees
+        </a>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer" style="position: relative;">
+            <div class="user-menu-popover hidden" id="user-menu-popover">
+                <a href="change_password.html" class="popover-item">
+                    <i class="fa-solid fa-lock" style="color: #3b82f6;"></i> Change Password
+                </a>
+                <div class="popover-divider"></div>
+                <a href="#" class="popover-item" onclick="logout()">
+                    <i class="fa-solid fa-right-from-bracket" style="color: #ef4444;"></i> Logout
+                </a>
+            </div>
+            <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">
+                <div class="user-avatar" id="sidebar-avatar">I</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-name">Interviewer</div>
+                    <div class="user-role" id="sidebar-role">Interviewer</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-title">My Interviewees</div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-text">
+                    <h1 style="font-size:1.3rem;font-weight:800;color:var(--text-primary);margin:0 0 3px;">Assigned Candidates</h1>
+                    <p style="font-size:0.83rem;color:var(--text-muted);margin:0;">Candidates pending your interview evaluation.</p>
+                </div>
+            </div>
+
+            <!-- Table Card -->
+            <div class="data-card">
+                <!-- Skeleton -->
+                <div id="inv-skeleton" style="padding:16px 20px;">
+                    <div class="skeleton-row" style="height:22px;margin-bottom:12px;border-radius:8px;"></div>
+                    <div class="skeleton-row" style="height:22px;margin-bottom:12px;border-radius:8px;"></div>
+                    <div class="skeleton-row" style="height:22px;border-radius:8px;"></div>
+                </div>
+
+                <!-- Empty -->
+                <div id="inv-empty" class="table-empty" style="display:none;">
+                    <div class="empty-icon-circle"><i class="fa-solid fa-user-check"></i></div>
+                    <div class="empty-title" style="font-weight:800; color:#fff;">No Pending Interviews</div>
+                    <div class="empty-sub">You have no active interview assignments. Check back later.</div>
+                </div>
+
+                <!-- Table -->
+                <div class="table-wrap" id="inv-table-wrap" style="display:none;">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th style="width:25%;">Candidate</th>
+                                <th style="width:25%;">Job Vacancy</th>
+                                <th style="width:20%;">Interview Round</th>
+                                <th style="width:10%;">ATS Match</th>
+                                <th style="width:20%; text-align:right;">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="inv-tbody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div id="inv-pagination"></div>
+
+        </div>
+    </main>
+</div>
+
+<!-- Logout Modal -->
+<div class="modal-overlay" id="logout-confirm-modal">
+    <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.12);border-radius:20px;width:min(400px,92vw);padding:32px 24px;text-align:center;">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin:0 auto 16px;">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </div>
+        <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin-bottom:8px;">Log out?</h3>
+        <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:24px;">You will need to sign back in to access the portal.</p>
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <button onclick="closeLogoutModal()" style="padding:10px 22px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.85rem;">Cancel</button>
+            <button onclick="confirmLogoutAction()" style="padding:10px 24px;border-radius:11px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;cursor:pointer;font-weight:800;font-size:0.85rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);">Logout</button>
+        </div>
+    </div>
+</div>
+
+<script src="../js/config.js?v=1"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/interviewer_common.js"></script>
+<script src="../js/interviewer_interviewees.js"></script>
+</body>
+</html>

@@ -161,7 +161,8 @@ def list_screening_candidates(
 ):
     """
     List all contacted candidates (reached = True) for the organization,
-    enriched with screening status (contacted_status, current_round_order, interview_status, current_round_title).
+    enriched with: contacted_status, current_round_order, interview_status,
+    current_round_title, assigned interviewer name, and average rating (1-10 scale).
     """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
@@ -178,7 +179,24 @@ def list_screening_candidates(
                 "   WHERE r.job_id = c.job_id AND r.round_order = COALESCE(css.current_round_order, 1) "
                 "   LIMIT 1), "
                 "  'Round ' || COALESCE(css.current_round_order, 1)"
-                ") AS current_round_title "
+                ") AS current_round_title, "
+                # Interviewer name for current round
+                "COALESCE("
+                "  (SELECT iv.full_name FROM interview_assignments ia "
+                "   JOIN interviewers iv ON ia.interviewer_id = iv.id "
+                "   JOIN screening_rounds sr ON ia.round_id = sr.id "
+                "   WHERE ia.candidate_id = c.id "
+                "     AND sr.round_order = COALESCE(css.current_round_order, 1) "
+                "   LIMIT 1), "
+                "  NULL"
+                ") AS current_interviewer_name, "
+                # Average rating across completed rounds (10-point scale)
+                "(SELECT ROUND(AVG(ia2.rating)::numeric, 1) "
+                " FROM interview_assignments ia2 "
+                " WHERE ia2.candidate_id = c.id "
+                "   AND ia2.completed_at IS NOT NULL "
+                "   AND ia2.rating IS NOT NULL"
+                ") AS average_rating "
                 "FROM candidates c "
                 "LEFT JOIN job_vacancies j ON c.job_id = j.id "
                 "LEFT JOIN candidate_screening_status css ON c.id = css.candidate_id "
@@ -225,6 +243,8 @@ def list_screening_candidates(
                         "current_round_order": r[16],
                         "interview_status": r[17],
                         "current_round_title": r[18],
+                        "current_interviewer_name": r[19],
+                        "average_rating": float(r[20]) if r[20] is not None else None,
                     }
                     for r in rows
                 ]

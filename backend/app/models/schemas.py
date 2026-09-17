@@ -6,6 +6,7 @@ from enum import Enum
 class UserRole(str, Enum):
     ADMIN = "admin"
     HR = "hr"
+    INTERVIEWER = "interviewer"
 
 
 # ── Auth ─────────────────────────────────────────────────────────────────────
@@ -301,6 +302,31 @@ class HRResponse(BaseModel):
     created_at: str
 
 
+# ── Department Management ────────────────────────────────────────────────────
+class CreateDepartmentRequest(BaseModel):
+    organization_id: str
+    branch_id: str
+    department_name: str
+    description: Optional[str] = None
+
+
+class UpdateDepartmentRequest(BaseModel):
+    department_name: Optional[str] = None
+    description: Optional[str] = None
+
+
+class DepartmentResponse(BaseModel):
+    department_id: str
+    organization_id: str
+    organization_name: Optional[str] = None
+    branch_id: str
+    branch_name: Optional[str] = None
+    department_name: str
+    description: Optional[str] = None
+    created_at: str
+    updated_at: str
+
+
 # ── Job Vacancy ───────────────────────────────────────────────────────────────
 class InterviewRoundInput(BaseModel):
     round_title: str
@@ -317,6 +343,7 @@ class CreateJobRequest(BaseModel):
 
     job_title: str
     department: Optional[str] = None
+    department_id: Optional[str] = None  # NEW: links to departments table
     employment_type: str = "Full-time"
     work_mode: str = "On-site"
     location: Optional[str] = None
@@ -335,6 +362,7 @@ class UpdateJobRequest(BaseModel):
     branch_id: Optional[str] = None
     job_title: Optional[str] = None
     department: Optional[str] = None
+    department_id: Optional[str] = None  # NEW: links to departments table
     employment_type: Optional[str] = None
     work_mode: Optional[str] = None
     location: Optional[str] = None
@@ -358,6 +386,8 @@ class JobResponse(BaseModel):
 
     job_title: str
     department: Optional[str] = None
+    department_id: Optional[str] = None  # NEW
+    department_name: Optional[str] = None  # NEW
     employment_type: str
     work_mode: str
     location: Optional[str] = None
@@ -587,3 +617,98 @@ class AuditLogResponse(BaseModel):
     resource_id: Optional[str] = None
     details: Optional[str] = None
     created_at: str
+
+
+# ── Interviewer Management ────────────────────────────────────────────────────
+class CreateInterviewerRequest(BaseModel):
+    department_id: str
+    full_name: str
+    username: str
+    email: EmailStr
+    password: str
+
+    @field_validator('username')
+    @classmethod
+    def username_alphanumeric(cls, v: str) -> str:
+        v = v.strip()
+        if len(v) < 3:
+            raise ValueError('Username must be at least 3 characters')
+        if not v.replace('_', '').replace('-', '').isalnum():
+            raise ValueError('Username must be alphanumeric (underscores/hyphens allowed)')
+        return v.lower()
+
+    @field_validator('password')
+    @classmethod
+    def password_strength(cls, v: str) -> str:
+        if len(v) < 6:
+            raise ValueError('Password must be at least 6 characters')
+        return v
+
+
+class UpdateInterviewerRequest(BaseModel):
+    department_id: Optional[str] = None
+    full_name: Optional[str] = None
+    username: Optional[str] = None
+    email: Optional[EmailStr] = None
+    password: Optional[str] = None
+
+
+class InterviewerResponse(BaseModel):
+    interviewer_id: str
+    organization_id: str
+    organization_name: Optional[str] = None
+    branch_id: str
+    branch_name: Optional[str] = None
+    department_id: str
+    department_name: Optional[str] = None
+    created_by_hr_id: Optional[str] = None
+    full_name: str
+    username: str
+    email: str
+    status: str = "active"
+    created_at: str
+    updated_at: str
+
+
+class InterviewerProfileResponse(BaseModel):
+    interviewer_id: str
+    full_name: str
+    username: str
+    email: str
+    organization_id: str
+    organization_name: Optional[str] = None
+    branch_id: str
+    branch_name: Optional[str] = None
+    department_id: str
+    department_name: Optional[str] = None
+    status: str = "active"
+    created_at: str
+
+
+# ── Interview Assignments ─────────────────────────────────────────────────────
+class AssignInterviewerRequest(BaseModel):
+    candidate_id: str
+    round_id: str
+    interviewer_id: str
+
+
+class SubmitInterviewResultRequest(BaseModel):
+    status: str          # Ongoing, Passed, Rejected, Onhold
+    rating: Optional[int] = None   # 1-10
+    feedback: Optional[str] = None
+    is_done: bool = False          # True = mark as completed
+
+    @field_validator('status')
+    @classmethod
+    def validate_status(cls, v: str) -> str:
+        allowed = {"Ongoing", "Passed", "Rejected", "Onhold"}
+        if v not in allowed:
+            raise ValueError(f'Status must be one of: {allowed}')
+        return v
+
+    @field_validator('rating')
+    @classmethod
+    def validate_rating(cls, v: Optional[int]) -> Optional[int]:
+        if v is not None and not (1 <= v <= 10):
+            raise ValueError('Rating must be an integer between 1 and 10')
+        return v

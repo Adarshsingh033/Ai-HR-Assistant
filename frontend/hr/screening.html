@@ -277,6 +277,11 @@
             <span class="nav-icon"><i class="fa-solid fa-clipboard-check"></i></span>
             Screening
         </a>
+        <a href="interviewers.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span>
+            Interviewers
+        </a>
+        
         <a href="comparison.html" class="nav-item">
             <span class="nav-icon"><i class="fa-solid fa-code-compare"></i></span>
             Candidate Comparison
@@ -366,12 +371,12 @@
                         <table class="candidates-table">
                             <thead>
                                 <tr>
-                                    <th style="width:20%;">Candidate Name</th>
-                                    <th style="width:20%;">Email</th>
-                                    <th style="width:13%;">Phone Number</th>
-                                    <th style="width:20%;">Round Step</th>
-                                    <th style="width:18%;">Interview Status</th>
-                                    <th style="width:9%; text-align:right;">Action</th>
+                                    <th style="width:20%;">Candidate</th>
+                                    <th style="width:20%;">Latest Round</th>
+                                    <th style="width:18%;">Interviewer</th>
+                                    <th style="width:10%;text-align:center;">Avg Rating</th>
+                                    <th style="width:15%;">Interview Status</th>
+                                    <th style="width:17%; text-align:right;">Action</th>
                                 </tr>
                             </thead>
                             <tbody id="screen-tbody"></tbody>
@@ -564,6 +569,50 @@
             <button onclick="submitInterviewProgress()"
                     style="padding:11px 26px;border-radius:12px;border:none;background:linear-gradient(135deg, #6366f1, #4f46e5);color:#fff;cursor:pointer;font-weight:800;font-size:0.86rem;box-shadow:0 4px 15px rgba(99,102,241,0.4);display:inline-flex;align-items:center;gap:8px;transition:all 0.15s;">
                 <i class="fa-solid fa-floppy-disk"></i> Save Status
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ══════════════════════════════════════════════
+     ASSIGN INTERVIEWER MODAL
+══════════════════════════════════════════════ -->
+<div class="modal-overlay" id="assign-interviewer-modal">
+    <div class="modal-lg" style="max-width:500px;">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+            <div>
+                <h3 style="font-size:1.2rem;font-weight:900;color:#fff;margin:0;">Assign Interviewer</h3>
+                <div style="font-size:0.82rem;color:var(--text-muted);margin-top:3px;" id="ai-sub">Candidate: <span id="ai-candidate-name"></span></div>
+            </div>
+            <button class="modal-close-btn" onclick="closeModal('assign-interviewer-modal')">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <input type="hidden" id="ai-candidate-id" />
+
+        <div class="form-group">
+            <label class="form-label">Select Interview Round <span style="color:#ef4444;">*</span></label>
+            <select class="form-control" id="ai-round-select" required>
+                <option value="" disabled selected>Select an interview round...</option>
+            </select>
+        </div>
+
+        <div class="form-group" style="margin-bottom: 24px;">
+            <label class="form-label">Select Interviewer <span style="color:#ef4444;">*</span></label>
+            <select class="form-control" id="ai-interviewer-select" required>
+                <option value="" disabled selected>Select an interviewer...</option>
+            </select>
+        </div>
+
+        <div style="display:flex;justify-content:flex-end;gap:12px;">
+            <button onclick="closeModal('assign-interviewer-modal')"
+                    style="padding:11px 22px;border-radius:12px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.86rem;">
+                Cancel
+            </button>
+            <button onclick="submitInterviewerAssignment()"
+                    style="padding:11px 26px;border-radius:12px;border:none;background:linear-gradient(135deg, #10b981, #059669);color:#fff;cursor:pointer;font-weight:800;font-size:0.86rem;box-shadow:0 4px 15px rgba(16,185,129,0.4);display:inline-flex;align-items:center;gap:8px;">
+                <i class="fa-solid fa-user-plus"></i> Assign
             </button>
         </div>
     </div>

@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import auth, admin, hr, jobs, candidates, emails, screening, comparison, super_admin, ai_tasks
+from app.routers import auth, admin, hr, jobs, candidates, emails, screening, comparison, super_admin, ai_tasks, departments, interviewers, assignments
 from app.database import init_db, close_pool
 from app.logger import get_logger
 
@@ -72,6 +72,9 @@ app.include_router(screening.router)
 app.include_router(comparison.router)
 app.include_router(super_admin.router)
 app.include_router(ai_tasks.router)
+app.include_router(departments.router)
+app.include_router(interviewers.router)
+app.include_router(assignments.router)
 
 
 

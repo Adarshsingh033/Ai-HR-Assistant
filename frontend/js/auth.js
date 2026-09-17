@@ -8,6 +8,7 @@ window.addEventListener('DOMContentLoaded', () => {
     if (session?.role === 'super_admin') location.href = '/super_admin/dashboard.html';
     else if (session?.role === 'admin') location.href = '/admin/dashboard.html';
     else if (session?.role === 'hr') location.href = '/hr/dashboard.html';
+    else if (session?.role === 'interviewer') location.href = '/interviewer/dashboard.html';
 
     // Clear any browser pre-filled credentials
     const form = document.getElementById('login-form');
@@ -95,6 +96,8 @@ async function handleLogin(e) {
                     location.href = '/super_admin/dashboard.html';
                 } else if (data.role === 'admin') {
                     location.href = '/admin/dashboard.html';
+                } else if (data.role === 'interviewer') {
+                    location.href = '/interviewer/dashboard.html';
                 } else {
                     location.href = '/hr/dashboard.html';
                 }

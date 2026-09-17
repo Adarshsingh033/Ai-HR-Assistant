@@ -55,10 +55,11 @@ def create_job(
             cur.execute(
                 """
                 INSERT INTO job_vacancies 
-                (id, organization_id, branch_id, created_by_hr_id, job_title, department, 
+                (id, organization_id, branch_id, created_by_hr_id, job_title, department,
+                 department_id,
                  employment_type, work_mode, location, openings, experience_required, 
                  qualification, salary, skills_required, job_description, status, created_at, updated_at)
-                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, NOW(), NOW())
                 RETURNING created_at, updated_at
                 """,
                 (
@@ -68,6 +69,7 @@ def create_job(
                     hr_id,
                     payload.job_title.strip(),
                     payload.department.strip() if payload.department else "General",
+                    payload.department_id if payload.department_id else None,
                     payload.employment_type.strip() if payload.employment_type else "Full-time",
                     payload.work_mode.strip() if payload.work_mode else "On-site",
                     payload.location.strip() if payload.location else "",
@@ -115,6 +117,16 @@ def create_job(
                 if brow:
                     branch_name = brow[0]
 
+    # Resolve department name if department_id provided
+    dept_name = ""
+    if payload.department_id:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute("SELECT department_name FROM departments WHERE id = %s LIMIT 1", (payload.department_id,))
+                dr = cur.fetchone()
+                if dr:
+                    dept_name = dr[0]
+
     logger.info("Job Vacancy created: %s (id=%s, org=%s)", payload.job_title, job_id, org_id)
     return JobResponse(
         job_id=job_id,
@@ -124,6 +136,8 @@ def create_job(
         created_by_hr_id=hr_id,
         job_title=payload.job_title,
         department=payload.department or "General",
+        department_id=payload.department_id or "",
+        department_name=dept_name,
         employment_type=payload.employment_type or "Full-time",
         work_mode=payload.work_mode or "On-site",
         location=payload.location or "",

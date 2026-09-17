@@ -744,3 +744,106 @@ def compare_two_candidates_with_llm(job_data: dict, c1: dict, c2: dict) -> Optio
             "reason": result.comparison_summary_reason,
         }
     }
+
+
+# ── Interview Question Generation ─────────────────────────────────────────────
+
+class InterviewQuestionsSchema(BaseModel):
+    questions: List[str] = Field(
+        ...,
+        description="Exactly 10 concise interview questions (1-2 sentences each) relevant to the job and candidate.",
+        min_length=10,
+        max_length=10,
+    )
+
+
+def generate_interview_questions(job_data: dict, candidate_data: dict) -> list[str]:
+    """
+    Generate exactly 10 concise interview questions tailored to a specific
+    candidate's experience level and a job vacancy's requirements.
+
+    Difficulty scales with the candidate's total experience — entry-level
+    candidates get fundamentals/situational questions while experienced
+    candidates get advanced, scenario-based questions.
+
+    Returns:
+        List of 10 question strings.
+    """
+    exp_years = candidate_data.get("total_experience", 0) or 0
+    if exp_years <= 1:
+        difficulty_note = "Focus on foundational concepts, learning ability, and basic situational questions suitable for a fresher or entry-level candidate."
+    elif exp_years <= 3:
+        difficulty_note = "Use a mix of conceptual and practical questions appropriate for a junior-to-mid-level professional."
+    elif exp_years <= 6:
+        difficulty_note = "Ask scenario-based and problem-solving questions appropriate for a mid-level professional."
+    else:
+        difficulty_note = "Ask advanced, scenario-based, architectural, or leadership questions suitable for a senior professional."
+
+    job_skills = ", ".join(job_data.get("skills_required", [])) if isinstance(job_data.get("skills_required"), list) else str(job_data.get("skills_required", ""))
+    cand_skills = candidate_data.get("skills", "")
+    if isinstance(cand_skills, list):
+        cand_skills = ", ".join(cand_skills)
+
+    prompt = ChatPromptTemplate.from_messages([
+        ("system", """
+You are an experienced technical interviewer. Your task is to generate exactly 10 interview questions
+for a specific candidate applying for a specific job vacancy.
+
+Rules:
+- Generate EXACTLY 10 questions — no more, no less.
+- Each question must be concise: 1 or 2 sentences only.
+- Questions must be relevant to BOTH the job requirements AND the candidate's profile.
+- Do NOT generate generic questions (e.g., "Tell me about yourself" or "What are your weaknesses?").
+- Questions should directly test skills, experience, and knowledge relevant to this role.
+- Avoid questions that are completely unrelated to the job or candidate's background.
+- Difficulty level instruction: {difficulty_note}
+- Mix question types: technical knowledge, problem-solving scenarios, past experience verification.
+
+Respond strictly in JSON format with exactly this structure:
+{{
+  "questions": ["question 1", "question 2", ..., "question 10"]
+}}
+"""),
+        ("human", """
+# JOB VACANCY
+Title: {job_title}
+Department: {department}
+Required Skills: {job_skills}
+Experience Required: {experience_required}
+Qualification Required: {qualification}
+Job Description Summary: {job_description}
+
+# CANDIDATE PROFILE
+Name: {candidate_name}
+Total Experience: {exp_years} years
+Skills: {cand_skills}
+Education/Qualification: {education}
+
+Generate exactly 10 interview questions for this candidate for this specific role.
+"""),
+    ])
+
+    groq_client = _build_groq_client()
+    q_extractor = groq_client.with_structured_output(schema=InterviewQuestionsSchema, method="json_mode")
+    chain = prompt | q_extractor
+
+    def _call():
+        return chain.invoke({
+            "difficulty_note": difficulty_note,
+            "job_title": job_data.get("job_title", "Job Vacancy"),
+            "department": job_data.get("department", "General"),
+            "job_skills": job_skills,
+            "experience_required": job_data.get("experience_required", "Not specified"),
+            "qualification": job_data.get("qualification", "Not specified"),
+            "job_description": (job_data.get("job_description", ""))[:600],
+            "candidate_name": candidate_data.get("name", "Candidate"),
+            "exp_years": exp_years,
+            "cand_skills": cand_skills,
+            "education": candidate_data.get("education", candidate_data.get("qualification", "Not specified")),
+        })
+
+    result = _invoke_groq_with_retry(_call, context="Interview question generation")
+    questions = result.questions if result and result.questions else []
+    # Ensure exactly 10
+    return questions[:10] if len(questions) >= 10 else questions
+

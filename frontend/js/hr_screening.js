@@ -126,15 +126,27 @@ function renderScreeningTable() {
         else if (interviewStatus === 'Rejected') statusPillClass = 'status-pill-rejected';
         else if (interviewStatus === 'On Hold') statusPillClass = 'status-pill-onhold';
 
+        let interviewerName = c.interviewer_name || 'Unassigned';
+        let avgRatingStr = '—';
+        if (c.avg_rating !== undefined && c.avg_rating !== null) {
+            avgRatingStr = Number(c.avg_rating).toFixed(1) + '/10';
+        }
+
         return `
         <tr>
             <td class="td-truncate" style="font-weight:600;color:var(--text-bright);">${escapeHtml(c.name || 'Unknown')}</td>
-            <td class="td-truncate">${escapeHtml(c.email || '—')}</td>
-            <td style="white-space:nowrap;">${escapeHtml(c.phone || '—')}</td>
             <td class="td-truncate">
                 <span class="round-step-badge" title="${escapeHtml(roundStep)}">
                     <i class="fa-solid fa-diagram-next"></i> <span>${escapeHtml(roundStep)}</span>
                 </span>
+            </td>
+            <td class="td-truncate">
+                <span style="font-size:0.82rem; ${c.interviewer_name ? 'color:var(--text-secondary);' : 'color:var(--text-muted); font-style:italic;'}">
+                    ${escapeHtml(interviewerName)}
+                </span>
+            </td>
+            <td style="text-align:center;font-weight:700;color:${c.avg_rating >= 7 ? '#10b981' : c.avg_rating >= 4 ? '#f59e0b' : c.avg_rating ? '#ef4444' : 'var(--text-muted)'};">
+                ${avgRatingStr}
             </td>
             <td style="white-space:nowrap;">
                 <span class="status-pill ${statusPillClass}">
@@ -146,6 +158,9 @@ function renderScreeningTable() {
                     <i class="fa-solid fa-ellipsis-vertical"></i>
                 </button>
                 <div class="action-dropdown" id="amenu-${cid}">
+                    <div class="action-dropdown-item" onclick="openAssignInterviewerModal('${cid}')">
+                        <i class="fa-solid fa-user-plus" style="color:#10b981;"></i> Assign
+                    </div>
                     <div class="action-dropdown-item" onclick="openViewProgressModal('${cid}')">
                         <i class="fa-regular fa-eye" style="color:#a5b4fc;"></i> View
                     </div>
@@ -619,6 +634,96 @@ async function saveEditedRounds() {
         await loadScreeningCandidates();
     } catch (err) {
         showToast('Failed to save interview rounds: ' + err.message, 'error');
+    }
+}
+
+/* ========================================================
+   4. ASSIGN INTERVIEWER MODAL
+   ======================================================== */
+
+async function openAssignInterviewerModal(candidateId) {
+    const c = screeningCandidates.find(x => x.candidate_id === candidateId);
+    if (!c) {
+        showToast('Candidate not found.', 'error');
+        return;
+    }
+
+    document.getElementById('ai-candidate-id').value = candidateId;
+    document.getElementById('ai-candidate-name').textContent = c.name || 'Unknown Candidate';
+
+    // Reset selects
+    const roundSelect = document.getElementById('ai-round-select');
+    const intSelect = document.getElementById('ai-interviewer-select');
+    roundSelect.innerHTML = '<option value="" disabled selected>Loading rounds...</option>';
+    intSelect.innerHTML = '<option value="" disabled selected>Loading interviewers...</option>';
+
+    openModal('assign-interviewer-modal');
+
+    try {
+        // 1. Fetch rounds for this candidate
+        const progData = await apiRequest('GET', `/api/screening/candidates/${candidateId}/progress`);
+        const rounds = progData.rounds || [];
+        
+        if (rounds.length === 0) {
+            roundSelect.innerHTML = '<option value="" disabled>No rounds configured for this job</option>';
+        } else {
+            roundSelect.innerHTML = '<option value="" disabled selected>Select an interview round...</option>' + 
+                rounds.map(r => `<option value="${r.round_id}">Round ${r.round_order}: ${escapeHtml(r.round_title)}</option>`).join('');
+        }
+
+        // 2. Fetch interviewers for the job's department
+        const jobId = c.job_id || progData.candidate.job_id;
+        const job = allJobs.find(j => (j.job_id || j.id) === jobId);
+        
+        if (!job || !job.department_id) {
+            intSelect.innerHTML = '<option value="" disabled>No department assigned to this job</option>';
+            showToast('This job vacancy lacks a department. Please update the job first.', 'error');
+            return;
+        }
+
+        const deptId = job.department_id;
+        const ivData = await apiRequest('GET', `/api/hr/interviewers/by-department/${deptId}`);
+        const interviewers = ivData.interviewers || [];
+
+        if (interviewers.length === 0) {
+            intSelect.innerHTML = '<option value="" disabled>No interviewers found in this department</option>';
+        } else {
+            intSelect.innerHTML = '<option value="" disabled selected>Select an interviewer...</option>' + 
+                interviewers.map(iv => `<option value="${iv.interviewer_id}">${escapeHtml(iv.full_name)} (${escapeHtml(iv.email)})</option>`).join('');
+        }
+
+    } catch (err) {
+        showToast('Failed to load assignment data: ' + err.message, 'error');
+        closeModal('assign-interviewer-modal');
+    }
+}
+
+async function submitInterviewerAssignment() {
+    const candidateId = document.getElementById('ai-candidate-id').value;
+    const roundId = document.getElementById('ai-round-select').value;
+    const interviewerId = document.getElementById('ai-interviewer-select').value;
+
+    if (!roundId) {
+        showToast('Please select an interview round.', 'error');
+        return;
+    }
+    if (!interviewerId) {
+        showToast('Please select an interviewer.', 'error');
+        return;
+    }
+
+    try {
+        await apiRequest('POST', `/api/screening/assign`, {
+            candidate_id: candidateId,
+            round_id: roundId,
+            interviewer_id: interviewerId
+        });
+
+        showToast('Interviewer assigned successfully!', 'success');
+        closeModal('assign-interviewer-modal');
+        await loadScreeningCandidates();
+    } catch (err) {
+        showToast('Failed to assign interviewer: ' + err.message, 'error');
     }
 }
 

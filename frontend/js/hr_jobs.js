@@ -6,6 +6,7 @@ let currentOrgId = null;
 let currentBranchId = null;
 let allJobs = [];
 let branchesList = [];
+let allDepartments = [];
 let jobSkillsTags = [];
 
 /* ── Default field weights ──────────────────────────────────────── */
@@ -38,6 +39,9 @@ async function initJobVacancyModule() {
 
     if (currentOrgId) {
         await loadBranchesList(currentOrgId);
+        if (currentBranchId) {
+            await loadDepartments();
+        }
         await loadJobVacancies();
     }
 
@@ -76,6 +80,30 @@ function populateBranchDropdowns(branches) {
             options += `<option value="${b.branch_id}">${escapeHtml(b.branch_name)}</option>`;
         });
         modalSelect.innerHTML = options;
+    }
+}
+
+/* Load Departments for Dropdown */
+async function loadDepartments() {
+    try {
+        const data = await apiRequest('GET', `/api/departments?branch_id=${currentBranchId}`);
+        if (data && data.departments) {
+            allDepartments = data.departments;
+            populateDeptSelect();
+        }
+    } catch (err) {
+        console.warn('Could not load departments for dropdown:', err);
+    }
+}
+
+function populateDeptSelect() {
+    const deptSelect = document.getElementById('job-dept');
+    if (deptSelect) {
+        let options = '<option value="" disabled selected>Select Department</option>';
+        allDepartments.forEach(d => {
+            options += `<option value="${d.department_id}">${escapeHtml(d.department_name)}</option>`;
+        });
+        deptSelect.innerHTML = options;
     }
 }
 
@@ -552,7 +580,7 @@ function openEditJobModal(jobId) {
     document.getElementById('job-modal-title').textContent = 'Edit Job Vacancy';
 
     document.getElementById('job-title').value = job.job_title || job.title || '';
-    document.getElementById('job-dept').value = job.department || '';
+    document.getElementById('job-dept').value = job.department_id || '';
     document.getElementById('job-employment-type').value = job.employment_type || 'Full-time';
     document.getElementById('job-work-mode').value = job.work_mode || 'On-site';
     document.getElementById('job-location').value = job.location || '';
@@ -597,7 +625,12 @@ const JD_TASK_KEY = 'jd_generation_current';
 
 async function generateAIJobDescription() {
     const title = document.getElementById('job-title')?.value.trim();
-    const dept = document.getElementById('job-dept')?.value.trim() || 'Engineering';
+    const deptSelect = document.getElementById('job-dept');
+    let deptName = 'General';
+    if (deptSelect && deptSelect.value) {
+        const d = allDepartments.find(x => x.department_id === deptSelect.value);
+        if (d) deptName = d.department_name;
+    }
     const empType = document.getElementById('job-employment-type')?.value || 'Full-time';
     const workMode = document.getElementById('job-work-mode')?.value || 'On-site';
     const location = document.getElementById('job-location')?.value.trim() || 'Office';
@@ -617,7 +650,7 @@ async function generateAIJobDescription() {
 
     const payload = {
         job_title: title,
-        department: dept,
+        department: deptName,
         employment_type: empType,
         work_mode: workMode,
         location: location,
@@ -704,7 +737,12 @@ async function handleSaveJob(e) {
 
     const jobId = document.getElementById('job-id-hidden')?.value;
     const title = document.getElementById('job-title')?.value.trim();
-    const dept = document.getElementById('job-dept')?.value.trim() || 'General';
+    const deptId = document.getElementById('job-dept')?.value;
+    let deptName = 'General';
+    if (deptId) {
+        const d = allDepartments.find(x => x.department_id === deptId);
+        if (d) deptName = d.department_name;
+    }
     const empType = document.getElementById('job-employment-type')?.value;
     const workMode = document.getElementById('job-work-mode')?.value;
     const location = document.getElementById('job-location')?.value.trim() || '';
@@ -763,7 +801,8 @@ async function handleSaveJob(e) {
             organization_id: currentOrgId,
             branch_id: currentBranchId || null,
             job_title: title,
-            department: dept,
+            department: deptName,
+            department_id: deptId,
             employment_type: empType,
             work_mode: workMode,
             location: location,

@@ -418,6 +418,10 @@
                 <span class="nav-icon"><i class="fa-solid fa-clipboard-check"></i></span>
                 Screening
             </a>
+        <a href="interviewers.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span>
+            Interviewers
+        </a>
             <a href="comparison.html" class="nav-item">
                 <span class="nav-icon"><i class="fa-solid fa-code-compare"></i></span>
                 Candidate Comparison
@@ -549,8 +553,10 @@
                                 <input type="text" id="job-title" class="input-custom" placeholder="e.g. Senior Software Engineer" />
                             </div>
                             <div class="form-group-custom">
-                                <label class="label-custom">Department</label>
-                                <input type="text" id="job-dept" class="input-custom" placeholder="e.g. Engineering" />
+                                <label class="label-custom">Department <span style="color:#ef4444;">*</span></label>
+                                <select id="job-dept" class="input-custom" required>
+                                    <option value="" disabled selected>Select Department</option>
+                                </select>
                             </div>
                         </div>
 

@@ -174,5 +174,40 @@ def authenticate_user(username: str, password: str) -> dict | None:
                 logger.warning("Failed login attempt for HR user '%s'.", username)
                 return None
 
+            # Check Interviewer table
+            cur.execute(
+                """
+                SELECT iv.id, iv.username, iv.password, iv.email,
+                       iv.organization_id, iv.branch_id, iv.department_id,
+                       iv.full_name, iv.status
+                FROM interviewers iv
+                WHERE (LOWER(iv.username) = LOWER(%s) OR LOWER(iv.email) = LOWER(%s))
+                LIMIT 1
+                """,
+                (username, username),
+            )
+            interviewer = cur.fetchone()
+
+            if interviewer:
+                if interviewer[8] == 'inactive':
+                    logger.warning("Inactive interviewer '%s' attempted login.", username)
+                    return None
+                if interviewer[2] == password:
+                    logger.info("Interviewer '%s' authenticated successfully.", username)
+                    return {
+                        "user_id": str(interviewer[0]),
+                        "username": interviewer[1],
+                        "role": "interviewer",
+                        "org_id": str(interviewer[4]) if interviewer[4] else "",
+                        "branch_id": str(interviewer[5]) if interviewer[5] else "",
+                        "department_id": str(interviewer[6]) if interviewer[6] else "",
+                        "email": interviewer[3],
+                        "full_name": interviewer[7],
+                        "profile_image": "",
+                        "phone": "",
+                    }
+                logger.warning("Failed login attempt for interviewer '%s'.", username)
+                return None
+
     logger.warning("Login attempt for unknown user '%s'.", username)
     return None
