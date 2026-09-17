@@ -40,6 +40,9 @@ async function initJobVacancyModule() {
         await loadBranchesList(currentOrgId);
         await loadJobVacancies();
     }
+
+    // Restore any in-progress JD generation task
+    restoreJDGenerationTask();
 }
 
 /* Load Branches for Dropdowns */
@@ -589,7 +592,9 @@ function closeJobModal() {
     closeModal('job-modal');
 }
 
-/* AI Job Description Generator */
+/* AI Job Description Generator — Background Task */
+const JD_TASK_KEY = 'jd_generation_current';
+
 async function generateAIJobDescription() {
     const title = document.getElementById('job-title')?.value.trim();
     const dept = document.getElementById('job-dept')?.value.trim() || 'Engineering';
@@ -610,30 +615,66 @@ async function generateAIJobDescription() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
 
-    try {
-        const payload = {
-            job_title: title,
-            department: dept,
-            employment_type: empType,
-            work_mode: workMode,
-            location: location,
-            experience_required: exp,
-            qualification: qualification,
-            salary: salary,
-            skills_required: jobSkillsTags,
-        };
+    const payload = {
+        job_title: title,
+        department: dept,
+        employment_type: empType,
+        work_mode: workMode,
+        location: location,
+        experience_required: exp,
+        qualification: qualification,
+        salary: salary,
+        skills_required: jobSkillsTags,
+    };
 
-        const res = await apiRequest('POST', '/api/jobs/generate-jd', payload);
-        if (res && res.description) {
-            document.getElementById('job-desc').value = res.description;
-            showToast('AI Job Description generated successfully!', 'success');
+    // Clear any previous JD task for this session
+    AITaskManager.clear(JD_TASK_KEY);
+
+    await AITaskManager.submit(JD_TASK_KEY, '/api/jobs/generate-jd', payload, {
+        onCompleted: (result) => {
+            if (result && result.description) {
+                const descEl = document.getElementById('job-desc');
+                if (descEl) descEl.value = result.description;
+                showToast('AI Job Description generated successfully!', 'success');
+            }
+            btn.disabled = false;
+            btn.innerHTML = origText;
+            AITaskManager.clear(JD_TASK_KEY);
+        },
+        onFailed: (err) => {
+            showToast(err.error || 'Failed to generate AI job description.', 'error');
+            btn.disabled = false;
+            btn.innerHTML = origText;
         }
-    } catch (err) {
-        showToast(err.message || 'Failed to generate AI job description.', 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = origText;
+    });
+}
+
+/* Restore pending JD generation on page load */
+function restoreJDGenerationTask() {
+    const stored = AITaskManager.getStored(JD_TASK_KEY);
+    if (!stored || stored.status === 'completed' || stored.status === 'failed') return;
+
+    const btn = document.getElementById('btn-generate-jd');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Generating...';
     }
+
+    AITaskManager.restore(JD_TASK_KEY, {
+        onCompleted: (result) => {
+            if (result && result.description) {
+                const descEl = document.getElementById('job-desc');
+                if (descEl) descEl.value = result.description;
+                showToast('AI Job Description ready!', 'success');
+            }
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate with AI'; }
+            AITaskManager.clear(JD_TASK_KEY);
+        },
+        onFailed: (err) => {
+            showToast(err.error || 'JD generation failed.', 'error');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles"></i> Generate with AI'; }
+        }
+    });
 }
 
 /* Live Input Restrictions (Openings Count & Salary) */

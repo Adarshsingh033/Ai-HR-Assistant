@@ -18,6 +18,7 @@ from app.database import get_db_connection
 from app.services.resume_parser import parse_resume, ResumeRejected
 from app.models.schemas import UpdateCandidateStatusRequest, UpdateCandidateRequest
 from app.services.ai_service import match_candidate_with_jd
+from app.services.task_service import create_task
 from app.logger import get_logger
 
 logger = get_logger(__name__)
@@ -40,81 +41,41 @@ async def parse_resume_only(
     file: UploadFile = File(...),
 ):
     """
-    Parse a candidate resume and run AI matching without saving to database.
+    Save the uploaded resume file and queue an async AI parse+match task.
+    Returns { task_id, status: 'pending' } immediately.
+    The client polls GET /api/ai-tasks/{task_id} for the result.
     """
     try:
         content = await file.read()
-        logger.info("Resume parse: '%s' for job_id=%s", file.filename, job_id)
+        logger.info("Resume queued for async parse: '%s' for job_id=%s", file.filename, job_id)
 
-        # ── Parse + validate ────────────────────────────────────
-        parsed = parse_resume(content, file.filename)
-
-        # ── Fetch JD for AI matching ────────────────────────────
-        jd_text = ""
-        with get_db_connection() as conn:
-            with conn.cursor() as cur:
-                cur.execute(
-                    """SELECT experience_required, qualification, skills_required,
-                              job_description
-                       FROM job_vacancies WHERE id = %s""",
-                    (job_id,),
-                )
-                row = cur.fetchone()
-                if row:
-                    jd_text = (
-                        f"Experience Required: {row[0] or ''}\n"
-                        f"Qualification: {row[1] or ''}\n"
-                        f"Skills Required: {row[2] or ''}\n"
-                        f"Description: {row[3] or ''}"
-                    )
-
-        # ── AI matching ─────────────────────────────────────────
-        match_data = {"match_percentage": 0, "match_explanation": "JD not found"}
-        if jd_text:
-            match_data = match_candidate_with_jd(parsed, jd_text)
-
-        resume_text = parsed.get("resume_text", "")
-        
-        # Save temp file for later saving
-        tmp_uuid = str(uuid.uuid4())
-        tmp_filename = f"tmp_{tmp_uuid}_{file.filename}"
-        tmp_filepath = os.path.join(UPLOAD_DIR, tmp_filename)
-        with open(tmp_filepath, "wb") as f:
+        # Save file immediately so the worker thread can read it
+        task_uuid = str(uuid.uuid4())
+        safe_filename = f"parse_{task_uuid}_{file.filename}"
+        file_path = os.path.join(UPLOAD_DIR, safe_filename)
+        with open(file_path, "wb") as f:
             f.write(content)
 
-        return {
-            "name": parsed.get("candidate_name", ""),
-            "email": parsed.get("email_address", ""),
-            "phone": parsed.get("contact_number", ""),
-            "gender": parsed.get("gender", ""),
-            "address": parsed.get("address", ""),
-            "total_experience": parsed.get("total_experience", ""),
-            "skills": parsed.get("skills", ""),
-            "education": parsed.get("education", ""),
-            "qualification": parsed.get("qualification", ""),
-            "linkedin_url": parsed.get("linkedin_url", ""),
-            "github_url": parsed.get("github_url", ""),
-            "job_id": job_id,
-            "org_id": org_id,
-            "hr_id": hr_id,
-            "filename": file.filename,
-            "tmp_filename": tmp_filename,
-            "resume_text": resume_text,
-            "match_percentage": match_data["match_percentage"],
-            "match_explanation": match_data["match_explanation"],
-        }
-
-    except ResumeRejected as e:
-        logger.warning("Resume rejected '%s': %s", file.filename, e.reason)
-        return JSONResponse(
-            status_code=422,
-            content={"rejected": True, "reason": e.reason, "filename": file.filename},
+        # Queue async task
+        task_id = create_task(
+            task_type="resume_parse",
+            input_data={
+                "file_path": file_path,
+                "filename": file.filename,
+                "job_id": job_id,
+                "org_id": org_id,
+                "hr_id": hr_id,
+            },
+            created_by=hr_id,
+            org_id=org_id,
         )
+        return {"task_id": task_id, "status": "pending", "filename": file.filename}
+
     except HTTPException:
         raise
     except Exception as e:
-        logger.error("Unexpected error for '%s': %s", file.filename, e, exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Failed to process resume: {e}")
+        logger.error("Failed to queue resume parse for '%s': %s", file.filename, e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to queue resume parse: {e}")
 
 @router.post("/save")
 async def save_parsed_candidate(

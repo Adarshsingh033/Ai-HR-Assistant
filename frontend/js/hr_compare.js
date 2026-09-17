@@ -89,6 +89,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     
     // Restore session if available
     await restoreCompareSession();
+
+    // Restore any in-progress comparison task
+    restoreCompareTask();
 });
 
 /* ── Load Job Vacancies ────────────────────────────────── */
@@ -217,6 +220,8 @@ function validateSelections() {
    RUN CANDIDATE COMPARISON
    ======================================================== */
 
+const COMPARE_TASK_KEY = 'candidate_comparison_current';
+
 async function runCandidateComparison() {
     const jobId = document.getElementById('compare-job-select').value;
     const cand1Id = document.getElementById('compare-cand1-select').value;
@@ -231,26 +236,62 @@ async function runCandidateComparison() {
     btn.disabled = true;
     btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Comparing…';
 
-    try {
-        const data = await apiRequest('POST', '/api/comparison/compare', {
-            job_id: jobId,
-            candidate1_id: cand1Id,
-            candidate2_id: cand2Id,
-        });
+    // Clear any old comparison task
+    AITaskManager.clear(COMPARE_TASK_KEY);
 
-        saveCompareSession(jobId, cand1Id, cand2Id, data);
-        renderComparisonResults(data);
+    await AITaskManager.submit(
+        COMPARE_TASK_KEY,
+        '/api/comparison/compare',
+        { job_id: jobId, candidate1_id: cand1Id, candidate2_id: cand2Id },
+        {
+            onCompleted: (result) => {
+                if (result) {
+                    saveCompareSession(jobId, cand1Id, cand2Id, result);
+                    renderComparisonResults(result);
+                    document.getElementById('compare-placeholder').style.display = 'none';
+                    document.getElementById('compare-result-container').style.display = 'block';
+                    showToast('Candidate comparison complete!', 'success');
+                }
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-code-compare"></i> Compare Profiles';
+                AITaskManager.clear(COMPARE_TASK_KEY);
+            },
+            onFailed: (err) => {
+                showToast('Comparison failed: ' + (err.error || 'Unknown error'), 'error');
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-code-compare"></i> Compare Profiles';
+            }
+        }
+    );
+}
 
-        document.getElementById('compare-placeholder').style.display = 'none';
-        document.getElementById('compare-result-container').style.display = 'block';
+/* Restore in-progress comparison task on page load */
+function restoreCompareTask() {
+    const stored = AITaskManager.getStored(COMPARE_TASK_KEY);
+    if (!stored || stored.status === 'completed' || stored.status === 'failed') return;
 
-        showToast('Candidate comparison generated!', 'success');
-    } catch (err) {
-        showToast('Comparison failed: ' + err.message, 'error');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = '<i class="fa-solid fa-code-compare"></i> Compare Profiles';
+    const btn = document.getElementById('btn-run-compare');
+    if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Comparing…';
     }
+
+    AITaskManager.restore(COMPARE_TASK_KEY, {
+        onCompleted: (result) => {
+            if (result) {
+                renderComparisonResults(result);
+                document.getElementById('compare-placeholder').style.display = 'none';
+                document.getElementById('compare-result-container').style.display = 'block';
+                showToast('Candidate comparison ready!', 'success');
+            }
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-code-compare"></i> Compare Profiles'; }
+            AITaskManager.clear(COMPARE_TASK_KEY);
+        },
+        onFailed: (err) => {
+            showToast('Comparison failed: ' + (err.error || ''), 'error');
+            if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-code-compare"></i> Compare Profiles'; }
+        }
+    });
 }
 
 function renderComparisonResults(data) {

@@ -9,6 +9,7 @@ from fastapi import APIRouter, HTTPException, Query, Header
 from app.models.schemas import CreateJobRequest, UpdateJobRequest, JobResponse, GenerateJDRequest
 from app.database import get_db_connection
 from app.services.ai_service import generate_job_description
+from app.services.task_service import create_task
 from app.logger import get_logger
 
 logger = get_logger(__name__)
@@ -462,23 +463,33 @@ def delete_job(job_id: str):
 
 
 @router.post("/generate-jd")
-def generate_jd(payload: GenerateJDRequest):
-    """Generate a professional job description using AI (Ollama with Groq fallback)."""
+def generate_jd(payload: GenerateJDRequest, hr_id: Optional[str] = None, org_id: Optional[str] = None):
+    """
+    Start an async AI job description generation task.
+    Returns a task_id immediately; the client should poll GET /api/ai-tasks/{task_id}.
+    """
     try:
-        jd = generate_job_description(
-            title=payload.job_title,
-            department=payload.department or "General",
-            location=payload.location or "Office",
-            job_type=payload.employment_type or "Full-time",
-            experience_required=payload.experience_required or "Entry-level",
-            qualification=payload.qualification or "Not specified",
-            salary=payload.salary or "Competitive",
-            skills_required=payload.skills_required or [],
+        input_data = {
+            "job_title": payload.job_title,
+            "department": payload.department or "General",
+            "location": payload.location or "Office",
+            "employment_type": payload.employment_type or "Full-time",
+            "experience_required": payload.experience_required or "Entry-level",
+            "qualification": payload.qualification or "Not specified",
+            "salary": payload.salary or "Competitive",
+            "skills_required": payload.skills_required or [],
+        }
+        task_id = create_task(
+            task_type="jd_generation",
+            input_data=input_data,
+            created_by=hr_id,
+            org_id=org_id,
         )
-        return {"description": jd}
+        logger.info("JD generation task queued: %s for '%s'", task_id, payload.job_title)
+        return {"task_id": task_id, "status": "pending"}
     except Exception as e:
-        logger.error("AI job description generation error: %s", e, exc_info=True)
+        logger.error("Failed to queue JD generation task: %s", e, exc_info=True)
         raise HTTPException(
             status_code=500,
-            detail=f"AI generation failed: {str(e)}"
+            detail=f"Failed to queue AI generation task: {str(e)}"
         )

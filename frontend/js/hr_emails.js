@@ -188,6 +188,8 @@ function openCompose() {
     if (draftIdEl) draftIdEl.value = '';
 }
 
+const EMAIL_DRAFT_TASK_KEY = 'email_draft_current';
+
 async function generateDraft() {
     const prompt = document.getElementById('ai-prompt').value.trim();
     const candidateId = document.getElementById('hidden-candidate-id').value.trim();
@@ -202,30 +204,33 @@ async function generateDraft() {
     btn.innerHTML = '<i class="fa-solid fa-circle-notch fa-spin"></i> Generating...';
     btn.disabled = true;
 
-    try {
-        const user = Session.get();
-        const response = await fetch(`${API}/api/emails/draft?hr_id=${user.user_id}`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                prompt: prompt,
-                candidate_id: candidateId || null
-            })
-        });
+    const user = Session.get();
 
-        if (!response.ok) throw new Error("Failed to generate draft.");
+    // Clear previous draft task
+    AITaskManager.clear(EMAIL_DRAFT_TASK_KEY);
 
-        const data = await response.json();
-        document.getElementById('compose-subject').value = data.subject || '';
-        document.getElementById('compose-body').value = data.body || '';
-        showToast("Draft generated successfully!", "success");
-    } catch (error) {
-        console.error(error);
-        showToast(error.message, "error");
-    } finally {
-        btn.innerHTML = originalText;
-        btn.disabled = false;
-    }
+    await AITaskManager.submit(
+        EMAIL_DRAFT_TASK_KEY,
+        `/api/emails/draft?hr_id=${user.user_id}`,
+        { prompt: prompt, candidate_id: candidateId || null },
+        {
+            onCompleted: (result) => {
+                if (result) {
+                    document.getElementById('compose-subject').value = result.subject || '';
+                    document.getElementById('compose-body').value = result.body || '';
+                    showToast("Draft generated successfully!", "success");
+                }
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                AITaskManager.clear(EMAIL_DRAFT_TASK_KEY);
+            },
+            onFailed: (err) => {
+                showToast(err.error || "Failed to generate draft.", "error");
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+            }
+        }
+    );
 }
 
 async function sendEmail() {

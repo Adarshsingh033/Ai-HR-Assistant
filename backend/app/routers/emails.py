@@ -6,6 +6,7 @@ from fastapi import APIRouter, HTTPException, Query
 
 from app.models.schemas import GenerateEmailRequest, SendEmailRequest, EmailResponse, DraftResponse, SaveDraftRequest, ToggleStarRequest
 from app.services.email_service import draft_email_content, send_and_save_email, get_emails, save_email_draft, toggle_email_star
+from app.services.task_service import create_task
 from app.logger import get_logger
 
 logger = get_logger(__name__)
@@ -13,30 +14,32 @@ logger = get_logger(__name__)
 router = APIRouter(prefix="/api/emails", tags=["Emails"])
 
 
-@router.post("/draft", response_model=DraftResponse)
+@router.post("/draft")
 def draft_email(request: GenerateEmailRequest, hr_id: str):
-    """Drafts an email using AI based on the HR's prompt."""
+    """
+    Queue an async AI email draft generation task.
+    Returns { task_id, status: 'pending' } immediately.
+    The client polls GET /api/ai-tasks/{task_id} for subject + body.
+    """
     if not hr_id:
         raise HTTPException(status_code=401, detail="Unauthorized. Need hr_id.")
-    
-    raw_draft = draft_email_content(hr_id, request.prompt, request.candidate_id)
-    
-    subject = "No Subject"
-    body = raw_draft
-    
-    subject_match = re.search(r'SUBJECT:\s*(.*)', raw_draft, re.IGNORECASE)
-    if subject_match:
-        subject = subject_match.group(1).strip()
-    
-    body_match = re.search(r'BODY:\s*(.*)', raw_draft, re.IGNORECASE | re.DOTALL)
-    if body_match:
-        body = body_match.group(1).strip()
-    elif "BODY:" in raw_draft.upper():
-        parts = re.split(r'BODY:', raw_draft, flags=re.IGNORECASE)
-        if len(parts) > 1:
-            body = parts[1].strip()
-    
-    return DraftResponse(subject=subject, body=body)
+
+    try:
+        task_id = create_task(
+            task_type="email_draft",
+            input_data={
+                "hr_id": hr_id,
+                "prompt": request.prompt,
+                "candidate_id": request.candidate_id,
+            },
+            created_by=hr_id,
+        )
+        logger.info("Email draft task queued: %s for hr_id=%s", task_id, hr_id)
+        return {"task_id": task_id, "status": "pending"}
+    except Exception as e:
+        logger.error("Failed to queue email draft task: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to queue email draft: {str(e)}")
+
 
 
 @router.post("/send")

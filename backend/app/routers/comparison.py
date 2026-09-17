@@ -10,6 +10,7 @@ from fastapi import APIRouter, HTTPException
 from app.database import get_db_connection
 from app.models.schemas import CompareCandidatesRequest
 from app.services.ai_service import compare_two_candidates_with_llm
+from app.services.task_service import create_task
 from app.logger import get_logger
 
 logger = get_logger(__name__)
@@ -60,11 +61,12 @@ def get_candidates_by_job(job_id: str, org_id: Optional[str] = None):
 
 
 @router.post("/compare")
-def compare_candidates(req: CompareCandidatesRequest):
+def compare_candidates(req: CompareCandidatesRequest, hr_id: Optional[str] = None, org_id: Optional[str] = None):
     """
-    Compare two candidates side-by-side against a Job Vacancy.
-    Returns category breakdown (Location, Skills, Education, Experience), match scores,
-    and a structured recommendation with comparison explanation.
+    Queue an async AI candidate comparison task.
+    Fetches all required data synchronously, then queues the LLM work.
+    Returns { task_id, status: 'pending' } immediately.
+    The client polls GET /api/ai-tasks/{task_id} for the full comparison result.
     """
     if req.candidate1_id == req.candidate2_id:
         raise HTTPException(status_code=400, detail="Please select two different candidates for comparison.")
@@ -113,79 +115,23 @@ def compare_candidates(req: CompareCandidatesRequest):
 
             c1_raw = cand_dict[req.candidate1_id]
             c2_raw = cand_dict[req.candidate2_id]
-
             c1 = _parse_candidate_obj(c1_raw)
             c2 = _parse_candidate_obj(c2_raw)
 
-            # 3. Call LLM for candidate comparison (Ollama primary, Groq fallback)
-            try:
-                llm_res = compare_two_candidates_with_llm(job_data, c1, c2)
-                if llm_res:
-                    llm_res["job_info"] = job_data
-                    logger.info("Successfully completed LLM candidate comparison.")
-                    return llm_res
-            except Exception as e:
-                logger.warning("LLM candidate comparison failed: %s. Falling back to rule-based evaluation.", e)
+    # Queue the AI comparison task
+    task_id = create_task(
+        task_type="candidate_comparison",
+        input_data={
+            "job_data": job_data,
+            "candidate1": c1,
+            "candidate2": c2,
+        },
+        created_by=hr_id,
+        org_id=org_id or job_data.get("job_id"),
+    )
+    logger.info("Comparison task queued: %s for job=%s", task_id, req.job_id)
+    return {"task_id": task_id, "status": "pending", "job_info": job_data}
 
-            # 4. Rule-based evaluation fallback if LLM unavailable
-            c1_eval = _evaluate_candidate_against_jd(c1, job_data)
-            c2_eval = _evaluate_candidate_against_jd(c2, job_data)
-
-            # Determine Recommended Candidate
-            c1_score = c1_eval["overall_score"]
-            c2_score = c2_eval["overall_score"]
-
-            if c1_score >= c2_score:
-                better_id = c1["candidate_id"]
-                better_name = c1["name"]
-                other_name = c2["name"]
-                winner_eval = c1_eval
-                other_eval = c2_eval
-            else:
-                better_id = c2["candidate_id"]
-                better_name = c2["name"]
-                other_name = c1["name"]
-                winner_eval = c2_eval
-                other_eval = c1_eval
-
-            # Build detailed recommendation explanation
-            recommendation_reason = _build_recommendation_reason(
-                job_data["job_title"],
-                winner_eval,
-                other_eval,
-                job_data
-            )
-
-            return {
-                "job_info": job_data,
-                "candidate1": {
-                    "candidate_id": c1["candidate_id"],
-                    "name": c1["name"],
-                    "email": c1["email"],
-                    "phone": c1["phone"],
-                    "filename": c1["filename"],
-                    "overall_score": c1_score,
-                    "is_recommended": (c1["candidate_id"] == better_id),
-                    "criteria": c1_eval["criteria"],
-                },
-                "candidate2": {
-                    "candidate_id": c2["candidate_id"],
-                    "name": c2["name"],
-                    "email": c2["email"],
-                    "phone": c2["phone"],
-                    "filename": c2["filename"],
-                    "overall_score": c2_score,
-                    "is_recommended": (c2["candidate_id"] == better_id),
-                    "criteria": c2_eval["criteria"],
-                },
-                "recommendation": {
-                    "recommended_candidate_id": better_id,
-                    "recommended_candidate_name": better_name,
-                    "recommendation_title": f"{better_name} is recommended for {job_data['job_title']}",
-                    "score_difference": abs(c1_score - c2_score),
-                    "reason": recommendation_reason,
-                }
-            }
 
 
 def _parse_candidate_obj(r) -> dict:

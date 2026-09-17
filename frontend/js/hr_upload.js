@@ -367,40 +367,61 @@ async function processItems(sess, fileMap) {
             continue;
         }
 
+        // Build form data for async parse endpoint
+        const fd = new FormData();
+        fd.append('job_id', sess.jobId);
+        fd.append('org_id', sess.orgId);
+        fd.append('hr_id', sess.hrId);
+        fd.append('file', file);
+
+        const taskKey = `resume_parse_${sess.jobId}_${idx}`;
+
         try {
-            const fd = new FormData();
-            fd.append('job_id', sess.jobId);
-            fd.append('org_id', sess.orgId);
-            fd.append('hr_id', sess.hrId);
-            fd.append('file', file);
+            const taskId = await AITaskManager.submit(
+                taskKey,
+                '/api/candidates/parse',
+                fd,
+                {},   // callbacks handled below via await-poll
+                'POST'
+            );
 
-            const res = await fetch(`${window.location.protocol}//${window.location.host}/api/candidates/parse`, {
-                method: 'POST',
-                body: fd,
-            });
-
-            const data = await res.json();
-
-            if (res.status === 422 && data.rejected) {
+            if (!taskId) {
                 item.status = 'failed';
-                item.rejectionReason = data.reason || 'Rejected by server.';
-            } else if (!res.ok) {
-                item.status = 'failed';
-                item.rejectionReason = data.detail || `Server error ${res.status}`;
-            } else {
+                item.rejectionReason = 'Failed to queue parse task.';
+                saveSession(sess);
+                updateProcessingUI(sess);
+                updateProcRow(idx, item);
+                continue;
+            }
+
+            // Store task_id in session item for recovery
+            item.task_id = taskId;
+            saveSession(sess);
+
+            // Wait for task to complete by polling
+            const result = await _waitForTask(taskId);
+
+            if (result.status === 'completed') {
+                const data = result.result_data;
                 item.status = 'passed';
                 item.result = data;
+                AITaskManager.clear(taskKey);
+            } else {
+                item.status = 'failed';
+                item.rejectionReason = result.error_message || 'Parse task failed.';
+                AITaskManager.clear(taskKey);
             }
+
         } catch (e) {
             item.status = 'failed';
-            item.rejectionReason = `Network error: ${e.message}`;
+            item.rejectionReason = `Error: ${e.message}`;
         }
 
         saveSession(sess);
         updateProcessingUI(sess);
         updateProcRow(idx, item);
 
-        // Small UX pause
+        // Small UX pause between files
         await new Promise(r => setTimeout(r, 200));
     }
 
@@ -416,6 +437,25 @@ async function processItems(sess, fileMap) {
     const failed = sess.items.filter(i => i.status === 'failed').length;
     if (passed > 0) showToast(` ${passed} resume(s) parsed and scored!`, 'success');
     if (failed > 0) showToast(`❌ ${failed} file(s) failed — check the Failed section.`, 'warning');
+}
+
+/* Poll a task until completed or failed — returns task object */
+async function _waitForTask(taskId, timeoutMs = 10 * 60 * 1000) {
+    const API_BASE = (typeof API !== 'undefined' ? API : '')
+        || `${window.location.protocol}//${window.location.host}`;
+    const start = Date.now();
+    while (Date.now() - start < timeoutMs) {
+        await new Promise(r => setTimeout(r, 2500));
+        try {
+            const res = await fetch(`${API_BASE}/api/ai-tasks/${taskId}`);
+            if (!res.ok) continue;
+            const task = await res.json();
+            if (task.status === 'completed' || task.status === 'failed') {
+                return task;
+            }
+        } catch { /* network hiccup — keep waiting */ }
+    }
+    return { status: 'failed', error_message: 'Task timed out.' };
 }
 
 /* ── Processing UI Helpers ─────────────────────────────────────── */

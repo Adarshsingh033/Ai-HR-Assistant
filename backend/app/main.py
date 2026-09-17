@@ -9,7 +9,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 
-from app.routers import auth, admin, hr, jobs, candidates, emails, screening, comparison, super_admin
+from app.routers import auth, admin, hr, jobs, candidates, emails, screening, comparison, super_admin, ai_tasks
 from app.database import init_db, close_pool
 from app.logger import get_logger
 
@@ -25,11 +25,18 @@ async def lifespan(app: FastAPI):
         # In production, migrations are executed explicitly via `python migrate.py`.
         if os.getenv("AUTO_MIGRATE", "false").lower() == "true":
             init_db()
+
+        # Start the AI background task worker
+        from app.services.task_service import start_worker
+        start_worker()
+
         logger.info("Application startup complete — server ready.")
     except Exception as e:
         logger.error("Error during application startup: %s", e, exc_info=True)
     yield
     # Shutdown
+    from app.services.task_service import stop_worker
+    stop_worker()
     close_pool()
     logger.info("Application shutdown complete.")
 
@@ -64,6 +71,7 @@ app.include_router(emails.router)
 app.include_router(screening.router)
 app.include_router(comparison.router)
 app.include_router(super_admin.router)
+app.include_router(ai_tasks.router)
 
 
 
