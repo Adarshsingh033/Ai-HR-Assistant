@@ -697,7 +697,7 @@ async function openAssignInterviewerModal(candidateId) {
             intSelect.innerHTML = '<option value="" disabled>No interviewers available in your branch</option>';
         } else {
             intSelect.innerHTML = '<option value="" disabled selected>Select an interviewer...</option>' + 
-                interviewers.map(iv => `<option value="${iv.interviewer_id}">${escapeHtml(iv.full_name)} (${escapeHtml(iv.email)}) — ${escapeHtml(iv.department_name || 'Branch')}</option>`).join('');
+                interviewers.map(iv => `<option value="${iv.interviewer_id}">${escapeHtml(iv.full_name)}</option>`).join('');
         }
 
     } catch (err) {

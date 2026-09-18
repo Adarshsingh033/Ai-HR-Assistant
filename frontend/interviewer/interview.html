@@ -80,12 +80,12 @@
         textarea.feedback-input:focus { border-color: #6366f1; }
 
         .submit-btn {
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: linear-gradient(135deg, #f97316, #ea580c);
             border: none; color: #fff; width: 100%; padding: 14px; border-radius: 12px;
             font-size: 1rem; font-weight: 800; cursor: pointer; transition: all 0.2s;
-            box-shadow: 0 4px 15px rgba(16,185,129,0.3); display: flex; align-items: center; justify-content: center; gap: 8px;
+            box-shadow: 0 4px 15px rgba(249,115,22,0.3); display: flex; align-items: center; justify-content: center; gap: 8px;
         }
-        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(16,185,129,0.4); }
+        .submit-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(249,115,22,0.4); }
 
         .status-radio-group {
             display: flex; gap: 12px; margin-bottom: 20px;
@@ -261,12 +261,7 @@
                             <textarea id="eval-feedback" class="feedback-input" placeholder="Provide your thoughts on the candidate's technical skills, communication, culture fit, etc..." required></textarea>
                         </div>
 
-                        <label style="display:flex; align-items:center; gap:10px; margin-bottom:24px; cursor:pointer; color:var(--text-muted); font-size:0.85rem;">
-                            <input type="checkbox" id="eval-is-done" checked style="width:18px; height:18px; accent-color:#10b981;">
-                            Mark interview as completed
-                        </label>
-
-                        <button type="submit" id="submit-btn" class="submit-btn">
+                        <button type="submit" id="submit-btn" class="submit-btn" style="margin-top:24px;">
                             <i class="fa-solid fa-paper-plane"></i> Submit Evaluation
                         </button>
                     </form>

@@ -180,7 +180,7 @@ async function submitEvaluation(event) {
 
     const ratingVal = document.getElementById('eval-rating').value;
     const feedbackVal = document.getElementById('eval-feedback').value.trim();
-    const isDone = document.getElementById('eval-is-done').checked;
+    const isDone = true;
     
     let statusVal = 'Ongoing';
     document.querySelectorAll('.status-radio input').forEach(rad => {
