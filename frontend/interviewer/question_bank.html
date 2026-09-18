@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Question Bank — AI HR Assistant</title>
+    <meta name="description" content="Create and manage interview questions with difficulty levels for your interview process." />
+    <link rel="stylesheet" href="../css/main.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+
+        /* ── Page Header ── */
+        .page-header-bar {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 28px; gap: 16px; flex-wrap: wrap;
+        }
+        .page-title { font-size: 1.4rem; font-weight: 900; color: var(--text-primary); letter-spacing: -0.01em; margin: 0 0 3px; }
+        .page-sub   { font-size: 0.84rem; color: var(--text-muted); margin: 0; }
+
+        /* ── Filter Bar ── */
+        .filter-row {
+            display: flex; gap: 12px; flex-wrap: wrap; align-items: center; margin-bottom: 24px;
+        }
+        .search-box-wrap {
+            flex: 1; min-width: 220px; position: relative;
+        }
+        .search-box-wrap i {
+            position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
+            color: var(--text-muted); font-size: 0.9rem; pointer-events: none;
+        }
+        .search-box-wrap input {
+            width: 100%; box-sizing: border-box; padding: 10px 14px 10px 38px;
+            border-radius: 12px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04); color: #fff; font-size: 0.88rem;
+            font-family: 'Inter', sans-serif; outline: none; transition: border-color 0.2s;
+        }
+        .search-box-wrap input:focus { border-color: var(--accent); }
+
+        .diff-filter-btn {
+            padding: 9px 18px; border-radius: 10px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04); color: var(--text-muted);
+            font-size: 0.83rem; font-weight: 700; cursor: pointer; transition: all 0.18s;
+            white-space: nowrap;
+        }
+        .diff-filter-btn:hover { background: rgba(255,255,255,0.08); }
+        .diff-filter-btn.active-all     { background: rgba(249,115,22,0.15); color: #fb923c; border-color: #f97316; }
+        .diff-filter-btn.active-easy    { background: rgba(16,185,129,0.15); color: #34d399; border-color: #10b981; }
+        .diff-filter-btn.active-medium  { background: rgba(245,158,11,0.15); color: #fbbf24; border-color: #f59e0b; }
+        .diff-filter-btn.active-hard    { background: rgba(239,68,68,0.15);  color: #f87171; border-color: #ef4444; }
+
+        /* ── Add Button ── */
+        .btn-add {
+            padding: 10px 22px; border-radius: 12px; border: none;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: #fff; font-weight: 800; font-size: 0.87rem; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(249,115,22,0.35);
+            display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s; white-space: nowrap;
+        }
+        .btn-add:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(249,115,22,0.45); }
+
+        /* ── Stats Row ── */
+        .stats-row {
+            display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 24px;
+        }
+        .stat-mini {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 14px; padding: 16px 20px; display: flex; align-items: center; gap: 14px;
+            transition: transform 0.2s ease;
+        }
+        .stat-mini:hover { transform: translateY(-2px); }
+        .stat-mini-icon {
+            width: 40px; height: 40px; border-radius: 10px; display: flex;
+            align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0;
+        }
+        .stat-mini-val { font-size: 1.5rem; font-weight: 900; color: #fff; line-height: 1; margin-bottom: 2px; }
+        .stat-mini-lbl { font-size: 0.73rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+
+        /* ── Question Cards (stacked single column) ── */
+        .q-list {
+            display: flex; flex-direction: column; gap: 10px;
+        }
+        .q-card {
+            background: rgba(255,255,255,0.03); border: 1px solid var(--border);
+            border-radius: 14px; padding: 18px 20px;
+            display: flex; align-items: flex-start; gap: 16px;
+            transition: all 0.2s ease; position: relative;
+        }
+        .q-card:hover {
+            border-color: rgba(249,115,22,0.35);
+            box-shadow: 0 4px 20px rgba(249,115,22,0.1);
+            background: rgba(255,255,255,0.05);
+        }
+        /* Coloured left accent by difficulty */
+        .q-card::before {
+            content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
+            border-radius: 3px 0 0 3px;
+        }
+        .q-card.easy::before   { background: #10b981; }
+        .q-card.medium::before { background: #f59e0b; }
+        .q-card.hard::before   { background: #ef4444; }
+
+        /* Left: row number */
+        .q-num {
+            font-size: 0.72rem; font-weight: 900; color: var(--text-muted);
+            min-width: 26px; text-align: center; padding-top: 2px; flex-shrink: 0;
+        }
+
+        /* Middle: content */
+        .q-body { flex: 1; min-width: 0; }
+        .q-text {
+            font-size: 0.93rem; font-weight: 600; color: var(--text-primary);
+            line-height: 1.5; word-break: break-word; margin-bottom: 0;
+        }
+        .q-meta { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 8px; }
+        .q-meta-item { font-size: 0.74rem; color: var(--text-muted); display: flex; align-items: center; gap: 4px; }
+
+        /* Right: kebab menu */
+        .q-kebab-wrap { position: relative; flex-shrink: 0; }
+        .q-kebab-btn {
+            width: 32px; height: 32px; border-radius: 8px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.03); color: var(--text-muted);
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            font-size: 0.95rem; transition: all 0.18s; letter-spacing: 1px;
+        }
+        .q-kebab-btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.25); }
+
+        .q-dropdown {
+            position: absolute; right: 0; top: calc(100% + 6px); z-index: 50;
+            background: #1e293b; border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 12px; padding: 6px; min-width: 140px;
+            box-shadow: 0 12px 30px rgba(0,0,0,0.5);
+            display: none; flex-direction: column; gap: 2px;
+            animation: dropIn 0.15s ease;
+        }
+        .q-dropdown.open { display: flex; }
+        @keyframes dropIn { from { opacity:0; transform: translateY(-6px); } to { opacity:1; transform: translateY(0); } }
+
+        .q-drop-item {
+            display: flex; align-items: center; gap: 10px; padding: 9px 14px;
+            border-radius: 8px; cursor: pointer; font-size: 0.83rem; font-weight: 700;
+            color: var(--text-secondary); border: none; background: none; width: 100%;
+            text-align: left; transition: all 0.15s;
+        }
+        .q-drop-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+        .q-drop-item.danger:hover { background: rgba(239,68,68,0.14); color: #f87171; }
+
+        /* Badges */
+        .diff-badge {
+            padding: 2px 10px; border-radius: 99px; font-size: 0.71rem; font-weight: 800;
+            letter-spacing: 0.04em; white-space: nowrap; display: inline-flex; align-items: center; gap: 5px;
+        }
+        .diff-easy   { background: rgba(16,185,129,0.15);  color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
+        .diff-medium { background: rgba(245,158,11,0.15);  color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
+        .diff-hard   { background: rgba(239,68,68,0.15);   color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
+
+        .q-category-badge {
+            padding: 2px 10px; border-radius: 99px; font-size: 0.71rem; font-weight: 700;
+            background: rgba(99,102,241,0.12); color: #a5b4fc;
+            border: 1px solid rgba(99,102,241,0.25);
+            display: inline-flex; align-items: center; gap: 4px;
+        }
+
+        /* ── Empty State ── */
+        .empty-state {
+            text-align: center; padding: 60px 24px;
+            display: flex; flex-direction: column; align-items: center;
+        }
+        .empty-icon {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: rgba(249,115,22,0.1); border: 1px solid rgba(249,115,22,0.25);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; color: #fb923c; margin-bottom: 18px;
+            box-shadow: 0 0 24px rgba(249,115,22,0.15);
+        }
+        .empty-title { font-size: 1.05rem; font-weight: 800; color: var(--text-primary); margin-bottom: 6px; }
+        .empty-sub   { font-size: 0.85rem; color: var(--text-muted); max-width: 380px; line-height: 1.55; margin-bottom: 22px; }
+
+        /* ── Skeleton ── */
+        .skeleton-row { padding: 14px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; gap: 16px; align-items: center; }
+        .skeleton-line { border-radius: 8px; animation: shimmer 1.6s infinite; }
+        @keyframes shimmer {
+            0%   { background: rgba(255,255,255,0.05); }
+            50%  { background: rgba(255,255,255,0.10); }
+            100% { background: rgba(255,255,255,0.05); }
+        }
+
+        /* ── Category select filter ── */
+        .cat-filter-select {
+            padding: 9px 14px; border-radius: 10px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.04); color: var(--text-secondary);
+            font-size: 0.83rem; font-family: 'Inter', sans-serif; font-weight: 600;
+            cursor: pointer; outline: none; transition: border-color 0.18s;
+        }
+        .cat-filter-select:focus { border-color: var(--accent); }
+        .cat-filter-select option { background: #111827; }
+
+        /* ── Modal ── */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); backdrop-filter: blur(6px); z-index: 999; display: none; align-items: center; justify-content: center; padding: 16px; }
+        .modal-overlay.open { display: flex; }
+        .modal-box {
+            background: #0f172a; border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 24px; width: min(580px, 94vw);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7); overflow: hidden;
+            animation: modalIn 0.22s ease;
+        }
+        @keyframes modalIn { from { transform: scale(0.94); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .modal-header {
+            padding: 28px 30px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .modal-title { font-size: 1.2rem; font-weight: 900; color: #fff; margin: 0; }
+        .modal-sub   { font-size: 0.8rem; color: var(--text-muted); margin-top: 3px; }
+        .modal-close {
+            width: 36px; height: 36px; border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.6); cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s;
+        }
+        .modal-close:hover { background: rgba(239,68,68,0.18); color: #f87171; border-color: rgba(239,68,68,0.35); }
+
+        .modal-body { padding: 26px 30px; display: flex; flex-direction: column; gap: 20px; }
+
+        .form-group { display: flex; flex-direction: column; gap: 8px; }
+        .form-label { font-size: 0.73rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; }
+        .form-control {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
+            border-radius: 12px; color: #fff; font-size: 0.88rem; font-family: 'Inter', sans-serif;
+            padding: 11px 14px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%; box-sizing: border-box;
+        }
+        .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+        textarea.form-control { resize: vertical; min-height: 120px; line-height: 1.55; }
+        select.form-control option { background: #111827; }
+
+        /* Difficulty Selector */
+        .diff-selector { display: flex; gap: 10px; }
+        .diff-opt {
+            flex: 1; text-align: center; padding: 10px 8px; border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.03);
+            cursor: pointer; font-weight: 800; font-size: 0.83rem; transition: all 0.18s;
+            color: var(--text-muted);
+        }
+        .diff-opt i { display: block; font-size: 1.15rem; margin-bottom: 5px; }
+        .diff-opt.easy   { border-color: rgba(16,185,129,0.25);  color: #34d399; }
+        .diff-opt.medium { border-color: rgba(245,158,11,0.25);  color: #fbbf24; }
+        .diff-opt.hard   { border-color: rgba(239,68,68,0.25);   color: #f87171; }
+        .diff-opt.easy.selected   { background: rgba(16,185,129,0.15);  border-color: #10b981; box-shadow: 0 0 14px rgba(16,185,129,0.2); }
+        .diff-opt.medium.selected { background: rgba(245,158,11,0.15);  border-color: #f59e0b; box-shadow: 0 0 14px rgba(245,158,11,0.2); }
+        .diff-opt.hard.selected   { background: rgba(239,68,68,0.15);   border-color: #ef4444; box-shadow: 0 0 14px rgba(239,68,68,0.2); }
+
+        .modal-footer {
+            padding: 18px 30px; border-top: 1px solid rgba(255,255,255,0.08);
+            display: flex; justify-content: flex-end; gap: 12px;
+        }
+        .btn-cancel {
+            padding: 10px 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.06); color: #fff; cursor: pointer;
+            font-weight: 700; font-size: 0.86rem; transition: all 0.15s;
+        }
+        .btn-cancel:hover { background: rgba(255,255,255,0.1); }
+        .btn-save {
+            padding: 10px 26px; border-radius: 12px; border: none;
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: #fff; cursor: pointer; font-weight: 800; font-size: 0.87rem;
+            box-shadow: 0 4px 15px rgba(249,115,22,0.35);
+            display: inline-flex; align-items: center; gap: 8px; transition: all 0.2s;
+        }
+        .btn-save:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(249,115,22,0.45); }
+        .btn-save:disabled { opacity: 0.55; cursor: not-allowed; transform: none; }
+
+        /* Delete confirm modal */
+        .del-modal-box {
+            background: #0f172a; border: 1px solid rgba(255,255,255,0.14);
+            border-radius: 22px; width: min(400px, 92vw);
+            padding: 32px 28px; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.7);
+            animation: modalIn 0.22s ease;
+        }
+
+        @media (max-width: 700px) {
+            .stats-row { grid-template-columns: repeat(2, 1fr); }
+            .q-table thead th.hide-mobile,
+            .q-table td.hide-mobile { display: none; }
+        }
+    </style>
+</head>
+<body>
+<div class="app-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-logo">
+            <div>
+                <div class="logo-text">AI HR Assistant</div>
+                <div class="logo-sub">Interviewer Portal</div>
+            </div>
+        </div>
+
+        <div class="nav-section-label">Main Menu</div>
+        <a href="dashboard.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+            Dashboard
+        </a>
+        <a href="my_interviewees.html" class="nav-item">
+            <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+            My Interviewees
+        </a>
+        <a href="question_bank.html" class="nav-item active">
+            <span class="nav-icon"><i class="fa-solid fa-book-open"></i></span>
+            Question Bank
+        </a>
+
+        <!-- Sidebar Footer -->
+        <div class="sidebar-footer" style="position: relative;">
+            <div class="user-menu-popover hidden" id="user-menu-popover">
+                <a href="change_password.html" class="popover-item">
+                    <i class="fa-solid fa-lock" style="color: #3b82f6;"></i> Change Password
+                </a>
+                <div class="popover-divider"></div>
+                <a href="#" class="popover-item" onclick="logout()">
+                    <i class="fa-solid fa-right-from-bracket" style="color: #ef4444;"></i> Logout
+                </a>
+            </div>
+            <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">
+                <div class="user-avatar" id="sidebar-avatar">I</div>
+                <div class="user-info">
+                    <div class="user-name" id="sidebar-name">Interviewer</div>
+                    <div class="user-role" id="sidebar-role">Interviewer</div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ── Main Content ── -->
+    <main class="main-content">
+        <header class="topbar">
+            <div class="topbar-title">Question Bank</div>
+        </header>
+
+        <div class="page-content">
+
+            <!-- Page Header -->
+            <div class="page-header-bar">
+                <div>
+                    <h1 class="page-title">Question Bank</h1>
+                    <p class="page-sub">Create and manage interview questions with difficulty levels</p>
+                </div>
+                <button class="btn-add" onclick="openAddModal()">
+                    <i class="fa-solid fa-plus"></i> Add Question
+                </button>
+            </div>
+
+            <!-- Stats Row -->
+            <div class="stats-row">
+                <div class="stat-mini">
+                    <div class="stat-mini-icon" style="background:rgba(249,115,22,0.12);color:#fb923c;border:1px solid rgba(249,115,22,0.25);">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <div class="stat-mini-val" id="stat-total">—</div>
+                        <div class="stat-mini-lbl">Total Questions</div>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-icon" style="background:rgba(16,185,129,0.12);color:#34d399;border:1px solid rgba(16,185,129,0.25);">
+                        <i class="fa-solid fa-leaf"></i>
+                    </div>
+                    <div>
+                        <div class="stat-mini-val" id="stat-easy">—</div>
+                        <div class="stat-mini-lbl">Easy</div>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-icon" style="background:rgba(245,158,11,0.12);color:#fbbf24;border:1px solid rgba(245,158,11,0.25);">
+                        <i class="fa-solid fa-bolt"></i>
+                    </div>
+                    <div>
+                        <div class="stat-mini-val" id="stat-medium">—</div>
+                        <div class="stat-mini-lbl">Medium</div>
+                    </div>
+                </div>
+                <div class="stat-mini">
+                    <div class="stat-mini-icon" style="background:rgba(239,68,68,0.12);color:#f87171;border:1px solid rgba(239,68,68,0.25);">
+                        <i class="fa-solid fa-fire"></i>
+                    </div>
+                    <div>
+                        <div class="stat-mini-val" id="stat-hard">—</div>
+                        <div class="stat-mini-lbl">Hard</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Row -->
+            <div class="filter-row">
+                <div class="search-box-wrap">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="search-input" placeholder="Search questions..." oninput="applyFilters()" />
+                </div>
+                <!-- Category Filter -->
+                <select class="cat-filter-select" id="category-filter" onchange="applyFilters()">
+                    <option value="">All Categories</option>
+                </select>
+                <!-- Difficulty Filter -->
+                <button class="diff-filter-btn active-all" data-diff="" onclick="setDiffFilter(this, '')">All Levels</button>
+                <button class="diff-filter-btn" data-diff="Easy" onclick="setDiffFilter(this, 'Easy')">
+                    <i class="fa-solid fa-leaf" style="margin-right:5px;"></i> Easy
+                </button>
+                <button class="diff-filter-btn" data-diff="Medium" onclick="setDiffFilter(this, 'Medium')">
+                    <i class="fa-solid fa-bolt" style="margin-right:5px;"></i> Medium
+                </button>
+                <button class="diff-filter-btn" data-diff="Hard" onclick="setDiffFilter(this, 'Hard')">
+                    <i class="fa-solid fa-fire" style="margin-right:5px;"></i> Hard
+                </button>
+            </div>
+
+            <!-- Skeleton -->
+            <div class="q-list" id="questions-skeleton">
+                <div class="q-card" style="pointer-events:none;">
+                    <div class="skeleton-line" style="height:12px;width:24px;flex-shrink:0;"></div>
+                    <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+                        <div class="skeleton-line" style="height:15px;width:85%;"></div>
+                        <div style="display:flex;gap:8px;">
+                            <div class="skeleton-line" style="height:11px;width:80px;"></div>
+                            <div class="skeleton-line" style="height:11px;width:60px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="q-card" style="pointer-events:none;">
+                    <div class="skeleton-line" style="height:12px;width:24px;flex-shrink:0;"></div>
+                    <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+                        <div class="skeleton-line" style="height:15px;width:70%;"></div>
+                        <div style="display:flex;gap:8px;">
+                            <div class="skeleton-line" style="height:11px;width:80px;"></div>
+                            <div class="skeleton-line" style="height:11px;width:60px;"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="q-card" style="pointer-events:none;">
+                    <div class="skeleton-line" style="height:12px;width:24px;flex-shrink:0;"></div>
+                    <div style="flex:1;display:flex;flex-direction:column;gap:8px;">
+                        <div class="skeleton-line" style="height:15px;width:90%;"></div>
+                        <div style="display:flex;gap:8px;">
+                            <div class="skeleton-line" style="height:11px;width:80px;"></div>
+                            <div class="skeleton-line" style="height:11px;width:60px;"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty State -->
+            <div id="questions-empty" class="empty-state" style="display:none;">
+                <div class="empty-icon"><i class="fa-solid fa-book-open"></i></div>
+                <div class="empty-title">No Questions Found</div>
+                <div class="empty-sub">Start building your question bank by clicking "Add Question". Filter by difficulty level to organise your questions.</div>
+                <button class="btn-add" onclick="openAddModal()">
+                    <i class="fa-solid fa-plus"></i> Add Your First Question
+                </button>
+            </div>
+
+            <!-- Questions List (stacked cards) -->
+            <div class="q-list" id="questions-grid" style="display:none;"></div>
+
+        </div>
+    </main>
+</div>
+
+<!-- ══════════════════════════════════════
+     ADD / EDIT MODAL
+══════════════════════════════════════ -->
+<div class="modal-overlay" id="question-modal">
+    <div class="modal-box">
+        <div class="modal-header">
+            <div>
+                <div class="modal-title" id="modal-title-text">Add New Question</div>
+                <div class="modal-sub">Fill in the question and select a difficulty level</div>
+            </div>
+            <button class="modal-close" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+
+        <div class="modal-body">
+            <input type="hidden" id="edit-q-id" />
+
+            <!-- Difficulty Selector -->
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-signal" style="margin-right:5px;"></i> Difficulty Level *</label>
+                <div class="diff-selector">
+                    <div class="diff-opt easy selected" id="diff-easy" onclick="selectDiff('Easy')">
+                        <i class="fa-solid fa-leaf"></i> Easy
+                    </div>
+                    <div class="diff-opt medium" id="diff-medium" onclick="selectDiff('Medium')">
+                        <i class="fa-solid fa-bolt"></i> Medium
+                    </div>
+                    <div class="diff-opt hard" id="diff-hard" onclick="selectDiff('Hard')">
+                        <i class="fa-solid fa-fire"></i> Hard
+                    </div>
+                </div>
+                <input type="hidden" id="selected-difficulty" value="Easy" />
+            </div>
+
+            <!-- Question Text -->
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-question-circle" style="margin-right:5px;"></i> Question *</label>
+                <textarea class="form-control" id="question-input" placeholder="e.g. What is the difference between synchronous and asynchronous programming?" rows="4"></textarea>
+            </div>
+
+            <!-- Category (optional) -->
+            <div class="form-group">
+                <label class="form-label"><i class="fa-solid fa-tag" style="margin-right:5px;"></i> Category <span style="color:var(--text-muted);font-weight:500;text-transform:none;letter-spacing:0;">(optional)</span></label>
+                <input type="text" class="form-control" id="category-input" placeholder="e.g. JavaScript, System Design, Behavioral..." />
+            </div>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-cancel" onclick="closeModal()">Cancel</button>
+            <button class="btn-save" id="save-btn" onclick="saveQuestion()">
+                <i class="fa-solid fa-floppy-disk"></i> Save Question
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal-overlay" id="delete-modal">
+    <div class="del-modal-box">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 18px;box-shadow:0 0 20px rgba(239,68,68,0.2);">
+            <i class="fa-solid fa-trash-can"></i>
+        </div>
+        <h3 style="font-size:1.1rem;font-weight:900;color:#fff;margin:0 0 8px;">Delete this question?</h3>
+        <p style="font-size:0.84rem;color:var(--text-muted);margin:0 0 24px;line-height:1.5;">This action cannot be undone. The question will be permanently removed from your question bank.</p>
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <button class="btn-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <button id="confirm-delete-btn" onclick="confirmDelete()"
+                    style="padding:10px 24px;border-radius:12px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;cursor:pointer;font-weight:800;font-size:0.86rem;box-shadow:0 4px 14px rgba(239,68,68,0.4);">
+                Delete
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Logout Confirmation Modal -->
+<div class="modal-overlay" id="logout-confirm-modal">
+    <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.14);border-radius:22px;width:min(400px,92vw);padding:32px 24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+        <div style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin:0 auto 16px;">
+            <i class="fa-solid fa-right-from-bracket"></i>
+        </div>
+        <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin:0 0 8px;">Log out?</h3>
+        <p style="font-size:0.84rem;color:var(--text-muted);margin:0 0 24px;">You will need to sign back in to access the portal.</p>
+        <div style="display:flex;gap:12px;justify-content:center;">
+            <button onclick="closeLogoutModal()" style="padding:10px 22px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.85rem;">Cancel</button>
+            <button onclick="confirmLogoutAction()" style="padding:10px 24px;border-radius:11px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;cursor:pointer;font-weight:800;font-size:0.85rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);">Logout</button>
+        </div>
+    </div>
+</div>
+
+<div class="toast-container" id="toast-container"></div>
+
+<script src="../js/config.js?v=1"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/interviewer_common.js"></script>
+<script src="../js/interviewer_question_bank.js?v=1"></script>
+</body>
+</html>
