@@ -94,12 +94,15 @@ function updateRadioSelection(radioInput) {
 async function downloadResume() {
     const btn = document.getElementById('btn-resume');
     const origHtml = btn.innerHTML;
-    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Loading...';
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Downloading...';
     
     try {
         const session = Session.get();
         const headers = {};
-        if (session && session.id) headers['X-Admin-ID'] = session.id;
+        if (session) {
+            const userId = session.user_id || session.id || session.interviewer_id || session.admin_id;
+            if (userId) headers['X-Admin-ID'] = userId;
+        }
 
         const baseUrl = typeof API !== 'undefined' ? API : 'http://localhost:8000';
         const url = `${baseUrl}/api/interviewer/assignments/${assignmentId}/resume`;
@@ -117,10 +120,13 @@ async function downloadResume() {
         const blob = await response.blob();
         const objectUrl = window.URL.createObjectURL(blob);
         
-        // Open in new tab
-        window.open(objectUrl, '_blank');
+        const a = document.createElement('a');
+        a.href = objectUrl;
+        a.download = currentAssignment?.candidate?.filename || 'Resume.pdf';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
         
-        // Optional: clear the object URL after a while to free memory
         setTimeout(() => window.URL.revokeObjectURL(objectUrl), 60000);
 
     } catch (e) {

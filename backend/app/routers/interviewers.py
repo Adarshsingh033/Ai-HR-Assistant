@@ -9,7 +9,7 @@ import math
 import json
 from datetime import datetime, timezone
 from fastapi import APIRouter, HTTPException, Header, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from typing import Optional
 import os
 
@@ -607,6 +607,154 @@ def get_my_interviewees(
     }
 
 
+@router.get("/api/interviewer/pullable-candidates")
+def get_pullable_candidates(
+    search: Optional[str] = Query(None),
+    x_interviewer_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """
+    Return ongoing candidates in the interviewer's organization/department/branch
+    that are available to be pulled by the logged-in interviewer.
+    """
+    if not x_interviewer_id:
+        raise HTTPException(status_code=401, detail="Authentication header missing.")
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            org_id, branch_id, dept_id = _get_interviewer_context(cur, x_interviewer_id)
+
+            where_clauses = ["COALESCE(css.interview_status, 'Ongoing') = 'Ongoing'", "c.org_id = %s", "c.reached = TRUE"]
+            params = [org_id]
+
+            if search and search.strip():
+                s = f"%{search.strip()}%"
+                where_clauses.append("(c.name ILIKE %s OR c.email ILIKE %s OR jv.job_title ILIKE %s)")
+                params.extend([s, s, s])
+
+            where_sql = " WHERE " + " AND ".join(where_clauses)
+
+            sql = f"""
+                SELECT DISTINCT ON (c.id)
+                       c.id, c.name, c.email, c.match_percentage,
+                       c.job_id, jv.job_title,
+                       sr.id AS round_id, sr.round_title, sr.round_order,
+                       ia.interviewer_id AS current_interviewer_id,
+                       iv_curr.full_name AS current_interviewer_name
+                FROM candidates c
+                LEFT JOIN candidate_screening_status css ON c.id = css.candidate_id
+                LEFT JOIN job_vacancies jv ON c.job_id = jv.id
+                LEFT JOIN screening_rounds sr ON sr.job_id = jv.id AND sr.round_order = COALESCE(css.current_round_order, 1)
+                LEFT JOIN interview_assignments ia ON ia.candidate_id = c.id AND ia.round_id = sr.id
+                LEFT JOIN interviewers iv_curr ON ia.interviewer_id = iv_curr.id
+                {where_sql}
+                ORDER BY c.id, sr.round_order ASC
+            """
+            cur.execute(sql, tuple(params))
+            rows = cur.fetchall()
+
+            items = []
+            for r in rows:
+                curr_iv_id = str(r[9]) if r[9] else None
+                # Skip candidates that are already assigned to ANY interviewer
+                if curr_iv_id is not None:
+                    continue
+
+                items.append({
+                    "candidate_id": str(r[0]),
+                    "candidate_name": r[1] or "Unknown",
+                    "candidate_email": r[2] or "",
+                    "ats_score": r[3] or 0,
+                    "job_id": str(r[4]),
+                    "job_title": r[5] or "General Vacancy",
+                    "round_id": str(r[6]) if r[6] else "",
+                    "round_title": r[7] or f"Round {r[8] or 1}",
+                    "round_order": r[8] or 1,
+                    "current_interviewer_id": curr_iv_id,
+                    "current_interviewer_name": r[10] or "Unassigned",
+                })
+
+    return {"candidates": items}
+
+
+@router.post("/api/interviewer/pull-candidates")
+def pull_candidates(
+    payload: dict,
+    x_interviewer_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """
+    Pull/assign multiple ongoing candidates to the logged-in interviewer.
+    payload: { items: [ { candidate_id, round_id, job_id }, ... ] }
+    """
+    if not x_interviewer_id:
+        raise HTTPException(status_code=401, detail="Authentication header missing.")
+
+    items = payload.get("items", [])
+    if not items:
+        raise HTTPException(status_code=400, detail="No candidates selected to pull.")
+
+    now = datetime.now(timezone.utc)
+    pulled_count = 0
+
+    with get_db_connection() as conn:
+        with conn.cursor() as cur:
+            org_id, branch_id, dept_id = _get_interviewer_context(cur, x_interviewer_id)
+
+            for item in items:
+                cand_id = item.get("candidate_id")
+                round_id = item.get("round_id")
+                job_id = item.get("job_id")
+
+                if not cand_id:
+                    continue
+
+                if not round_id or not job_id:
+                    cur.execute(
+                        """
+                        SELECT css.job_id, sr.id
+                        FROM candidate_screening_status css
+                        JOIN screening_rounds sr ON sr.job_id = css.job_id AND sr.round_order = css.current_round_order
+                        WHERE css.candidate_id = %s AND css.org_id = %s
+                        LIMIT 1
+                        """,
+                        (cand_id, org_id),
+                    )
+                    r_row = cur.fetchone()
+                    if r_row:
+                        job_id = job_id or str(r_row[0])
+                        round_id = round_id or str(r_row[1])
+
+                if not round_id or not job_id:
+                    continue
+
+                assignment_id = str(uuid.uuid4())
+                cur.execute(
+                    """
+                    INSERT INTO interview_assignments
+                        (id, organization_id, branch_id, department_id, candidate_id,
+                         job_id, round_id, interviewer_id, assigned_by_hr_id,
+                         status, assigned_at, created_at, updated_at)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, 'Ongoing', %s, %s, %s)
+                    ON CONFLICT (candidate_id, round_id) DO UPDATE
+                    SET interviewer_id = EXCLUDED.interviewer_id,
+                        status = 'Ongoing',
+                        rating = NULL,
+                        feedback = NULL,
+                        updated_at = EXCLUDED.updated_at
+                    """,
+                    (assignment_id, org_id, branch_id, dept_id, cand_id,
+                     job_id, round_id, x_interviewer_id, None,
+                     now, now, now),
+                )
+                pulled_count += 1
+
+            conn.commit()
+
+    return {
+        "message": f"Successfully pulled {pulled_count} candidate(s) to your interview list!",
+        "pulled_count": pulled_count
+    }
+
+
 @router.get("/api/interviewer/my-interviewees/{assignment_id}")
 def get_assignment_detail(
     assignment_id: str,
@@ -714,7 +862,7 @@ def download_candidate_resume(
 
             cur.execute(
                 """
-                SELECT c.filename FROM interview_assignments ia
+                SELECT c.filename, c.resume_file, c.resume_text, c.id FROM interview_assignments ia
                 JOIN candidates c ON ia.candidate_id = c.id
                 WHERE ia.id = %s AND ia.interviewer_id = %s AND ia.organization_id = %s
                 LIMIT 1
@@ -725,20 +873,29 @@ def download_candidate_resume(
             if not row:
                 raise HTTPException(status_code=403, detail="Resume access denied or assignment not found")
 
-            filename = row[0]
+            filename = row[0] or "resume.pdf"
+            resume_file = row[1]
+            resume_text = row[2] or ""
+            candidate_id = str(row[3])
 
-    # Locate file in uploads directory
-    uploads_base = os.path.normpath(
-        os.path.join(os.path.dirname(__file__), "..", "..", "uploads")
-    )
-    file_path = os.path.join(uploads_base, filename)
-    if not os.path.isfile(file_path):
-        raise HTTPException(status_code=404, detail="Resume file not found on server")
+    if resume_file:
+        return Response(
+            content=bytes(resume_file),
+            media_type="application/octet-stream",
+            headers={"Content-Disposition": f'attachment; filename="{filename}"'}
+        )
 
-    return FileResponse(
-        path=file_path,
-        filename=filename,
-        media_type="application/octet-stream",
+    import tempfile
+    upload_dir = os.path.join(tempfile.gettempdir(), "ai_hr_resumes")
+    file_path = os.path.join(upload_dir, f"{candidate_id}_{filename}")
+    if os.path.exists(file_path):
+        return FileResponse(path=file_path, filename=filename, media_type="application/octet-stream")
+
+    txt_filename = filename if filename.endswith('.txt') else f"{filename}.txt"
+    return Response(
+        content=resume_text.encode("utf-8"),
+        media_type="text/plain",
+        headers={"Content-Disposition": f'attachment; filename="{txt_filename}"'}
     )
 
 
@@ -919,23 +1076,26 @@ def submit_interview_result(
                 cur.execute("SELECT COALESCE(MAX(round_order), 1) FROM screening_rounds WHERE job_id = %s", (job_id,))
                 max_rounds = cur.fetchone()[0]
 
-                # Map interviewer status to screening status
+                # Map interviewer status to screening status for the round
                 status_map = {
                     "Passed": "Passed",
                     "Rejected": "Rejected",
                     "Onhold": "On Hold",
                     "Ongoing": "Ongoing",
                 }
-                screening_status = status_map.get(payload.status, payload.status)
-
+                round_eval_status = status_map.get(payload.status, payload.status)
+                
+                # Determine overall candidate status
+                screening_status = round_eval_status
                 new_round_order = round_order
+                
                 if payload.status == "Passed" and round_order < max_rounds:
                     new_round_order = round_order + 1
                     screening_status = "Ongoing"
                 elif payload.status == "Passed" and round_order >= max_rounds:
                     screening_status = "Passed"
 
-                # Also upsert screening_comments for history
+                # Also upsert screening_comments for history (must use round_eval_status)
                 sc_id = str(uuid.uuid4())
                 cur.execute(
                     """
@@ -945,11 +1105,11 @@ def submit_interview_result(
                     SET status = EXCLUDED.status, score = EXCLUDED.score,
                         comment = EXCLUDED.comment, updated_at = EXCLUDED.updated_at
                     """,
-                    (sc_id, candidate_id, round_id, screening_status,
+                    (sc_id, candidate_id, round_id, round_eval_status,
                      payload.rating, payload.feedback or "", now, now),
                 )
 
-                # Update candidate_screening_status
+                # Update candidate_screening_status (overall candidate status)
                 css_id = str(uuid.uuid4())
                 cur.execute(
                     """

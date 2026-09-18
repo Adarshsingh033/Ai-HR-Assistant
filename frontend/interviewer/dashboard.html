@@ -76,6 +76,19 @@
             text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
         }
         .btn-sm:hover { background: rgba(99,102,241,0.3); }
+
+        .btn-primary-sm {
+            background: linear-gradient(135deg, #f97316, #ea580c);
+            color: #fff;
+            box-shadow: 0 4px 14px rgba(249, 115, 22, 0.35);
+            border: none;
+        }
+        .btn-primary-sm:hover {
+            background: linear-gradient(135deg, #ea580c, #c2410c);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(249, 115, 22, 0.45);
+            color: #fff;
+        }
         
         .empty-state { text-align: center; padding: 40px 20px; color: var(--text-muted); font-size: 0.9rem; }
     </style>
@@ -159,35 +172,7 @@
                 </div>
             </div>
 
-            <!-- Recent Pending Assignments -->
-            <div class="card">
-                <div class="card-header">
-                    <h2 class="card-title"><i class="fa-solid fa-clock" style="color:#a5b4fc;margin-right:8px;"></i> Recent Pending Assignments</h2>
-                    <a href="my_interviewees.html" class="btn-sm" style="background:rgba(255,255,255,0.05);color:#fff;border-color:rgba(255,255,255,0.1);">View All</a>
-                </div>
-                
-                <div id="pending-skeleton" style="padding:10px;">
-                    <div class="skeleton-row" style="height:20px;margin-bottom:12px;"></div>
-                    <div class="skeleton-row" style="height:20px;margin-bottom:12px;"></div>
-                </div>
 
-                <div id="pending-empty" class="empty-state hidden">
-                    <i class="fa-solid fa-mug-hot" style="font-size:2rem;color:rgba(255,255,255,0.1);margin-bottom:10px;display:block;"></i>
-                    No pending interviews. You're all caught up!
-                </div>
-
-                <table class="simple-table hidden" id="pending-table">
-                    <thead>
-                        <tr>
-                            <th>Candidate</th>
-                            <th>Job Vacancy</th>
-                            <th>Round</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pending-tbody"></tbody>
-                </table>
-            </div>
 
         </div>
     </main>

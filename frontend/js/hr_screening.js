@@ -126,10 +126,10 @@ function renderScreeningTable() {
         else if (interviewStatus === 'Rejected') statusPillClass = 'status-pill-rejected';
         else if (interviewStatus === 'On Hold') statusPillClass = 'status-pill-onhold';
 
-        let interviewerName = c.interviewer_name || 'Unassigned';
+        let interviewerName = c.current_interviewer_name || 'Unassigned';
         let avgRatingStr = '—';
-        if (c.avg_rating !== undefined && c.avg_rating !== null) {
-            avgRatingStr = Number(c.avg_rating).toFixed(1) + '/10';
+        if (c.average_rating !== undefined && c.average_rating !== null) {
+            avgRatingStr = Number(c.average_rating).toFixed(1) + '/10';
         }
 
         return `
@@ -141,11 +141,11 @@ function renderScreeningTable() {
                 </span>
             </td>
             <td class="td-truncate">
-                <span style="font-size:0.82rem; ${c.interviewer_name ? 'color:var(--text-secondary);' : 'color:var(--text-muted); font-style:italic;'}">
+                <span style="font-size:0.82rem; ${c.current_interviewer_name ? 'color:var(--text-secondary);' : 'color:var(--text-muted); font-style:italic;'}">
                     ${escapeHtml(interviewerName)}
                 </span>
             </td>
-            <td style="text-align:center;font-weight:700;color:${c.avg_rating >= 7 ? '#10b981' : c.avg_rating >= 4 ? '#f59e0b' : c.avg_rating ? '#ef4444' : 'var(--text-muted)'};">
+            <td style="text-align:center;font-weight:700;color:${c.average_rating >= 7 ? '#10b981' : c.average_rating >= 4 ? '#f59e0b' : c.average_rating ? '#ef4444' : 'var(--text-muted)'};">
                 ${avgRatingStr}
             </td>
             <td style="white-space:nowrap;">
@@ -416,12 +416,12 @@ async function openViewProgressModal(candidateId) {
                             Round ${r.round_order}: ${escapeHtml(r.round_title)}
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;">
-                            ${r.score !== null && r.score !== undefined ? `<span style="background:rgba(99,102,241,0.2);color:#a5b4fc;padding:3px 10px;border-radius:99px;font-weight:800;font-size:0.75rem;border:1px solid rgba(99,102,241,0.4);"><i class="fa-solid fa-star"></i> Score: ${r.score}/100</span>` : ''}
+                            ${r.score !== null && r.score !== undefined ? `<span style="background:rgba(99,102,241,0.2);color:#a5b4fc;padding:3px 10px;border-radius:99px;font-weight:800;font-size:0.75rem;border:1px solid rgba(99,102,241,0.4);"><i class="fa-solid fa-star"></i> Rating: ${r.score}/10</span>` : ''}
                             <span class="status-pill ${r.status === 'Passed' ? 'status-pill-passed' : r.status === 'Rejected' ? 'status-pill-rejected' : r.status === 'On Hold' ? 'status-pill-onhold' : 'status-pill-ongoing'}">${r.status || 'Pending'}</span>
                         </div>
                     </div>
                     <div style="font-size:0.8rem;color:rgba(255,255,255,0.55);margin-bottom:8px;">${escapeHtml(r.round_description || 'No description.')}</div>
-                    ${r.comment ? `<div style="font-size:0.84rem;color:#e2e8f0;background:rgba(255,255,255,0.03);padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-top:6px;"><strong>HR Comment:</strong> ${escapeHtml(r.comment)}</div>` : `<div style="font-size:0.78rem;color:rgba(255,255,255,0.35);font-style:italic;margin-top:4px;">No evaluation comments added for this round.</div>`}
+                    ${r.comment ? `<div style="font-size:0.84rem;color:#e2e8f0;background:rgba(255,255,255,0.03);padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-top:6px;"><strong>Feedback:</strong> ${escapeHtml(r.comment)}</div>` : `<div style="font-size:0.78rem;color:rgba(255,255,255,0.35);font-style:italic;margin-top:4px;">No evaluation comments added for this round.</div>`}
                 </div>
             `).join('');
         }

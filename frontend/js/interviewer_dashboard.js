@@ -26,6 +26,8 @@ async function loadRecentAssignments() {
     const table = document.getElementById('pending-table');
     const skel = document.getElementById('pending-skeleton');
 
+    if (!tbody && !empty && !table && !skel) return;
+
     try {
         const data = await apiRequest('GET', '/api/interviewer/my-interviewees?limit=5');
         const assignments = data.assignments || [];
@@ -56,8 +58,8 @@ async function loadRecentAssignments() {
                         <span style="${badgeStyle}">${escapeHtml(a.round_step)}</span>
                     </td>
                     <td>
-                        <a href="interview.html?id=${a.assignment_id}" class="btn-sm" style="background:rgba(16,185,129,0.15); color:#34d399; border-color:rgba(16,185,129,0.3);">
-                            Start Interview
+                        <a href="interview.html?id=${a.assignment_id}" class="btn-sm btn-primary-sm">
+                            <i class="fa-solid fa-play" style="font-size:0.75rem;"></i> Start
                         </a>
                     </td>
                 </tr>`;

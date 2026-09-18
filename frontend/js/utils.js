@@ -49,7 +49,7 @@ async function apiRequest(method, path, body = null, isFormData = false) {
 
     // Inject user_id if logged in
     if (s) {
-        const adminId = s.user_id || s.id || s.admin_id;
+        const adminId = s.user_id || s.id || s.admin_id || s.interviewer_id;
         if (adminId) {
             headers['X-Admin-ID'] = adminId;
             if (s.role === 'super_admin') {
