@@ -168,7 +168,6 @@ def list_candidates(
     search: Optional[str] = None,
     contacted: Optional[bool] = None,
     sort_by_match: bool = False,
-    top_10: bool = False,
 ):
     """List candidates with optional filters and ranking order."""
     with get_db_connection() as conn:
@@ -207,11 +206,8 @@ def list_candidates(
             if where_clauses:
                 query += " WHERE " + " AND ".join(where_clauses)
 
-            if top_10:
-                query += " ORDER BY match_percentage DESC, created_at ASC LIMIT 10"
-            else:
-                # Default ranking: Match Score DESC, then upload time ASC (earliest uploaded gets higher rank)
-                query += " ORDER BY match_percentage DESC, created_at ASC"
+            # Default ranking: Match Score DESC, then upload time ASC (earliest uploaded gets higher rank)
+            query += " ORDER BY match_percentage DESC, created_at ASC"
 
             cur.execute(query, tuple(params))
             rows = cur.fetchall()
