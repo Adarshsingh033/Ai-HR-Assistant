@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,10 +8,13 @@
     <meta name="description" content="View, filter, and manage all candidates parsed from uploaded resumes." />
     <link rel="stylesheet" href="../css/main.css" />
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap"
+        rel="stylesheet" />
     <style>
         /* ── Page-level overrides ── */
-        body { font-family: 'Inter', sans-serif; }
+        body {
+            font-family: 'Inter', sans-serif;
+        }
 
         .stat-card {
             background: var(--bg-card);
@@ -22,14 +26,32 @@
             gap: clamp(10px, 1.1vw, 14px);
             min-width: 0;
         }
+
         .stat-icon {
-            width: 42px; height: 42px;
+            width: 42px;
+            height: 42px;
             border-radius: 11px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 1.05rem; flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.05rem;
+            flex-shrink: 0;
         }
-        .stat-label { font-size: 0.72rem; color: rgba(255,255,255,0.45); text-transform: uppercase; font-weight: 700; letter-spacing: 0.05em; }
-        .stat-value { font-size: clamp(1.2rem, 1.7vw, 1.55rem); font-weight: 900; color: #fff; line-height: 1.1; }
+
+        .stat-label {
+            font-size: 0.72rem;
+            color: rgba(255, 255, 255, 0.45);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-value {
+            font-size: clamp(1.2rem, 1.7vw, 1.55rem);
+            font-weight: 900;
+            color: #fff;
+            line-height: 1.1;
+        }
 
         /* ── Table ── */
         /* Inherits colours/border from main.css; the inner wrap does the scrolling. */
@@ -38,6 +60,7 @@
             overflow: hidden;
             min-width: 0;
         }
+
         .table-header-row {
             display: flex;
             align-items: center;
@@ -45,263 +68,608 @@
             padding: 18px 22px 14px;
             border-bottom: 1px solid var(--border);
         }
-        .table-title { font-size: 1rem; font-weight: 800; color: #fff; }
-        .table-subtitle { font-size: 0.78rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
-        .candidates-table { width: 100%; border-collapse: collapse; }
+
+        .table-title {
+            font-size: 1rem;
+            font-weight: 800;
+            color: #fff;
+        }
+
+        .table-subtitle {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin-top: 2px;
+        }
+
+        .candidates-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
         .candidates-table thead th {
-            background: rgba(255,255,255,0.03);
+            background: rgba(255, 255, 255, 0.03);
             text-align: left;
             padding: clamp(11px, 1.2vw, 14px) clamp(10px, 1.3vw, 18px);
             font-size: 0.72rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: rgba(255,255,255,0.45);
+            color: rgba(255, 255, 255, 0.45);
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
-        .candidates-table thead th:first-child { padding-left: 20px; padding-right: 12px; }
-        .candidates-table thead th:last-child { padding-right: 22px; text-align: right; }
+
+        .candidates-table thead th:first-child {
+            padding-left: 20px;
+            padding-right: 12px;
+        }
+
+        .candidates-table thead th:last-child {
+            padding-right: 22px;
+            text-align: right;
+        }
+
         .candidates-table tbody tr {
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             transition: background 0.15s;
         }
-        .candidates-table tbody tr:last-child { border-bottom: none; }
-        .candidates-table tbody tr:hover { background: rgba(255,255,255,0.03); }
+
+        .candidates-table tbody tr:last-child {
+            border-bottom: none;
+        }
+
+        .candidates-table tbody tr:hover {
+            background: rgba(255, 255, 255, 0.03);
+        }
+
         .candidates-table tbody td {
             padding: clamp(11px, 1.2vw, 14px) clamp(10px, 1.3vw, 18px);
             font-size: 0.83rem;
-            color: rgba(255,255,255,0.78);
+            color: rgba(255, 255, 255, 0.78);
             vertical-align: middle;
         }
-        .candidates-table tbody td:first-child { padding-left: 20px; padding-right: 12px; }
-        .candidates-table tbody td:last-child { padding-right: 22px; }
+
+        .candidates-table tbody td:first-child {
+            padding-left: 20px;
+            padding-right: 12px;
+        }
+
+        .candidates-table tbody td:last-child {
+            padding-right: 22px;
+        }
 
         /* ── Name cell ── */
-        .cand-name-cell { display: flex; align-items: center; gap: 11px; }
+        .cand-name-cell {
+            display: flex;
+            align-items: center;
+            gap: 11px;
+        }
+
         .cand-avatar {
-            width: 36px; height: 36px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
             background: linear-gradient(135deg, #6366f1, #4f46e5);
-            display: flex; align-items: center; justify-content: center;
-            font-size: 0.9rem; font-weight: 800; color: #fff; flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
         }
-        .cand-name { font-size: 0.88rem; font-weight: 700; color: #e2e8f0; }
-        .cand-file { font-size: 0.7rem; color: rgba(255,255,255,0.35); margin-top: 1px; }
+
+        .cand-name {
+            font-size: 0.88rem;
+            font-weight: 700;
+            color: #e2e8f0;
+        }
+
+        .cand-file {
+            font-size: 0.7rem;
+            color: rgba(255, 255, 255, 0.35);
+            margin-top: 1px;
+        }
 
         /* ── Match badge ── */
         /* Fluid so the "NN% ATS Score" label stays inside its column at 1024px. */
         .match-badge {
-            display: inline-flex; align-items: center;
+            display: inline-flex;
+            align-items: center;
             padding: 3px clamp(6px, 0.8vw, 10px);
             border-radius: 99px;
-            font-size: clamp(0.64rem, 0.72vw, 0.76rem); font-weight: 800;
+            font-size: clamp(0.64rem, 0.72vw, 0.76rem);
+            font-weight: 800;
             white-space: nowrap;
         }
-        .match-high   { background: rgba(16,185,129,0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-        .match-medium { background: rgba(245,158,11,0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-        .match-low    { background: rgba(239,68,68,0.15);  color: #f87171; border: 1px solid rgba(239,68,68,0.3);  }
+
+        .match-high {
+            background: rgba(16, 185, 129, 0.15);
+            color: #34d399;
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .match-medium {
+            background: rgba(245, 158, 11, 0.15);
+            color: #fbbf24;
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .match-low {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
 
         /* ── Rank Badge ── */
         .rank-badge {
-            display: inline-flex; align-items: center; justify-content: center;
-            width: 32px; height: 32px; border-radius: 50%;
-            font-size: 0.82rem; font-weight: 900; color: #fff;
-            background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(79,70,229,0.35));
-            border: 1px solid rgba(99,102,241,0.4);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-size: 0.82rem;
+            font-weight: 900;
+            color: #fff;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(79, 70, 229, 0.35));
+            border: 1px solid rgba(99, 102, 241, 0.4);
         }
+
         .rank-badge.top-1 {
             background: linear-gradient(135deg, #f59e0b, #d97706);
-            border-color: #fbbf24; color: #fff; box-shadow: 0 0 10px rgba(245,158,11,0.4);
+            border-color: #fbbf24;
+            color: #fff;
+            box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
         }
+
         .rank-badge.top-2 {
             background: linear-gradient(135deg, #94a3b8, #64748b);
-            border-color: #cbd5e1; color: #fff;
+            border-color: #cbd5e1;
+            color: #fff;
         }
+
         .rank-badge.top-3 {
             background: linear-gradient(135deg, #b45309, #78350f);
-            border-color: #f59e0b; color: #fff;
+            border-color: #f59e0b;
+            color: #fff;
         }
 
         /* ── Toggle Switch for Contacted ── */
         .toggle-switch {
-            position: relative; display: inline-block; width: 42px; height: 23px; vertical-align: middle;
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 23px;
+            vertical-align: middle;
         }
-        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
         .toggle-slider {
-            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
-            background-color: rgba(255,255,255,0.12); transition: .25s; border-radius: 24px;
-            border: 1px solid rgba(255,255,255,0.2);
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(255, 255, 255, 0.12);
+            transition: .25s;
+            border-radius: 24px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
         .toggle-slider:before {
-            position: absolute; content: ""; height: 17px; width: 17px; left: 2px; bottom: 2px;
-            background-color: #cbd5e1; transition: .25s; border-radius: 50%;
+            position: absolute;
+            content: "";
+            height: 17px;
+            width: 17px;
+            left: 2px;
+            bottom: 2px;
+            background-color: #cbd5e1;
+            transition: .25s;
+            border-radius: 50%;
         }
-        input:checked + .toggle-slider { background-color: #10b981; border-color: #34d399; }
-        input:checked + .toggle-slider:before { transform: translateX(19px); background-color: #fff; }
+
+        input:checked+.toggle-slider {
+            background-color: #10b981;
+            border-color: #34d399;
+        }
+
+        input:checked+.toggle-slider:before {
+            transform: translateX(19px);
+            background-color: #fff;
+        }
 
         /* ── Action Three-Dot Dropdown ── */
         .action-dots-btn {
-            width: 32px; height: 32px; border-radius: 8px;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
             border: 1px solid var(--border);
-            background: rgba(255,255,255,0.04);
-            color: rgba(255,255,255,0.6);
-            cursor: pointer; display: inline-flex; align-items: center; justify-content: center;
-            font-size: 0.9rem; transition: all 0.2s;
+            background: rgba(255, 255, 255, 0.04);
+            color: rgba(255, 255, 255, 0.6);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.2s;
         }
+
         .action-dots-btn:hover {
-            background: rgba(255,255,255,0.1); color: #fff; border-color: rgba(255,255,255,0.25);
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.25);
         }
+
         .action-dropdown {
-            position: absolute; right: 0; top: 38px;
-            background: #1e293b; border: 1px solid rgba(255,255,255,0.15);
-            border-radius: 12px; padding: 6px 0; min-width: 150px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-            z-index: 100; text-align: left;
+            position: absolute;
+            right: 0;
+            top: 38px;
+            background: #1e293b;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 12px;
+            padding: 6px 0;
+            min-width: 150px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+            z-index: 100;
+            text-align: left;
             display: none;
         }
+
         .action-dropdown.open {
-            display: block; animation: popoverUp 0.15s ease forwards;
+            display: block;
+            animation: popoverUp 0.15s ease forwards;
         }
+
         .action-dropdown-item {
-            display: flex; align-items: center; gap: 10px;
-            padding: 8px 14px; font-size: 0.82rem; font-weight: 600;
-            color: #e2e8f0; cursor: pointer; transition: background 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 14px;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            cursor: pointer;
+            transition: background 0.15s;
         }
+
         .action-dropdown-item:hover {
-            background: rgba(255,255,255,0.08);
+            background: rgba(255, 255, 255, 0.08);
         }
+
         .action-dropdown-item.danger:hover {
-            background: rgba(239,68,68,0.15); color: #f87171;
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
         }
+
         .action-dropdown-divider {
-            height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0;
+            height: 1px;
+            background: rgba(255, 255, 255, 0.08);
+            margin: 4px 0;
         }
 
         /* ── Empty state ── */
         .table-empty {
-            text-align: center; padding: 60px 20px;
-            color: rgba(255,255,255,0.35); font-size: 0.88rem;
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(255, 255, 255, 0.35);
+            font-size: 0.88rem;
         }
-        .table-empty i { font-size: 2.5rem; display: block; margin-bottom: 14px; color: rgba(99,102,241,0.35); }
+
+        .table-empty i {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 14px;
+            color: rgba(99, 102, 241, 0.35);
+        }
 
         .modal-xl {
-            background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:22px;
-            width:min(860px, 94vw); max-height:min(92vh, calc(100vh - 32px));
-            display:flex; flex-direction:column; overflow:hidden;
-            padding:clamp(18px, 2vw, 28px) clamp(18px, 2.2vw, 32px) clamp(14px, 1.5vw, 20px);
-        }
-        .modal-fixed-top { flex-shrink:0; padding-bottom:14px; border-bottom:1px solid rgba(255,255,255,0.08); margin-bottom:14px; }
-        .modal-fixed-top .modal-top { margin-bottom:0; }
-        .modal-details-scroll { flex:1; overflow-y:auto; padding-right:8px; }
-        .modal-details-scroll::-webkit-scrollbar { width:6px; }
-        .modal-details-scroll::-webkit-scrollbar-track { background:rgba(255,255,255,0.04); border-radius:3px; }
-        .modal-details-scroll::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.2); border-radius:3px; }
-        .modal-details-scroll::-webkit-scrollbar-thumb:hover { background:rgba(99,102,241,0.5); }
-        .modal-bottom-actions { flex-shrink:0; margin-top:14px; padding-top:12px; border-top:1px solid rgba(255,255,255,0.08); display:flex; justify-content:flex-end; }
-        .modal-lg {
-            background:#0f172a; border:1px solid rgba(255,255,255,0.12); border-radius:22px;
-            width:min(860px, 94vw); max-height:min(92vh, calc(100vh - 32px));
-            display:flex; flex-direction:column; overflow:hidden;
-            padding:clamp(18px, 2vw, 28px) clamp(18px, 2.2vw, 32px) clamp(14px, 1.5vw, 20px);
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+            width: min(860px, 94vw);
+            max-height: min(92vh, calc(100vh - 32px));
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: clamp(18px, 2vw, 28px) clamp(18px, 2.2vw, 32px) clamp(14px, 1.5vw, 20px);
         }
 
-        .modal-top { display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px; }
-        .modal-close-btn {
-            width:34px;height:34px;border-radius:50%;border:1px solid rgba(255,255,255,0.15);
-            background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.7);cursor:pointer;
-            display:flex;align-items:center;justify-content:center;font-size:1rem;
-            transition:all 0.2s; flex-shrink:0;
+        .modal-fixed-top {
+            flex-shrink: 0;
+            padding-bottom: 14px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            margin-bottom: 14px;
         }
-        .modal-close-btn:hover { background:rgba(239,68,68,0.2);border-color:rgba(239,68,68,0.5);color:#f87171; }
+
+        .modal-fixed-top .modal-top {
+            margin-bottom: 0;
+        }
+
+        .modal-details-scroll {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 8px;
+        }
+
+        .modal-details-scroll::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .modal-details-scroll::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.04);
+            border-radius: 3px;
+        }
+
+        .modal-details-scroll::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .modal-details-scroll::-webkit-scrollbar-thumb:hover {
+            background: rgba(99, 102, 241, 0.5);
+        }
+
+        .modal-bottom-actions {
+            flex-shrink: 0;
+            margin-top: 14px;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .modal-lg {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+            width: min(860px, 94vw);
+            max-height: min(92vh, calc(100vh - 32px));
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            padding: clamp(18px, 2vw, 28px) clamp(18px, 2.2vw, 32px) clamp(14px, 1.5vw, 20px);
+        }
+
+        .modal-top {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 24px;
+        }
+
+        .modal-close-btn {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.06);
+            color: rgba(255, 255, 255, 0.7);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .modal-close-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            border-color: rgba(239, 68, 68, 0.5);
+            color: #f87171;
+        }
 
         /* Profile header */
-        .profile-header { display:flex;align-items:center;gap:16px; }
-        .profile-avatar-lg {
-            width:58px;height:58px;border-radius:50%;
-            background:linear-gradient(135deg,#6366f1,#4f46e5);
-            display:flex;align-items:center;justify-content:center;
-            font-size:1.4rem;font-weight:900;color:#fff;flex-shrink:0;
+        .profile-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
         }
-        .profile-name { font-size:1.3rem;font-weight:900;color:#fff; }
-        .profile-sub { font-size:0.82rem;color:rgba(255,255,255,0.5);margin-top:3px; }
+
+        .profile-avatar-lg {
+            width: 58px;
+            height: 58px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #6366f1, #4f46e5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .profile-name {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #fff;
+        }
+
+        .profile-sub {
+            font-size: 0.82rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 3px;
+        }
 
         /* Section label */
         .sec-label {
-            font-size:0.68rem;font-weight:800;text-transform:uppercase;
-            letter-spacing:0.07em;color:rgba(255,255,255,0.35);
-            margin-bottom:10px;margin-top:22px;
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.07em;
+            color: rgba(255, 255, 255, 0.35);
+            margin-bottom: 10px;
+            margin-top: 22px;
         }
 
         /* Info grid */
-        .info-grid { display:grid;grid-template-columns:repeat(auto-fit, minmax(min(220px, 100%), 1fr));gap:10px; }
-        .info-item {
-            background:rgba(255,255,255,0.04);
-            border:1px solid rgba(255,255,255,0.07);
-            border-radius:10px;padding:10px 14px;
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+            gap: 10px;
         }
-        .info-item .lbl { font-size:0.66rem;color:rgba(255,255,255,0.38);text-transform:uppercase;font-weight:700;letter-spacing:0.05em;margin-bottom:3px; }
-        .info-item .val { font-size:0.84rem;color:#e2e8f0;font-weight:600;word-break:break-word; }
-        .info-item .val a { color:#818cf8;text-decoration:none; }
-        .info-item .val a:hover { text-decoration:underline; }
+
+        .info-item {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
+            padding: 10px 14px;
+        }
+
+        .info-item .lbl {
+            font-size: 0.66rem;
+            color: rgba(255, 255, 255, 0.38);
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            margin-bottom: 3px;
+        }
+
+        .info-item .val {
+            font-size: 0.84rem;
+            color: #e2e8f0;
+            font-weight: 600;
+            word-break: break-word;
+        }
+
+        .info-item .val a {
+            color: #818cf8;
+            text-decoration: none;
+        }
+
+        .info-item .val a:hover {
+            text-decoration: underline;
+        }
 
         /* Skills wrap */
-        .skills-wrap { display:flex;flex-wrap:wrap;gap:7px;margin-top:2px; }
+        .skills-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 7px;
+            margin-top: 2px;
+        }
+
         .skill-chip {
-            font-size:0.73rem;font-weight:700;
-            padding:4px 11px;border-radius:99px;
-            background:rgba(99,102,241,0.15);
-            color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);
+            font-size: 0.73rem;
+            font-weight: 700;
+            padding: 4px 11px;
+            border-radius: 99px;
+            background: rgba(99, 102, 241, 0.15);
+            color: #a5b4fc;
+            border: 1px solid rgba(99, 102, 241, 0.3);
         }
 
         /* Resume text preview */
         .resume-preview {
-            background:rgba(0,0,0,0.3);
-            border:1px solid rgba(255,255,255,0.08);
-            border-radius:12px;padding:18px 20px;
-            font-size:0.78rem;
-            color:rgba(255,255,255,0.65);
-            line-height:1.7;
-            white-space:pre-wrap;
-            word-break:break-word;
-            max-height:min(280px, 34vh);
-            overflow-y:auto;
-            font-family:'Inter',monospace;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            padding: 18px 20px;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.7;
+            white-space: pre-wrap;
+            word-break: break-word;
+            max-height: min(280px, 34vh);
+            overflow-y: auto;
+            font-family: 'Inter', monospace;
         }
 
         /* Edit form */
-        .form-grid { display:grid;grid-template-columns:repeat(auto-fit, minmax(min(220px, 100%), 1fr));gap:14px; }
-        .form-group { display:flex;flex-direction:column;gap:6px; }
-        .form-group.full { grid-column:1/-1; }
-        .form-label { font-size:0.72rem;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:0.04em; }
-        .form-control {
-            background:rgba(255,255,255,0.05);
-            border:1px solid rgba(255,255,255,0.1);
-            border-radius:10px;
-            color:#fff;font-size:0.85rem;font-family:'Inter',sans-serif;
-            padding:10px 13px;outline:none;transition:border-color 0.2s;
-            width:100%;box-sizing:border-box;
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr));
+            gap: 14px;
         }
-        .form-control:focus { border-color:rgba(99,102,241,0.6); }
-        .form-control::placeholder { color:rgba(255,255,255,0.25); }
-        textarea.form-control { resize:vertical;min-height:80px; }
-        select.form-control option { background:#1e293b; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full {
+            grid-column: 1/-1;
+        }
+
+        .form-label {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .form-control {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: #fff;
+            font-size: 0.85rem;
+            font-family: 'Inter', sans-serif;
+            padding: 10px 13px;
+            outline: none;
+            transition: border-color 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .form-control:focus {
+            border-color: rgba(99, 102, 241, 0.6);
+        }
+
+        .form-control::placeholder {
+            color: rgba(255, 255, 255, 0.25);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        select.form-control option {
+            background: #1e293b;
+        }
 
         /* Match explanation */
         .match-explain {
-            background:rgba(99,102,241,0.07);border:1px solid rgba(99,102,241,0.2);
-            border-radius:10px;padding:14px 16px;
-            font-size:0.78rem;color:rgba(255,255,255,0.65);line-height:1.6;
+            background: rgba(99, 102, 241, 0.07);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 10px;
+            padding: 14px 16px;
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.65);
+            line-height: 1.6;
         }
 
         /* Delete confirm */
-        .del-modal { background:#0f172a;border:1px solid rgba(255,255,255,0.12);border-radius:22px;width:min(400px, 92vw);padding:clamp(24px, 3vw, 36px) clamp(20px, 2.2vw, 28px);text-align:center; }
+        .del-modal {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            border-radius: 22px;
+            width: min(400px, 92vw);
+            padding: clamp(24px, 3vw, 36px) clamp(20px, 2.2vw, 28px);
+            text-align: center;
+        }
 
         /* Loader skeleton */
-        @keyframes shimmer { to { background-position: -200% 0; } }
+        @keyframes shimmer {
+            to {
+                background-position: -200% 0;
+            }
+        }
+
         .skeleton-row {
             height: 56px;
-            background: linear-gradient(90deg,rgba(255,255,255,0.04) 25%,rgba(255,255,255,0.07) 50%,rgba(255,255,255,0.04) 75%);
+            background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.07) 50%, rgba(255, 255, 255, 0.04) 75%);
             background-size: 200% 100%;
             animation: shimmer 1.4s infinite;
             border-radius: 8px;
@@ -309,395 +677,417 @@
         }
     </style>
 </head>
+
 <body>
-<div class="app-layout">
+    <div class="app-layout">
 
-    <!-- ── Sidebar ── -->
-    <aside class="sidebar" id="sidebar">
-        <div class="sidebar-logo">
-            <div>
-                <div class="logo-text">AI HR Assistant</div>
-                <div class="logo-sub">HR Portal</div>
+        <!-- ── Sidebar ── -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-logo">
+                <div>
+                    <div class="logo-text">AI HR Assistant</div>
+                    <div class="logo-sub">HR Portal</div>
+                </div>
             </div>
-        </div>
 
-        <div class="nav-section-label">Main Menu</div>
-        <a href="dashboard.html" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
-            Dashboard
-        </a>
-        <a href="jobs.html" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
-            Job Vacancy
-        </a>
-        <a href="upload_resumes.html" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-file-arrow-up"></i></span>
-            Upload Resumes
-        </a>
-        <a href="all_candidates.html" class="nav-item active">
-            <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
-            Candidates
-        </a>
-        <a href="screening.html" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-clipboard-check"></i></span>
-            Screening
-        </a>
-        <a href="interviewers.html" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span>
-            Interviewers
-        </a>
-        <a href="comparison.html" class="nav-item">
-            <span class="nav-icon"><i class="fa-solid fa-code-compare"></i></span>
-            Candidate Comparison
-        </a>
+            <div class="nav-section-label">Main Menu</div>
+            <a href="dashboard.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-chart-pie"></i></span>
+                Dashboard
+            </a>
+            <a href="jobs.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-briefcase"></i></span>
+                Job Vacancy
+            </a>
+            <a href="upload_resumes.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-file-arrow-up"></i></span>
+                Upload Resumes
+            </a>
+            <a href="all_candidates.html" class="nav-item active">
+                <span class="nav-icon"><i class="fa-solid fa-users"></i></span>
+                Candidates
+            </a>
+            <a href="screening.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-clipboard-check"></i></span>
+                Screening
+            </a>
+            <a href="interviewers.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-user-tie"></i></span>
+                Interviewers
+            </a>
+            <a href="comparison.html" class="nav-item">
+                <span class="nav-icon"><i class="fa-solid fa-code-compare"></i></span>
+                Candidate Comparison
+            </a>
             <a href="emails.html" class="nav-item">
                 <span class="nav-icon"><i class="fa-solid fa-paper-plane"></i></span>
                 Mailing
             </a>
 
-        <!-- Sidebar Footer -->
-        <div class="sidebar-footer" style="position:relative;">
-            <div class="user-menu-popover hidden" id="user-menu-popover">
-                <a href="profile.html" class="popover-item">
-                    <i class="fa-solid fa-user" style="color: #3b82f6;"></i> Profile
-                </a>
-                <div class="popover-divider"></div>
-                <a href="change_password.html" class="popover-item">
-                    <i class="fa-solid fa-lock" style="color: #3b82f6;"></i> Change Password
-                </a>
-                <div class="popover-divider"></div>
-                <a href="#" class="popover-item" onclick="logout()">
-                    <i class="fa-solid fa-right-from-bracket" style="color: #ef4444;"></i> Logout
-                </a>
-            </div>
-            <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">
-                <div class="user-avatar" id="sidebar-avatar">H</div>
-                <div class="user-info">
-                    <div class="user-name" id="sidebar-name">HR User</div>
-                    <div class="user-role" id="sidebar-org">HR Manager</div>
+            <!-- Sidebar Footer -->
+            <div class="sidebar-footer" style="position:relative;">
+                <div class="user-menu-popover hidden" id="user-menu-popover">
+                    <a href="profile.html" class="popover-item">
+                        <i class="fa-solid fa-user" style="color: #3b82f6;"></i> Profile
+                    </a>
+                    <div class="popover-divider"></div>
+                    <a href="change_password.html" class="popover-item">
+                        <i class="fa-solid fa-lock" style="color: #3b82f6;"></i> Change Password
+                    </a>
+                    <div class="popover-divider"></div>
+                    <a href="#" class="popover-item" onclick="logout()">
+                        <i class="fa-solid fa-right-from-bracket" style="color: #ef4444;"></i> Logout
+                    </a>
                 </div>
-            </div>
-        </div>
-    </aside>
-
-    <!-- ── Main Content ── -->
-    <main class="main-content">
-        <header class="topbar">
-            <div class="topbar-title">Candidates</div>
-        </header>
-
-        <div class="page-content scrollable">
-
-            <!-- Stats strip -->
-            <div class="stats-strip">
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">
-                        <i class="fa-solid fa-users"></i>
-                    </div>
-                    <div>
-                        <div class="stat-label">Total Candidates</div>
-                        <div class="stat-value" id="stat-total">—</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#34d399;">
-                        <i class="fa-solid fa-calendar-days"></i>
-                    </div>
-                    <div>
-                        <div class="stat-label">This Month</div>
-                        <div class="stat-value" id="stat-month">—</div>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon" style="background:rgba(59,130,246,0.15);color:#60a5fa;">
-                        <i class="fa-solid fa-address-book"></i>
-                    </div>
-                    <div>
-                        <div class="stat-label">Contacted</div>
-                        <div class="stat-value" id="stat-contacted">—</div>
+                <div class="user-chip" id="user-chip" onclick="toggleUserMenu(event)">
+                    <div class="user-avatar" id="sidebar-avatar">H</div>
+                    <div class="user-info">
+                        <div class="user-name" id="sidebar-name">HR User</div>
+                        <div class="user-role" id="sidebar-org">HR Manager</div>
                     </div>
                 </div>
             </div>
-            <!-- Main Filter Controls Bar -->
-            <div class="filter-bar">
-                <div class="search-bar">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <input type="text" id="search-input" placeholder="Search by candidate name, email, phone, location..." oninput="onSearchInput(this.value)">
+        </aside>
+
+        <!-- ── Main Content ── -->
+        <main class="main-content">
+            <header class="topbar">
+                <div class="topbar-title">Candidates</div>
+            </header>
+
+            <div class="page-content scrollable">
+
+                <!-- Stats strip -->
+                <div class="stats-strip">
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label">Total Candidates</div>
+                            <div class="stat-value" id="stat-total">—</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#34d399;">
+                            <i class="fa-solid fa-calendar-days"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label">This Month</div>
+                            <div class="stat-value" id="stat-month">—</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon" style="background:rgba(59,130,246,0.15);color:#60a5fa;">
+                            <i class="fa-solid fa-address-book"></i>
+                        </div>
+                        <div>
+                            <div class="stat-label">Contacted</div>
+                            <div class="stat-value" id="stat-contacted">—</div>
+                        </div>
+                    </div>
                 </div>
-                <select class="filter-select" id="filter-job" onchange="onJobFilterChange(this.value)">
-                    <option value="">All Job Vacancies</option>
-                </select>
-                <select class="filter-select" id="filter-status" onchange="onStatusFilterChange(this.value)">
-                    <option value="">All Contact Status</option>
-                    <option value="true">Contacted Only</option>
-                    <option value="false">Not Contacted</option>
-                </select>
-            </div>
-
-            <!-- Table Card Container -->
-            <div class="table-card">
-
-                <div id="table-skeleton" style="padding:8px 0;">
-                    <div class="skeleton-row"></div>
-                    <div class="skeleton-row"></div>
-                    <div class="skeleton-row"></div>
-                    <div class="skeleton-row"></div>
+                <!-- Main Filter Controls Bar -->
+                <div class="filter-bar">
+                    <div class="search-bar">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="search-input"
+                            placeholder="Search by candidate name, email, phone, location..."
+                            oninput="onSearchInput(this.value)">
+                    </div>
+                    <select class="filter-select" id="filter-job" onchange="onJobFilterChange(this.value)">
+                        <option value="">All Job Vacancies</option>
+                    </select>
+                    <select class="filter-select" id="filter-status" onchange="onStatusFilterChange(this.value)">
+                        <option value="">All Contact Status</option>
+                        <option value="true">Contacted Only</option>
+                        <option value="false">Not Contacted</option>
+                    </select>
                 </div>
 
-                <div id="table-empty" class="table-empty" style="display:none;">
-                    <i class="fa-solid fa-users-slash"></i>
-                    No candidates found.<br>
-                    <span style="font-size:0.78rem;opacity:0.6;">Try adjusting the filters or upload new resumes.</span>
+                <!-- Table Card Container -->
+                <div class="table-card">
+
+                    <div id="table-skeleton" style="padding:8px 0;">
+                        <div class="skeleton-row"></div>
+                        <div class="skeleton-row"></div>
+                        <div class="skeleton-row"></div>
+                        <div class="skeleton-row"></div>
+                    </div>
+
+                    <div id="table-empty" class="table-empty" style="display:none;">
+                        <i class="fa-solid fa-users-slash"></i>
+                        No candidates found.<br>
+                        <span style="font-size:0.78rem;opacity:0.6;">Try adjusting the filters or upload new
+                            resumes.</span>
+                    </div>
+
+                    <div id="table-wrap" class="table-wrap" style="display:none;">
+                        <table class="candidates-table" id="candidates-table">
+                            <thead>
+                                <tr>
+                                    <th style="width:6%;text-align:center;">Rank</th>
+                                    <th style="width:19%;">Name</th>
+                                    <th style="width:20%;">Email</th>
+                                    <th style="width:12%;">Phone Number</th>
+                                    <th style="width:12%;">Location</th>
+                                    <th style="width:14%;text-align:center;">ATS Score</th>
+                                    <th style="width:10%;text-align:center;">Contacted</th>
+                                    <th style="width:7%;text-align:right;">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="candidates-tbody"></tbody>
+                        </table>
+                    </div>
                 </div>
 
-                <div id="table-wrap" class="table-wrap" style="display:none;">
-                    <table class="candidates-table" id="candidates-table">
-                        <thead>
-                            <tr>
-                                <th style="width:6%;text-align:center;">Rank</th>
-                                <th style="width:19%;">Name</th>
-                                <th style="width:20%;">Email</th>
-                                <th style="width:12%;">Phone Number</th>
-                                <th style="width:12%;">Location</th>
-                                <th style="width:14%;text-align:center;">ATS Score</th>
-                                <th style="width:10%;text-align:center;">Contacted</th>
-                                <th style="width:7%;text-align:right;">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="candidates-tbody"></tbody>
-                    </table>
-                </div>
-            </div>
+                <!-- Pagination Controls -->
+                <div id="candidate-pagination-container"></div>
 
-            <!-- Pagination Controls -->
-            <div id="candidate-pagination-container"></div>
+            </div><!-- page-content -->
+        </main>
+    </div>
 
-        </div><!-- page-content -->
-    </main>
-</div>
-
-<!-- ══════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════
      VIEW Modal
 ══════════════════════════════════════════════ -->
-<div class="modal-overlay" id="view-modal">
-    <div class="modal-xl">
-        <!-- FIXED TOP HEADER -->
-        <div class="modal-fixed-top">
-            <div class="modal-top">
-                <div class="profile-header">
-                    <div class="profile-avatar-lg" id="vm-avatar">A</div>
-                    <div>
-                        <div class="profile-name" id="vm-name">Candidate Name</div>
-                        <div class="profile-sub" id="vm-sub">Job Title • Experience</div>
-                    </div>
-                </div>
-                <button class="modal-close-btn" onclick="closeModal('view-modal')">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
-            </div>
-        </div>
-
-        <!-- SCROLLABLE BODY (CARDS + SKILLS + AI REASON + RESUME PREVIEW) -->
-        <div class="modal-details-scroll">
-            <div class="info-grid">
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-solid fa-envelope" style="margin-right:4px;"></i>Email</div>
-                    <div class="val" id="vm-email">—</div>
-                </div>
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-solid fa-phone" style="margin-right:4px;"></i>Phone</div>
-                    <div class="val" id="vm-phone">—</div>
-                </div>
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-solid fa-briefcase" style="margin-right:4px;"></i>Applied Vacancy</div>
-                    <div class="val" id="vm-job">—</div>
-                </div>
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-solid fa-bullseye" style="margin-right:4px;"></i>ATS Score</div>
-                    <div class="val" id="vm-score">—</div>
-                </div>
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i>Location</div>
-                    <div class="val" id="vm-address">—</div>
-                </div>
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-solid fa-venus-mars" style="margin-right:4px;"></i>Gender</div>
-                    <div class="val" id="vm-gender">—</div>
-                </div>
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-solid fa-hourglass-half" style="margin-right:4px;"></i>Experience</div>
-                    <div class="val" id="vm-exp">—</div>
-                </div>
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-solid fa-graduation-cap" style="margin-right:4px;"></i>Qualification</div>
-                    <div class="val" id="vm-qual">—</div>
-                </div>
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-brands fa-linkedin" style="margin-right:4px;"></i>LinkedIn</div>
-                    <div class="val" id="vm-linkedin">—</div>
-                </div>
-                <div class="info-item">
-                    <div class="lbl"><i class="fa-brands fa-github" style="margin-right:4px;"></i>GitHub</div>
-                    <div class="val" id="vm-github">—</div>
-                </div>
-            </div>
-
-            <div class="sec-label">Skills</div>
-            <div class="skills-wrap" id="vm-skills"></div>
-
-            <div class="sec-label">ATS Matching Reason</div>
-            <div class="match-explain" id="vm-match-explain">—</div>
-
-            <div class="sec-label">Original Uploaded Resume Preview</div>
-            <div id="vm-preview-wrap" style="margin-top:8px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;background:#0f172a;">
-                <iframe id="vm-preview-frame" style="width:100%;height:clamp(260px, 42vh, 420px);border:none;display:none;background:#fff;"></iframe>
-                <div class="resume-preview" id="vm-resume-text" style="display:none;">No resume text available.</div>
-            </div>
-        </div>
-
-        <!-- FIXED BOTTOM ACTIONS -->
-        <div class="modal-bottom-actions">
-            <a id="vm-download-link" href="#" download
-               style="text-decoration:none;display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;border-radius:10px;font-size:0.82rem;font-weight:700;">
-                <i class="fa-solid fa-download"></i> Download Resume
-            </a>
-        </div>
-    </div>
-</div>
-
-<!-- ══════════════════════════════════════════════
-     EDIT Modal
-══════════════════════════════════════════════ -->
-<div class="modal-overlay" id="edit-modal">
-    <div class="modal-lg">
-        <form id="edit-form" onsubmit="saveCandidate(event)" style="display:flex;flex-direction:column;height:100%;flex:1;overflow:hidden;">
+    <div class="modal-overlay" id="view-modal">
+        <div class="modal-xl">
             <!-- FIXED TOP HEADER -->
             <div class="modal-fixed-top">
                 <div class="modal-top">
-                    <div>
-                        <div style="font-size:1.2rem;font-weight:900;color:#fff;">Edit Candidate</div>
-                        <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:3px;">Update extracted resume information</div>
+                    <div class="profile-header">
+                        <div class="profile-avatar-lg" id="vm-avatar">A</div>
+                        <div>
+                            <div class="profile-name" id="vm-name">Candidate Name</div>
+                            <div class="profile-sub" id="vm-sub">Job Title • Experience</div>
+                        </div>
                     </div>
-                    <button type="button" class="modal-close-btn" onclick="closeModal('edit-modal')">
+                    <button class="modal-close-btn" onclick="closeModal('view-modal')">
                         <i class="fa-solid fa-xmark"></i>
                     </button>
                 </div>
             </div>
 
-            <!-- SCROLLABLE FORM BODY -->
+            <!-- SCROLLABLE BODY (CARDS + SKILLS + AI REASON + RESUME PREVIEW) -->
             <div class="modal-details-scroll">
-                <input type="hidden" id="edit-candidate-id" />
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label class="form-label">Full Name</label>
-                        <input class="form-control" id="edit-name" placeholder="Candidate full name" />
+                <div class="info-grid">
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-solid fa-envelope" style="margin-right:4px;"></i>Email</div>
+                        <div class="val" id="vm-email">—</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Gender</label>
-                        <select class="form-control" id="edit-gender">
-                            <option value="">Select Gender</option>
-                            <option value="Male">Male</option>
-                            <option value="Female">Female</option>
-                            <option value="Other">Other</option>
-                        </select>
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-solid fa-phone" style="margin-right:4px;"></i>Phone</div>
+                        <div class="val" id="vm-phone">—</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Email Address</label>
-                        <input class="form-control" id="edit-email" type="email" placeholder="email@example.com" />
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-solid fa-briefcase" style="margin-right:4px;"></i>Applied Vacancy
+                        </div>
+                        <div class="val" id="vm-job">—</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Phone Number</label>
-                        <input class="form-control" id="edit-phone" placeholder="+1 234 567 890" />
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-solid fa-bullseye" style="margin-right:4px;"></i>ATS Score</div>
+                        <div class="val" id="vm-score">—</div>
                     </div>
-                    <div class="form-group full">
-                        <label class="form-label">Address / Location</label>
-                        <input class="form-control" id="edit-address" placeholder="City, State, Country" />
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-solid fa-location-dot" style="margin-right:4px;"></i>Location
+                        </div>
+                        <div class="val" id="vm-address">—</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Total Experience</label>
-                        <input class="form-control" id="edit-experience" placeholder="e.g. 3 years" />
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-solid fa-venus-mars" style="margin-right:4px;"></i>Gender</div>
+                        <div class="val" id="vm-gender">—</div>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Qualification</label>
-                        <input class="form-control" id="edit-qualification" placeholder="e.g. B.Tech, MBA" />
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-solid fa-hourglass-half" style="margin-right:4px;"></i>Experience
+                        </div>
+                        <div class="val" id="vm-exp">—</div>
                     </div>
-                    <div class="form-group full">
-                        <label class="form-label">Skills (comma-separated)</label>
-                        <textarea class="form-control" id="edit-skills" rows="3" placeholder="Python, React, SQL, …"></textarea>
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-solid fa-graduation-cap"
+                                style="margin-right:4px;"></i>Qualification</div>
+                        <div class="val" id="vm-qual">—</div>
                     </div>
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-brands fa-linkedin" style="margin-right:4px;"></i>LinkedIn</div>
+                        <div class="val" id="vm-linkedin">—</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="lbl"><i class="fa-brands fa-github" style="margin-right:4px;"></i>GitHub</div>
+                        <div class="val" id="vm-github">—</div>
+                    </div>
+                </div>
 
-                    <div class="form-group">
-                        <label class="form-label">LinkedIn URL</label>
-                        <input class="form-control" id="edit-linkedin" placeholder="https://linkedin.com/in/…" />
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">GitHub URL</label>
-                        <input class="form-control" id="edit-github" placeholder="https://github.com/…" />
+                <div class="sec-label">Skills</div>
+                <div class="skills-wrap" id="vm-skills"></div>
+
+                <div class="sec-label">ATS Matching Reason</div>
+                <div class="match-explain" id="vm-match-explain">—</div>
+
+                <div class="sec-label">Original Uploaded Resume Preview</div>
+                <div id="vm-preview-wrap"
+                    style="margin-top:8px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;background:#0f172a;">
+                    <iframe id="vm-preview-frame"
+                        style="width:100%;height:clamp(260px, 42vh, 420px);border:none;display:none;background:#fff;"></iframe>
+                    <div class="resume-preview" id="vm-resume-text" style="display:none;">No resume text available.
                     </div>
                 </div>
             </div>
 
             <!-- FIXED BOTTOM ACTIONS -->
-            <div class="modal-bottom-actions" style="gap:10px;">
-                <button type="button" onclick="closeModal('edit-modal')"
-                        style="padding:10px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:700;">
-                    Cancel
-                </button>
-                <button type="submit" id="edit-save-btn"
-                        style="padding:10px 28px;background:linear-gradient(90deg,#6366f1,#4f46e5);border:none;color:#fff;border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:800;display:flex;align-items:center;gap:8px;">
-                    <i class="fa-solid fa-floppy-disk"></i> Save Changes
-                </button>
+            <div class="modal-bottom-actions">
+                <a id="vm-download-link" href="#" download
+                    style="text-decoration:none;display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;border-radius:10px;font-size:0.82rem;font-weight:700;">
+                    <i class="fa-solid fa-download"></i> Download Resume
+                </a>
             </div>
-        </form>
+        </div>
     </div>
-</div>
 
-<!-- ══════════════════════════════════════════════
+    <!-- ══════════════════════════════════════════════
+     EDIT Modal
+══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="edit-modal">
+        <div class="modal-lg">
+            <form id="edit-form" onsubmit="saveCandidate(event)"
+                style="display:flex;flex-direction:column;height:100%;flex:1;overflow:hidden;">
+                <!-- FIXED TOP HEADER -->
+                <div class="modal-fixed-top">
+                    <div class="modal-top">
+                        <div>
+                            <div style="font-size:1.2rem;font-weight:900;color:#fff;">Edit Candidate</div>
+                            <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:3px;">Update extracted
+                                resume information</div>
+                        </div>
+                        <button type="button" class="modal-close-btn" onclick="closeModal('edit-modal')">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- SCROLLABLE FORM BODY -->
+                <div class="modal-details-scroll">
+                    <input type="hidden" id="edit-candidate-id" />
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Full Name</label>
+                            <input class="form-control" id="edit-name" placeholder="Candidate full name" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select class="form-control" id="edit-gender">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input class="form-control" id="edit-email" type="email" placeholder="email@example.com" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input class="form-control" id="edit-phone" placeholder="+1 234 567 890" />
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Address / Location</label>
+                            <input class="form-control" id="edit-address" placeholder="City, State, Country" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total Experience</label>
+                            <input class="form-control" id="edit-experience" placeholder="e.g. 3 years" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Qualification</label>
+                            <input class="form-control" id="edit-qualification" placeholder="e.g. B.Tech, MBA" />
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Skills (comma-separated)</label>
+                            <textarea class="form-control" id="edit-skills" rows="3"
+                                placeholder="Python, React, SQL, …"></textarea>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label">LinkedIn URL</label>
+                            <input class="form-control" id="edit-linkedin" placeholder="https://linkedin.com/in/…" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">GitHub URL</label>
+                            <input class="form-control" id="edit-github" placeholder="https://github.com/…" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- FIXED BOTTOM ACTIONS -->
+                <div class="modal-bottom-actions" style="gap:10px;">
+                    <button type="button" onclick="closeModal('edit-modal')"
+                        style="padding:10px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:700;">
+                        Cancel
+                    </button>
+                    <button type="submit" id="edit-save-btn"
+                        style="padding:10px 28px;background:linear-gradient(90deg,#6366f1,#4f46e5);border:none;color:#fff;border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:800;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-floppy-disk"></i> Save Changes
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
      DELETE Confirm Modal
 ══════════════════════════════════════════════ -->
-<div class="modal-overlay" id="delete-modal">
-    <div class="del-modal">
-        <div style="width:56px;height:56px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;">
-            <i class="fa-solid fa-trash-can"></i>
-        </div>
-        <h3 style="font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:8px;">Delete Candidate?</h3>
-        <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:6px;">You are about to delete:</p>
-        <p style="font-size:0.95rem;font-weight:700;color:#f87171;margin-bottom:22px;" id="del-name">Candidate Name</p>
-        <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:24px;">This action cannot be undone. All candidate data will be permanently removed.</p>
-        <input type="hidden" id="del-candidate-id" />
-        <div style="display:flex;gap:12px;justify-content:center;">
-            <button onclick="closeModal('delete-modal')"
+    <div class="modal-overlay" id="delete-modal">
+        <div class="del-modal">
+            <div
+                style="width:56px;height:56px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;">
+                <i class="fa-solid fa-trash-can"></i>
+            </div>
+            <h3 style="font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:8px;">Delete Candidate?</h3>
+            <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:6px;">You are about to delete:</p>
+            <p style="font-size:0.95rem;font-weight:700;color:#f87171;margin-bottom:22px;" id="del-name">Candidate Name
+            </p>
+            <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:24px;">This action cannot be undone.
+                All candidate data will be permanently removed.</p>
+            <input type="hidden" id="del-candidate-id" />
+            <div style="display:flex;gap:12px;justify-content:center;">
+                <button onclick="closeModal('delete-modal')"
                     style="padding:10px 24px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">
-                Cancel
-            </button>
-            <button onclick="confirmDelete()"
+                    Cancel
+                </button>
+                <button onclick="confirmDelete()"
                     style="padding:10px 28px;border-radius:11px;border:none;background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff;cursor:pointer;font-weight:800;font-size:0.88rem;box-shadow:0 4px 15px rgba(239,68,68,0.3);">
-                <i class="fa-solid fa-trash-can"></i> Delete
-            </button>
+                    <i class="fa-solid fa-trash-can"></i> Delete
+                </button>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- Logout Modal -->
-<div class="modal-overlay" id="logout-confirm-modal">
-    <div class="del-modal">
-        <div style="width:56px;height:56px;border-radius:50%;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;">
-            <i class="fa-solid fa-right-from-bracket"></i>
-        </div>
-        <h3 style="font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:8px;">Confirm Logout</h3>
-        <p style="font-size:0.88rem;color:rgba(255,255,255,0.65);margin-bottom:24px;line-height:1.5;">Are you sure you want to log out?</p>
-        <div style="display:flex;gap:12px;justify-content:center;">
-            <button onclick="closeLogoutModal()" style="padding:10px 22px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:600;font-size:0.9rem;">Cancel</button>
-            <button onclick="confirmLogoutAction()" style="padding:10px 22px;border-radius:10px;border:none;background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff;cursor:pointer;font-weight:700;font-size:0.9rem;">Logout</button>
+    <!-- Logout Modal -->
+    <div class="modal-overlay" id="logout-confirm-modal">
+        <div class="del-modal">
+            <div
+                style="width:56px;height:56px;border-radius:50%;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </div>
+            <h3 style="font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:8px;">Confirm Logout</h3>
+            <p style="font-size:0.88rem;color:rgba(255,255,255,0.65);margin-bottom:24px;line-height:1.5;">Are you sure
+                you want to log out?</p>
+            <div style="display:flex;gap:12px;justify-content:center;">
+                <button onclick="closeLogoutModal()"
+                    style="padding:10px 22px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:600;font-size:0.9rem;">Cancel</button>
+                <button onclick="confirmLogoutAction()"
+                    style="padding:10px 22px;border-radius:10px;border:none;background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff;cursor:pointer;font-weight:700;font-size:0.9rem;">Logout</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div class="toast-container" id="toast-container"></div>
+    <div class="toast-container" id="toast-container"></div>
 
     <script src="../js/config.js?v=1"></script>
     <script src="../js/utils.js"></script>
-<script src="../js/hr_common.js"></script>
-<script src="../js/hr_all_candidates.js"></script>
+    <script src="../js/hr_common.js"></script>
+    <script src="../js/hr_all_candidates.js"></script>
 </body>
+
 </html>

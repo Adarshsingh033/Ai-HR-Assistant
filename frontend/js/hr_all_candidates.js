@@ -196,7 +196,7 @@ function renderTable() {
                 ${escapeHtml(c.address || '—')}
             </td>
             <td style="text-align:center;white-space:nowrap;">
-                <span class="match-badge ${matchCls}">${matchPct}% ATS Score</span>
+                <span class="match-badge ${matchCls}">${matchPct}%</span>
             </td>
             <td style="text-align:center;">
                 <label class="toggle-switch" title="${c.reached ? 'Contacted' : 'Not Contacted'}">
@@ -384,7 +384,7 @@ function openViewModal(candidateId) {
     // Match score
     const scoreEl = document.getElementById('vm-score');
     if (scoreEl) {
-        scoreEl.innerHTML = `<span class="match-badge ${c.match_percentage >= 70 ? 'match-high' : c.match_percentage >= 40 ? 'match-medium' : 'match-low'}">${c.match_percentage || 0}% ATS Score</span>`;
+        scoreEl.innerHTML = `<span class="match-badge ${c.match_percentage >= 70 ? 'match-high' : c.match_percentage >= 40 ? 'match-medium' : 'match-low'}">${c.match_percentage || 0}%</span>`;
     }
 
     const li = document.getElementById('vm-linkedin');
@@ -402,7 +402,7 @@ function openViewModal(candidateId) {
     // Match explanation & reason
     const matchEl = document.getElementById('vm-match-explain');
     matchEl.innerHTML = c.match_explanation
-        ? `<strong style="color:#a5b4fc;">${c.match_percentage}% ATS Score</strong><br><span style="margin-top:4px;display:block;color:rgba(255,255,255,0.75);">${escapeHtml(c.match_explanation)}</span>`
+        ? `<strong style="color:#a5b4fc;">${c.match_percentage}%</strong><br><span style="margin-top:4px;display:block;color:rgba(255,255,255,0.75);">${escapeHtml(c.match_explanation)}</span>`
         : '—';
 
     // Download link

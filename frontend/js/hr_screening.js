@@ -671,25 +671,33 @@ async function openAssignInterviewerModal(candidateId) {
                 rounds.map(r => `<option value="${r.round_id}">Round ${r.round_order}: ${escapeHtml(r.round_title)}</option>`).join('');
         }
 
-        // 2. Fetch interviewers for the job's department
+        // 2. Fetch interviewers for the job's department (with fallback to all branch interviewers)
         const jobId = c.job_id || progData.candidate.job_id;
         const job = allJobs.find(j => (j.job_id || j.id) === jobId);
         
-        if (!job || !job.department_id) {
-            intSelect.innerHTML = '<option value="" disabled>No department assigned to this job</option>';
-            showToast('This job vacancy lacks a department. Please update the job first.', 'error');
-            return;
+        let interviewers = [];
+        const deptId = (job && job.department_id) ? job.department_id : '';
+
+        if (deptId) {
+            try {
+                const ivData = await apiRequest('GET', `/api/hr/interviewers/by-department/${deptId}`);
+                interviewers = (ivData && ivData.interviewers) ? ivData.interviewers : [];
+            } catch (_) {}
         }
 
-        const deptId = job.department_id;
-        const ivData = await apiRequest('GET', `/api/hr/interviewers/by-department/${deptId}`);
-        const interviewers = ivData.interviewers || [];
+        // Fallback: if no department-specific interviewers found or job lacks department, fetch all branch interviewers
+        if (interviewers.length === 0) {
+            try {
+                const ivData = await apiRequest('GET', '/api/hr/interviewers?limit=1000');
+                interviewers = (ivData && ivData.interviewers) ? ivData.interviewers : [];
+            } catch (_) {}
+        }
 
         if (interviewers.length === 0) {
-            intSelect.innerHTML = '<option value="" disabled>No interviewers found in this department</option>';
+            intSelect.innerHTML = '<option value="" disabled>No interviewers available in your branch</option>';
         } else {
             intSelect.innerHTML = '<option value="" disabled selected>Select an interviewer...</option>' + 
-                interviewers.map(iv => `<option value="${iv.interviewer_id}">${escapeHtml(iv.full_name)} (${escapeHtml(iv.email)})</option>`).join('');
+                interviewers.map(iv => `<option value="${iv.interviewer_id}">${escapeHtml(iv.full_name)} (${escapeHtml(iv.email)}) — ${escapeHtml(iv.department_name || 'Branch')}</option>`).join('');
         }
 
     } catch (err) {

@@ -146,7 +146,7 @@ def list_interviewers(
     search: Optional[str] = Query(None),
     department_id: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
+    limit: int = Query(10, ge=1, le=1000),
     x_hr_id: Optional[str] = Header(None, alias="X-Admin-ID"),
 ):
     """List interviewers for HR's branch with search (name/email), dept filter, pagination."""
@@ -529,7 +529,7 @@ def get_interviewer_dashboard(
 def get_my_interviewees(
     status_filter: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
+    limit: int = Query(10, ge=1, le=1000),
     x_interviewer_id: Optional[str] = Header(None, alias="X-Admin-ID"),
 ):
     """

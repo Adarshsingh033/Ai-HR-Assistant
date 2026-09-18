@@ -114,7 +114,7 @@ def list_departments(
     organization_id: Optional[str] = Query(None),
     branch_id: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
+    limit: int = Query(10, ge=1, le=1000),
     x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
 ):
     """List all departments belonging to the current admin with search, filter, and pagination."""
@@ -318,40 +318,64 @@ def list_branch_departments(
             }
 
 
-# ── HR-accessible Endpoint ────────────────────────────────────────────────────
+# ── HR-accessible & General Endpoints ─────────────────────────────────────────
 
-@router.get("/api/hr/departments")
-def list_hr_departments(
-    x_hr_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+@router.get("/api/departments")
+def list_departments_public(
+    branch_id: Optional[str] = Query(None),
+    organization_id: Optional[str] = Query(None),
+    x_user_id: Optional[str] = Header(None, alias="X-Admin-ID"),
 ):
     """
-    Return departments accessible to the current HR user (filtered to their branch).
-    Used by HR to populate the Department dropdown in Job Vacancy creation.
+    Return departments filtered by branch_id or organization_id.
+    If neither is supplied, resolves the user's branch/org context.
+    Used by HR Job Vacancies and Interviewers dropdowns.
     """
-    if not x_hr_id:
-        raise HTTPException(status_code=401, detail="Authentication header missing.")
-
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            # Look up HR's branch from organization_members
-            cur.execute(
-                "SELECT branch_id, organization_id FROM organization_members WHERE id = %s LIMIT 1",
-                (x_hr_id,),
-            )
-            hr_row = cur.fetchone()
-            if not hr_row:
-                raise HTTPException(status_code=404, detail="HR user not found")
+            target_branch = branch_id.strip() if branch_id else None
+            target_org = organization_id.strip() if organization_id else None
 
-            branch_id, org_id = hr_row
+            # Fallback check if user context provides branch/org
+            if not target_branch and not target_org and x_user_id:
+                cur.execute(
+                    "SELECT branch_id, organization_id FROM organization_members WHERE id = %s LIMIT 1",
+                    (x_user_id,),
+                )
+                mrow = cur.fetchone()
+                if mrow:
+                    target_branch = str(mrow[0]) if mrow[0] else None
+                    target_org = str(mrow[1]) if mrow[1] else None
+                else:
+                    cur.execute(
+                        "SELECT id FROM organization WHERE admin_id = %s LIMIT 1",
+                        (x_user_id,),
+                    )
+                    orow = cur.fetchone()
+                    if orow:
+                        target_org = str(orow[0])
+
+            where_clauses = []
+            params = []
+
+            if target_branch:
+                where_clauses.append("d.branch_id = %s")
+                params.append(target_branch)
+
+            if target_org:
+                where_clauses.append("d.organization_id = %s")
+                params.append(target_org)
+
+            where_sql = (" WHERE " + " AND ".join(where_clauses)) if where_clauses else ""
 
             cur.execute(
-                """
-                SELECT id, department_name, description, branch_id
-                FROM departments
-                WHERE branch_id = %s AND organization_id = %s
-                ORDER BY department_name ASC
+                f"""
+                SELECT d.id, d.department_name, d.description, d.branch_id, d.organization_id
+                FROM departments d
+                {where_sql}
+                ORDER BY d.department_name ASC
                 """,
-                (branch_id, org_id),
+                tuple(params),
             )
             rows = cur.fetchall()
             return {
@@ -361,7 +385,19 @@ def list_hr_departments(
                         "department_name": r[1],
                         "description": r[2] or "",
                         "branch_id": str(r[3]),
+                        "organization_id": str(r[4]),
                     }
                     for r in rows
                 ]
             }
+
+
+@router.get("/api/hr/departments")
+def list_hr_departments(
+    branch_id: Optional[str] = Query(None),
+    x_hr_id: Optional[str] = Header(None, alias="X-Admin-ID"),
+):
+    """
+    Return departments accessible to the current HR user.
+    """
+    return list_departments_public(branch_id=branch_id, x_user_id=x_hr_id)

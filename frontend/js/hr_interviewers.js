@@ -27,7 +27,29 @@ window.addEventListener('DOMContentLoaded', async () => {
 
 async function loadDepartments() {
     try {
-        const data = await apiRequest('GET', `/api/departments?branch_id=${currentBranchId}`);
+        const session = Session.get();
+        if (session) {
+            currentOrgId = currentOrgId || session.org_id || '';
+            currentBranchId = currentBranchId || session.branch_id || '';
+        }
+
+        if (!currentBranchId) {
+            try {
+                const profile = await apiRequest('GET', '/api/hr/profile');
+                if (profile) {
+                    currentOrgId = profile.org_id || currentOrgId;
+                    currentBranchId = profile.branch_id || currentBranchId;
+                }
+            } catch (_) {}
+        }
+
+        let url = '/api/departments';
+        const params = [];
+        if (currentBranchId) params.push(`branch_id=${encodeURIComponent(currentBranchId)}`);
+        if (currentOrgId) params.push(`organization_id=${encodeURIComponent(currentOrgId)}`);
+        if (params.length > 0) url += '?' + params.join('&');
+
+        const data = await apiRequest('GET', url);
         allDepartments = (data && data.departments) ? data.departments : [];
         populateDeptSelects();
     } catch (e) {
@@ -108,14 +130,12 @@ function renderTable() {
     const pagedData = allInterviewers.slice(startIdx, startIdx + ivState.limit);
 
     tbody.innerHTML = pagedData.map(iv => {
-        const initial = (iv.full_name || 'U').charAt(0).toUpperCase();
-        const statusClass = iv.status === 'active' ? 'active' : 'inactive';
+        const formattedDate = iv.created_at ? new Date(iv.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : '—';
         
         return `
         <tr>
             <td>
                 <div class="name-cell">
-                    <div class="avatar-icon">${initial}</div>
                     <div>
                         <div class="name-text">${escapeHtml(iv.full_name)}</div>
                         <div class="email-text">${escapeHtml(iv.email)}</div>
@@ -124,14 +144,14 @@ function renderTable() {
             </td>
             <td>
                 <span style="font-size:0.84rem;font-family:monospace;color:#a5b4fc;background:rgba(99,102,241,0.1);padding:3px 8px;border-radius:6px;border:1px solid rgba(99,102,241,0.2);">
-                    @${escapeHtml(iv.username)}
+                    ${escapeHtml(iv.username)}
                 </span>
             </td>
             <td>
                 <span class="dept-badge"><i class="fa-solid fa-sitemap"></i> ${escapeHtml(iv.department_name)}</span>
             </td>
             <td>
-                <span class="status-pill ${statusClass}">${escapeHtml(iv.status)}</span>
+                <span style="color:var(--text-muted);font-size:0.85rem;">${formattedDate}</span>
             </td>
             <td class="action-cell">
                 <button class="action-dots-btn" onclick="toggleActionMenu(event, '${iv.interviewer_id}')" title="Actions">
@@ -163,6 +183,9 @@ function changePage(page) {
     renderTable();
 }
 
+window.changePage = changePage;
+window.changeLimit = changeLimit;
+
 function renderPagination(total, totalPages, startIdx, pagedCount) {
     const container = document.getElementById('iv-pagination');
     if (!container) return;
@@ -172,78 +195,60 @@ function renderPagination(total, totalPages, startIdx, pagedCount) {
         return;
     }
 
-    const startItem = total === 0 ? 0 : startIdx + 1;
-    const endItem = startIdx + pagedCount;
-    const currentPage = ivState.page;
-
-    let pageBtns = '';
-    const maxVisiblePages = 5;
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
-    
-    if (endPage - startPage + 1 < maxVisiblePages) {
-        startPage = Math.max(1, endPage - maxVisiblePages + 1);
-    }
-
-    if (startPage > 1) {
-        pageBtns += `<button onclick="changePage(1)" class="page-btn">1</button>`;
-        if (startPage > 2) pageBtns += `<span class="page-dots">…</span>`;
-    }
-
-    for (let p = startPage; p <= endPage; p++) {
-        if (p === currentPage) {
-            pageBtns += `<button class="page-btn active">${p}</button>`;
-        } else {
-            pageBtns += `<button onclick="changePage(${p})" class="page-btn">${p}</button>`;
-        }
-    }
-
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) pageBtns += `<span class="page-dots">…</span>`;
-        pageBtns += `<button onclick="changePage(${totalPages})" class="page-btn">${totalPages}</button>`;
-    }
-
-    container.innerHTML = `
-        <div class="pagination-wrap">
-            <div class="pagination-info">
-                <span>${startItem}–${endItem} of ${total} <span class="dot">·</span> Page ${currentPage} of ${totalPages}</span>
-                <div class="limit-select">
-                    <span>Rows:</span>
-                    <select onchange="changeLimit(this.value)">
-                        <option value="10" ${ivState.limit === 10 ? 'selected' : ''}>10</option>
-                        <option value="25" ${ivState.limit === 25 ? 'selected' : ''}>25</option>
-                        <option value="50" ${ivState.limit === 50 ? 'selected' : ''}>50</option>
-                    </select>
-                </div>
-            </div>
-            <div class="pagination-controls">
-                <button onclick="changePage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} class="page-nav" title="Previous page">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                ${pageBtns}
-                <button onclick="changePage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} class="page-nav" title="Next page">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-            </div>
-        </div>
-    `;
+    container.innerHTML = paginationBarHTML({
+        page: ivState.page,
+        totalPages: totalPages || 1,
+        total: total,
+        limit: ivState.limit,
+        onPage: 'changePage',
+        onPageSize: 'changeLimit',
+        pageSizes: [10, 25, 50]
+    });
 }
 
 function toggleActionMenu(event, id) {
-    event.stopPropagation();
+    if (event) event.stopPropagation();
     const targetMenu = document.getElementById(`amenu-${id}`);
     const isCurrentlyOpen = targetMenu && targetMenu.classList.contains('open');
 
-    document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
+    document.querySelectorAll('.action-dropdown').forEach(el => el.classList.remove('open'));
 
     if (targetMenu && !isCurrentlyOpen) {
         targetMenu.classList.add('open');
+        if (event && event.currentTarget) {
+            const btn = event.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            const menuHeight = targetMenu.offsetHeight || 110;
+            const menuWidth = targetMenu.offsetWidth || 140;
+            const spaceBelow = window.innerHeight - rect.bottom;
+
+            targetMenu.style.position = 'fixed';
+            targetMenu.style.right = 'auto';
+            targetMenu.style.left = `${Math.min(window.innerWidth - menuWidth - 16, Math.max(10, rect.right - menuWidth))}px`;
+            targetMenu.style.zIndex = '99999';
+
+            if (spaceBelow < menuHeight + 15 && rect.top > menuHeight + 15) {
+                targetMenu.style.top = `${rect.top - menuHeight - 4}px`;
+                targetMenu.style.bottom = 'auto';
+            } else {
+                targetMenu.style.top = `${rect.bottom + 4}px`;
+                targetMenu.style.bottom = 'auto';
+            }
+        }
     }
 }
 
-document.addEventListener('click', () => {
-    document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
+document.addEventListener('click', (e) => {
+    document.querySelectorAll('.action-dropdown.open').forEach(el => {
+        if (!el.contains(e.target)) {
+            el.classList.remove('open');
+        }
+    });
 });
+
+window.addEventListener('scroll', () => {
+    document.querySelectorAll('.action-dropdown.open').forEach(el => el.classList.remove('open'));
+}, true);
 
 /* ── Modal & CRUD ──────────────────────────────────────── */
 
@@ -256,7 +261,13 @@ document.querySelectorAll('.modal-overlay').forEach(el => {
     });
 });
 
-function openCreateModal() {
+async function openCreateModal() {
+    if (!allDepartments || allDepartments.length === 0) {
+        await loadDepartments();
+    } else {
+        populateDeptSelects();
+    }
+
     document.getElementById('iv-edit-id').value = '';
     document.getElementById('iv-form').reset();
     document.getElementById('iv-modal-title').textContent = 'Add Interviewer';
@@ -269,9 +280,15 @@ function openCreateModal() {
     openModal('iv-modal');
 }
 
-function openEditModal(id) {
+async function openEditModal(id) {
     const iv = allInterviewers.find(x => x.interviewer_id === id);
     if (!iv) return;
+
+    if (!allDepartments || allDepartments.length === 0) {
+        await loadDepartments();
+    } else {
+        populateDeptSelects();
+    }
 
     document.getElementById('iv-edit-id').value = iv.interviewer_id;
     document.getElementById('iv-dept-select').value = iv.department_id;

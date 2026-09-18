@@ -5,7 +5,7 @@
 
 'use strict';
 
-const PAGE_SIZE = 10;
+let PAGE_SIZE = 10;
 let currentPage = 1;
 let totalPages = 1;
 let editingDeptId = null;
@@ -21,57 +21,34 @@ document.addEventListener('DOMContentLoaded', async () => {
 // Close dropdowns on outside click
 document.addEventListener('click', (e) => {
     document.querySelectorAll('.action-dropdown.open').forEach(d => {
-        if (!d.closest('.action-cell').contains(e.target)) d.classList.remove('open');
+        if (!d.contains(e.target) && (!e.target.closest || !e.target.closest('.action-dots-btn'))) {
+            d.classList.remove('open');
+        }
     });
 });
 
+window.addEventListener('scroll', () => {
+    document.querySelectorAll('.action-dropdown.open').forEach(d => d.classList.remove('open'));
+}, true);
+
 // ── API helpers ───────────────────────────────────────────────────────────────
 
-async function apiGet(url) {
-    const session = Session.get();
-    const res = await fetch(API_BASE + url, {
-        headers: { 'X-Admin-ID': session?.user_id || '' }
-    });
-    if (!res.ok) {
-        const err = await res.json().catch(() => ({ detail: 'Request failed' }));
-        throw new Error(err.detail || 'Request failed');
-    }
-    return res.json();
+// ── API helpers ───────────────────────────────────────────────────────────────
+
+function apiGet(url) {
+    return apiRequest('GET', url);
 }
 
-async function apiPost(url, body) {
-    const session = Session.get();
-    const res = await fetch(API_BASE + url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Admin-ID': session?.user_id || '' },
-        body: JSON.stringify(body),
-    });
-    const data = await res.json().catch(() => ({ detail: 'Request failed' }));
-    if (!res.ok) throw new Error(data.detail || 'Request failed');
-    return data;
+function apiPost(url, body) {
+    return apiRequest('POST', url, body);
 }
 
-async function apiPut(url, body) {
-    const session = Session.get();
-    const res = await fetch(API_BASE + url, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json', 'X-Admin-ID': session?.user_id || '' },
-        body: JSON.stringify(body),
-    });
-    const data = await res.json().catch(() => ({ detail: 'Request failed' }));
-    if (!res.ok) throw new Error(data.detail || 'Request failed');
-    return data;
+function apiPut(url, body) {
+    return apiRequest('PUT', url, body);
 }
 
-async function apiDelete(url) {
-    const session = Session.get();
-    const res = await fetch(API_BASE + url, {
-        method: 'DELETE',
-        headers: { 'X-Admin-ID': session?.user_id || '' }
-    });
-    const data = await res.json().catch(() => ({ detail: 'Request failed' }));
-    if (!res.ok) throw new Error(data.detail || 'Request failed');
-    return data;
+function apiDelete(url) {
+    return apiRequest('DELETE', url);
 }
 
 // ── Load filters ──────────────────────────────────────────────────────────────
@@ -83,7 +60,7 @@ async function loadFilterOrgs() {
         const orgs = data.organizations || data.data || [];
         orgs.forEach(o => {
             const opt = document.createElement('option');
-            opt.value = o.organization_id || o.id;
+            opt.value = o.org_id || o.organization_id || o.id;
             opt.textContent = o.organization_name || o.company_name || o.name || 'Unknown';
             orgSelect.appendChild(opt);
         });
@@ -182,28 +159,25 @@ function renderTable(depts) {
     }).join('');
 }
 
+function onDeptPageSizeChange(newSize) {
+    PAGE_SIZE = parseInt(newSize, 10) || 10;
+    loadDepartments(1);
+}
+window.onDeptPageSizeChange = onDeptPageSizeChange;
+
 function renderPagination(total, page, limit, pages) {
     const container = document.getElementById('dept-pagination');
-    if (pages <= 1) { container.innerHTML = ''; return; }
-    const start = (page - 1) * limit + 1;
-    const end = Math.min(page * limit, total);
-    container.innerHTML = `
-    <div class="pagination-bar">
-        <div class="pagination-info">
-            <span>Showing <strong>${start}–${end}</strong> of <strong>${total}</strong></span>
-        </div>
-        <div class="pagination-controls">
-            <button class="page-btn nav-btn" onclick="loadDepartments(${page - 1})" ${page <= 1 ? 'disabled' : ''}>
-                <i class="fa-solid fa-chevron-left"></i>
-            </button>
-            ${Array.from({length: pages}, (_, i) => i + 1).map(p => `
-                <button class="page-btn ${p === page ? 'active' : ''}" onclick="loadDepartments(${p})">${p}</button>
-            `).join('')}
-            <button class="page-btn nav-btn" onclick="loadDepartments(${page + 1})" ${page >= pages ? 'disabled' : ''}>
-                <i class="fa-solid fa-chevron-right"></i>
-            </button>
-        </div>
-    </div>`;
+    if (!container) return;
+    if (total === 0) { container.innerHTML = ''; return; }
+    container.innerHTML = paginationBarHTML({
+        page: page,
+        totalPages: pages || 1,
+        total: total,
+        limit: limit,
+        onPage: 'loadDepartments',
+        onPageSize: 'onDeptPageSizeChange',
+        pageSizes: [10, 25, 50]
+    });
 }
 
 // ── Filters ───────────────────────────────────────────────────────────────────
@@ -219,11 +193,35 @@ function onFilterChange() {
 // ── Action menu toggle ────────────────────────────────────────────────────────
 
 function toggleActionMenu(e, deptId) {
-    e.stopPropagation();
+    if (e) e.stopPropagation();
     const dd = document.getElementById(`dropdown-${deptId}`);
-    const wasOpen = dd.classList.contains('open');
+    const wasOpen = dd && dd.classList.contains('open');
+
     document.querySelectorAll('.action-dropdown.open').forEach(d => d.classList.remove('open'));
-    if (!wasOpen) dd.classList.add('open');
+
+    if (dd && !wasOpen) {
+        dd.classList.add('open');
+        if (e && e.currentTarget) {
+            const btn = e.currentTarget;
+            const rect = btn.getBoundingClientRect();
+            const menuHeight = dd.offsetHeight || 110;
+            const menuWidth = dd.offsetWidth || 140;
+            const spaceBelow = window.innerHeight - rect.bottom;
+
+            dd.style.position = 'fixed';
+            dd.style.right = 'auto';
+            dd.style.left = `${Math.min(window.innerWidth - menuWidth - 16, Math.max(10, rect.right - menuWidth))}px`;
+            dd.style.zIndex = '99999';
+
+            if (spaceBelow < menuHeight + 15 && rect.top > menuHeight + 15) {
+                dd.style.top = `${rect.top - menuHeight - 4}px`;
+                dd.style.bottom = 'auto';
+            } else {
+                dd.style.top = `${rect.bottom + 4}px`;
+                dd.style.bottom = 'auto';
+            }
+        }
+    }
 }
 
 // ── Create modal ──────────────────────────────────────────────────────────────
@@ -231,14 +229,19 @@ function toggleActionMenu(e, deptId) {
 async function openCreateModal() {
     editingDeptId = null;
     document.getElementById('dept-modal-title').textContent = 'Create Department';
-    document.getElementById('dept-modal-subtitle').textContent = 'Fill in department details below';
+    document.getElementById('dept-modal-subtitle').textContent = 'Select organization first, then branch, then department details';
     document.getElementById('dept-submit-label').textContent = 'Save Department';
     document.getElementById('dept-edit-id').value = '';
     document.getElementById('dept-name-input').value = '';
     document.getElementById('dept-desc-input').value = '';
 
+    const branchSel = document.getElementById('dept-branch-select');
+    if (branchSel) {
+        branchSel.innerHTML = '<option value="" disabled selected>Select Organization First</option>';
+        branchSel.disabled = true;
+    }
+
     await loadOrgOptionsForModal();
-    document.getElementById('dept-branch-select').innerHTML = '<option value="" disabled selected>Select Branch</option>';
     document.getElementById('dept-modal').classList.add('open');
 }
 
@@ -264,31 +267,47 @@ function closeDeptModal() {
 
 async function loadOrgOptionsForModal(selectedOrgId = '') {
     const sel = document.getElementById('dept-org-select');
-    sel.innerHTML = '<option value="" disabled selected>Loading...</option>';
+    sel.innerHTML = '<option value="" disabled selected>Loading organizations...</option>';
     try {
         const data = await apiGet('/api/admin/organizations?limit=200');
         const orgs = data.organizations || data.data || [];
-        sel.innerHTML = '<option value="" disabled>Select Organization</option>';
+        sel.innerHTML = '<option value="" disabled ' + (selectedOrgId ? '' : 'selected') + '>Select Organization</option>';
         orgs.forEach(o => {
             const opt = document.createElement('option');
-            opt.value = o.organization_id || o.id;
+            opt.value = o.org_id || o.organization_id || o.id;
             opt.textContent = o.organization_name || o.company_name || 'Unknown';
             if (opt.value === selectedOrgId) opt.selected = true;
             sel.appendChild(opt);
         });
     } catch (err) {
-        sel.innerHTML = '<option value="" disabled>Failed to load</option>';
+        sel.innerHTML = '<option value="" disabled selected>Failed to load organizations</option>';
     }
 }
 
 async function loadBranchesForOrg(orgId, selectedBranchId = '') {
     const sel = document.getElementById('dept-branch-select');
-    sel.innerHTML = '<option value="" disabled>Loading...</option>';
-    if (!orgId) { sel.innerHTML = '<option value="" disabled selected>Select Branch</option>'; return; }
+    if (!sel) return;
+
+    if (!orgId) {
+        sel.innerHTML = '<option value="" disabled selected>Select Organization First</option>';
+        sel.disabled = true;
+        return;
+    }
+
+    sel.innerHTML = '<option value="" disabled selected>Loading branches...</option>';
+    sel.disabled = true;
+
     try {
         const data = await apiGet(`/api/admin/branches?organization_id=${orgId}&limit=200`);
         const branches = data.branches || data.data || [];
-        sel.innerHTML = '<option value="" disabled>Select Branch</option>';
+
+        if (branches.length === 0) {
+            sel.innerHTML = '<option value="" disabled selected>No branches available for this organization</option>';
+            sel.disabled = true;
+            return;
+        }
+
+        sel.innerHTML = '<option value="" disabled ' + (selectedBranchId ? '' : 'selected') + '>Select Branch</option>';
         branches.forEach(b => {
             const opt = document.createElement('option');
             opt.value = b.branch_id || b.id;
@@ -296,8 +315,10 @@ async function loadBranchesForOrg(orgId, selectedBranchId = '') {
             if (opt.value === selectedBranchId) opt.selected = true;
             sel.appendChild(opt);
         });
+        sel.disabled = false;
     } catch (err) {
-        sel.innerHTML = '<option value="" disabled>Failed to load</option>';
+        sel.innerHTML = '<option value="" disabled selected>Failed to load branches</option>';
+        sel.disabled = true;
     }
 }
 

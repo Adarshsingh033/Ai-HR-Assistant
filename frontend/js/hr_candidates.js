@@ -114,7 +114,7 @@ async function loadCandidates(jobId = null, orgId = null) {
                             </div>
                         </div>
                         <div class="match-badge ${cand.match_percentage >= 70 ? 'match-high' : cand.match_percentage >= 40 ? 'match-mid' : 'match-low'}">
-                            ${cand.match_percentage || 0}% ATS Score
+                            ${cand.match_percentage || 0}%
                         </div>
                     </div>
                 </div>
@@ -217,7 +217,7 @@ async function openTopMatchListModal() {
                 </td>
                 <td>
                     <div class="match-badge ${cand.match_percentage >= 70 ? 'match-high' : cand.match_percentage >= 40 ? 'match-mid' : 'match-low'}">
-                        ${cand.match_percentage || 0}% ATS Score
+                        ${cand.match_percentage || 0}%
                     </div>
                 </td>
                 <td>
@@ -274,7 +274,7 @@ function openViewCandidateModal(cand) {
         <div class="mt-4 p-3 rounded bg-[rgba(255,255,255,0.05)] border border-[rgba(255,255,255,0.1)]">
             <div class="flex items-center justify-between mb-2">
                 <span class="text-sm font-semibold">ATS Match Analysis</span>
-                <span class="match-badge ${cand.match_percentage >= 70 ? 'match-high' : cand.match_percentage >= 40 ? 'match-mid' : 'match-low'}">${cand.match_percentage || 0}% ATS Score</span>
+                <span class="match-badge ${cand.match_percentage >= 70 ? 'match-high' : cand.match_percentage >= 40 ? 'match-mid' : 'match-low'}">${cand.match_percentage || 0}%</span>
             </div>
             <p class="text-xs text-muted leading-relaxed">${cand.match_explanation || 'No analysis available.'}</p>
         </div>

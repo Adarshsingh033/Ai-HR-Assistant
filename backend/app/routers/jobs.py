@@ -194,9 +194,11 @@ def list_jobs(
                        v.job_title, COALESCE(v.department, ''), v.employment_type, v.work_mode,
                        COALESCE(v.location, ''), v.openings, COALESCE(v.experience_required, ''),
                        COALESCE(v.qualification, ''), COALESCE(v.salary, ''), COALESCE(v.skills_required, ''),
-                       v.job_description, v.status, v.closed_at, v.created_at, v.updated_at
+                       v.job_description, v.status, v.closed_at, v.created_at, v.updated_at,
+                       COALESCE(v.department_id::text, ''), COALESCE(d.department_name, '')
                 FROM job_vacancies v
                 LEFT JOIN branches b ON v.branch_id = b.id
+                LEFT JOIN departments d ON v.department_id = d.id
                 {where_sql}
                 ORDER BY v.created_at DESC
             """
@@ -225,6 +227,8 @@ def list_jobs(
             for r in rows:
                 jid = str(r[0])
                 rounds = job_rounds_map.get(jid, [])
+                dept_id_val = str(r[20]) if r[20] else ""
+                dept_name_val = r[21] or r[6] or ""
                 jobs.append({
                     "job_id": jid,
                     "organization_id": str(r[1]),
@@ -233,7 +237,9 @@ def list_jobs(
                     "created_by_hr_id": str(r[4]) if r[4] else "",
                     "job_title": r[5],
                     "title": r[5], # Legacy alias
-                    "department": r[6],
+                    "department": dept_name_val,
+                    "department_id": dept_id_val,
+                    "department_name": dept_name_val,
                     "employment_type": r[7],
                     "work_mode": r[8],
                     "location": r[9],
@@ -265,9 +271,11 @@ def get_job(job_id: str):
                        v.job_title, COALESCE(v.department, ''), v.employment_type, v.work_mode,
                        COALESCE(v.location, ''), v.openings, COALESCE(v.experience_required, ''),
                        COALESCE(v.qualification, ''), COALESCE(v.salary, ''), COALESCE(v.skills_required, ''),
-                       v.job_description, v.status, v.closed_at, v.created_at, v.updated_at
+                       v.job_description, v.status, v.closed_at, v.created_at, v.updated_at,
+                       COALESCE(v.department_id::text, ''), COALESCE(d.department_name, '')
                 FROM job_vacancies v
                 LEFT JOIN branches b ON v.branch_id = b.id
+                LEFT JOIN departments d ON v.department_id = d.id
                 WHERE v.id = %s
                 """,
                 (job_id,),
@@ -293,6 +301,9 @@ def get_job(job_id: str):
                 for rr in r_rows
             ]
 
+            dept_id_val = str(r[20]) if r[20] else ""
+            dept_name_val = r[21] or r[6] or ""
+
     return {
         "job_id": str(r[0]),
         "organization_id": str(r[1]),
@@ -301,7 +312,9 @@ def get_job(job_id: str):
         "created_by_hr_id": str(r[4]) if r[4] else "",
         "job_title": r[5],
         "title": r[5],
-        "department": r[6],
+        "department": dept_name_val,
+        "department_id": dept_id_val,
+        "department_name": dept_name_val,
         "employment_type": r[7],
         "work_mode": r[8],
         "location": r[9],

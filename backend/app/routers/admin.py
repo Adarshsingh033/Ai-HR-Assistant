@@ -342,7 +342,7 @@ def list_organizations(
     company_size: Optional[str] = Query(None),
     status: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
+    limit: int = Query(10, ge=1, le=1000),
     x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
 ):
     """List all organizations belonging to the current admin with search, filter, and pagination support."""
@@ -695,7 +695,7 @@ def list_branches(
     search: Optional[str] = Query(None),
     organization_id: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
+    limit: int = Query(10, ge=1, le=1000),
     x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
 ):
     """List all branches with search, filter by organization, and pagination."""
@@ -994,7 +994,7 @@ def list_members(
     branch_id: Optional[str] = Query(None),
     status: Optional[str] = Query(None),
     page: int = Query(1, ge=1),
-    limit: int = Query(10, ge=1, le=100),
+    limit: int = Query(10, ge=1, le=1000),
     x_admin_id: Optional[str] = Header(None, alias="X-Admin-ID"),
 ):
     """List HR members with search, filters, and pagination."""

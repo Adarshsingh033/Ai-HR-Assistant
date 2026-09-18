@@ -86,7 +86,13 @@ function populateBranchDropdowns(branches) {
 /* Load Departments for Dropdown */
 async function loadDepartments() {
     try {
-        const data = await apiRequest('GET', `/api/departments?branch_id=${currentBranchId}`);
+        let url = '/api/departments';
+        const params = [];
+        if (currentBranchId) params.push(`branch_id=${encodeURIComponent(currentBranchId)}`);
+        if (currentOrgId) params.push(`organization_id=${encodeURIComponent(currentOrgId)}`);
+        if (params.length > 0) url += '?' + params.join('&');
+
+        const data = await apiRequest('GET', url);
         if (data && data.departments) {
             allDepartments = data.departments;
             populateDeptSelect();
@@ -580,7 +586,12 @@ function openEditJobModal(jobId) {
     document.getElementById('job-modal-title').textContent = 'Edit Job Vacancy';
 
     document.getElementById('job-title').value = job.job_title || job.title || '';
-    document.getElementById('job-dept').value = job.department_id || '';
+    let selectedDeptId = job.department_id || '';
+    if (!selectedDeptId && job.department) {
+        const match = allDepartments.find(d => (d.department_name || '').toLowerCase() === (job.department || '').toLowerCase());
+        if (match) selectedDeptId = match.department_id;
+    }
+    document.getElementById('job-dept').value = selectedDeptId;
     document.getElementById('job-employment-type').value = job.employment_type || 'Full-time';
     document.getElementById('job-work-mode').value = job.work_mode || 'On-site';
     document.getElementById('job-location').value = job.location || '';

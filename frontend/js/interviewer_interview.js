@@ -101,7 +101,8 @@ async function downloadResume() {
         const headers = {};
         if (session && session.id) headers['X-Admin-ID'] = session.id;
 
-        const url = `${API_BASE_URL}/api/interviewer/assignments/${assignmentId}/resume`;
+        const baseUrl = typeof API !== 'undefined' ? API : 'http://localhost:8000';
+        const url = `${baseUrl}/api/interviewer/assignments/${assignmentId}/resume`;
         
         const response = await fetch(url, { headers });
         if (!response.ok) {

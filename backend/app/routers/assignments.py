@@ -78,19 +78,14 @@ def assign_interviewer(
                 (job_id, org_id),
             )
             job_row = cur.fetchone()
-            if not job_row or not job_row[0]:
-                raise HTTPException(
-                    status_code=400,
-                    detail="Job vacancy has no department assigned. Please update the job vacancy to select a department first."
-                )
-            job_dept_id = str(job_row[0])
+            job_dept_id = str(job_row[0]) if (job_row and job_row[0]) else None
 
-            # 4. Verify interviewer belongs to HR's org, branch, AND same department as the job
+            # 4. Verify interviewer belongs to HR's org and branch
             cur.execute(
                 """
-                SELECT iv.id, iv.department_id, d.department_name, iv.full_name
+                SELECT iv.id, iv.department_id, COALESCE(d.department_name, ''), iv.full_name
                 FROM interviewers iv
-                JOIN departments d ON iv.department_id = d.id
+                LEFT JOIN departments d ON iv.department_id = d.id
                 WHERE iv.id = %s
                   AND iv.organization_id = %s
                   AND iv.branch_id = %s
@@ -106,17 +101,19 @@ def assign_interviewer(
                     detail="Interviewer not found in your organization/branch or is inactive"
                 )
 
-            if str(iv_row[1]) != job_dept_id:
-                raise HTTPException(
-                    status_code=403,
-                    detail=f"Interviewer's department does not match the job vacancy's department. "
-                           f"Only interviewers from the '{iv_row[2]}' department can be assigned to this vacancy."
-                )
-
+            iv_dept_id = str(iv_row[1]) if iv_row[1] else None
             interviewer_name = iv_row[3]
 
+            # If job had no department_id assigned yet, auto-assign the interviewer's department to the job
+            if not job_dept_id and iv_dept_id:
+                cur.execute(
+                    "UPDATE job_vacancies SET department_id = %s WHERE id = %s",
+                    (iv_dept_id, job_id),
+                )
+                job_dept_id = iv_dept_id
+
             # 5. Get department_id for the assignment record
-            dept_id = job_dept_id
+            dept_id = iv_dept_id or job_dept_id or ""
 
             # 6. Upsert assignment (one interviewer per candidate per round)
             cur.execute(
