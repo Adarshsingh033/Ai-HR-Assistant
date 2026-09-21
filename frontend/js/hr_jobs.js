@@ -201,7 +201,7 @@ function renderJobsGrid(jobs) {
                         <i class="fa-regular fa-eye" style="font-size:0.82rem;"></i>
                     </button>
                     <button onclick="openEditJobModal('${jobId}')" title="Edit" style="background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.3);color:#818cf8;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.28)'" onmouseout="this.style.background='rgba(99,102,241,0.14)'">
-                        <i class="fa-solid fa-pen-to-square" style="font-size:0.82rem;"></i>
+                        <i class="fa-solid fa-pen" style="color:#a5b4fc; font-size:0.82rem;"></i>
                     </button>
                     <button onclick="deleteJobVacancy('${jobId}')" title="Delete" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">
                         <i class="fa-solid fa-trash-can" style="font-size:0.82rem;"></i>

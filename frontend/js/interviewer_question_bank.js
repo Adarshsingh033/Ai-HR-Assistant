@@ -150,7 +150,7 @@ function renderList(questions) {
                 </button>
                 <div class="q-dropdown" id="qmenu-${q.id}">
                     <button class="q-drop-item" onclick="closeAllQMenus(); openEditModal('${q.id}')">
-                        <i class="fa-solid fa-pen-to-square" style="color:#818cf8;"></i> Edit
+                        <i class="fa-solid fa-pen" style="color:#a5b4fc;"></i> Edit
                     </button>
                     <button class="q-drop-item danger" onclick="closeAllQMenus(); openDeleteModal('${q.id}')">
                         <i class="fa-solid fa-trash-can" style="color:#f87171;"></i> Delete

@@ -42,4 +42,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!session) return;
     
     syncSuperAdminSidebar();
+
+    // Apply saved theme & update toggle button tooltip
+    if (typeof initTheme === 'function') initTheme();
 });

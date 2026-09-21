@@ -213,7 +213,7 @@ function renderTable() {
                         <i class="fa-regular fa-eye" style="color:#818cf8;"></i> View
                     </div>
                     <div class="action-dropdown-item" onclick="handleAction('edit', '${cid}')">
-                        <i class="fa-solid fa-pen-to-square" style="color:#fbbf24;"></i> Edit
+                        <i class="fa-solid fa-pen" style="color:#a5b4fc;"></i> Edit
                     </div>
                     <div class="action-dropdown-item" onclick="handleAction('sendmail', '${cid}')">
                         <i class="fa-solid fa-paper-plane" style="color:#a5b4fc;"></i> Send Mail

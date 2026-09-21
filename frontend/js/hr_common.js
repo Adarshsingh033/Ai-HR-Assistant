@@ -41,6 +41,9 @@ window.addEventListener('DOMContentLoaded', async () => {
     // Render immediately from session cache
     syncHRSidebarFromSession();
 
+    // Apply saved theme & update toggle button tooltip
+    if (typeof initTheme === 'function') initTheme();
+
     // Background sync from backend profile API
     await loadHRProfileForSidebar();
 });

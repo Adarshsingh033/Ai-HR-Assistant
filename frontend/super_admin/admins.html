@@ -6,6 +6,9 @@
     <title>Admins | AI HR Assistant</title>
     <link rel="stylesheet" href="../css/main.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>/* instant theme restore */
+        (function(){var t=localStorage.getItem('hr_app_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+    </script>
 </head>
 <body>
     <div class="app-layout">
@@ -39,6 +42,10 @@
         <main class="main-content">
             <header class="topbar">
                 <div class="topbar-title">Manage Admins</div>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" data-tooltip="Switch to Light Mode" aria-label="Toggle theme" id="theme-toggle-btn">
+                    <i class="fa-solid fa-moon icon-dark"></i>
+                    <i class="fa-solid fa-sun icon-light"></i>
+                </button>
             </header>
 
             <div class="page-content">
@@ -406,7 +413,7 @@
                                 <i class="fa-regular fa-eye" style="color: #60a5fa; width: 14px;"></i> View
                             </button>
                             <button type="button" onclick="openEditModal('${a.admin_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #fff; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">
-                                <i class="fa-solid fa-pen-to-square" style="color: #a5b4fc; width: 14px;"></i> Edit
+                                <i class="fa-solid fa-pen" style="color: #a5b4fc; width: 14px;"></i> Edit
                             </button>
                             ${activateDropdownBtn}
                             <button type="button" onclick="confirmDeleteAdmin('${a.admin_id}', '${a.full_name.replace(/'/g, "\\'")}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #ef4444; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='none'">

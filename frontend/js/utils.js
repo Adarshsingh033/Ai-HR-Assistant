@@ -298,3 +298,45 @@ document.addEventListener('input', function (e) {
     }
 }, true);
 
+/* ── Theme Toggle ─────────────────────────────────────────────── */
+/**
+ * initTheme()
+ * Call once on every app page (except the login page) to restore
+ * the user's saved theme preference without a flash.
+ * Pages that should always stay dark (e.g. login) should NOT call this.
+ */
+function initTheme() {
+    const saved = localStorage.getItem('hr_app_theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', saved);
+    // Update tooltip to reflect current state
+    document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+        btn.setAttribute('data-tooltip', saved === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+    });
+}
+
+/**
+ * toggleTheme()
+ * Switches between 'dark' and 'light', persists the choice,
+ * and updates the toggle button tooltip.
+ */
+function toggleTheme() {
+    const html = document.documentElement;
+    const current = html.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    html.setAttribute('data-theme', next);
+    localStorage.setItem('hr_app_theme', next);
+    // Update all toggle button tooltips on the page
+    document.querySelectorAll('.theme-toggle-btn').forEach(btn => {
+        btn.setAttribute('data-tooltip', next === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode');
+    });
+}
+
+// Apply saved theme as early as possible (before DOMContentLoaded)
+// to prevent FOUC on pages that include this script.
+(function () {
+    const saved = localStorage.getItem('hr_app_theme');
+    // Only override if this is NOT the login page
+    if (saved && document.documentElement.getAttribute('data-login-page') !== 'true') {
+        document.documentElement.setAttribute('data-theme', saved);
+    }
+})();

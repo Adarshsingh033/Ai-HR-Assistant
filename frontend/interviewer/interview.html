@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -113,6 +113,7 @@
         .status-radio.onhold { border-color: rgba(245,158,11,0.3); color: #fbbf24; }
         .status-radio.onhold.selected { background: rgba(245,158,11,0.15); border-color: #f59e0b; }
     </style>
+<script>/* instant theme restore */(function(){var t=localStorage.getItem('hr_app_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 <div class="app-layout">
@@ -170,7 +171,8 @@
                 </a>
                 <div class="topbar-title">Interview Evaluation</div>
             </div>
-        </header>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" data-tooltip="Switch to Light Mode" aria-label="Toggle theme" id="theme-toggle-btn"><i class="fa-solid fa-moon icon-dark"></i><i class="fa-solid fa-sun icon-light"></i></button>
+            </header>
 
         <div class="page-content" id="eval-content" style="display:none;">
             <div class="eval-grid">

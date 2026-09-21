@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -243,6 +243,7 @@
         }
         .status-tile[data-status="Rejected"].active .status-tile-icon { background: #ef4444; color: #fff; }
     </style>
+<script>/* instant theme restore */(function(){var t=localStorage.getItem('hr_app_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 <div class="app-layout">
@@ -320,7 +321,8 @@
     <main class="main-content">
         <header class="topbar">
             <div class="topbar-title">Candidate Screening & Evaluation</div>
-        </header>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" data-tooltip="Switch to Light Mode" aria-label="Toggle theme" id="theme-toggle-btn"><i class="fa-solid fa-moon icon-dark"></i><i class="fa-solid fa-sun icon-light"></i></button>
+            </header>
 
         <div class="page-content">
 
@@ -451,7 +453,7 @@
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
                 <div>
                     <h3 style="font-size:1.25rem;font-weight:900;color:#fff;margin:0;display:flex;align-items:center;gap:10px;">
-                        <i class="fa-solid fa-pen-to-square" style="color:#6366f1;"></i> Update Status
+                        <i class="fa-solid fa-pen" style="color:#a5b4fc;"></i> Update Status
                     </h3>
                     <div style="font-size:0.8rem;color:var(--text-muted);margin-top:3px;">Evaluate candidate performance and update interview outcome</div>
                 </div>

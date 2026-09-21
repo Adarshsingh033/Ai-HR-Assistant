@@ -161,7 +161,7 @@ function renderOrganizationsTable(orgs) {
                             <i class="fa-regular fa-eye" style="color: #60a5fa; width: 14px;"></i> View
                         </button>
                         <button type="button" onclick="openEditOrgModal('${org.org_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #fff; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">
-                            <i class="fa-solid fa-pen-to-square" style="color: #a5b4fc; width: 14px;"></i> Edit
+                            <i class="fa-solid fa-pen" style="color: #a5b4fc; width: 14px;"></i> Edit
                         </button>
                         <button type="button" onclick="openDeleteOrgModal('${org.org_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #ef4444; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.background='none'">
                             <i class="fa-solid fa-trash-can" style="color: #ef4444; width: 14px;"></i> Delete

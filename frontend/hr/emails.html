@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -309,6 +309,7 @@
             to { opacity: 1; transform: translateY(0); }
         }
     </style>
+<script>/* instant theme restore */(function(){var t=localStorage.getItem('hr_app_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 
 <body>
@@ -387,6 +388,7 @@
         <main class="main-content">
             <header class="topbar">
                 <div class="topbar-title">Mailing</div>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" data-tooltip="Switch to Light Mode" aria-label="Toggle theme" id="theme-toggle-btn"><i class="fa-solid fa-moon icon-dark"></i><i class="fa-solid fa-sun icon-light"></i></button>
             </header>
 
             <div class="page-content" style="padding-top: 10px; padding-bottom: 10px; overflow: hidden;">
@@ -395,7 +397,7 @@
                     <!-- Mail Sidebar -->
                     <div class="mail-sidebar">
                         <button class="btn-compose" onclick="openCompose()">
-                            <i class="fa-solid fa-pen"></i> Compose
+                            <i class="fa-solid fa-pen" style="color: #a5b4fc;"></i> Compose
                         </button>
                         
                         <div class="mail-folder active" data-folder="inbox">

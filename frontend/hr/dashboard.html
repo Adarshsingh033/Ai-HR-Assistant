@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -219,6 +219,7 @@
         .badge-closed { color: #ef4444; background: rgba(239,68,68,0.1);  padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 600; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>/* instant theme restore */(function(){var t=localStorage.getItem('hr_app_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 
 <body>
@@ -300,6 +301,7 @@
         <main class="main-content">
             <header class="topbar">
                 <div class="topbar-title">Dashboard Overview</div>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" data-tooltip="Switch to Light Mode" aria-label="Toggle theme" id="theme-toggle-btn"><i class="fa-solid fa-moon icon-dark"></i><i class="fa-solid fa-sun icon-light"></i></button>
             </header>
 
             <div class="page-content dashboard-page">

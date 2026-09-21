@@ -159,7 +159,7 @@ function renderTable() {
                 </button>
                 <div class="action-dropdown" id="amenu-${iv.interviewer_id}">
                     <div class="action-dropdown-item" onclick="openEditModal('${iv.interviewer_id}')">
-                        <i class="fa-solid fa-pen" style="color:#38bdf8;"></i> Edit
+                        <i class="fa-solid fa-pen" style="color:#a5b4fc;"></i> Edit
                     </div>
                     <div class="action-dropdown-item danger" onclick="openDeleteModal('${iv.interviewer_id}', '${escapeHtml(iv.full_name)}')">
                         <i class="fa-solid fa-trash-can"></i> Delete

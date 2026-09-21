@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -207,6 +207,7 @@
 
         .results-actions { display: flex; gap: 9px; justify-content: flex-end; margin-top: 4px; flex-wrap: wrap; }
     </style>
+<script>/* instant theme restore */(function(){var t=localStorage.getItem('hr_app_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();</script>
 </head>
 <body>
 <div class="app-layout">
@@ -282,7 +283,8 @@
     <main class="main-content">
         <header class="topbar">
             <div class="topbar-title">Upload Resumes</div>
-        </header>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" data-tooltip="Switch to Light Mode" aria-label="Toggle theme" id="theme-toggle-btn"><i class="fa-solid fa-moon icon-dark"></i><i class="fa-solid fa-sun icon-light"></i></button>
+            </header>
 
         <div class="page-content scrollable" style="padding-bottom:0;">
             <div class="upload-layout">

@@ -165,7 +165,7 @@ function renderScreeningTable() {
                         <i class="fa-regular fa-eye" style="color:#a5b4fc;"></i> View
                     </div>
                     <div class="action-dropdown-item" onclick="openUpdateProgressModal('${cid}')">
-                        <i class="fa-solid fa-pen-to-square" style="color:#38bdf8;"></i> Update Status
+                        <i class="fa-solid fa-pen" style="color:#a5b4fc;"></i> Update Status
                     </div>
                     <div class="action-dropdown-divider"></div>
                     <div class="action-dropdown-item" onclick="openScreeningEmail('${cid}')">

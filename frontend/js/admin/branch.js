@@ -177,7 +177,7 @@ function renderBranchTable() {
                             <i class="fa-regular fa-eye" style="color: #60a5fa;"></i> View
                         </div>
                         <div onclick="triggerBranchEdit('${branch.branch_id}')" style="padding: 8px 16px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
-                            <i class="fa-solid fa-pen-to-square" style="color: #f59e0b;"></i> Edit
+                            <i class="fa-solid fa-pen" style="color: #a5b4fc;"></i> Edit
                         </div>
                         <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0;"></div>
                         <div onclick="triggerBranchDelete('${branch.branch_id}')" style="padding: 8px 16px; color: #ef4444; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.12)'" onmouseout="this.style.background='transparent'">

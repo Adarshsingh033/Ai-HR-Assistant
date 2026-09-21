@@ -8,12 +8,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-        /*
-          Filter bar, search bar, table wrapper and cell styling all come from
-          css/main.css so this page scales with the rest of the product.
-        */
         .audit-table tbody td { color: rgba(255, 255, 255, 0.85); }
     </style>
+    <script>/* instant theme restore */
+        (function(){var t=localStorage.getItem('hr_app_theme');if(t)document.documentElement.setAttribute('data-theme',t);})();
+    </script>
 </head>
 <body>
     <div class="app-layout">
@@ -46,6 +45,10 @@
         <main class="main-content">
             <header class="topbar">
                 <div class="topbar-title">Audit Logs</div>
+                <button class="theme-toggle-btn" onclick="toggleTheme()" data-tooltip="Switch to Light Mode" aria-label="Toggle theme" id="theme-toggle-btn">
+                    <i class="fa-solid fa-moon icon-dark"></i>
+                    <i class="fa-solid fa-sun icon-light"></i>
+                </button>
             </header>
 
             <div class="page-content">
@@ -211,7 +214,7 @@
             const act = (action || '').toUpperCase();
             if (act === 'GET') return `<span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:8px; background:rgba(59,130,246,0.15); color:#60a5fa; border:1px solid rgba(59,130,246,0.3); font-weight:800; font-size:0.75rem;"><i class="fa-solid fa-arrow-down-short-wide" style="font-size:9px;"></i> GET</span>`;
             if (act === 'POST' || act.includes('CREATED')) return `<span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:8px; background:rgba(16,185,129,0.15); color:#34d399; border:1px solid rgba(16,185,129,0.3); font-weight:800; font-size:0.75rem;"><i class="fa-solid fa-plus" style="font-size:9px;"></i> ${act}</span>`;
-            if (act === 'PUT' || act.includes('UPDATED') || act.includes('STATUS')) return `<span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:8px; background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-weight:800; font-size:0.75rem;"><i class="fa-solid fa-pen" style="font-size:9px;"></i> ${act}</span>`;
+            if (act === 'PUT' || act.includes('UPDATED') || act.includes('STATUS')) return `<span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:8px; background:rgba(245,158,11,0.15); color:#fbbf24; border:1px solid rgba(245,158,11,0.3); font-weight:800; font-size:0.75rem;"><i class="fa-solid fa-pen" style="color:#a5b4fc; font-size:9px;"></i> ${act}</span>`;
             if (act === 'DELETE' || act.includes('DELETED')) return `<span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:8px; background:rgba(239,68,68,0.15); color:#f87171; border:1px solid rgba(239,68,68,0.3); font-weight:800; font-size:0.75rem;"><i class="fa-solid fa-trash" style="font-size:9px;"></i> ${act}</span>`;
             if (act === 'PATCH') return `<span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:8px; background:rgba(168,85,247,0.15); color:#c084fc; border:1px solid rgba(168,85,247,0.3); font-weight:800; font-size:0.75rem;"><i class="fa-solid fa-code-commit" style="font-size:9px;"></i> PATCH</span>`;
             return `<span style="display:inline-flex; align-items:center; gap:5px; padding:4px 10px; border-radius:8px; background:rgba(100,116,139,0.15); color:#94a3b8; border:1px solid rgba(100,116,139,0.3); font-weight:800; font-size:0.75rem;">${act}</span>`;
