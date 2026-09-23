@@ -218,7 +218,7 @@ html[data-theme="light"] .search-wrap input::placeholder {
 }
 
 html[data-theme="light"] .filter-select {
-  background: #f8fafc;
+  background-color: #f8fafc;
   border: 1px solid rgba(0, 0, 0, 0.10);
   color: #0f172a;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(0,0,0,0.45)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
@@ -231,7 +231,7 @@ html[data-theme="light"] .filter-select option {
 
 /* Light mode form controls */
 html[data-theme="light"] .form-control {
-  background: #f8fafc;
+  background-color: #f8fafc;
   border: 1px solid rgba(0, 0, 0, 0.12);
   color: #0f172a;
 }
@@ -241,7 +241,7 @@ html[data-theme="light"] .form-control::placeholder {
 }
 
 html[data-theme="light"] .input-custom {
-  background: #f8fafc;
+  background-color: #f8fafc;
   border: 1px solid rgba(0, 0, 0, 0.12);
   color: #0f172a;
 }
@@ -256,6 +256,11 @@ html[data-theme="light"] select.filter-select,
 html[data-theme="light"] select {
   color-scheme: light;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(0,0,0,0.45)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 9px center !important;
+  background-size: 12px !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
 }
 
 html[data-theme="light"] select.form-control option,
@@ -969,8 +974,8 @@ textarea.form-control {
   justify-content: space-between;
   margin-top: clamp(10px, 1.1vw, 16px);
   padding: clamp(8px, 0.9vw, 12px) clamp(12px, 1.4vw, 20px);
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border);
   border-radius: var(--radius-md);
   backdrop-filter: blur(10px);
   gap: clamp(10px, 1.2vw, 16px);
@@ -985,7 +990,7 @@ textarea.form-control {
   flex-wrap: wrap;
   font-size: 0.8rem;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
 }
 
 .pagination-size {
@@ -996,24 +1001,30 @@ textarea.form-control {
 }
 
 .pagination-size select {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #fff;
+  background-color: var(--bg-subtle);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
   border-radius: var(--radius-sm);
-  padding: 3px 8px;
+  padding: 3px 26px 3px 8px;
   font-family: inherit;
   font-size: 0.78rem;
   font-weight: 600;
   outline: none;
   cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='rgba(255,255,255,0.7)'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  background-size: 12px;
 }
 
 .pagination-controls {
   display: flex;
   align-items: center;
   gap: 2px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
   border-radius: var(--radius-sm);
   padding: 4px 6px;
   flex-wrap: wrap;
@@ -1029,7 +1040,7 @@ textarea.form-control {
   border-radius: 50%;
   border: none;
   background: transparent;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-primary);
   font-family: inherit;
   font-size: 0.8rem;
   font-weight: 600;

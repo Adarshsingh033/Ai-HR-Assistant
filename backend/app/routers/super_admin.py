@@ -73,11 +73,15 @@ def get_dashboard_stats(x_super_admin_id: Optional[str] = Header(None, alias="X-
 
             # Month-wise Admin creation (Last 6 months)
             cur.execute("""
-                SELECT to_char(created_at, 'Mon YYYY') as month, COUNT(*) as count 
-                FROM admin 
-                WHERE created_at >= NOW() - INTERVAL '6 months'
-                GROUP BY to_char(created_at, 'Mon YYYY'), date_trunc('month', created_at)
-                ORDER BY date_trunc('month', created_at) ASC
+                SELECT to_char(m, 'Mon YYYY') as month, COUNT(a.id) as count 
+                FROM generate_series(
+                    date_trunc('month', NOW() - INTERVAL '5 months'),
+                    date_trunc('month', NOW()),
+                    INTERVAL '1 month'
+                ) as m
+                LEFT JOIN admin a ON date_trunc('month', a.created_at) = m
+                GROUP BY m
+                ORDER BY m ASC
             """)
             admin_creation_trend = [{"month": r[0], "count": r[1]} for r in cur.fetchall()]
 
