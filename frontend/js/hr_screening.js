@@ -199,82 +199,15 @@ function renderScreeningPagination(total, totalPages, startIdx, pagedCount) {
         return;
     }
 
-    const startItem = total === 0 ? 0 : startIdx + 1;
-    const endItem = startIdx + pagedCount;
-    const currentPage = screeningState.page;
-
-    let pageBtns = '';
-
-    const maxVisiblePages = 7;
-    let startPage = 1;
-    let endPage = totalPages;
-
-    if (totalPages > maxVisiblePages) {
-        if (currentPage <= 4) {
-            startPage = 1;
-            endPage = 5;
-        } else if (currentPage >= totalPages - 3) {
-            startPage = totalPages - 4;
-            endPage = totalPages;
-        } else {
-            startPage = currentPage - 2;
-            endPage = currentPage + 2;
-        }
-    }
-
-    if (startPage > 1) {
-        pageBtns += `<button onclick="changeScreeningPage(1)" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">1</button>`;
-        if (startPage > 2) {
-            pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
-        }
-    }
-
-    for (let p = startPage; p <= endPage; p++) {
-        if (p === currentPage) {
-            pageBtns += `<button style="width:28px;height:28px;border-radius:50%;border:none;background:rgba(255,255,255,0.18);color:#fff;font-size:0.82rem;font-weight:700;cursor:default;display:inline-flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,0.2);">${p}</button>`;
-        } else {
-            pageBtns += `<button onclick="changeScreeningPage(${p})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.82rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${p}</button>`;
-        }
-    }
-
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            pageBtns += `<span style="color:rgba(255,255,255,0.4);font-size:0.8rem;padding:0 2px;">…</span>`;
-        }
-        pageBtns += `<button onclick="changeScreeningPage(${totalPages})" style="width:28px;height:28px;border-radius:50%;border:none;background:transparent;color:rgba(255,255,255,0.7);font-size:0.8rem;font-weight:600;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;transition:all 0.15s;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">${totalPages}</button>`;
-    }
-
-    container.innerHTML = `
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 20px; padding: 12px 20px; background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border); border-radius: 14px; flex-wrap: wrap; gap: 16px; backdrop-filter: blur(10px); font-family: 'Inter', sans-serif;">
-            <div style="display: flex; align-items: center; gap: 16px; font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 500;">
-                <span>${startItem}–${endItem} of ${total} <span style="margin:0 4px;opacity:0.4;">·</span> Page ${currentPage} of ${totalPages}</span>
-                <div style="display: flex; align-items: center; gap: 8px;">
-                    <span>Rows per page:</span>
-                    <select onchange="changeScreeningLimit(this.value)" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.12); color: #fff; border-radius: 8px; padding: 3px 8px; font-size: 0.8rem; font-weight: 600; outline: none; cursor: pointer;">
-                        <option value="10" ${screeningState.limit === 10 ? 'selected' : ''}>10</option>
-                        <option value="25" ${screeningState.limit === 25 ? 'selected' : ''}>25</option>
-                        <option value="50" ${screeningState.limit === 50 ? 'selected' : ''}>50</option>
-                        <option value="100" ${screeningState.limit === 100 ? 'selected' : ''}>100</option>
-                    </select>
-                </div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 2px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 10px; padding: 4px 6px;">
-                <button onclick="changeScreeningPage(1)" ${currentPage <= 1 ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage <= 1 ? '0.3' : '1'};transition:all 0.15s;" title="First page">
-                    <i class="fa-solid fa-angles-left"></i>
-                </button>
-                <button onclick="changeScreeningPage(${currentPage - 1})" ${currentPage <= 1 ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage <= 1 ? '0.3' : '1'};transition:all 0.15s;" title="Previous page">
-                    <i class="fa-solid fa-chevron-left"></i>
-                </button>
-                ${pageBtns}
-                <button onclick="changeScreeningPage(${currentPage + 1})" ${currentPage >= totalPages ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage >= totalPages ? '0.3' : '1'};transition:all 0.15s;" title="Next page">
-                    <i class="fa-solid fa-chevron-right"></i>
-                </button>
-                <button onclick="changeScreeningPage(${totalPages})" ${currentPage >= totalPages ? 'disabled' : ''} style="width:28px;height:28px;border-radius:6px;border:none;background:transparent;color:rgba(255,255,255,0.6);cursor:pointer;font-size:0.75rem;display:inline-flex;align-items:center;justify-content:center;opacity:${currentPage >= totalPages ? '0.3' : '1'};transition:all 0.15s;" title="Last page">
-                    <i class="fa-solid fa-angles-right"></i>
-                </button>
-            </div>
-        </div>
-    `;
+    container.innerHTML = paginationBarHTML({
+        page: screeningState.page,
+        totalPages: totalPages,
+        total: total,
+        limit: screeningState.limit,
+        onPage: 'changeScreeningPage',
+        onPageSize: 'changeScreeningLimit',
+        pageSizes: [10, 25, 50, 100]
+    });
 }
 
 function getInterviewStatusIcon(status) {
@@ -371,7 +304,7 @@ async function openViewProgressModal(candidateId) {
         // Stepper rendering
         const stepper = document.getElementById('vp-stepper');
         if (rounds.length === 0) {
-            stepper.innerHTML = `<div style="color:rgba(255,255,255,0.5);font-size:0.85rem;">No interview rounds configured for this vacancy.</div>`;
+            stepper.innerHTML = `<div style="color:var(--text-muted);font-size:0.85rem;">No interview rounds configured for this vacancy.</div>`;
         } else {
             // The connector line is inset by half a step, so it needs the step count
             stepper.style.setProperty('--step-count', rounds.length);
@@ -407,12 +340,12 @@ async function openViewProgressModal(candidateId) {
         // Round feedback cards rendering
         const roundsDetails = document.getElementById('vp-rounds-details');
         if (rounds.length === 0) {
-            roundsDetails.innerHTML = `<div style="color:rgba(255,255,255,0.4);font-size:0.84rem;">No round evaluation comments saved yet.</div>`;
+            roundsDetails.innerHTML = `<div style="color:var(--text-muted);font-size:0.84rem;">No round evaluation comments saved yet.</div>`;
         } else {
             roundsDetails.innerHTML = rounds.map(r => `
                 <div class="progress-round-box">
                     <div class="progress-round-top">
-                        <div style="font-size:0.95rem;font-weight:800;color:#fff;">
+                        <div style="font-size:0.95rem;font-weight:800;color:var(--text-bright);">
                             Round ${r.round_order}: ${escapeHtml(r.round_title)}
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;">
@@ -420,8 +353,8 @@ async function openViewProgressModal(candidateId) {
                             <span class="status-pill ${r.status === 'Passed' ? 'status-pill-passed' : r.status === 'Rejected' ? 'status-pill-rejected' : r.status === 'On Hold' ? 'status-pill-onhold' : 'status-pill-ongoing'}">${r.status || 'Pending'}</span>
                         </div>
                     </div>
-                    <div style="font-size:0.8rem;color:rgba(255,255,255,0.55);margin-bottom:8px;">${escapeHtml(r.round_description || 'No description.')}</div>
-                    ${r.comment ? `<div style="font-size:0.84rem;color:#e2e8f0;background:rgba(255,255,255,0.03);padding:10px 14px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);margin-top:6px;"><strong>Feedback:</strong> ${escapeHtml(r.comment)}</div>` : `<div style="font-size:0.78rem;color:rgba(255,255,255,0.35);font-style:italic;margin-top:4px;">No evaluation comments added for this round.</div>`}
+                    <div style="font-size:0.8rem;color:var(--text-muted);margin-bottom:8px;">${escapeHtml(r.round_description || 'No description.')}</div>
+                    ${r.comment ? `<div style="font-size:0.84rem;color:var(--text-bright);background:var(--bg-subtle);padding:10px 14px;border-radius:8px;border:1px solid var(--border);margin-top:6px;"><strong>Feedback:</strong> ${escapeHtml(r.comment)}</div>` : `<div style="font-size:0.78rem;color:var(--text-muted);font-style:italic;margin-top:4px;">No evaluation comments added for this round.</div>`}
                 </div>
             `).join('');
         }
@@ -538,7 +471,7 @@ async function openEditRoundsModal(candidateId, jobId) {
         const listContainer = document.getElementById('er-rounds-list');
 
         if (rounds.length === 0) {
-            listContainer.innerHTML = `<div style="color:rgba(255,255,255,0.5);font-size:0.85rem;margin-bottom:14px;">No rounds currently configured. Click below to add rounds.</div>`;
+            listContainer.innerHTML = `<div style="color:var(--text-muted);font-size:0.85rem;margin-bottom:14px;">No rounds currently configured. Click below to add rounds.</div>`;
         } else {
             listContainer.innerHTML = rounds.map((r, idx) => `
                 <div class="progress-round-box er-round-box" data-round-id="${r.round_id}">
