@@ -73,7 +73,7 @@ async function loadOrganizations(page = currentOrgPage) {
         console.error('Failed to load organizations:', err);
         tbody.innerHTML = `
             <tr>
-                <td colspan="7" style="text-align: center; color: #ef4444; padding: 24px;">
+                <td colspan="7" style="text-align: center; color: var(--danger); padding: 24px;">
                     Failed to load organizations: ${escapeHtml(err.message || 'Request failed')}
                 </td>
             </tr>
@@ -110,7 +110,7 @@ function renderOrganizationsTable(orgs) {
 
         // Status Badge Column (Clickable Toggle Pill with Custom Tooltip)
         const statusBadge = isInactive
-            ? `<button type="button" onclick="toggleOrgStatus('${org.org_id}', 'active')" data-tooltip="Click to set Active" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'"><i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Inactive</button>`
+            ? `<button type="button" onclick="toggleOrgStatus('${org.org_id}', 'active')" data-tooltip="Click to set Active" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'"><i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Inactive</button>`
             : `<button type="button" onclick="toggleOrgStatus('${org.org_id}', 'inactive')" data-tooltip="Click to set Inactive" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(16, 185, 129, 0.25)'" onmouseout="this.style.background='rgba(16, 185, 129, 0.12)'"><i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Active</button>`;
 
         return `
@@ -129,7 +129,7 @@ function renderOrganizationsTable(orgs) {
 
                 <!-- 3. Industry Column -->
                 <td>
-                    <span style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(59, 130, 246, 0.12); color: #60a5fa; font-size: 0.78rem; font-weight: 600; text-transform: capitalize;">
+                    <span style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(59, 130, 246, 0.12); color: var(--info); font-size: 0.78rem; font-weight: 600; text-transform: capitalize;">
                         ${escapeHtml(indLabel)}
                     </span>
                 </td>
@@ -156,15 +156,15 @@ function renderOrganizationsTable(orgs) {
                     </button>
 
                     <!-- Popover Dropdown Menu (View, Edit, Delete Only) -->
-                    <div id="org-action-menu-${org.org_id}" class="org-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; min-width: 140px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
+                    <div id="org-action-menu-${org.org_id}" class="org-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; min-width: 140px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
                         <button type="button" onclick="openViewOrgModal('${org.org_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: var(--text-bright); font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='none'">
-                            <i class="fa-regular fa-eye" style="color: #60a5fa; width: 14px;"></i> View
+                            <i class="fa-regular fa-eye" style="color: var(--info); width: 14px;"></i> View
                         </button>
                         <button type="button" onclick="openEditOrgModal('${org.org_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: var(--text-bright); font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='none'">
-                            <i class="fa-solid fa-pen" style="color: #a5b4fc; width: 14px;"></i> Edit
+                            <i class="fa-solid fa-pen" style="color: var(--accent); width: 14px;"></i> Edit
                         </button>
-                        <button type="button" onclick="openDeleteOrgModal('${org.org_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #ef4444; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.background='none'">
-                            <i class="fa-solid fa-trash-can" style="color: #ef4444; width: 14px;"></i> Delete
+                        <button type="button" onclick="openDeleteOrgModal('${org.org_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: var(--danger); font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.background='none'">
+                            <i class="fa-solid fa-trash-can" style="color: var(--danger); width: 14px;"></i> Delete
                         </button>
                     </div>
                 </td>

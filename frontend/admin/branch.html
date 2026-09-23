@@ -142,7 +142,7 @@
         <div class="modal-card" style="max-width: 620px; width: 92%; max-height: 88vh; padding: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow: hidden;">
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;">
                 <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-bright); margin: 0; letter-spacing: -0.01em;" id="branch-modal-title">Create Branch</h3>
-                <button type="button" onclick="closeBranchModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='var(--bg-subtle)';this.style.color='rgba(255,255,255,0.7)';">×</button>
+                <button type="button" onclick="closeBranchModal()" style="background: var(--bg-subtle); border: 1px solid rgba(255,255,255,0.12); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='var(--bg-subtle)';this.style.color='rgba(255,255,255,0.7)';">×</button>
             </div>
             <form id="branch-form" onsubmit="handleSaveBranch(event)" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;">
                 <input type="hidden" id="branch-id-hidden" />
@@ -181,7 +181,7 @@
 
                 <!-- Pinned Footer -->
                 <div class="modal-footer" style="padding: 16px 28px;">
-                    <button type="button" onclick="closeBranchModal()" style="padding: 10px 22px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease;">Cancel</button>
+                    <button type="button" onclick="closeBranchModal()" style="padding: 10px 22px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text-primary); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease;">Cancel</button>
                     <button type="submit" id="branch-submit-btn" style="padding: 10px 26px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: none; color: #fff; box-shadow: 0 4px 18px rgba(249, 115, 22, 0.4); cursor: pointer; transition: all 0.2s ease;">Save Branch</button>
                 </div>
             </form>
@@ -193,7 +193,7 @@
         <div class="modal-card" style="max-width: 500px; width: 92%; padding: 36px 32px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75);">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
                 <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--text-bright);">Branch Details</h3>
-                <button type="button" onclick="closeViewBranchModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;" title="Close">×</button>
+                <button type="button" onclick="closeViewBranchModal()" style="background: var(--bg-subtle); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;" title="Close">×</button>
             </div>
 
             <div style="text-align: center; margin-bottom: 24px;">

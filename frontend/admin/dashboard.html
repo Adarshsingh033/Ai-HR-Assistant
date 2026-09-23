@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -108,7 +108,7 @@
                     <div class="stats-grid">
                         
                         <!-- Metric Card 1: Organizations -->
-                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: clamp(13px, 1.2vw, 18px); position: relative; overflow: hidden;">
+                        <div class="stat-card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: clamp(13px, 1.2vw, 18px); position: relative; overflow: hidden;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                 <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Organizations</span>
                                 <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(99, 102, 241, 0.15); border: 1px solid rgba(99, 102, 241, 0.3); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
@@ -116,14 +116,14 @@
                                 </div>
                             </div>
                             <div style="font-size: clamp(1.35rem, 1.8vw, 1.9rem); font-weight: 800; color: var(--text-bright); line-height: 1;" id="dash-stat-orgs">—</div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
                                 <span>Active: <strong id="dash-stat-active-orgs" style="color: #10b981;">—</strong></span>
                                 <span>Inactive: <strong id="dash-stat-inactive-orgs" style="color: #ef4444;">—</strong></span>
                             </div>
                         </div>
 
                         <!-- Metric Card 2: Total Branches -->
-                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: clamp(13px, 1.2vw, 18px); position: relative; overflow: hidden;">
+                        <div class="stat-card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: clamp(13px, 1.2vw, 18px); position: relative; overflow: hidden;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                 <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">Total Branches</span>
                                 <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
@@ -131,13 +131,13 @@
                                 </div>
                             </div>
                             <div style="font-size: clamp(1.35rem, 1.8vw, 1.9rem); font-weight: 800; color: var(--text-bright); line-height: 1;" id="dash-stat-branches">—</div>
-                            <div style="margin-top: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);">
+                            <div style="margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
                                 Distributed across registered organizations
                             </div>
                         </div>
 
                         <!-- Metric Card 3: HR Managers -->
-                        <div class="stat-card" style="background: rgba(15, 23, 42, 0.6); border: 1px solid rgba(255,255,255,0.12); border-radius: 14px; padding: clamp(13px, 1.2vw, 18px); position: relative; overflow: hidden;">
+                        <div class="stat-card" style="background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: clamp(13px, 1.2vw, 18px); position: relative; overflow: hidden;">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                                 <span style="font-size: 0.78rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em;">HR Managers</span>
                                 <div style="width: 36px; height: 36px; border-radius: 10px; background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; display: flex; align-items: center; justify-content: center; font-size: 1.1rem;">
@@ -145,7 +145,7 @@
                                 </div>
                             </div>
                             <div style="font-size: clamp(1.35rem, 1.8vw, 1.9rem); font-weight: 800; color: var(--text-bright); line-height: 1;" id="dash-stat-hrs">—</div>
-                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; color: rgba(255,255,255,0.5);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; font-size: 0.75rem; color: var(--text-muted);">
                                 <span>Active: <strong id="dash-stat-active-hrs" style="color: #10b981;">—</strong></span>
                                 <span>Inactive: <strong id="dash-stat-inactive-hrs" style="color: #ef4444;">—</strong></span>
                             </div>
@@ -162,7 +162,7 @@
                                 <h3 style="font-size: clamp(0.9rem, 1vw, 1rem); font-weight: 800; color: var(--text-bright); margin: 0; display: flex; align-items: center; gap: 8px;">
                                     <i class="fa-solid fa-chart-column" style="color: #818cf8;"></i> Branches per Organization
                                 </h3>
-                                <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase;">Branch Count</span>
+                                <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Branch Count</span>
                             </div>
                             <div class="chart-box">
                                 <canvas id="chart-branches-per-org"></canvas>
@@ -175,7 +175,7 @@
                                 <h3 style="font-size: clamp(0.9rem, 1vw, 1rem); font-weight: 800; color: var(--text-bright); margin: 0; display: flex; align-items: center; gap: 8px;">
                                     <i class="fa-solid fa-chart-bar" style="color: #10b981;"></i> HR Managers per Branch
                                 </h3>
-                                <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); text-transform: uppercase;">HR Count</span>
+                                <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">HR Count</span>
                             </div>
                             <div class="chart-box">
                                 <canvas id="chart-hrs-per-branch"></canvas>

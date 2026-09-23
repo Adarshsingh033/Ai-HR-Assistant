@@ -148,7 +148,7 @@ function renderTable(depts) {
                 </button>
                 <div class="action-dropdown" id="dropdown-${d.department_id}">
                     <div class="action-dropdown-item" onclick="openEditModal('${d.department_id}', ${JSON.stringify(d).replace(/"/g, '&quot;')})">
-                        <i class="fa-solid fa-pen" style="color:#a5b4fc;"></i> Edit
+                        <i class="fa-solid fa-pen" style="color: var(--accent);"></i> Edit
                     </div>
                     <div class="action-dropdown-item danger" onclick="openDeleteModal('${d.department_id}', '${escHtml(d.department_name)}')">
                         <i class="fa-solid fa-trash-can"></i> Delete

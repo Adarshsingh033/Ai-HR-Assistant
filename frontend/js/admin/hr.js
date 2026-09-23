@@ -217,7 +217,7 @@ function showMemberError(msg) {
     if (tbody) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="6" style="text-align: center; color: #ef4444; padding: 32px;">
+                <td colspan="6" style="text-align: center; color: var(--danger); padding: 32px;">
                     ${escapeHtml(msg)}
                 </td>
             </tr>
@@ -251,7 +251,7 @@ function renderMemberTable() {
 
         // Clickable status toggle pill with custom data-tooltip
         const statusBadge = isInactive
-            ? `<button type="button" onclick="toggleMemberStatus('${m.member_id}', 'active')" data-tooltip="Click to set Active" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'"><i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Inactive</button>`
+            ? `<button type="button" onclick="toggleMemberStatus('${m.member_id}', 'active')" data-tooltip="Click to set Active" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; background: rgba(239, 68, 68, 0.12); border: 1px solid rgba(239, 68, 68, 0.3); color: var(--danger); font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.25)'" onmouseout="this.style.background='rgba(239, 68, 68, 0.12)'"><i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Inactive</button>`
             : `<button type="button" onclick="toggleMemberStatus('${m.member_id}', 'inactive')" data-tooltip="Click to set Inactive" style="display: inline-flex; align-items: center; gap: 6px; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.12); border: 1px solid rgba(16, 185, 129, 0.3); color: #10b981; font-size: 0.78rem; font-weight: 700; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(16, 185, 129, 0.25)'" onmouseout="this.style.background='rgba(16, 185, 129, 0.12)'"><i class="fa-solid fa-circle" style="font-size: 0.45rem;"></i> Active</button>`;
 
         return `
@@ -268,13 +268,13 @@ function renderMemberTable() {
 
                 <!-- 3. Email & Phone -->
                 <td>
-                    <div style="font-size: 0.86rem; color: rgba(255,255,255,0.9); font-weight: 500;">${escapeHtml(m.email)}</div>
-                    <div style="font-size: 0.78rem; color: rgba(255,255,255,0.5);">${escapeHtml(m.phone || '—')}</div>
+                    <div style="font-size: 0.86rem; color: var(--text-primary); font-weight: 500;">${escapeHtml(m.email)}</div>
+                    <div style="font-size: 0.78rem; color: var(--text-muted);">${escapeHtml(m.phone || '—')}</div>
                 </td>
 
                 <!-- 4. Organization -->
                 <td>
-                    <div style="font-weight: 600; color: #a5b4fc; font-size: 0.88rem;">
+                    <div style="font-weight: 600; color: var(--accent); font-size: 0.88rem;">
                         ${escapeHtml(m.organization_name || '—')}
                     </div>
                 </td>
@@ -298,15 +298,15 @@ function renderMemberTable() {
                     </button>
 
                     <!-- Dropdown Menu -->
-                    <div id="member-action-menu-${m.member_id}" class="member-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; min-width: 140px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
+                    <div id="member-action-menu-${m.member_id}" class="member-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; min-width: 140px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
                         <button type="button" onclick="triggerMemberView('${m.member_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: var(--text-bright); font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='none'">
-                            <i class="fa-regular fa-eye" style="color: #60a5fa; width: 14px;"></i> View
+                            <i class="fa-regular fa-eye" style="color: var(--info); width: 14px;"></i> View
                         </button>
                         <button type="button" onclick="triggerMemberEdit('${m.member_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: var(--text-bright); font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='none'">
-                            <i class="fa-solid fa-pen" style="color: #a5b4fc; width: 14px;"></i> Edit
+                            <i class="fa-solid fa-pen" style="color: var(--accent); width: 14px;"></i> Edit
                         </button>
-                        <button type="button" onclick="triggerMemberDelete('${m.member_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #ef4444; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.background='none'">
-                            <i class="fa-solid fa-trash-can" style="color: #ef4444; width: 14px;"></i> Delete
+                        <button type="button" onclick="triggerMemberDelete('${m.member_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: var(--danger); font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.background='none'">
+                            <i class="fa-solid fa-trash-can" style="color: var(--danger); width: 14px;"></i> Delete
                         </button>
                     </div>
                 </td>

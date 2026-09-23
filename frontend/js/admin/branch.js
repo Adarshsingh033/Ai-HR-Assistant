@@ -111,7 +111,7 @@ function showBranchError(msg) {
     if (tbody) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" style="text-align: center; color: #ef4444; padding: 36px; font-weight: 600;">
+                <td colspan="5" style="text-align: center; color: var(--danger); padding: 36px; font-weight: 600;">
                     ${escapeHtml(msg)}
                 </td>
             </tr>
@@ -149,15 +149,15 @@ function renderBranchTable() {
 
                 <!-- 2. Organization Column -->
                 <td>
-                    <span style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(59, 130, 246, 0.12); color: #60a5fa; font-size: 0.78rem; font-weight: 600;">
+                    <span style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(59, 130, 246, 0.12); color: var(--info); font-size: 0.78rem; font-weight: 600;">
                         ${escapeHtml(branch.organization_name || '—')}
                     </span>
                 </td>
 
                 <!-- 3. Location Column -->
                 <td>
-                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.85);">
-                        <i class="fa-solid fa-location-dot" style="color: rgba(255,255,255,0.4); margin-right: 6px;"></i>${escapeHtml(locationStr)}
+                    <div style="font-size: 0.85rem; color: var(--text-primary);">
+                        <i class="fa-solid fa-location-dot" style="color: var(--text-muted); margin-right: 6px;"></i>${escapeHtml(locationStr)}
                     </div>
                 </td>
 
@@ -168,19 +168,19 @@ function renderBranchTable() {
 
                 <!-- 5. Action Dropdown Menu Column -->
                 <td style="text-align: right; position: relative;">
-                    <button type="button" class="btn-action-trigger" onclick="toggleBranchActionMenu(event, '${branch.branch_id}')" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--text-primary); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" title="Actions">
+                    <button type="button" class="btn-action-trigger" onclick="toggleBranchActionMenu(event, '${branch.branch_id}')" style="background: var(--bg-subtle); border: 1px solid var(--border); color: var(--text-primary); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;" title="Actions">
                         <i class="fa-solid fa-ellipsis"></i>
                     </button>
 
                     <div id="branch-action-menu-${branch.branch_id}" class="branch-action-dropdown hidden" style="position: absolute; right: 0; top: 42px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; min-width: 140px; padding: 6px 0; text-align: left;">
                         <div onclick="triggerBranchView('${branch.branch_id}')" style="padding: 8px 16px; color: var(--text-bright); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='transparent'">
-                            <i class="fa-regular fa-eye" style="color: #60a5fa;"></i> View
+                            <i class="fa-regular fa-eye" style="color: var(--info);"></i> View
                         </div>
                         <div onclick="triggerBranchEdit('${branch.branch_id}')" style="padding: 8px 16px; color: var(--text-bright); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='transparent'">
-                            <i class="fa-solid fa-pen" style="color: #a5b4fc;"></i> Edit
+                            <i class="fa-solid fa-pen" style="color: var(--accent);"></i> Edit
                         </div>
-                        <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0;"></div>
-                        <div onclick="triggerBranchDelete('${branch.branch_id}')" style="padding: 8px 16px; color: #ef4444; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.12)'" onmouseout="this.style.background='transparent'">
+                        <div style="height: 1px; background: var(--border); margin: 4px 0;"></div>
+                        <div onclick="triggerBranchDelete('${branch.branch_id}')" style="padding: 8px 16px; color: var(--danger); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239, 68, 68, 0.12)'" onmouseout="this.style.background='transparent'">
                             <i class="fa-solid fa-trash-can"></i> Delete
                         </div>
                     </div>
