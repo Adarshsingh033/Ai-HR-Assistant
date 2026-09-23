@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -27,8 +27,8 @@
 
         /* Job Vacancy Specific Cards & Badges */
         .vacancy-card {
-            background: rgba(15, 23, 42, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 20px;
             padding: 22px;
             display: flex;
@@ -36,12 +36,13 @@
             position: relative;
             box-sizing: border-box;
             transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
         }
 
         .vacancy-card:hover {
             transform: translateY(-3px);
-            border-color: rgba(99, 102, 241, 0.5);
-            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.45);
+            border-color: var(--accent);
+            box-shadow: 0 14px 35px rgba(0, 0, 0, 0.08);
         }
 
         .status-pill {
@@ -57,21 +58,21 @@
         }
 
         .status-pill.active {
-            background: rgba(16, 185, 129, 0.18);
-            border: 1px solid rgba(16, 185, 129, 0.4);
-            color: #34d399;
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--success);
         }
 
         .status-pill.draft {
-            background: rgba(245, 158, 11, 0.18);
-            border: 1px solid rgba(245, 158, 11, 0.4);
-            color: #fbbf24;
+            background: rgba(245, 158, 11, 0.15);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            color: var(--warning);
         }
 
         .status-pill.closed {
-            background: rgba(239, 68, 68, 0.18);
-            border: 1px solid rgba(239, 68, 68, 0.4);
-            color: #f87171;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--danger);
         }
 
         .work-mode-pill {
@@ -79,9 +80,9 @@
             font-weight: 700;
             padding: 4px 12px;
             border-radius: 8px;
-            background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
-            border: 1px solid rgba(99, 102, 241, 0.3);
+            background: rgba(99, 102, 241, 0.1);
+            color: var(--accent);
+            border: 1px solid rgba(99, 102, 241, 0.25);
         }
 
         .emp-type-pill {
@@ -89,9 +90,9 @@
             font-weight: 700;
             padding: 4px 12px;
             border-radius: 8px;
-            background: rgba(56, 189, 248, 0.15);
-            color: #38bdf8;
-            border: 1px solid rgba(56, 189, 248, 0.3);
+            background: rgba(14, 165, 233, 0.1);
+            color: var(--info);
+            border: 1px solid rgba(14, 165, 233, 0.25);
         }
 
         .vacancy-meta-row {
@@ -115,21 +116,21 @@
             gap: 8px;
             margin-top: 16px;
             padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            border-top: 1px solid var(--border);
         }
 
         .skill-badge {
             font-size: 0.78rem;
             font-weight: 600;
             padding: 3px 11px;
-            background: rgba(255, 255, 255, 0.08);
-            color: #f1f5f9;
+            background: var(--bg-subtle);
+            color: var(--text-primary);
             border-radius: 99px;
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            border: 1px solid var(--border);
         }
 
         .jd-generator-box {
-            background: linear-gradient(180deg, rgba(99, 102, 241, 0.12) 0%, rgba(15, 23, 42, 0.6) 100%);
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.12) 0%, var(--bg-subtle) 100%);
             border: 1px solid rgba(99, 102, 241, 0.35);
             border-radius: 16px;
             padding: 22px;
@@ -169,35 +170,36 @@
         }
         /* ── Markdown JD render styles ─────────────────────────────── */
         .jd-markdown h1, .jd-markdown h2, .jd-markdown h3 {
-            color: #c7d2fe;
+            color: var(--text-bright);
             font-weight: 800;
             margin: 18px 0 8px;
             line-height: 1.3;
         }
-        .jd-markdown h1 { font-size: 1.15rem; border-bottom: 1px solid rgba(99,102,241,0.3); padding-bottom: 6px; }
-        .jd-markdown h2 { font-size: 1rem; color: #a5b4fc; }
-        .jd-markdown h3 { font-size: 0.92rem; color: #93c5fd; }
-        .jd-markdown p  { color: rgba(255,255,255,0.82); font-size: 0.88rem; line-height: 1.7; margin: 6px 0; }
+        .jd-markdown h1 { font-size: 1.15rem; border-bottom: 1px solid var(--border); padding-bottom: 6px; }
+        .jd-markdown h2 { font-size: 1rem; color: var(--accent); }
+        .jd-markdown h3 { font-size: 0.92rem; color: var(--info); }
+        .jd-markdown p  { color: var(--text-primary); font-size: 0.88rem; line-height: 1.7; margin: 6px 0; }
         .jd-markdown ul, .jd-markdown ol {
             padding-left: 20px;
             margin: 6px 0 10px;
         }
         .jd-markdown li {
-            color: rgba(255,255,255,0.82);
+            color: var(--text-primary);
             font-size: 0.875rem;
             line-height: 1.7;
             margin-bottom: 4px;
         }
-        .jd-markdown li::marker { color: #6366f1; }
-        .jd-markdown strong { color: #fff; font-weight: 700; }
-        .jd-markdown em     { color: #a5b4fc; font-style: italic; }
-        .jd-markdown hr     { border: none; border-top: 1px solid rgba(255,255,255,0.1); margin: 14px 0; }
+        .jd-markdown li::marker { color: var(--accent); }
+        .jd-markdown strong { color: var(--text-bright); font-weight: 700; }
+        .jd-markdown em     { color: var(--accent); font-style: italic; }
+        .jd-markdown hr     { border: none; border-top: 1px solid var(--border); margin: 14px 0; }
         .jd-markdown code   {
-            background: rgba(99,102,241,0.18);
-            color: #a5b4fc;
+            background: var(--bg-subtle);
+            color: var(--accent);
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 0.82rem;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
         }
         /* ── Status cycling tooltip ─────────────────────────────────── */
         .status-pill.clickable { cursor: pointer; user-select: none; }
@@ -208,8 +210,8 @@
             display: flex;
             gap: 0;
             padding: 0 36px;
-            background: rgba(11, 19, 41, 0.98);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            background: var(--bg-card);
+            border-bottom: 1px solid var(--border);
             flex-shrink: 0;
         }
         .wizard-tab {
@@ -219,7 +221,7 @@
             padding: 14px 22px;
             font-size: 0.85rem;
             font-weight: 700;
-            color: rgba(255,255,255,0.4);
+            color: var(--text-muted);
             cursor: pointer;
             border-bottom: 3px solid transparent;
             transition: all 0.2s ease;
@@ -230,7 +232,8 @@
         .wizard-tab .tab-num {
             width: 24px; height: 24px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.08);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             display: flex; align-items: center; justify-content: center;
             font-size: 0.75rem;
             font-weight: 800;
@@ -238,19 +241,21 @@
             flex-shrink: 0;
         }
         .wizard-tab.active {
-            color: #a5b4fc;
-            border-bottom-color: #6366f1;
+            color: var(--accent);
+            border-bottom-color: var(--accent);
         }
         .wizard-tab.active .tab-num {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-            color: #fff;
-            box-shadow: 0 3px 10px rgba(99,102,241,0.5);
+            background: linear-gradient(135deg, var(--accent), var(--accent-dark, #4f46e5));
+            border-color: transparent;
+            color: #ffffff;
+            box-shadow: 0 3px 10px rgba(99,102,241,0.3);
         }
         .wizard-tab.done .tab-num {
-            background: rgba(16,185,129,0.2);
-            color: #10b981;
+            background: rgba(16,185,129,0.15);
+            border-color: rgba(16,185,129,0.3);
+            color: var(--success, #10b981);
         }
-        .wizard-tab.done { color: rgba(255,255,255,0.55); }
+        .wizard-tab.done { color: var(--text-primary); }
 
         /* ── Weightage Section ──────────────────────────────────────── */
         .weight-section { display: none; }
@@ -274,14 +279,14 @@
             background: linear-gradient(135deg, #6366f1, #4f46e5);
             display: flex; align-items: center; justify-content: center;
             font-size: 1.1rem;
-            color: #fff;
+            color: var(--text-bright);
             flex-shrink: 0;
             box-shadow: 0 4px 14px rgba(99,102,241,0.5);
         }
 
         .weight-field-card {
-            background: rgba(15,23,42,0.6);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             border-radius: 16px;
             padding: 20px 22px;
             margin-bottom: 14px;
@@ -363,15 +368,15 @@
 
         /* Total weight bar */
         .total-weight-bar-wrap {
-            background: rgba(15,23,42,0.7);
-            border: 1px solid rgba(255,255,255,0.1);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             border-radius: 16px;
             padding: 18px 22px;
             margin-top: 20px;
         }
         .total-bar-track {
             height: 10px;
-            background: rgba(255,255,255,0.07);
+            background: var(--border);
             border-radius: 99px;
             margin: 12px 0 8px;
             overflow: hidden;
@@ -475,9 +480,9 @@
 
                     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
                         <!-- Status Filter Only -->
-                        <div style="flex: 1; min-width: 130px; max-width: 200px; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; background: rgba(255,255,255,0.03); display: flex; align-items: center; padding-left: 12px; height: 42px;">
-                            <span style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.45); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS •</span>
-                            <select id="job-filter-status" onchange="onJobFilterChange()" class="input-custom" style="height: 40px; background: transparent; border: none; color: #fff; font-weight: 600; font-size: 0.85rem; padding-left: 6px; flex: 1;">
+                        <div style="flex: 1; min-width: 130px; max-width: 200px; border: 1px solid var(--border); border-radius: 12px; background: var(--bg-subtle); display: flex; align-items: center; padding-left: 12px; height: 42px;">
+                            <span style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); letter-spacing: 0.05em; text-transform: uppercase; white-space: nowrap;">STATUS •</span>
+                            <select id="job-filter-status" onchange="onJobFilterChange()" class="input-custom" style="height: 40px; background: transparent; border: none; color: var(--text-primary); font-weight: 600; font-size: 0.85rem; padding-left: 6px; flex: 1; box-shadow: none;">
                                 <option value="">All Status</option>
                                 <option value="draft">Draft</option>
                                 <option value="active">Active</option>
@@ -497,7 +502,7 @@
                     <div style="width: 64px; height: 64px; border-radius: 50%; background: rgba(99, 102, 241, 0.15); color: #818cf8; display: flex; align-items: center; justify-content: center; font-size: 1.6rem; margin: 0 auto 16px;">
                         <i class="fa-solid fa-briefcase"></i>
                     </div>
-                    <h3 style="font-size: 1.2rem; font-weight: 800; color: #fff; margin: 0;">No Job Vacancies Found</h3>
+                    <h3 style="font-size: 1.2rem; font-weight: 800; color: var(--text-bright); margin: 0;">No Job Vacancies Found</h3>
                 </div>
 
                 <!-- Vacancies Grid -->
@@ -513,15 +518,15 @@
 
     <!-- Create / Edit Job Vacancy Modal -->
     <div class="modal-overlay" id="job-modal">
-        <div class="modal-card" style="width: min(880px, 94vw); padding: 0; background: #0b1329; border: 1px solid rgba(255,255,255,0.18); border-radius: 28px; box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; overflow: hidden;">
+        <div class="modal-card" style="width: min(880px, 94vw); padding: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 28px; box-shadow: 0 25px 60px -10px rgba(0, 0, 0, 0.85); display: flex; flex-direction: column; overflow: hidden;">
             
             <!-- Static Modal Header (Fixed) -->
-            <div class="modal-header" style="padding: clamp(16px, 1.8vw, 22px) clamp(20px, 2.6vw, 36px) 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: rgba(11, 19, 41, 0.98); backdrop-filter: blur(10px); z-index: 10;">
+            <div class="modal-header" style="padding: clamp(16px, 1.8vw, 22px) clamp(20px, 2.6vw, 36px) 0; border-bottom: none; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--bg-card); backdrop-filter: blur(10px); z-index: 10;">
                 <div>
-                    <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff;" id="job-modal-title">Create Job Vacancy</h3>
-                    <p style="font-size: 0.84rem; color: rgba(255,255,255,0.55); margin-top: 2px;" id="job-modal-subtitle">Fill in vacancy specifications then set field weights.</p>
+                    <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--text-bright);" id="job-modal-title">Create Job Vacancy</h3>
+                    <p style="font-size: 0.84rem; color: var(--text-muted); margin-top: 2px;" id="job-modal-subtitle">Fill in vacancy specifications then set field weights.</p>
                 </div>
-                <button type="button" onclick="closeJobModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.8); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: background 0.2s; flex-shrink: 0;">×</button>
+                <button type="button" onclick="closeJobModal()" style="background: var(--bg-subtle); border: 1px solid var(--border); color: var(--text-primary); width: 38px; height: 38px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: background 0.2s; flex-shrink: 0;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='var(--bg-subtle)'">×</button>
             </div>
 
             <!-- Step Tabs -->
@@ -619,22 +624,22 @@
                         <!-- Required Skills Tag Input -->
                         <div class="form-group-custom" style="margin-bottom: 20px;">
                             <label class="label-custom">Required Skills</label>
-                            <div class="tag-input-wrap" id="skills-wrap" style="min-height: 48px; padding: 8px 14px; background: rgba(15, 23, 42, 0.8); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
-                                <input type="text" id="skill-input" placeholder="Type skill and press Enter..." style="background: transparent; border: none; color: #ffffff; outline: none; font-size: 0.9rem; flex: 1; min-width: 160px;" />
+                            <div class="tag-input-wrap" id="skills-wrap" style="min-height: 48px; padding: 8px 14px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                                <input type="text" id="skill-input" placeholder="Type skill and press Enter..." style="background: transparent; border: none; color: var(--text-bright); outline: none; font-size: 0.9rem; flex: 1; min-width: 160px;" />
                             </div>
                         </div>
 
                         <!-- AI JD Generator & Description Box -->
                         <div class="jd-generator-box">
                             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
-                                <label class="label-custom" style="color: #a5b4fc; margin-bottom: 0; font-size: 0.9rem;">
-                                    <span class="ai-sparkle"><i class="fa-solid fa-wand-magic-sparkles"></i></span> Job Description <span style="color:#ef4444;">*</span>
+                                <label class="label-custom" style="color: var(--accent); margin-bottom: 0; font-size: 0.9rem;">
+                                    <span class="ai-sparkle"><i class="fa-solid fa-wand-magic-sparkles"></i></span> Job Description <span style="color:var(--danger);">*</span>
                                 </label>
-                                <button type="button" id="btn-generate-jd" onclick="generateAIJobDescription()" style="background: linear-gradient(90deg, rgba(99, 102, 241, 0.25), rgba(79, 70, 229, 0.25)); border: 1px solid rgba(99, 102, 241, 0.45); color: #a5b4fc; padding: 8px 16px; border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease;">
+                                <button type="button" id="btn-generate-jd" onclick="generateAIJobDescription()" style="background: linear-gradient(90deg, rgba(99, 102, 241, 0.15), rgba(79, 70, 229, 0.15)); border: 1px solid rgba(99, 102, 241, 0.45); color: var(--accent); padding: 8px 16px; border-radius: 10px; font-size: 0.82rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s ease;">
                                     <i class="fa-solid fa-wand-magic-sparkles"></i> Auto-Generate with AI
                                 </button>
                             </div>
-                            <textarea id="job-desc" class="input-custom" style="min-height: 200px; height: auto; padding: 14px; font-family: inherit; font-size: 0.9rem; line-height: 1.6; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 12px; color: #ffffff;" placeholder="Enter comprehensive job description or use AI auto-generate..."></textarea>
+                            <textarea id="job-desc" class="input-custom" style="min-height: 200px; height: auto; padding: 14px; font-family: inherit; font-size: 0.9rem; line-height: 1.6; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px; color: var(--text-bright);" placeholder="Enter comprehensive job description or use AI auto-generate..."></textarea>
                         </div>
 
                         <!-- Status Selection -->
@@ -658,8 +663,8 @@
                                 <i class="fa-solid fa-sliders"></i>
                             </div>
                             <div>
-                                <div style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 3px;">Set Candidate Matching Weights</div>
-                                <div style="font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.5;">Adjust how much each field influences AI candidate matching. Higher weight = stronger match priority.</div>
+                                <div style="font-size: 0.95rem; font-weight: 800; color: var(--text-bright); margin-bottom: 3px;">Set Candidate Matching Weights</div>
+                                <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Adjust how much each field influences AI candidate matching. Higher weight = stronger match priority.</div>
                             </div>
                         </div>
 
@@ -671,8 +676,8 @@
                                         <i class="fa-solid fa-location-dot"></i>
                                     </div>
                                     <div>
-                                        <div style="font-size: 0.88rem; font-weight: 800; color: #e2e8f0;">Location</div>
-                                        <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">Geographical match priority</div>
+                                        <div style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary);">Location</div>
+                                        <div style="font-size: 0.74rem; color: var(--text-muted);">Geographical match priority</div>
                                     </div>
                                 </div>
                                 <div class="weight-value-badge" id="badge-location">20%</div>
@@ -682,8 +687,8 @@
                                 style="background: linear-gradient(to right, #6366f1 20%, rgba(255,255,255,0.12) 20%);"
                                 oninput="onWeightChange('location', this.value)" />
                             <div style="display:flex; justify-content:space-between; margin-top:6px;">
-                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Low</span>
-                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">High</span>
+                                <span style="font-size:0.7rem; color:var(--text-muted);">Low</span>
+                                <span style="font-size:0.7rem; color:var(--text-muted);">High</span>
                             </div>
                         </div>
 
@@ -695,8 +700,8 @@
                                         <i class="fa-solid fa-hourglass-half"></i>
                                     </div>
                                     <div>
-                                        <div style="font-size: 0.88rem; font-weight: 800; color: #e2e8f0;">Experience Required</div>
-                                        <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">Years of relevant experience</div>
+                                        <div style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary);">Experience Required</div>
+                                        <div style="font-size: 0.74rem; color: var(--text-muted);">Years of relevant experience</div>
                                     </div>
                                 </div>
                                 <div class="weight-value-badge" id="badge-experience" style="border-color: rgba(251,191,36,0.35); color: #fbbf24;">30%</div>
@@ -706,8 +711,8 @@
                                 style="background: linear-gradient(to right, #fbbf24 30%, rgba(255,255,255,0.12) 30%);"
                                 oninput="onWeightChange('experience', this.value)" />
                             <div style="display:flex; justify-content:space-between; margin-top:6px;">
-                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Low</span>
-                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">High</span>
+                                <span style="font-size:0.7rem; color:var(--text-muted);">Low</span>
+                                <span style="font-size:0.7rem; color:var(--text-muted);">High</span>
                             </div>
                         </div>
 
@@ -719,8 +724,8 @@
                                         <i class="fa-solid fa-graduation-cap"></i>
                                     </div>
                                     <div>
-                                        <div style="font-size: 0.88rem; font-weight: 800; color: #e2e8f0;">Qualification</div>
-                                        <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">Educational background & degree</div>
+                                        <div style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary);">Qualification</div>
+                                        <div style="font-size: 0.74rem; color: var(--text-muted);">Educational background & degree</div>
                                     </div>
                                 </div>
                                 <div class="weight-value-badge" id="badge-qualification" style="border-color: rgba(165,180,252,0.35); color: #a5b4fc;">25%</div>
@@ -730,8 +735,8 @@
                                 style="background: linear-gradient(to right, #a5b4fc 25%, rgba(255,255,255,0.12) 25%);"
                                 oninput="onWeightChange('qualification', this.value)" />
                             <div style="display:flex; justify-content:space-between; margin-top:6px;">
-                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Low</span>
-                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">High</span>
+                                <span style="font-size:0.7rem; color:var(--text-muted);">Low</span>
+                                <span style="font-size:0.7rem; color:var(--text-muted);">High</span>
                             </div>
                         </div>
 
@@ -743,8 +748,8 @@
                                         <i class="fa-solid fa-code"></i>
                                     </div>
                                     <div>
-                                        <div style="font-size: 0.88rem; font-weight: 800; color: #e2e8f0;">Skills</div>
-                                        <div style="font-size: 0.74rem; color: rgba(255,255,255,0.45);">Technical & soft skills match</div>
+                                        <div style="font-size: 0.88rem; font-weight: 800; color: var(--text-primary);">Skills</div>
+                                        <div style="font-size: 0.74rem; color: var(--text-muted);">Technical & soft skills match</div>
                                     </div>
                                 </div>
                                 <div class="weight-value-badge" id="badge-skills" style="border-color: rgba(16,185,129,0.35); color: #10b981;">25%</div>
@@ -754,21 +759,21 @@
                                 style="background: linear-gradient(to right, #10b981 25%, rgba(255,255,255,0.12) 25%);"
                                 oninput="onWeightChange('skills', this.value)" />
                             <div style="display:flex; justify-content:space-between; margin-top:6px;">
-                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">Low</span>
-                                <span style="font-size:0.7rem; color:rgba(255,255,255,0.3);">High</span>
+                                <span style="font-size:0.7rem; color:var(--text-muted);">Low</span>
+                                <span style="font-size:0.7rem; color:var(--text-muted);">High</span>
                             </div>
                         </div>
 
                         <!-- Total Weight Summary Bar -->
                         <div class="total-weight-bar-wrap">
                             <div style="display:flex; align-items:center; justify-content:space-between;">
-                                <div style="font-size:0.84rem; font-weight:800; color:#e2e8f0;">
+                                <div style="font-size:0.84rem; font-weight:800; color:var(--text-primary);">
                                     <i class="fa-solid fa-chart-pie" style="color:#6366f1; margin-right:8px;"></i>
                                     Total Weight
                                 </div>
                                 <div style="display:flex; align-items:center; gap:10px;">
-                                    <span id="total-weight-pct" style="font-size:1.1rem; font-weight:900; color:#fff;">100%</span>
-                                    <button type="button" onclick="resetWeights()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.14); color: rgba(255,255,255,0.6); padding: 5px 12px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.12)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                                    <span id="total-weight-pct" style="font-size:1.1rem; font-weight:900; color:var(--text-bright);">100%</span>
+                                    <button type="button" onclick="resetWeights()" style="background: var(--bg-card); border: 1px solid var(--border); color: var(--text-muted); padding: 5px 12px; border-radius: 8px; font-size: 0.76rem; font-weight: 700; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='var(--bg-card)'">
                                         <i class="fa-solid fa-rotate-left" style="margin-right:4px;"></i> Reset
                                     </button>
                                 </div>
@@ -776,7 +781,7 @@
                             <div class="total-bar-track">
                                 <div class="total-bar-fill" id="total-bar-fill" style="width:100%; background: linear-gradient(90deg, #6366f1, #10b981);"></div>
                             </div>
-                            <div id="total-weight-hint" style="font-size: 0.78rem; color: rgba(255,255,255,0.45); text-align:center;">Weights above 100% are allowed — they are normalized during AI matching.</div>
+                            <div id="total-weight-hint" style="font-size: 0.78rem; color: var(--text-muted); text-align:center;">Weights above 100% are allowed — they are normalized during AI matching.</div>
                         </div>
 
                     </div><!-- /step2-content -->
@@ -790,13 +795,13 @@
                                 <i class="fa-solid fa-layer-group"></i>
                             </div>
                             <div>
-                                <div style="font-size: 0.95rem; font-weight: 800; color: #fff; margin-bottom: 3px;">Configure Interview Rounds</div>
-                                <div style="font-size: 0.82rem; color: rgba(255,255,255,0.55); line-height: 1.5;">Enter the number of interview rounds required for this job vacancy. The corresponding round sections will be created automatically.</div>
+                                <div style="font-size: 0.95rem; font-weight: 800; color: var(--text-bright); margin-bottom: 3px;">Configure Interview Rounds</div>
+                                <div style="font-size: 0.82rem; color: var(--text-muted); line-height: 1.5;">Enter the number of interview rounds required for this job vacancy. The corresponding round sections will be created automatically.</div>
                             </div>
                         </div>
 
                         <!-- Number of Rounds Input Card -->
-                        <div class="weight-field-card" style="margin-bottom: 22px; padding: 18px 22px; background: rgba(15,23,42,0.8);">
+                        <div class="weight-field-card" style="margin-bottom: 22px; padding: 18px 22px; background: var(--bg-subtle);">
                             <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;">
                                 <label class="label-custom" style="margin-bottom: 0; font-size: 0.9rem; flex: 1; min-width: 200px;">
                                     <i class="fa-solid fa-list-ol" style="color: #c084fc; margin-right: 8px;"></i> Number of Interview Rounds <span style="color:#ef4444;">*</span>
@@ -818,7 +823,7 @@
             </div>
 
             <!-- Static Modal Footer (Fixed) -->
-            <div class="modal-footer" style="padding: clamp(14px, 1.5vw, 18px) clamp(20px, 2.6vw, 36px); border-top: 1px solid rgba(255, 255, 255, 0.1); display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-shrink: 0; background: rgba(11, 19, 41, 0.95); backdrop-filter: blur(10px); z-index: 10;">
+            <div class="modal-footer" style="padding: clamp(14px, 1.5vw, 18px) clamp(20px, 2.6vw, 36px); border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; gap: 14px; flex-shrink: 0; background: var(--bg-card); backdrop-filter: blur(10px); z-index: 10;">
                 <!-- Left side: Cancel / Back -->
                 <div style="display:flex; gap:10px;">
                     <button type="button" onclick="closeJobModal()" id="modal-cancel-btn" style="padding: 11px 22px; border-radius: 12px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text-primary); cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
@@ -841,10 +846,10 @@
 
     <!-- Job Details Modal (View Only) -->
     <div class="modal-overlay" id="view-job-modal" onclick="handleViewModalOverlayClick(event)">
-        <div class="modal-card" id="view-job-modal-card" style="width: min(760px, 94vw); padding: 0; background: #0b1329; border: 1px solid rgba(255,255,255,0.15); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 70px -10px rgba(0,0,0,0.9);">
+        <div class="modal-card" id="view-job-modal-card" style="width: min(760px, 94vw); padding: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 30px 70px -10px rgba(0,0,0,0.9);">
 
             <!-- Modal Header -->
-            <div style="padding: 24px 28px 20px; border-bottom: 1px solid rgba(255,255,255,0.08); display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; background: rgba(11,19,41,0.98);">
+            <div style="padding: 24px 28px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: flex-start; justify-content: space-between; flex-shrink: 0; background: var(--bg-card);">
                 <div style="flex: 1; min-width: 0;">
                     <!-- Status + Action Buttons Row -->
                     <div style="display: flex; align-items: center; gap: 10px; margin-bottom: 12px; flex-wrap: wrap;">
@@ -854,11 +859,11 @@
                         <span id="vj-openings-badge" style="font-size: 0.72rem; font-weight: 700; padding: 3px 10px; border-radius: 6px; background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.25);"></span>
                     </div>
                     <!-- Job Title -->
-                    <h2 style="font-size: 1.55rem; font-weight: 900; color: #fff; margin: 0 0 5px; line-height: 1.25;" id="vj-title">Job Title</h2>
-                    <div style="font-size: 0.84rem; color: rgba(255,255,255,0.55);" id="vj-sub">Department • Branch</div>
+                    <h2 style="font-size: 1.55rem; font-weight: 900; color: var(--text-bright); margin: 0 0 5px; line-height: 1.25;" id="vj-title">Job Title</h2>
+                    <div style="font-size: 0.84rem; color: var(--text-muted);" id="vj-sub">Department • Branch</div>
                 </div>
                 <!-- X Close -->
-                <button type="button" onclick="closeViewJobModal()" style="margin-left: 16px; flex-shrink: 0; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">×</button>
+                <button type="button" onclick="closeViewJobModal()" style="margin-left: 16px; flex-shrink: 0; background: var(--bg-subtle); border: 1px solid var(--border); color: var(--text-primary); width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer; transition: background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.1)'" onmouseout="this.style.background='var(--bg-subtle)'">×</button>
             </div>
 
             <!-- Scrollable Body -->
@@ -866,39 +871,39 @@
 
                 <!-- Info Grid -->
                 <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-bottom: 22px;">
-                    <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;">
-                        <div style="font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-location-dot" style="margin-right:5px;"></i>Location</div>
-                        <div style="font-size: 0.9rem; font-weight: 700; color: #fff;" id="vj-location">—</div>
+                    <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px;">
+                        <div style="font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-location-dot" style="margin-right:5px;"></i>Location</div>
+                        <div style="font-size: 0.9rem; font-weight: 700; color: var(--text-bright);" id="vj-location">—</div>
                     </div>
-                    <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;">
-                        <div style="font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-hourglass-half" style="margin-right:5px;"></i>Experience</div>
+                    <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px;">
+                        <div style="font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-hourglass-half" style="margin-right:5px;"></i>Experience</div>
                         <div style="font-size: 0.9rem; font-weight: 700; color: #fbbf24;" id="vj-exp">—</div>
                     </div>
-                    <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;">
-                        <div style="font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-graduation-cap" style="margin-right:5px;"></i>Qualification</div>
+                    <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px;">
+                        <div style="font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-graduation-cap" style="margin-right:5px;"></i>Qualification</div>
                         <div style="font-size: 0.9rem; font-weight: 700; color: #a5b4fc;" id="vj-qualification">—</div>
                     </div>
-                    <div style="background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 12px 16px;">
-                        <div style="font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-money-bill-wave" style="margin-right:5px;"></i>Salary</div>
+                    <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 12px; padding: 12px 16px;">
+                        <div style="font-size: 0.68rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 5px;"><i class="fa-solid fa-money-bill-wave" style="margin-right:5px;"></i>Salary</div>
                         <div style="font-size: 0.9rem; font-weight: 700; color: #10b981;" id="vj-salary">—</div>
                     </div>
                 </div>
 
                 <!-- Required Skills -->
                 <div style="margin-bottom: 22px;">
-                    <div style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;">Required Skills</div>
+                    <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 10px;">Required Skills</div>
                     <div id="vj-skills" style="display: flex; flex-wrap: wrap; gap: 7px;"></div>
                 </div>
 
                 <!-- Job Description (Markdown Rendered) -->
                 <div style="margin-bottom: 22px;">
-                    <div style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;">Job Description</div>
-                    <div id="vj-desc" class="jd-markdown" style="background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.08); border-radius: 14px; padding: 20px 22px; line-height: 1.7;"></div>
+                    <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;">Job Description</div>
+                    <div id="vj-desc" class="jd-markdown" style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 14px; padding: 20px 22px; line-height: 1.7;"></div>
                 </div>
 
                 <!-- Configured Interview Rounds List -->
                 <div>
-                    <div style="font-size: 0.72rem; font-weight: 700; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;"><i class="fa-solid fa-layer-group" style="color:#c084fc; margin-right:6px;"></i>Configured Interview Rounds</div>
+                    <div style="font-size: 0.72rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px;"><i class="fa-solid fa-layer-group" style="color:#c084fc; margin-right:6px;"></i>Configured Interview Rounds</div>
                     <div id="vj-rounds-list" style="display: flex; flex-direction: column; gap: 10px;"></div>
                 </div>
             </div>
@@ -907,7 +912,7 @@
 
     <!-- Delete Job Confirmation Modal -->
     <div class="modal-overlay" id="delete-job-modal">
-        <div class="modal-card" style="width: min(420px, 92vw); text-align: center; padding: clamp(22px, 2.4vw, 32px) clamp(18px, 2vw, 24px); background: #0f172a; border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);">
+        <div class="modal-card" style="width: min(420px, 92vw); text-align: center; padding: clamp(22px, 2.4vw, 32px) clamp(18px, 2vw, 24px); background: var(--bg-card); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85);">
             <div style="width: 60px; height: 60px; border-radius: 50%; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin: 0 auto 18px;">
                 <i class="fa-solid fa-trash-can"></i>
             </div>
@@ -915,7 +920,7 @@
             <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5;">Are you sure you want to delete this job vacancy? All linked records will be affected.</p>
             <div style="display: flex; gap: 12px; justify-content: center;">
                 <button type="button" onclick="closeDeleteJobModal()" style="padding: 10px 22px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text-primary); cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
-                <button type="button" onclick="confirmDeleteJobAction()" id="confirm-delete-job-btn" style="padding: 10px 24px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Delete Vacancy</button>
+                <button type="button" onclick="confirmDeleteJobAction()" id="confirm-delete-job-btn" style="padding: 10px 24px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: var(--text-bright); cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Delete Vacancy</button>
             </div>
         </div>
     </div>
@@ -930,7 +935,7 @@
             <p style="font-size: 0.88rem; color: var(--text-muted); margin-bottom: 24px; line-height: 1.5;">Are you sure you want to log out of AI HR Assistant?</p>
             <div style="display: flex; gap: 12px; justify-content: center;">
                 <button type="button" onclick="closeLogoutModal()" style="padding: 10px 22px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-subtle); color: var(--text-primary); cursor: pointer; font-weight: 600; font-size: 0.9rem;">Cancel</button>
-                <button type="button" onclick="confirmLogoutAction()" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: #fff; cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Logout</button>
+                <button type="button" onclick="confirmLogoutAction()" style="padding: 10px 22px; border-radius: 10px; border: none; background: linear-gradient(90deg, #ef4444, #dc2626); color: var(--text-bright); cursor: pointer; font-weight: 700; font-size: 0.9rem; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.35);">Logout</button>
             </div>
         </div>
     </div>

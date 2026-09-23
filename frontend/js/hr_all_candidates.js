@@ -397,12 +397,12 @@ function openViewModal(candidateId) {
     const skills = Array.isArray(c.skills) ? c.skills : (c.skills || '').split(',').filter(Boolean);
     skillsWrap.innerHTML = skills.length
         ? skills.map(s => `<span class="skill-chip">${escapeHtml(s.trim())}</span>`).join('')
-        : '<span style="color:rgba(255,255,255,0.3);font-size:0.8rem;">No skills extracted</span>';
+        : '<span style="color:var(--text-muted);font-size:0.8rem;">No skills extracted</span>';
 
     // Match explanation & reason
     const matchEl = document.getElementById('vm-match-explain');
     matchEl.innerHTML = c.match_explanation
-        ? `<strong style="color:#a5b4fc;">${c.match_percentage}%</strong><br><span style="margin-top:4px;display:block;color:rgba(255,255,255,0.75);">${escapeHtml(c.match_explanation)}</span>`
+        ? `<strong style="color:var(--accent);">${c.match_percentage}%</strong><br><span style="margin-top:4px;display:block;color:var(--text-muted);">${escapeHtml(c.match_explanation)}</span>`
         : '—';
 
     // Download link

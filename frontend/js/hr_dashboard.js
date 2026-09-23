@@ -42,6 +42,9 @@ async function loadDashboardData(orgId) {
 
         // Initialize Candidate Status Chart
         initStatusChart(data.status_distribution || {});
+        
+        // Initialize Top Jobs Chart
+        initTopJobsChart(data.recent_jobs || []);
 
         // Populate Recent Jobs
         populateRecentJobs(data.recent_jobs || []);
@@ -92,10 +95,10 @@ function initStatusChart(statusData) {
                 legend: {
                     position: 'bottom',
                     labels: {
-                        color: '#cbd5e1',
+                        color: '#94a3b8',
                         usePointStyle: true,
                         padding: 20,
-                        font: { family: "'Inter', sans-serif", size: 12 }
+                        font: { family: "'Inter', sans-serif", size: 12, weight: '600' }
                     }
                 },
                 tooltip: {
@@ -106,6 +109,79 @@ function initStatusChart(statusData) {
                     borderWidth: 1,
                     padding: 12,
                     cornerRadius: 8
+                }
+            }
+        }
+    });
+}
+
+let topJobsChartInstance = null;
+
+function initTopJobsChart(jobs) {
+    const ctx = document.getElementById('topJobsChart');
+    if (!ctx) return;
+
+    if (topJobsChartInstance) {
+        topJobsChartInstance.destroy();
+    }
+
+    // Sort jobs by candidate count descending and take top 5
+    const sortedJobs = [...jobs].sort((a, b) => (b.candidate_count || 0) - (a.candidate_count || 0)).slice(0, 5);
+    
+    const labels = sortedJobs.length > 0 ? sortedJobs.map(j => j.title) : ['No Jobs'];
+    const dataValues = sortedJobs.length > 0 ? sortedJobs.map(j => j.candidate_count || 0) : [0];
+
+    topJobsChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Candidates',
+                data: dataValues,
+                backgroundColor: 'rgba(249, 115, 22, 0.8)', // Primary Orange
+                borderColor: '#ea580c',
+                borderWidth: 1,
+                borderRadius: 4,
+                barThickness: 'flex',
+                maxBarThickness: 32
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: { display: false },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#fff',
+                    bodyColor: '#cbd5e1',
+                    padding: 12,
+                    cornerRadius: 8
+                }
+            },
+            scales: {
+                x: {
+                    ticks: {
+                        color: '#94a3b8',
+                        font: { family: "'Inter', sans-serif", size: 11, weight: '600' },
+                        callback: function(value) {
+                            // Truncate long labels
+                            let label = this.getLabelForValue(value);
+                            return label.length > 12 ? label.substr(0, 10) + '...' : label;
+                        }
+                    },
+                    grid: { display: false }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        color: '#94a3b8',
+                        font: { family: "'Inter', sans-serif", size: 11, weight: '600' },
+                        precision: 0
+                    },
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.15)'
+                    }
                 }
             }
         }

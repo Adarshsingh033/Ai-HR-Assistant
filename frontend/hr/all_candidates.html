@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -40,7 +40,7 @@
 
         .stat-label {
             font-size: 0.72rem;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 0.05em;
@@ -49,7 +49,7 @@
         .stat-value {
             font-size: clamp(1.2rem, 1.7vw, 1.55rem);
             font-weight: 900;
-            color: #fff;
+            color: var(--text-bright);
             line-height: 1.1;
         }
 
@@ -72,13 +72,22 @@
         .table-title {
             font-size: 1rem;
             font-weight: 800;
-            color: #fff;
+            color: var(--text-bright);
         }
 
         .table-subtitle {
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--text-muted);
             margin-top: 2px;
+        }
+
+        
+        .table-wrap {
+            overflow-x: auto;
+            width: 100%;
+        }
+        .candidates-table {
+            min-width: 800px;
         }
 
         .candidates-table {
@@ -87,14 +96,14 @@
         }
 
         .candidates-table thead th {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--bg-subtle);
             text-align: left;
             padding: clamp(11px, 1.2vw, 14px) clamp(10px, 1.3vw, 18px);
             font-size: 0.72rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: rgba(255, 255, 255, 0.45);
+            color: var(--text-muted);
             border-bottom: 1px solid var(--border);
             white-space: nowrap;
         }
@@ -110,7 +119,7 @@
         }
 
         .candidates-table tbody tr {
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--bg-subtle);
             transition: background 0.15s;
         }
 
@@ -119,13 +128,13 @@
         }
 
         .candidates-table tbody tr:hover {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--bg-subtle);
         }
 
         .candidates-table tbody td {
             padding: clamp(11px, 1.2vw, 14px) clamp(10px, 1.3vw, 18px);
             font-size: 0.83rem;
-            color: rgba(255, 255, 255, 0.78);
+            color: var(--text-primary);
             vertical-align: middle;
         }
 
@@ -155,19 +164,19 @@
             justify-content: center;
             font-size: 0.9rem;
             font-weight: 800;
-            color: #fff;
+            color: #ffffff;
             flex-shrink: 0;
         }
 
         .cand-name {
             font-size: 0.88rem;
             font-weight: 700;
-            color: #e2e8f0;
+            color: var(--text-bright);
         }
 
         .cand-file {
             font-size: 0.7rem;
-            color: rgba(255, 255, 255, 0.35);
+            color: var(--text-muted);
             margin-top: 1px;
         }
 
@@ -185,19 +194,19 @@
 
         .match-high {
             background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
+            color: var(--success);
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
 
         .match-medium {
             background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
+            color: var(--warning);
             border: 1px solid rgba(245, 158, 11, 0.3);
         }
 
         .match-low {
             background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
+            color: var(--danger);
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
 
@@ -211,28 +220,28 @@
             border-radius: 50%;
             font-size: 0.82rem;
             font-weight: 900;
-            color: #fff;
+            color: var(--text-bright);
             background: linear-gradient(135deg, rgba(99, 102, 241, 0.25), rgba(79, 70, 229, 0.35));
             border: 1px solid rgba(99, 102, 241, 0.4);
         }
 
         .rank-badge.top-1 {
             background: linear-gradient(135deg, #f59e0b, #d97706);
-            border-color: #fbbf24;
-            color: #fff;
+            border-color: var(--warning);
+            color: var(--text-bright);
             box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
         }
 
         .rank-badge.top-2 {
             background: linear-gradient(135deg, #94a3b8, #64748b);
             border-color: #cbd5e1;
-            color: #fff;
+            color: var(--text-bright);
         }
 
         .rank-badge.top-3 {
             background: linear-gradient(135deg, #b45309, #78350f);
             border-color: #f59e0b;
-            color: #fff;
+            color: var(--text-bright);
         }
 
         /* ── Toggle Switch for Contacted ── */
@@ -257,10 +266,10 @@
             left: 0;
             right: 0;
             bottom: 0;
-            background-color: rgba(255, 255, 255, 0.12);
+            background-color: var(--border);
             transition: .25s;
             border-radius: 24px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
+            border: 1px solid var(--border);
         }
 
         .toggle-slider:before {
@@ -270,19 +279,19 @@
             width: 17px;
             left: 2px;
             bottom: 2px;
-            background-color: #cbd5e1;
+            background-color: #ffffff;
             transition: .25s;
             border-radius: 50%;
         }
 
         input:checked+.toggle-slider {
             background-color: #10b981;
-            border-color: #34d399;
+            border-color: var(--success);
         }
 
         input:checked+.toggle-slider:before {
             transform: translateX(19px);
-            background-color: #fff;
+            background-color: #ffffff;
         }
 
         /* ── Action Three-Dot Dropdown ── */
@@ -291,8 +300,8 @@
             height: 32px;
             border-radius: 8px;
             border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.04);
-            color: rgba(255, 255, 255, 0.6);
+            background: var(--bg-subtle);
+            color: var(--text-muted);
             cursor: pointer;
             display: inline-flex;
             align-items: center;
@@ -302,17 +311,17 @@
         }
 
         .action-dots-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border-color: rgba(255, 255, 255, 0.25);
+            background: var(--border);
+            color: var(--text-bright);
+            border-color: var(--text-muted);
         }
 
         .action-dropdown {
             position: absolute;
             right: 0;
             top: 38px;
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: var(--bg-card-hover);
+            border: 1px solid var(--border);
             border-radius: 12px;
             padding: 6px 0;
             min-width: 150px;
@@ -334,23 +343,23 @@
             padding: 8px 14px;
             font-size: 0.82rem;
             font-weight: 600;
-            color: #e2e8f0;
+            color: var(--text-bright);
             cursor: pointer;
             transition: background 0.15s;
         }
 
         .action-dropdown-item:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--border);
         }
 
         .action-dropdown-item.danger:hover {
             background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
+            color: var(--danger);
         }
 
         .action-dropdown-divider {
             height: 1px;
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--border);
             margin: 4px 0;
         }
 
@@ -358,7 +367,7 @@
         .table-empty {
             text-align: center;
             padding: 60px 20px;
-            color: rgba(255, 255, 255, 0.35);
+            color: var(--text-muted);
             font-size: 0.88rem;
         }
 
@@ -370,8 +379,8 @@
         }
 
         .modal-xl {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 22px;
             width: min(860px, 94vw);
             max-height: min(92vh, calc(100vh - 32px));
@@ -384,7 +393,7 @@
         .modal-fixed-top {
             flex-shrink: 0;
             padding-bottom: 14px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid var(--border);
             margin-bottom: 14px;
         }
 
@@ -403,12 +412,12 @@
         }
 
         .modal-details-scroll::-webkit-scrollbar-track {
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--bg-subtle);
             border-radius: 3px;
         }
 
         .modal-details-scroll::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2);
+            background: var(--border);
             border-radius: 3px;
         }
 
@@ -420,14 +429,14 @@
             flex-shrink: 0;
             margin-top: 14px;
             padding-top: 12px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: flex-end;
         }
 
         .modal-lg {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 22px;
             width: min(860px, 94vw);
             max-height: min(92vh, calc(100vh - 32px));
@@ -448,9 +457,9 @@
             width: 34px;
             height: 34px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.06);
-            color: rgba(255, 255, 255, 0.7);
+            border: 1px solid var(--border);
+            background: var(--bg-subtle);
+            color: var(--text-primary);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -463,7 +472,7 @@
         .modal-close-btn:hover {
             background: rgba(239, 68, 68, 0.2);
             border-color: rgba(239, 68, 68, 0.5);
-            color: #f87171;
+            color: var(--danger);
         }
 
         /* Profile header */
@@ -483,19 +492,19 @@
             justify-content: center;
             font-size: 1.4rem;
             font-weight: 900;
-            color: #fff;
+            color: var(--text-bright);
             flex-shrink: 0;
         }
 
         .profile-name {
             font-size: 1.3rem;
             font-weight: 900;
-            color: #fff;
+            color: var(--text-bright);
         }
 
         .profile-sub {
             font-size: 0.82rem;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
             margin-top: 3px;
         }
 
@@ -505,7 +514,7 @@
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.07em;
-            color: rgba(255, 255, 255, 0.35);
+            color: var(--text-muted);
             margin-bottom: 10px;
             margin-top: 22px;
         }
@@ -518,15 +527,15 @@
         }
 
         .info-item {
-            background: rgba(255, 255, 255, 0.04);
-            border: 1px solid rgba(255, 255, 255, 0.07);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             border-radius: 10px;
             padding: 10px 14px;
         }
 
         .info-item .lbl {
             font-size: 0.66rem;
-            color: rgba(255, 255, 255, 0.38);
+            color: var(--text-muted);
             text-transform: uppercase;
             font-weight: 700;
             letter-spacing: 0.05em;
@@ -535,13 +544,13 @@
 
         .info-item .val {
             font-size: 0.84rem;
-            color: #e2e8f0;
+            color: var(--text-bright);
             font-weight: 600;
             word-break: break-word;
         }
 
         .info-item .val a {
-            color: #818cf8;
+            color: var(--accent);
             text-decoration: none;
         }
 
@@ -563,18 +572,18 @@
             padding: 4px 11px;
             border-radius: 99px;
             background: rgba(99, 102, 241, 0.15);
-            color: #a5b4fc;
+            color: var(--accent);
             border: 1px solid rgba(99, 102, 241, 0.3);
         }
 
         /* Resume text preview */
         .resume-preview {
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             border-radius: 12px;
             padding: 18px 20px;
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.65);
+            color: var(--text-muted);
             line-height: 1.7;
             white-space: pre-wrap;
             word-break: break-word;
@@ -603,16 +612,16 @@
         .form-label {
             font-size: 0.72rem;
             font-weight: 700;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
             text-transform: uppercase;
             letter-spacing: 0.04em;
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             border-radius: 10px;
-            color: #fff;
+            color: var(--text-bright);
             font-size: 0.85rem;
             font-family: 'Inter', sans-serif;
             padding: 10px 13px;
@@ -627,7 +636,7 @@
         }
 
         .form-control::placeholder {
-            color: rgba(255, 255, 255, 0.25);
+            color: var(--text-muted);
         }
 
         textarea.form-control {
@@ -636,7 +645,7 @@
         }
 
         select.form-control option {
-            background: #1e293b;
+            background: var(--bg-card-hover);
         }
 
         /* Match explanation */
@@ -646,14 +655,14 @@
             border-radius: 10px;
             padding: 14px 16px;
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.65);
+            color: var(--text-muted);
             line-height: 1.6;
         }
 
         /* Delete confirm */
         .del-modal {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 22px;
             width: min(400px, 92vw);
             padding: clamp(24px, 3vw, 36px) clamp(20px, 2.2vw, 28px);
@@ -669,7 +678,7 @@
 
         .skeleton-row {
             height: 56px;
-            background: linear-gradient(90deg, rgba(255, 255, 255, 0.04) 25%, rgba(255, 255, 255, 0.07) 50%, rgba(255, 255, 255, 0.04) 75%);
+            background: linear-gradient(90deg, var(--bg-subtle) 25%, var(--border) 50%, var(--bg-subtle) 75%);
             background-size: 200% 100%;
             animation: shimmer 1.4s infinite;
             border-radius: 8px;
@@ -762,7 +771,7 @@
                 <!-- Stats strip -->
                 <div class="stats-strip">
                     <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(99,102,241,0.15);color:#818cf8;">
+                        <div class="stat-icon" style="background:rgba(99,102,241,0.15);color:var(--accent);">
                             <i class="fa-solid fa-users"></i>
                         </div>
                         <div>
@@ -771,7 +780,7 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(16,185,129,0.15);color:#34d399;">
+                        <div class="stat-icon" style="background:rgba(16,185,129,0.15);color:var(--success);">
                             <i class="fa-solid fa-calendar-days"></i>
                         </div>
                         <div>
@@ -780,7 +789,7 @@
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon" style="background:rgba(59,130,246,0.15);color:#60a5fa;">
+                        <div class="stat-icon" style="background:rgba(59,130,246,0.15);color:var(--info);">
                             <i class="fa-solid fa-address-book"></i>
                         </div>
                         <div>
@@ -928,7 +937,7 @@
 
                 <div class="sec-label">Original Uploaded Resume Preview</div>
                 <div id="vm-preview-wrap"
-                    style="margin-top:8px;border:1px solid rgba(255,255,255,0.1);border-radius:12px;overflow:hidden;background:#0f172a;">
+                    style="margin-top:8px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg-subtle);">
                     <iframe id="vm-preview-frame"
                         style="width:100%;height:clamp(260px, 42vh, 420px);border:none;display:none;background:#fff;"></iframe>
                     <div class="resume-preview" id="vm-resume-text" style="display:none;">No resume text available.
@@ -939,7 +948,7 @@
             <!-- FIXED BOTTOM ACTIONS -->
             <div class="modal-bottom-actions">
                 <a id="vm-download-link" href="#" download
-                    style="text-decoration:none;display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);color:#a5b4fc;border-radius:10px;font-size:0.82rem;font-weight:700;">
+                    style="text-decoration:none;display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(99,102,241,0.2);border:1px solid rgba(99,102,241,0.4);color:var(--accent);border-radius:10px;font-size:0.82rem;font-weight:700;">
                     <i class="fa-solid fa-download"></i> Download Resume
                 </a>
             </div>
@@ -957,8 +966,8 @@
                 <div class="modal-fixed-top">
                     <div class="modal-top">
                         <div>
-                            <div style="font-size:1.2rem;font-weight:900;color:#fff;">Edit Candidate</div>
-                            <div style="font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:3px;">Update extracted
+                            <div style="font-size:1.2rem;font-weight:900;color:var(--text-bright);">Edit Candidate</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:3px;">Update extracted
                                 resume information</div>
                         </div>
                         <button type="button" class="modal-close-btn" onclick="closeModal('edit-modal')">
@@ -1024,11 +1033,11 @@
                 <!-- FIXED BOTTOM ACTIONS -->
                 <div class="modal-bottom-actions" style="gap:10px;">
                     <button type="button" onclick="closeModal('edit-modal')"
-                        style="padding:10px 22px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:700;">
+                        style="padding:10px 22px;background:var(--bg-subtle);border:1px solid var(--border);color:var(--text-primary);border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:700;">
                         Cancel
                     </button>
                     <button type="submit" id="edit-save-btn"
-                        style="padding:10px 28px;background:linear-gradient(90deg,#6366f1,#4f46e5);border:none;color:#fff;border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:800;display:flex;align-items:center;gap:8px;">
+                        style="padding:10px 28px;background:linear-gradient(90deg,#6366f1,#4f46e5);border:none;color:var(--text-bright);border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:800;display:flex;align-items:center;gap:8px;">
                         <i class="fa-solid fa-floppy-disk"></i> Save Changes
                     </button>
                 </div>
@@ -1045,20 +1054,20 @@
                 style="width:56px;height:56px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;">
                 <i class="fa-solid fa-trash-can"></i>
             </div>
-            <h3 style="font-size:1.2rem;font-weight:900;color:#fff;margin-bottom:8px;">Delete Candidate?</h3>
-            <p style="font-size:0.85rem;color:rgba(255,255,255,0.55);margin-bottom:6px;">You are about to delete:</p>
+            <h3 style="font-size:1.2rem;font-weight:900;color:var(--text-bright);margin-bottom:8px;">Delete Candidate?</h3>
+            <p style="font-size:0.85rem;color:var(--text-muted);margin-bottom:6px;">You are about to delete:</p>
             <p style="font-size:0.95rem;font-weight:700;color:#f87171;margin-bottom:22px;" id="del-name">Candidate Name
             </p>
-            <p style="font-size:0.8rem;color:rgba(255,255,255,0.4);margin-bottom:24px;">This action cannot be undone.
+            <p style="font-size:0.8rem;color:var(--text-muted);margin-bottom:24px;">This action cannot be undone.
                 All candidate data will be permanently removed.</p>
             <input type="hidden" id="del-candidate-id" />
             <div style="display:flex;gap:12px;justify-content:center;">
                 <button onclick="closeModal('delete-modal')"
-                    style="padding:10px 24px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.88rem;">
+                    style="padding:10px 24px;border-radius:11px;border:1px solid var(--border);background:var(--bg-subtle);color:var(--text-bright);cursor:pointer;font-weight:700;font-size:0.88rem;">
                     Cancel
                 </button>
                 <button onclick="confirmDelete()"
-                    style="padding:10px 28px;border-radius:11px;border:none;background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff;cursor:pointer;font-weight:800;font-size:0.88rem;box-shadow:0 4px 15px rgba(239,68,68,0.3);">
+                    style="padding:10px 28px;border-radius:11px;border:none;background:linear-gradient(90deg,#ef4444,#dc2626);color:var(--text-bright);cursor:pointer;font-weight:800;font-size:0.88rem;box-shadow:0 4px 15px rgba(239,68,68,0.3);">
                     <i class="fa-solid fa-trash-can"></i> Delete
                 </button>
             </div>
@@ -1069,17 +1078,17 @@
     <div class="modal-overlay" id="logout-confirm-modal">
         <div class="del-modal">
             <div
-                style="width:56px;height:56px;border-radius:50%;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:#818cf8;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;">
+                style="width:56px;height:56px;border-radius:50%;background:rgba(99,102,241,0.15);border:1px solid rgba(99,102,241,0.3);color:var(--accent);display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 16px;">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </div>
-            <h3 style="font-size:1.25rem;font-weight:800;color:#fff;margin-bottom:8px;">Confirm Logout</h3>
-            <p style="font-size:0.88rem;color:rgba(255,255,255,0.65);margin-bottom:24px;line-height:1.5;">Are you sure
+            <h3 style="font-size:1.25rem;font-weight:800;color:var(--text-bright);margin-bottom:8px;">Confirm Logout</h3>
+            <p style="font-size:0.88rem;color:var(--text-muted);margin-bottom:24px;line-height:1.5;">Are you sure
                 you want to log out?</p>
             <div style="display:flex;gap:12px;justify-content:center;">
                 <button onclick="closeLogoutModal()"
-                    style="padding:10px 22px;border-radius:10px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:600;font-size:0.9rem;">Cancel</button>
+                    style="padding:10px 22px;border-radius:10px;border:1px solid var(--border);background:var(--bg-subtle);color:var(--text-bright);cursor:pointer;font-weight:600;font-size:0.9rem;">Cancel</button>
                 <button onclick="confirmLogoutAction()"
-                    style="padding:10px 22px;border-radius:10px;border:none;background:linear-gradient(90deg,#ef4444,#dc2626);color:#fff;cursor:pointer;font-weight:700;font-size:0.9rem;">Logout</button>
+                    style="padding:10px 22px;border-radius:10px;border:none;background:linear-gradient(90deg,#ef4444,#dc2626);color:var(--text-bright);cursor:pointer;font-weight:700;font-size:0.9rem;">Logout</button>
             </div>
         </div>
     </div>

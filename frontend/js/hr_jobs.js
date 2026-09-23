@@ -197,11 +197,11 @@ function renderJobsGrid(jobs) {
                     ${sm.label}
                 </span>
                 <div style="display:flex;gap:8px;">
-                    <button onclick="viewJobDetails('${jobId}')" title="View JD" style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);color:#fff;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(255,255,255,0.14)'" onmouseout="this.style.background='rgba(255,255,255,0.06)'">
+                    <button onclick="viewJobDetails('${jobId}')" title="View JD" style="background:var(--bg-subtle);border:1px solid var(--border);color:var(--text-primary);width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='var(--bg-card-hover)'" onmouseout="this.style.background='var(--bg-subtle)'">
                         <i class="fa-regular fa-eye" style="font-size:0.82rem;"></i>
                     </button>
-                    <button onclick="openEditJobModal('${jobId}')" title="Edit" style="background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.3);color:#818cf8;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.28)'" onmouseout="this.style.background='rgba(99,102,241,0.14)'">
-                        <i class="fa-solid fa-pen" style="color:#a5b4fc; font-size:0.82rem;"></i>
+                    <button onclick="openEditJobModal('${jobId}')" title="Edit" style="background:rgba(99,102,241,0.14);border:1px solid rgba(99,102,241,0.3);color:var(--accent);width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(99,102,241,0.28)'" onmouseout="this.style.background='rgba(99,102,241,0.14)'">
+                        <i class="fa-solid fa-pen" style="color:var(--accent); font-size:0.82rem;"></i>
                     </button>
                     <button onclick="deleteJobVacancy('${jobId}')" title="Delete" style="background:rgba(239,68,68,0.12);border:1px solid rgba(239,68,68,0.3);color:#ef4444;width:34px;height:34px;border-radius:8px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background 0.2s;" onmouseover="this.style.background='rgba(239,68,68,0.25)'" onmouseout="this.style.background='rgba(239,68,68,0.12)'">
                         <i class="fa-solid fa-trash-can" style="font-size:0.82rem;"></i>
@@ -211,34 +211,34 @@ function renderJobsGrid(jobs) {
 
             <!-- ── Title & Department ── -->
             <div style="margin-bottom:14px;">
-                <h3 style="font-size:1.18rem;font-weight:900;color:#fff;margin:0 0 4px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${title}">${title}</h3>
-                <div style="font-size:0.82rem;color:rgba(255,255,255,0.55);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                <h3 style="font-size:1.18rem;font-weight:900;color:var(--text-bright);margin:0 0 4px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${title}">${title}</h3>
+                <div style="font-size:0.82rem;color:var(--text-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
                     ${dept}
                 </div>
             </div>
 
             <!-- ── Type Badges ── -->
             <div style="display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px;">
-                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(99,102,241,0.15);color:#a5b4fc;border:1px solid rgba(99,102,241,0.3);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${workMode}</span>
-                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(56,189,248,0.12);color:#38bdf8;border:1px solid rgba(56,189,248,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${empType}</span>
-                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(16,185,129,0.12);color:#10b981;border:1px solid rgba(16,185,129,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${openings} Opening${openings > 1 ? 's' : ''}</span>
-                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(168,85,247,0.15);color:#c084fc;border:1px solid rgba(168,85,247,0.3);display:inline-flex;align-items:center;justify-content:center;line-height:1;"><i class="fa-solid fa-layer-group" style="margin-right:5px;"></i>${job.total_interview_rounds !== undefined ? job.total_interview_rounds : (job.interview_rounds ? job.interview_rounds.length : 0)} Rounds</span>
+                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(99,102,241,0.1);color:var(--accent);border:1px solid rgba(99,102,241,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${workMode}</span>
+                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(14,165,233,0.1);color:var(--info);border:1px solid rgba(14,165,233,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${empType}</span>
+                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(16,185,129,0.1);color:var(--success);border:1px solid rgba(16,185,129,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;">${openings} Opening${openings > 1 ? 's' : ''}</span>
+                <span style="font-size:0.75rem;font-weight:700;padding:5px 12px;border-radius:8px;background:rgba(168,85,247,0.1);color:#9333ea;border:1px solid rgba(168,85,247,0.25);display:inline-flex;align-items:center;justify-content:center;line-height:1;"><i class="fa-solid fa-layer-group" style="margin-right:5px;"></i>${job.total_interview_rounds !== undefined ? job.total_interview_rounds : (job.interview_rounds ? job.interview_rounds.length : 0)} Rounds</span>
             </div>
 
             <!-- ── Info Rows (Location & Experience only) ── -->
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:0;">
-                <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:9px 12px;overflow:hidden;">
-                    <i class="fa-solid fa-location-dot" style="color:#6366f1;font-size:0.82rem;flex-shrink:0;"></i>
+                <div style="display:flex;align-items:center;gap:10px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:10px;padding:9px 12px;overflow:hidden;">
+                    <i class="fa-solid fa-location-dot" style="color:var(--accent);font-size:0.82rem;flex-shrink:0;"></i>
                     <div style="min-width:0;">
-                        <div style="font-size:0.64rem;color:rgba(255,255,255,0.45);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Location</div>
-                        <div style="font-size:0.82rem;font-weight:700;color:#e2e8f0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${location}">${location}</div>
+                        <div style="font-size:0.64rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Location</div>
+                        <div style="font-size:0.82rem;font-weight:700;color:var(--text-primary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${location}">${location}</div>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:9px 12px;overflow:hidden;">
+                <div style="display:flex;align-items:center;gap:10px;background:var(--bg-subtle);border:1px solid var(--border);border-radius:10px;padding:9px 12px;overflow:hidden;">
                     <i class="fa-solid fa-hourglass-half" style="color:#fbbf24;font-size:0.82rem;flex-shrink:0;"></i>
                     <div style="min-width:0;">
-                        <div style="font-size:0.64rem;color:rgba(255,255,255,0.45);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Experience</div>
-                        <div style="font-size:0.82rem;font-weight:700;color:#fbbf24;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${exp}">${exp}</div>
+                        <div style="font-size:0.64rem;color:var(--text-muted);text-transform:uppercase;font-weight:700;letter-spacing:0.04em;">Experience</div>
+                        <div style="font-size:0.82rem;font-weight:700;color:#f59e0b;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;" title="${exp}">${exp}</div>
                     </div>
                 </div>
             </div>
@@ -275,7 +275,7 @@ function renderSkillTags() {
     jobSkillsTags.forEach((tag, i) => {
         const el = document.createElement('span');
         el.className = 'tag-pill';
-        el.style.cssText = 'background: rgba(99,102,241,0.2); border: 1px solid rgba(99,102,241,0.4); color: #a5b4fc; padding: 3px 10px; border-radius: 99px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;';
+        el.style.cssText = 'background: var(--bg-subtle); border: 1px solid var(--border); color: var(--accent); padding: 3px 10px; border-radius: 99px; font-size: 0.78rem; font-weight: 600; display: inline-flex; align-items: center; gap: 6px;';
         el.innerHTML = `${escapeHtml(tag)} <span onclick="removeSkillTag(${i})" style="cursor:pointer; font-weight:800;">×</span>`;
         wrap.insertBefore(el, input);
     });
@@ -449,22 +449,22 @@ function renderInterviewRoundForms() {
         const descVal = escapeHtml(r.round_description || '');
 
         return `
-        <div class="weight-field-card" style="background: rgba(15,23,42,0.6); border: 1px solid rgba(168,85,247,0.25); border-radius: 16px; padding: 18px 20px;">
+        <div class="weight-field-card" style="background: var(--bg-subtle); border: 1px solid rgba(168,85,247,0.25); border-radius: 16px; padding: 18px 20px;">
             <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
-                <span class="status-pill" style="background:rgba(168,85,247,0.18); border:1px solid rgba(168,85,247,0.4); color:#c084fc;">
+                <span class="status-pill" style="background:rgba(168,85,247,0.18); border:1px solid rgba(168,85,247,0.4); color:var(--purple, #a855f7);">
                     <i class="fa-solid fa-layer-group" style="font-size:0.6rem;"></i> Round ${roundNum}
                 </span>
-                <span style="font-size:0.75rem; color:rgba(255,255,255,0.4);">Interview Step ${roundNum} of ${configuredRounds.length}</span>
+                <span style="font-size:0.75rem; color:var(--text-muted);">Interview Step ${roundNum} of ${configuredRounds.length}</span>
             </div>
 
             <div class="form-group-custom" style="margin-bottom:14px;">
-                <label class="label-custom">Round Title <span style="color:#ef4444;">*</span></label>
+                <label class="label-custom">Round Title <span style="color:var(--danger, #ef4444);">*</span></label>
                 <input type="text" id="round-title-${i}" class="input-custom" placeholder="e.g. Round ${roundNum}: HR Screening / Technical Assessment" value="${titleVal}" oninput="updateConfiguredRound(${i}, 'title', this.value)" />
             </div>
 
             <div class="form-group-custom">
-                <label class="label-custom">Round Description <span style="font-weight:400; color:rgba(255,255,255,0.45);">(Optional)</span></label>
-                <textarea id="round-desc-${i}" class="input-custom" style="min-height: 80px; height: auto; padding: 10px 14px; font-family: inherit; font-size: 0.88rem; line-height: 1.5; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255, 255, 255, 0.16); border-radius: 12px; color: #ffffff;" placeholder="Brief description, interview format, key topics, or criteria for this round..." oninput="updateConfiguredRound(${i}, 'desc', this.value)">${descVal}</textarea>
+                <label class="label-custom">Round Description <span style="font-weight:400; color:var(--text-muted);">(Optional)</span></label>
+                <textarea id="round-desc-${i}" class="input-custom" style="min-height: 80px; height: auto; padding: 10px 14px; font-family: inherit; font-size: 0.88rem; line-height: 1.5; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; color: var(--text-bright);" placeholder="Brief description, interview format, key topics, or criteria for this round..." oninput="updateConfiguredRound(${i}, 'desc', this.value)">${descVal}</textarea>
             </div>
         </div>`;
     }).join('');
@@ -490,7 +490,8 @@ function onWeightChange(field, value) {
     const slider = document.getElementById(`weight-${field}`);
     if (slider) {
         const color = SLIDER_COLORS[field] || '#6366f1';
-        slider.style.background = `linear-gradient(to right, ${color} ${v}%, rgba(255,255,255,0.12) ${v}%)`;
+        // Using var(--border) for the unfilled track part supports both themes
+        slider.style.background = `linear-gradient(to right, ${color} ${v}%, var(--border) ${v}%)`;
     }
 
     updateTotalWeightUI();
@@ -515,7 +516,7 @@ function updateTotalWeightUI() {
             pctEl && (pctEl.style.color = '#fbbf24');
         } else {
             barEl.style.background = 'linear-gradient(90deg, #6366f1, #818cf8)';
-            pctEl && (pctEl.style.color = 'rgba(255,255,255,0.6)');
+            pctEl && (pctEl.style.color = 'var(--text-muted)');
         }
     }
 
@@ -945,7 +946,7 @@ function viewJobDetails(jobId) {
     if (skillsWrap) {
         skillsWrap.innerHTML = (job.skills_required || []).length
             ? (job.skills_required).map(s => `<span class="skill-badge">${escapeHtml(s)}</span>`).join('')
-            : '<span style="color:rgba(255,255,255,0.4);font-size:0.83rem;">No skills specified</span>';
+            : '<span style="color:var(--text-muted);font-size:0.83rem;">No skills specified</span>';
     }
 
     // Job Description — render as Markdown
@@ -965,17 +966,17 @@ function viewJobDetails(jobId) {
     if (roundsListEl) {
         const rounds = job.interview_rounds || [];
         if (rounds.length === 0) {
-            roundsListEl.innerHTML = `<div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:12px; padding:14px; color:rgba(255,255,255,0.45); font-size:0.84rem;">No interview rounds configured for this vacancy.</div>`;
+            roundsListEl.innerHTML = `<div style="background:var(--bg-subtle); border:1px solid var(--border); border-radius:12px; padding:14px; color:var(--text-muted); font-size:0.84rem;">No interview rounds configured for this vacancy.</div>`;
         } else {
             roundsListEl.innerHTML = rounds.map((r, i) => `
                 <div style="background:rgba(168,85,247,0.08); border:1px solid rgba(168,85,247,0.22); border-radius:12px; padding:14px 16px;">
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:4px;">
-                        <span class="status-pill" style="background:rgba(168,85,247,0.18); border:1px solid rgba(168,85,247,0.4); color:#c084fc; font-size:0.7rem;">
+                        <span class="status-pill" style="background:rgba(168,85,247,0.18); border:1px solid rgba(168,85,247,0.4); color:var(--purple, #a855f7); font-size:0.7rem;">
                             Round ${r.round_order || (i + 1)}
                         </span>
                     </div>
-                    <div style="font-size:0.92rem; font-weight:800; color:#fff; margin-bottom:4px;">${escapeHtml(r.round_title || `Round ${i+1}`)}</div>
-                    <div style="font-size:0.83rem; color:rgba(255,255,255,0.65); line-height:1.5;">${escapeHtml(r.round_description || 'No description provided.')}</div>
+                    <div style="font-size:0.92rem; font-weight:800; color:var(--text-bright); margin-bottom:4px;">${escapeHtml(r.round_title || `Round ${i+1}`)}</div>
+                    <div style="font-size:0.83rem; color:var(--text-muted); line-height:1.5;">${escapeHtml(r.round_description || 'No description provided.')}</div>
                 </div>
             `).join('');
         }

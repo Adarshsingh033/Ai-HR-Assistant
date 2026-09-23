@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -10,8 +10,8 @@
     <style>
         /* ── Welcome Banner ── */
         .welcome-banner {
-            background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(79,70,229,0.25) 100%);
-            border: 1px solid rgba(99,102,241,0.3);
+            background: linear-gradient(135deg, rgba(99,102,241,0.15) 0%, rgba(79,70,229,0.05) 100%);
+            border: 1px solid var(--border);
             border-radius: var(--radius-md);
             padding: clamp(14px, 1.6vw, 20px) clamp(16px, 1.8vw, 24px);
             margin-bottom: clamp(12px, 1.4vw, 18px);
@@ -20,19 +20,17 @@
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
         }
 
         .welcome-text h2 {
             font-size: clamp(1.1rem, 1.6vw, 1.5rem);
             margin-bottom: 3px;
-            background: linear-gradient(135deg, #fff 0%, #a5b4fc 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: var(--text-bright);
         }
 
         .welcome-text p {
-            color: var(--text-secondary);
+            color: var(--text-muted);
             font-size: clamp(0.78rem, 0.9vw, 0.88rem);
         }
 
@@ -45,17 +43,17 @@
         }
 
         .stat-card {
-            background: rgba(30,41,59,0.7);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255,255,255,0.08);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: var(--radius-md);
             padding: clamp(12px, 1.4vw, 18px);
             display: flex;
             align-items: center;
             gap: clamp(10px, 1.2vw, 14px);
-            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s ease, border-color 0.3s ease;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
         }
 
         .stat-card::before {
@@ -101,19 +99,22 @@
         .stat-value {
             font-size: clamp(1.3rem, 1.8vw, 1.7rem);
             font-weight: 800;
-            color: #fff;
+            color: var(--text-bright);
             line-height: 1;
         }
 
         /* ── Main Dashboard Grid (Chart + Jobs List) ── */
         .dashboard-main-grid {
             display: grid;
-            grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.2fr) minmax(0, 1fr);
             gap: clamp(10px, 1.4vw, 16px);
         }
 
-        /* 1099px so it does not collide with the 1100px desktop band in main.css */
-        @media (max-width: 1099px) {
+        /* Responsive */
+        @media (max-width: 1300px) {
+            .dashboard-main-grid { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); }
+        }
+        @media (max-width: 900px) {
             .dashboard-main-grid { grid-template-columns: minmax(0, 1fr); }
         }
 
@@ -138,13 +139,13 @@
         .card-header-fancy h3 {
             font-size: clamp(0.88rem, 1vw, 1rem);
             font-weight: 700;
-            color: #fff;
+            color: var(--text-bright);
             display: flex;
             align-items: center;
             gap: 7px;
         }
 
-        .card-header-fancy h3 i { color: #818cf8; }
+        .card-header-fancy h3 i { color: var(--accent); }
 
         /* Responsive chart container – height scales with viewport.
            Capped and centred so the doughnut does not float in a sea of
@@ -167,25 +168,29 @@
         }
 
         .job-item {
-            background: rgba(255,255,255,0.03);
-            border: 1px solid rgba(255,255,255,0.05);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             border-radius: 10px;
             padding: clamp(10px, 1.2vw, 14px);
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 8px;
-            transition: background 0.2s;
+            transition: transform 0.2s, background 0.2s, box-shadow 0.2s;
             flex-shrink: 0;
         }
 
-        .job-item:hover { background: rgba(255,255,255,0.06); }
+        .job-item:hover { 
+            background: var(--bg-card-hover); 
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
 
         .job-info { display: flex; flex-direction: column; gap: 3px; min-width: 0; flex: 1; }
 
         .job-title {
-            font-weight: 600;
-            color: #fff;
+            font-weight: 700;
+            color: var(--text-bright);
             font-size: clamp(0.82rem, 0.95vw, 0.94rem);
             white-space: nowrap;
             overflow: hidden;
@@ -205,9 +210,9 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            background: rgba(99,102,241,0.15);
-            color: #818cf8;
-            border: 1px solid rgba(99,102,241,0.3);
+            background: rgba(99,102,241,0.1);
+            color: var(--accent-light);
+            border: 1px solid rgba(99,102,241,0.2);
             border-radius: 20px;
             padding: 3px 9px;
             font-size: 0.72rem;
@@ -358,13 +363,23 @@
 
                 <!-- Charts & Lists -->
                 <div class="dashboard-main-grid">
-                    <!-- Chart: Candidates by Status -->
+                    <!-- Chart 1: Candidates by Status -->
                     <div class="chart-card">
                         <div class="card-header-fancy">
                             <h3><i class="fa-solid fa-chart-pie"></i> Candidate Pipeline</h3>
                         </div>
                         <div class="chart-container">
                             <canvas id="statusChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Chart 2: Top Jobs (Bar Chart) -->
+                    <div class="chart-card">
+                        <div class="card-header-fancy">
+                            <h3><i class="fa-solid fa-chart-simple"></i> Top Jobs by Candidates</h3>
+                        </div>
+                        <div class="chart-container">
+                            <canvas id="topJobsChart"></canvas>
                         </div>
                     </div>
 
