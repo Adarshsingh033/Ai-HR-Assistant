@@ -149,10 +149,10 @@
 
     <!-- Create / Edit Member Modal -->
     <div class="modal-overlay" id="member-modal">
-        <div class="modal-card" style="max-width: 660px; width: 92%; max-height: 88vh; padding: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.14); border-radius: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow: hidden;">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
-                <h3 style="font-size: 1.35rem; font-weight: 800; color: #fff; margin: 0; letter-spacing: -0.01em;" id="member-modal-title">Create HR Member</h3>
-                <button type="button" onclick="closeMemberModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.7)';">×</button>
+        <div class="modal-card" style="max-width: 660px; width: 92%; max-height: 88vh; padding: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow: hidden;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;">
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-bright); margin: 0; letter-spacing: -0.01em;" id="member-modal-title">Create HR Member</h3>
+                <button type="button" onclick="closeMemberModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='var(--bg-subtle)';this.style.color='rgba(255,255,255,0.7)';">×</button>
             </div>
 
             <form id="member-form" onsubmit="handleSaveMember(event)" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;">
@@ -172,33 +172,33 @@
                     <div class="form-grid-2">
                         <!-- Organization & Branch -->
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 ORGANIZATION <span style="color: #ef4444;">*</span>
                             </label>
                             <select id="member-org-select" onchange="onModalOrgChange(this.value)" class="input-custom" required style="height: 46px; font-size: 0.9rem; cursor: pointer;">
-                                <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization</option>
+                                <option value="" disabled selected style="background: var(--bg-card); color: var(--text-bright);">Select Organization</option>
                             </select>
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 BRANCH <span style="color: #ef4444;">*</span>
                             </label>
                             <select id="member-branch-select" class="input-custom" required disabled style="height: 46px; font-size: 0.9rem; cursor: pointer;">
-                                <option value="" disabled selected style="background: #0f172a; color: #fff;">Select Organization First</option>
+                                <option value="" disabled selected style="background: var(--bg-card); color: var(--text-bright);">Select Organization First</option>
                             </select>
                         </div>
 
                         <!-- Full Name & Username -->
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 FULL NAME <span style="color: #ef4444;">*</span>
                             </label>
                             <input type="text" id="member-fullname-input" placeholder="e.g. John Doe" required style="height: 46px; font-size: 0.9rem;" class="input-custom" />
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 USERNAME <span style="color: #ef4444;">*</span>
                             </label>
                             <input type="text" id="member-username-input" placeholder="e.g. johndoe" required style="height: 46px; font-size: 0.9rem;" class="input-custom" />
@@ -206,14 +206,14 @@
 
                         <!-- Email & Phone -->
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 EMAIL ADDRESS <span style="color: #ef4444;">*</span>
                             </label>
                             <input type="email" id="member-email-input" placeholder="john@example.com" required style="height: 46px; font-size: 0.9rem;" class="input-custom" />
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 PHONE NUMBER
                             </label>
                             <input type="text" id="member-phone-input" placeholder="e.g. 9876543210" maxlength="10" oninput="this.value = this.value.replace(/\D/g, '').slice(0, 10)" style="height: 46px; font-size: 0.9rem;" class="input-custom" />
@@ -221,7 +221,7 @@
 
                         <!-- Password & Status -->
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 PASSWORD <span id="member-password-req" style="color: #ef4444;">*</span>
                             </label>
                             <div style="position: relative; display: flex; align-items: center;">
@@ -233,7 +233,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 STATUS
                             </label>
                             <div style="display: inline-flex; align-items: center; gap: 10px; padding: 4px 0;">
@@ -249,7 +249,7 @@
 
                 <!-- Pinned Footer -->
                 <div class="modal-footer" style="padding: 16px 28px;">
-                    <button type="button" onclick="closeMemberModal()" style="padding: 10px 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease;">Cancel</button>
+                    <button type="button" onclick="closeMemberModal()" style="padding: 10px 22px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease;">Cancel</button>
                     <button type="submit" id="member-submit-btn" style="padding: 10px 26px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: none; color: #fff; box-shadow: 0 4px 18px rgba(249, 115, 22, 0.4); cursor: pointer; transition: all 0.2s ease;">Save HR</button>
                 </div>
             </form>
@@ -258,44 +258,44 @@
 
     <!-- View Member Modal -->
     <div class="modal-overlay" id="view-member-modal">
-        <div class="modal-card" style="max-width: 480px; width: 92%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto;">
+        <div class="modal-card" style="max-width: 480px; width: 92%; max-height: 88vh; padding: 24px 28px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff;">HR Profile</h3>
-                <button type="button" onclick="closeViewMemberModal()" data-tooltip="Close" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;">×</button>
+                <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--text-bright);">HR Profile</h3>
+                <button type="button" onclick="closeViewMemberModal()" data-tooltip="Close" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;">×</button>
             </div>
 
             <div style="text-align: center; margin-bottom: 24px;">
                 <div id="view-member-avatar-box" style="width: 84px; height: 84px; border-radius: 50%; margin: 0 auto 14px; background: rgba(99,102,241,0.15); border: 2px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #818cf8; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
                     <i class="fa-solid fa-user"></i>
                 </div>
-                <h2 id="view-member-fullname" style="font-size: 1.35rem; font-weight: 800; color: #fff; margin-bottom: 2px;">—</h2>
+                <h2 id="view-member-fullname" style="font-size: 1.35rem; font-weight: 800; color: var(--text-bright); margin-bottom: 2px;">—</h2>
                 <div id="view-member-username" style="font-size: 0.88rem; color: #818cf8; font-weight: 600;">@—</div>
             </div>
 
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Email:</span>
-                    <span id="view-member-email" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
+            <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; gap: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Email:</span>
+                    <span id="view-member-email" style="font-size: 0.85rem; color: var(--text-bright); font-weight: 600;">—</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Phone:</span>
-                    <span id="view-member-phone" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Phone:</span>
+                    <span id="view-member-phone" style="font-size: 0.85rem; color: var(--text-bright); font-weight: 600;">—</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Organization:</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Organization:</span>
                     <span id="view-member-org" style="font-size: 0.85rem; color: #a5b4fc; font-weight: 700;">—</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Branch:</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Branch:</span>
                     <span id="view-member-branch" style="font-size: 0.85rem; color: #38bdf8; font-weight: 700;">—</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.06); padding-bottom: 8px;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Status:</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); padding-bottom: 8px;">
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Status:</span>
                     <span id="view-member-status" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 0.8rem; font-weight: 700;">Active</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Created Date:</span>
-                    <span id="view-member-date" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Created Date:</span>
+                    <span id="view-member-date" style="font-size: 0.85rem; color: var(--text-bright); font-weight: 600;">—</span>
                 </div>
             </div>
         </div>

@@ -195,10 +195,10 @@
 
     <!-- Create / Edit Organization Modal -->
     <div class="modal-overlay" id="org-modal">
-        <div class="modal-card" style="max-width: 620px; width: 92%; max-height: 88vh; padding: 0; background: #0f172a; border: 1px solid rgba(255,255,255,0.14); border-radius: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow: hidden;">
-            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid rgba(255,255,255,0.08); flex-shrink: 0;">
-                <h3 style="font-size: 1.35rem; font-weight: 800; color: #fff; margin: 0; letter-spacing: -0.01em;" id="org-modal-title">Create Organization</h3>
-                <button type="button" onclick="closeOrgModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='rgba(255,255,255,0.06)';this.style.color='rgba(255,255,255,0.7)';">×</button>
+        <div class="modal-card" style="max-width: 620px; width: 92%; max-height: 88vh; padding: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow: hidden;">
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;">
+                <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-bright); margin: 0; letter-spacing: -0.01em;" id="org-modal-title">Create Organization</h3>
+                <button type="button" onclick="closeOrgModal()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='var(--bg-subtle)';this.style.color='rgba(255,255,255,0.7)';">×</button>
             </div>
 
             <form id="org-form" onsubmit="handleSaveOrganization(event)" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;">
@@ -217,14 +217,14 @@
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
                         <div class="form-group" style="grid-column: span 2;">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 Organization Name <span style="color: #ef4444;">*</span>
                             </label>
                             <input type="text" id="org-name-input" class="input-custom" placeholder="e.g. Acme Corporation" required style="height: 46px; font-size: 0.9rem;" />
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 Industry Type <span style="color: #ef4444;">*</span>
                             </label>
                             <select id="org-industry-select" class="input-custom" required style="height: 46px; font-size: 0.9rem; cursor: pointer;">
@@ -238,7 +238,7 @@
                         </div>
 
                         <div class="form-group">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 Company Size <span style="color: #ef4444;">*</span>
                             </label>
                             <select id="org-size-select" class="input-custom" required style="height: 46px; font-size: 0.9rem; cursor: pointer;">
@@ -253,7 +253,7 @@
                         </div>
 
                         <div class="form-group" style="grid-column: span 2;">
-                            <label class="form-label" style="font-weight: 700; color: rgba(255,255,255,0.75); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
+                            <label class="form-label" style="font-weight: 700; color: var(--text-muted); font-size: 0.76rem; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; display: block;">
                                 Status
                             </label>
                             <div style="display: inline-flex; align-items: center; gap: 10px; padding: 4px 0;">
@@ -269,7 +269,7 @@
 
                 <!-- Pinned Footer -->
                 <div class="modal-footer" style="padding: 16px 28px;">
-                    <button type="button" onclick="closeOrgModal()" style="padding: 10px 22px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.14); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease;">Cancel</button>
+                    <button type="button" onclick="closeOrgModal()" style="padding: 10px 22px; border-radius: 12px; border: 1px solid var(--border); background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.85); font-weight: 600; font-size: 0.88rem; cursor: pointer; transition: all 0.2s ease;">Cancel</button>
                     <button type="submit" class="btn-save-profile" id="org-submit-btn" style="padding: 10px 26px; border-radius: 12px; font-weight: 700; font-size: 0.88rem; background: linear-gradient(135deg, #f97316 0%, #ea580c 100%); border: none; color: #fff; box-shadow: 0 4px 18px rgba(249, 115, 22, 0.4); cursor: pointer; transition: all 0.2s ease;">Save Organization</button>
                 </div>
             </form>
@@ -278,35 +278,35 @@
 
     <!-- View Organization Modal -->
     <div class="modal-overlay" id="view-org-modal">
-        <div class="modal-card" style="max-width: 480px; width: 92%; max-height: 88vh; padding: 24px 28px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto;">
+        <div class="modal-card" style="max-width: 480px; width: 92%; max-height: 88vh; padding: 24px 28px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-                <h3 style="font-size: 1.4rem; font-weight: 800; color: #fff;">Organization Details</h3>
-                <button type="button" onclick="closeViewOrgModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.7); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;" title="Close">×</button>
+                <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--text-bright);">Organization Details</h3>
+                <button type="button" onclick="closeViewOrgModal()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;" title="Close">×</button>
             </div>
 
             <div style="text-align: center; margin-bottom: 24px;">
                 <div id="view-org-logo" style="width: 86px; height: 86px; border-radius: 50%; margin: 0 auto 16px; background: rgba(99,102,241,0.15); border: 2px solid rgba(99,102,241,0.3); display: flex; align-items: center; justify-content: center; font-size: 2rem; color: #818cf8; overflow: hidden; box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
                     <i class="fa-solid fa-building"></i>
                 </div>
-                <h2 id="view-org-name" style="font-size: 1.5rem; font-weight: 800; color: #fff; margin-bottom: 4px;">—</h2>
+                <h2 id="view-org-name" style="font-size: 1.5rem; font-weight: 800; color: var(--text-bright); margin-bottom: 4px;">—</h2>
             </div>
 
-            <div style="background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Industry:</span>
+            <div style="background: var(--bg-subtle); border: 1px solid var(--border); border-radius: 16px; padding: 20px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 12px; border-bottom: 1px solid var(--border);">
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Industry:</span>
                     <span id="view-org-industry" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(59, 130, 246, 0.15); color: #60a5fa; font-size: 0.8rem; font-weight: 700;">—</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Company Size:</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border);">
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Company Size:</span>
                     <span id="view-org-size" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #34d399; font-size: 0.8rem; font-weight: 700;">—</span>
                 </div>
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid rgba(255,255,255,0.06);">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Status:</span>
+                <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--border);">
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Status:</span>
                     <span id="view-org-status" style="display: inline-block; padding: 4px 12px; border-radius: 99px; background: rgba(16, 185, 129, 0.15); color: #10b981; font-size: 0.8rem; font-weight: 700;">Active</span>
                 </div>
                 <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 12px;">
-                    <span style="font-size: 0.82rem; color: rgba(255,255,255,0.6); font-weight: 600;">Created Date:</span>
-                    <span id="view-org-date" style="font-size: 0.85rem; color: #fff; font-weight: 600;">—</span>
+                    <span style="font-size: 0.82rem; color: var(--text-muted); font-weight: 600;">Created Date:</span>
+                    <span id="view-org-date" style="font-size: 0.85rem; color: var(--text-bright); font-weight: 600;">—</span>
                 </div>
             </div>
         </div>

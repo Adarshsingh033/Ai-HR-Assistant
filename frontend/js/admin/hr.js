@@ -64,9 +64,9 @@ async function loadOrgAndBranchFilters() {
 function populateMemberOrgDropdowns() {
     const filterSelect = document.getElementById('member-filter-org');
     if (filterSelect) {
-        let opts = `<option value="" style="background: #0f172a; color: #fff;">All Organizations</option>`;
+        let opts = `<option value="" style="background: var(--bg-card); color: var(--text-bright);">All Organizations</option>`;
         cachedOrgsForMember.forEach(o => {
-            opts += `<option value="${o.org_id}" style="background: #0f172a; color: #fff;">${escapeHtml(o.organization_name)}</option>`;
+            opts += `<option value="${o.org_id}" style="background: var(--bg-card); color: var(--text-bright);">${escapeHtml(o.organization_name)}</option>`;
         });
         filterSelect.innerHTML = opts;
     }
@@ -85,9 +85,9 @@ function populateMemberBranchFilterDropdown() {
     const filterSelect = document.getElementById('member-filter-branch');
     if (!filterSelect) return;
 
-    let opts = `<option value="" style="background: #0f172a; color: #fff;">All Branches</option>`;
+    let opts = `<option value="" style="background: var(--bg-card); color: var(--text-bright);">All Branches</option>`;
     cachedBranchesForMember.forEach(b => {
-        opts += `<option value="${b.branch_id}" style="background: #0f172a; color: #fff;">${escapeHtml(b.branch_name)}</option>`;
+        opts += `<option value="${b.branch_id}" style="background: var(--bg-card); color: var(--text-bright);">${escapeHtml(b.branch_name)}</option>`;
     });
     filterSelect.innerHTML = opts;
 }
@@ -263,7 +263,7 @@ function renderMemberTable() {
 
                 <!-- 2. HR Member (Name) -->
                 <td>
-                    <div style="font-weight: 700; color: #fff; font-size: 0.94rem;">${escapeHtml(m.full_name)}</div>
+                    <div style="font-weight: 700; color: var(--text-bright); font-size: 0.94rem;">${escapeHtml(m.full_name)}</div>
                 </td>
 
                 <!-- 3. Email & Phone -->
@@ -293,16 +293,16 @@ function renderMemberTable() {
 
                 <!-- 6. Actions (3-Dot Menu) -->
                 <td style="text-align: right; position: relative;">
-                    <button type="button" onclick="toggleMemberActionMenu(event, '${m.member_id}')" data-tooltip="Actions" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s ease;">
+                    <button type="button" onclick="toggleMemberActionMenu(event, '${m.member_id}')" data-tooltip="Actions" style="background: var(--bg-subtle); border: 1px solid var(--border); color: var(--text-primary); width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; font-size: 1rem; transition: all 0.2s ease;">
                         <i class="fa-solid fa-ellipsis"></i>
                     </button>
 
                     <!-- Dropdown Menu -->
-                    <div id="member-action-menu-${m.member_id}" class="member-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; min-width: 140px; background: #0f172a; border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
-                        <button type="button" onclick="triggerMemberView('${m.member_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #fff; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">
+                    <div id="member-action-menu-${m.member_id}" class="member-action-dropdown hidden" style="position: absolute; right: 8px; top: 44px; min-width: 140px; background: var(--bg-card); border: 1px solid rgba(255,255,255,0.18); border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.8); z-index: 1000; overflow: hidden;">
+                        <button type="button" onclick="triggerMemberView('${m.member_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: var(--text-bright); font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='none'">
                             <i class="fa-regular fa-eye" style="color: #60a5fa; width: 14px;"></i> View
                         </button>
-                        <button type="button" onclick="triggerMemberEdit('${m.member_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #fff; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='none'">
+                        <button type="button" onclick="triggerMemberEdit('${m.member_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: var(--text-bright); font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='none'">
                             <i class="fa-solid fa-pen" style="color: #a5b4fc; width: 14px;"></i> Edit
                         </button>
                         <button type="button" onclick="triggerMemberDelete('${m.member_id}')" style="width: 100%; text-align: left; padding: 10px 14px; background: none; border: none; color: #ef4444; font-size: 0.84rem; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(239,68,68,0.12)'" onmouseout="this.style.background='none'">

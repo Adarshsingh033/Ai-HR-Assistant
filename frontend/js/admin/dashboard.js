@@ -223,7 +223,7 @@ function renderRecentOrganizations(orgs) {
                 <div style="display: flex; align-items: center; gap: 12px;">
                     ${logoHtml}
                     <div>
-                        <div style="font-weight: 700; color: #fff; font-size: 0.9rem;">${escapeHtml(o.organization_name)}</div>
+                        <div style="font-weight: 700; color: var(--text-bright); font-size: 0.9rem;">${escapeHtml(o.organization_name)}</div>
                         <div style="font-size: 0.78rem; color: rgba(255,255,255,0.5); display: flex; gap: 10px; margin-top: 2px;">
                             <span><i class="fa-solid fa-code-branch" style="color: #38bdf8;"></i> ${o.branch_count} Branches</span>
                             <span><i class="fa-solid fa-users" style="color: #10b981;"></i> ${o.hr_count} HR</span>
@@ -263,7 +263,7 @@ function renderRecentHRManagers(hrs) {
                 <div style="display: flex; align-items: center; gap: 12px;">
                     ${avatarHtml}
                     <div>
-                        <div style="font-weight: 700; color: #fff; font-size: 0.9rem;">${escapeHtml(h.full_name)}</div>
+                        <div style="font-weight: 700; color: var(--text-bright); font-size: 0.9rem;">${escapeHtml(h.full_name)}</div>
                         <div style="font-size: 0.78rem; color: rgba(255,255,255,0.5); display: flex; gap: 10px; margin-top: 2px;">
                             <span>${escapeHtml(h.organization_name || '—')}</span>
                             <span>${escapeHtml(h.branch_name || '—')}</span>

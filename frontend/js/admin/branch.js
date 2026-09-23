@@ -44,9 +44,9 @@ function populateOrgDropdowns() {
     // 1. Filter dropdown (all orgs)
     const filterSelect = document.getElementById('branch-filter-org');
     if (filterSelect) {
-        let options = `<option value="" style="background: #0f172a; color: #fff;">All Organizations</option>`;
+        let options = `<option value="" style="background: var(--bg-card); color: var(--text-bright);">All Organizations</option>`;
         cachedOrganizations.forEach(org => {
-            options += `<option value="${org.org_id}" style="background: #0f172a; color: #fff;">${escapeHtml(org.organization_name)}</option>`;
+            options += `<option value="${org.org_id}" style="background: var(--bg-card); color: var(--text-bright);">${escapeHtml(org.organization_name)}</option>`;
         });
         filterSelect.innerHTML = options;
     }
@@ -144,7 +144,7 @@ function renderBranchTable() {
             <tr style="position: relative;">
                 <!-- 1. Branch Name Column -->
                 <td style="padding-left: 16px;">
-                    <div style="font-weight: 700; color: #fff; font-size: 0.93rem;">${escapeHtml(branch.branch_name)}</div>
+                    <div style="font-weight: 700; color: var(--text-bright); font-size: 0.93rem;">${escapeHtml(branch.branch_name)}</div>
                 </td>
 
                 <!-- 2. Organization Column -->
@@ -172,11 +172,11 @@ function renderBranchTable() {
                         <i class="fa-solid fa-ellipsis"></i>
                     </button>
 
-                    <div id="branch-action-menu-${branch.branch_id}" class="branch-action-dropdown hidden" style="position: absolute; right: 0; top: 42px; background: #0f172a; border: 1px solid rgba(255,255,255,0.15); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; min-width: 140px; padding: 6px 0; text-align: left;">
-                        <div onclick="triggerBranchView('${branch.branch_id}')" style="padding: 8px 16px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                    <div id="branch-action-menu-${branch.branch_id}" class="branch-action-dropdown hidden" style="position: absolute; right: 0; top: 42px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 100; min-width: 140px; padding: 6px 0; text-align: left;">
+                        <div onclick="triggerBranchView('${branch.branch_id}')" style="padding: 8px 16px; color: var(--text-bright); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='transparent'">
                             <i class="fa-regular fa-eye" style="color: #60a5fa;"></i> View
                         </div>
-                        <div onclick="triggerBranchEdit('${branch.branch_id}')" style="padding: 8px 16px; color: #fff; font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='rgba(255,255,255,0.08)'" onmouseout="this.style.background='transparent'">
+                        <div onclick="triggerBranchEdit('${branch.branch_id}')" style="padding: 8px 16px; color: var(--text-bright); font-size: 0.85rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 10px; transition: background 0.15s ease;" onmouseover="this.style.background='var(--bg-subtle)'" onmouseout="this.style.background='transparent'">
                             <i class="fa-solid fa-pen" style="color: #a5b4fc;"></i> Edit
                         </div>
                         <div style="height: 1px; background: rgba(255,255,255,0.08); margin: 4px 0;"></div>
