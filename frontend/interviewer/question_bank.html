@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -71,8 +71,8 @@
             padding: 10px 14px 10px 38px;
             border-radius: 12px;
             border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.04);
-            color: #fff;
+            background: var(--bg-subtle);
+            color: var(--text-primary);
             font-size: 0.88rem;
             font-family: 'Inter', sans-serif;
             outline: none;
@@ -87,7 +87,7 @@
             padding: 9px 18px;
             border-radius: 10px;
             border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--bg-subtle);
             color: var(--text-muted);
             font-size: 0.83rem;
             font-weight: 700;
@@ -97,7 +97,7 @@
         }
 
         .diff-filter-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
+            background: var(--bg-hover);
         }
 
         .diff-filter-btn.active-all {
@@ -108,21 +108,24 @@
 
         .diff-filter-btn.active-easy {
             background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
+            color: #059669;
             border-color: #10b981;
         }
+        html[data-theme="dark"] .diff-filter-btn.active-easy { color: #34d399; }
 
         .diff-filter-btn.active-medium {
             background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
+            color: #d97706;
             border-color: #f59e0b;
         }
+        html[data-theme="dark"] .diff-filter-btn.active-medium { color: #fbbf24; }
 
         .diff-filter-btn.active-hard {
             background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
+            color: #dc2626;
             border-color: #ef4444;
         }
+        html[data-theme="dark"] .diff-filter-btn.active-hard { color: #f87171; }
 
         /* ── Add Button ── */
         .btn-add {
@@ -156,7 +159,7 @@
         }
 
         .stat-mini {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--bg-subtle);
             border: 1px solid var(--border);
             border-radius: 14px;
             padding: 16px 20px;
@@ -184,7 +187,7 @@
         .stat-mini-val {
             font-size: 1.5rem;
             font-weight: 900;
-            color: #fff;
+            color: var(--text-bright);
             line-height: 1;
             margin-bottom: 2px;
         }
@@ -205,7 +208,7 @@
         }
 
         .q-card {
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--bg-subtle);
             border: 1px solid var(--border);
             border-radius: 14px;
             padding: 18px 20px;
@@ -219,7 +222,7 @@
         .q-card:hover {
             border-color: rgba(249, 115, 22, 0.35);
             box-shadow: 0 4px 20px rgba(249, 115, 22, 0.1);
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-hover);
         }
 
         /* Coloured left accent by difficulty */
@@ -298,7 +301,7 @@
             height: 32px;
             border-radius: 8px;
             border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.03);
+            background: var(--bg-subtle);
             color: var(--text-muted);
             cursor: pointer;
             display: flex;
@@ -310,9 +313,9 @@
         }
 
         .q-kebab-btn:hover {
-            background: rgba(255, 255, 255, 0.08);
-            color: #fff;
-            border-color: rgba(255, 255, 255, 0.25);
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            border-color: var(--border);
         }
 
         .q-dropdown {
@@ -320,12 +323,12 @@
             right: 0;
             top: calc(100% + 6px);
             z-index: 50;
-            background: #1e293b;
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 12px;
             padding: 6px;
             min-width: 140px;
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.5);
+            box-shadow: var(--shadow-lg);
             display: none;
             flex-direction: column;
             gap: 2px;
@@ -366,14 +369,15 @@
         }
 
         .q-drop-item:hover {
-            background: rgba(255, 255, 255, 0.07);
-            color: #fff;
+            background: var(--bg-hover);
+            color: var(--text-bright);
         }
 
         .q-drop-item.danger:hover {
             background: rgba(239, 68, 68, 0.14);
-            color: #f87171;
+            color: #dc2626;
         }
+        html[data-theme="dark"] .q-drop-item.danger:hover { color: #f87171; }
 
         /* Badges */
         .diff-badge {
@@ -390,21 +394,24 @@
 
         .diff-easy {
             background: rgba(16, 185, 129, 0.15);
-            color: #34d399;
+            color: #059669;
             border: 1px solid rgba(16, 185, 129, 0.3);
         }
+        html[data-theme="dark"] .diff-easy { color: #34d399; }
 
         .diff-medium {
             background: rgba(245, 158, 11, 0.15);
-            color: #fbbf24;
+            color: #d97706;
             border: 1px solid rgba(245, 158, 11, 0.3);
         }
+        html[data-theme="dark"] .diff-medium { color: #fbbf24; }
 
         .diff-hard {
             background: rgba(239, 68, 68, 0.15);
-            color: #f87171;
+            color: #dc2626;
             border: 1px solid rgba(239, 68, 68, 0.3);
         }
+        html[data-theme="dark"] .diff-hard { color: #f87171; }
 
         .q-category-badge {
             padding: 2px 10px;
@@ -412,12 +419,13 @@
             font-size: 0.71rem;
             font-weight: 700;
             background: rgba(99, 102, 241, 0.12);
-            color: #a5b4fc;
+            color: #4338ca;
             border: 1px solid rgba(99, 102, 241, 0.25);
             display: inline-flex;
             align-items: center;
             gap: 4px;
         }
+        html[data-theme="dark"] .q-category-badge { color: #a5b4fc; }
 
         /* ── Empty State ── */
         .empty-state {
@@ -491,7 +499,7 @@
             padding: 9px 14px;
             border-radius: 10px;
             border: 1px solid var(--border);
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--bg-subtle);
             color: var(--text-secondary);
             font-size: 0.83rem;
             font-family: 'Inter', sans-serif;
@@ -506,7 +514,8 @@
         }
 
         .cat-filter-select option {
-            background: #111827;
+            background: var(--bg-card);
+            color: var(--text-primary);
         }
 
         /* ── Modal ── */
@@ -527,14 +536,14 @@
         }
 
         .modal-box {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 24px;
             width: min(580px, 94vw);
             max-height: 90vh;
             display: flex;
             flex-direction: column;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            box-shadow: var(--shadow-lg);
             overflow: hidden;
             animation: modalIn 0.22s ease;
         }
@@ -553,7 +562,7 @@
 
         .modal-header {
             padding: 28px 30px 20px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -562,7 +571,7 @@
         .modal-title {
             font-size: 1.2rem;
             font-weight: 900;
-            color: #fff;
+            color: var(--text-bright);
             margin: 0;
         }
 
@@ -576,9 +585,9 @@
             width: 36px;
             height: 36px;
             border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.12);
-            background: rgba(255, 255, 255, 0.05);
-            color: rgba(255, 255, 255, 0.6);
+            border: 1px solid var(--border);
+            background: var(--bg-subtle);
+            color: var(--text-muted);
             cursor: pointer;
             display: flex;
             align-items: center;
@@ -617,10 +626,10 @@
         }
 
         .form-control {
-            background: rgba(255, 255, 255, 0.05);
+            background: var(--bg-subtle);
             border: 1px solid var(--border);
             border-radius: 12px;
-            color: #fff;
+            color: var(--text-primary);
             font-size: 0.88rem;
             font-family: 'Inter', sans-serif;
             padding: 11px 14px;
@@ -642,7 +651,8 @@
         }
 
         select.form-control option {
-            background: #111827;
+            background: var(--bg-card);
+            color: var(--text-primary);
         }
 
         /* Difficulty Selector */
@@ -656,8 +666,8 @@
             text-align: center;
             padding: 10px 8px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            background: var(--bg-subtle);
             cursor: pointer;
             font-weight: 800;
             font-size: 0.83rem;
@@ -673,18 +683,21 @@
 
         .diff-opt.easy {
             border-color: rgba(16, 185, 129, 0.25);
-            color: #34d399;
+            color: #059669;
         }
+        html[data-theme="dark"] .diff-opt.easy { color: #34d399; }
 
         .diff-opt.medium {
             border-color: rgba(245, 158, 11, 0.25);
-            color: #fbbf24;
+            color: #d97706;
         }
+        html[data-theme="dark"] .diff-opt.medium { color: #fbbf24; }
 
         .diff-opt.hard {
             border-color: rgba(239, 68, 68, 0.25);
-            color: #f87171;
+            color: #dc2626;
         }
+        html[data-theme="dark"] .diff-opt.hard { color: #f87171; }
 
         .diff-opt.easy.selected {
             background: rgba(16, 185, 129, 0.15);
@@ -706,7 +719,7 @@
 
         .modal-footer {
             padding: 18px 30px;
-            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            border-top: 1px solid var(--border);
             display: flex;
             justify-content: flex-end;
             gap: 12px;
@@ -715,9 +728,9 @@
         .btn-cancel {
             padding: 10px 22px;
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            background: rgba(255, 255, 255, 0.06);
-            color: #fff;
+            border: 1px solid var(--border);
+            background: var(--bg-subtle);
+            color: var(--text-primary);
             cursor: pointer;
             font-weight: 700;
             font-size: 0.86rem;
@@ -757,13 +770,13 @@
 
         /* Delete confirm modal */
         .del-modal-box {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.14);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 22px;
             width: min(400px, 92vw);
             padding: 32px 28px;
             text-align: center;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            box-shadow: var(--shadow-lg);
             animation: modalIn 0.22s ease;
         }
 
@@ -1032,10 +1045,10 @@
     <div class="modal-overlay" id="delete-modal">
         <div class="del-modal-box">
             <div
-                style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 18px;box-shadow:0 0 20px rgba(239,68,68,0.2);">
+                style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:1.4rem;margin:0 auto 18px;box-shadow:0 0 20px rgba(239,68,68,0.2);">
                 <i class="fa-solid fa-trash-can"></i>
             </div>
-            <h3 style="font-size:1.1rem;font-weight:900;color:#fff;margin:0 0 8px;">Delete this question?</h3>
+            <h3 style="font-size:1.1rem;font-weight:900;color:var(--text-bright);margin:0 0 8px;">Delete this question?</h3>
             <p style="font-size:0.84rem;color:var(--text-muted);margin:0 0 24px;line-height:1.5;">This action cannot be
                 undone. The question will be permanently removed from your question bank.</p>
             <div style="display:flex;gap:12px;justify-content:center;">
@@ -1051,17 +1064,17 @@
     <!-- Logout Confirmation Modal -->
     <div class="modal-overlay" id="logout-confirm-modal">
         <div
-            style="background:#0f172a;border:1px solid rgba(255,255,255,0.14);border-radius:22px;width:min(400px,92vw);padding:32px 24px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+            style="background:var(--bg-card);border:1px solid var(--border);border-radius:22px;width:min(400px,92vw);padding:32px 24px;text-align:center;box-shadow:var(--shadow-lg);">
             <div
-                style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin:0 auto 16px;">
+                style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#ef4444;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin:0 auto 16px;">
                 <i class="fa-solid fa-right-from-bracket"></i>
             </div>
-            <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin:0 0 8px;">Log out?</h3>
+            <h3 style="font-size:1.15rem;font-weight:900;color:var(--text-bright);margin:0 0 8px;">Log out?</h3>
             <p style="font-size:0.84rem;color:var(--text-muted);margin:0 0 24px;">You will need to sign back in to
                 access the portal.</p>
             <div style="display:flex;gap:12px;justify-content:center;">
                 <button onclick="closeLogoutModal()"
-                    style="padding:10px 22px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.85rem;">Cancel</button>
+                    style="padding:10px 22px;border-radius:11px;border:1px solid var(--border);background:var(--bg-subtle);color:var(--text-primary);cursor:pointer;font-weight:700;font-size:0.85rem;">Cancel</button>
                 <button onclick="confirmLogoutAction()"
                     style="padding:10px 24px;border-radius:11px;border:none;background:linear-gradient(135deg,#ef4444,#dc2626);color:#fff;cursor:pointer;font-weight:800;font-size:0.85rem;box-shadow:0 4px 15px rgba(239,68,68,0.4);">Logout</button>
             </div>

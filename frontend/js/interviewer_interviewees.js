@@ -88,7 +88,7 @@ function renderTable() {
                         ${initial}
                     </div>
                     <div>
-                        <div style="font-weight:700; color:#fff; font-size:0.92rem;">${escapeHtml(a.candidate_name)}</div>
+                        <div style="font-weight:700; color:var(--text-bright); font-size:0.92rem;">${escapeHtml(a.candidate_name)}</div>
                         <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">${escapeHtml(a.candidate_email)}</div>
                     </div>
                 </div>
@@ -244,7 +244,7 @@ function renderPullTable() {
                         ${initial}
                     </div>
                     <div>
-                        <div style="font-weight:700; color:#fff; font-size:0.92rem;">${escapeHtml(c.candidate_name)}</div>
+                        <div style="font-weight:700; color:var(--text-bright); font-size:0.92rem;">${escapeHtml(c.candidate_name)}</div>
                         <div style="font-size:0.75rem; color:var(--text-muted); margin-top:2px;">${escapeHtml(c.candidate_email)}</div>
                     </div>
                 </div>

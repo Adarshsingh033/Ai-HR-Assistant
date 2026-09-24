@@ -48,7 +48,7 @@ function populateUI() {
     const skillsBox = document.getElementById('cand-skills');
     if (c.skills && c.skills.length > 0) {
         skillsBox.innerHTML = c.skills.map(s => 
-            `<span style="background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); padding:4px 10px; border-radius:8px; font-size:0.75rem; color:#e2e8f0;">${escapeHtml(s)}</span>`
+            `<span style="background:var(--bg-subtle); border:1px solid var(--border); padding:4px 10px; border-radius:8px; font-size:0.75rem; color:var(--text-secondary);">${escapeHtml(s)}</span>`
         ).join('');
     } else {
         skillsBox.innerHTML = '<span style="color:var(--text-muted); font-size:0.8rem;">No skills listed</span>';
