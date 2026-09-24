@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -49,12 +49,12 @@
         .form-group { display: flex; flex-direction: column; gap: 7px; margin-bottom: 0; }
         .form-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
         .form-control {
-            background: rgba(255,255,255,0.05); border: 1px solid var(--border);
-            border-radius: 12px; color: #fff; font-size: 0.88rem; font-family: inherit;
+            background: var(--bg-subtle); border: 1px solid var(--border);
+            border-radius: 12px; color: var(--text-primary); font-size: 0.88rem; font-family: inherit;
             padding: 0 16px; height: 46px; outline: none; transition: border-color 0.2s, box-shadow 0.2s; width: 100%; box-sizing: border-box;
         }
         .form-control:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-        select.form-control option { background: #111827; color: #fff; padding: 8px; }
+        select.form-control option { background: var(--bg-card); color: var(--text-primary); padding: 8px; }
 
         /* ── Compact & Perfectly Proportioned Compare Button ── */
         #btn-run-compare {
@@ -89,49 +89,48 @@
             box-shadow: none;
         }
 
-        /* ── Tom Select Dark Theme Overrides ── */
+        /* ── Tom Select Theme Overrides ── */
         .ts-wrapper, .ts-wrapper.form-control, .ts-wrapper.single, .ts-wrapper.multi {
             padding: 0; background: transparent; border: none; box-shadow: none; height: auto;
         }
         .ts-wrapper.single .ts-control, .ts-wrapper.multi .ts-control, .ts-control {
-            background: rgba(255,255,255,0.05) !important; 
+            background: var(--bg-subtle) !important; 
             border: 1px solid var(--border) !important;
             border-radius: 12px !important; 
-            color: #fff !important; 
+            color: var(--text-primary) !important; 
             font-size: 0.88rem; font-family: inherit;
             padding: 0 16px !important; 
             height: 46px !important; 
             box-sizing: border-box; display: flex; align-items: center;
         }
         .ts-wrapper.disabled .ts-control {
-            opacity: 0.4;
-            background: rgba(255,255,255,0.02) !important;
+            opacity: 0.6;
+            background: var(--bg-hover) !important;
             cursor: not-allowed;
         }
-        .ts-control > input, .ts-wrapper.single .ts-control input { color: #fff !important; font-family: inherit; }
+        .ts-control > input, .ts-wrapper.single .ts-control input { color: var(--text-primary) !important; font-family: inherit; }
         .ts-wrapper.focus .ts-control { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-glow) !important; }
         .ts-dropdown, .ts-wrapper.single .ts-dropdown, .ts-wrapper.multi .ts-dropdown {
-            background: #111827 !important; border: 1px solid var(--border) !important; border-radius: 12px !important;
-            color: #fff !important; margin-top: 6px; box-shadow: var(--shadow-md) !important;
+            background: var(--bg-card) !important; border: 1px solid var(--border) !important; border-radius: 12px !important;
+            color: var(--text-primary) !important; margin-top: 6px; box-shadow: var(--shadow-md) !important;
         }
-        .ts-dropdown .option { padding: 10px 16px !important; color: #fff !important; }
-        .ts-dropdown .active, .ts-dropdown .option:hover { background: var(--accent) !important; color: #fff !important; }
-        .ts-control .item { color: #fff !important; }
+        .ts-dropdown .option { padding: 10px 16px !important; color: var(--text-primary) !important; }
+        .ts-dropdown .active, .ts-dropdown .option:hover { background: var(--bg-hover) !important; color: var(--text-primary) !important; }
+        .ts-control .item { color: var(--text-primary) !important; }
         /* Fix the dropdown arrow color */
-        .ts-wrapper.single .ts-control:after { border-color: rgba(255,255,255,0.6) transparent transparent transparent !important; }
-        .ts-wrapper.single.dropdown-active .ts-control:after { border-color: transparent transparent rgba(255,255,255,0.6) transparent !important; }
+        .ts-wrapper.single .ts-control:after { border-color: var(--text-muted) transparent transparent transparent !important; }
+        .ts-wrapper.single.dropdown-active .ts-control:after { border-color: transparent transparent var(--text-muted) transparent !important; }
 
         /* ── Modern Enhanced Comparison Empty Placeholder ── */
         .compare-hero-card {
-            background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(30, 27, 75, 0.75));
-            border: 1px solid rgba(255, 255, 255, 0.12);
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: 24px;
             padding: 56px 32px;
             text-align: center;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-md);
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -146,7 +145,7 @@
             transform: translateX(-50%);
             width: min(450px, 90%);
             height: clamp(200px, 30vh, 320px);
-            background: radial-gradient(circle, rgba(99, 102, 241, 0.25) 0%, rgba(168, 85, 247, 0.15) 50%, transparent 80%);
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.1) 50%, transparent 80%);
             pointer-events: none;
             filter: blur(40px);
         }
@@ -176,14 +175,14 @@
         .compare-hero-title {
             font-size: 1.5rem;
             font-weight: 800;
-            color: #ffffff;
+            color: var(--text-primary);
             letter-spacing: -0.01em;
             margin-bottom: 10px;
         }
 
         .compare-hero-desc {
             font-size: 0.92rem;
-            color: rgba(255, 255, 255, 0.65);
+            color: var(--text-muted);
             max-width: 560px;
             line-height: 1.6;
             margin-bottom: 36px;
@@ -204,8 +203,8 @@
         }
 
         .compare-step-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             border-radius: 16px;
             padding: 20px 16px;
             display: flex;
@@ -216,8 +215,8 @@
         }
 
         .compare-step-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(99, 102, 241, 0.3);
+            background: var(--bg-hover);
+            border-color: var(--primary);
             transform: translateY(-2px);
         }
 
@@ -227,7 +226,7 @@
             border-radius: 50%;
             background: rgba(99, 102, 241, 0.2);
             border: 1px solid rgba(99, 102, 241, 0.4);
-            color: #a5b4fc;
+            color: #4338ca;
             font-size: 0.85rem;
             font-weight: 800;
             display: flex;
@@ -236,16 +235,20 @@
             margin-bottom: 12px;
         }
 
+        html[data-theme="dark"] .step-num-badge {
+            color: #a5b4fc;
+        }
+
         .step-item-title {
             font-size: 0.9rem;
             font-weight: 700;
-            color: #ffffff;
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
 
         .step-item-desc {
             font-size: 0.78rem;
-            color: rgba(255, 255, 255, 0.5);
+            color: var(--text-muted);
             line-height: 1.4;
         }
 
@@ -298,7 +301,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: conic-gradient(#6366f1 0deg, rgba(255,255,255,0.08) 0deg);
+            background: conic-gradient(#6366f1 0deg, var(--bg-hover) 0deg);
             padding: 10px;
             box-shadow: 0 0 25px rgba(99,102,241,0.25);
             transition: all 0.5s ease;
@@ -307,14 +310,14 @@
             width: calc(100% - 20px);
             height: calc(100% - 20px);
             border-radius: 50%;
-            background: #0f172a;
-            border: 3px solid rgba(255,255,255,0.12);
+            background: #ffffff;
+            border: 3px solid var(--border);
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 2.2rem;
             font-weight: 900;
-            color: #fff;
+            color: #000000;
             overflow: hidden;
         }
         .profile-name-title {
@@ -406,7 +409,7 @@
         }
         .crit-detail-text {
             font-size: 0.83rem;
-            color: rgba(255,255,255,0.7);
+            color: var(--text-secondary);
             line-height: 1.4;
             margin-top: 4px;
         }
@@ -631,7 +634,7 @@
                     <div class="side-by-side-grid">
                         <div class="cand-criterion-block">
                             <div class="crit-label-row">
-                                <strong style="color:#fff;" id="c1-name-cat1">Candidate A</strong>
+                                <strong style="color:var(--text-bright);" id="c1-name-cat1">Candidate A</strong>
                                 <span class="crit-status-tag" id="c1-loc-status">Location</span>
                             </div>
                             <div class="bar-track">
@@ -642,7 +645,7 @@
 
                         <div class="cand-criterion-block">
                             <div class="crit-label-row">
-                                <strong style="color:#fff;" id="c2-name-cat1">Candidate B</strong>
+                                <strong style="color:var(--text-bright);" id="c2-name-cat1">Candidate B</strong>
                                 <span class="crit-status-tag" id="c2-loc-status">Location</span>
                             </div>
                             <div class="bar-track">
@@ -659,7 +662,7 @@
                     <div class="side-by-side-grid">
                         <div class="cand-criterion-block">
                             <div class="crit-label-row">
-                                <strong style="color:#fff;" id="c1-name-cat2">Candidate A</strong>
+                                <strong style="color:var(--text-bright);" id="c1-name-cat2">Candidate A</strong>
                                 <span class="crit-status-tag" id="c1-skills-status">Skills Match</span>
                             </div>
                             <div class="bar-track">
@@ -671,7 +674,7 @@
 
                         <div class="cand-criterion-block">
                             <div class="crit-label-row">
-                                <strong style="color:#fff;" id="c2-name-cat2">Candidate B</strong>
+                                <strong style="color:var(--text-bright);" id="c2-name-cat2">Candidate B</strong>
                                 <span class="crit-status-tag" id="c2-skills-status">Skills Match</span>
                             </div>
                             <div class="bar-track">
@@ -689,7 +692,7 @@
                     <div class="side-by-side-grid">
                         <div class="cand-criterion-block">
                             <div class="crit-label-row">
-                                <strong style="color:#fff;" id="c1-name-cat3">Candidate A</strong>
+                                <strong style="color:var(--text-bright);" id="c1-name-cat3">Candidate A</strong>
                                 <span class="crit-status-tag" id="c1-edu-status">Education</span>
                             </div>
                             <div class="bar-track">
@@ -700,7 +703,7 @@
 
                         <div class="cand-criterion-block">
                             <div class="crit-label-row">
-                                <strong style="color:#fff;" id="c2-name-cat3">Candidate B</strong>
+                                <strong style="color:var(--text-bright);" id="c2-name-cat3">Candidate B</strong>
                                 <span class="crit-status-tag" id="c2-edu-status">Education</span>
                             </div>
                             <div class="bar-track">
@@ -717,7 +720,7 @@
                     <div class="side-by-side-grid">
                         <div class="cand-criterion-block">
                             <div class="crit-label-row">
-                                <strong style="color:#fff;" id="c1-name-cat4">Candidate A</strong>
+                                <strong style="color:var(--text-bright);" id="c1-name-cat4">Candidate A</strong>
                                 <span class="crit-status-tag" id="c1-exp-status">Experience</span>
                             </div>
                             <div class="bar-track">
@@ -728,7 +731,7 @@
 
                         <div class="cand-criterion-block">
                             <div class="crit-label-row">
-                                <strong style="color:#fff;" id="c2-name-cat4">Candidate B</strong>
+                                <strong style="color:var(--text-bright);" id="c2-name-cat4">Candidate B</strong>
                                 <span class="crit-status-tag" id="c2-exp-status">Experience</span>
                             </div>
                             <div class="bar-track">
@@ -748,8 +751,8 @@
                             <i class="fa-solid fa-trophy"></i>
                         </div>
                         <div>
-                            <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin:0;" id="rec-title">Recommended Candidate</h3>
-                            <div style="font-size:0.8rem;color:rgba(255,255,255,0.6);margin-top:2px;">AI Comparison Rationale & Decision Factors</div>
+                            <h3 style="font-size:1.15rem;font-weight:900;color:var(--text-bright);margin:0;" id="rec-title">Recommended Candidate</h3>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:2px;">AI Comparison Rationale & Decision Factors</div>
                         </div>
                     </div>
                     <div class="rec-reason-text" id="rec-reason-body">
@@ -765,15 +768,15 @@
 
 <!-- Logout Confirmation Modal -->
 <div class="modal-overlay" id="logout-confirm-modal">
-    <div style="background:#0f172a;border:1px solid rgba(255,255,255,0.14);border-radius:22px;width:min(400px, 92vw);padding:clamp(22px, 2.4vw, 32px) clamp(20px, 2.2vw, 28px);text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.6);">
+    <div style="background:var(--bg-card);border:1px solid var(--border);border-radius:22px;width:min(400px, 92vw);padding:clamp(22px, 2.4vw, 32px) clamp(20px, 2.2vw, 28px);text-align:center;box-shadow:0 20px 50px rgba(0,0,0,0.2);">
         <div style="width:54px;height:54px;border-radius:50%;background:rgba(239,68,68,0.15);border:1px solid rgba(239,68,68,0.3);color:#f87171;display:flex;align-items:center;justify-content:center;font-size:1.35rem;margin:0 auto 16px;box-shadow:0 0 20px rgba(239,68,68,0.2);">
             <i class="fa-solid fa-right-from-bracket"></i>
         </div>
-        <h3 style="font-size:1.15rem;font-weight:900;color:#fff;margin-bottom:8px;">Log out of your account?</h3>
+        <h3 style="font-size:1.15rem;font-weight:900;color:var(--text-bright);margin-bottom:8px;">Log out of your account?</h3>
         <p style="font-size:0.84rem;color:var(--text-muted);margin-bottom:24px;">You will need to sign back in to access the AI HR Assistant portal.</p>
         <div style="display:flex;gap:12px;justify-content:center;">
             <button onclick="closeLogoutModal()"
-                    style="padding:10px 22px;border-radius:11px;border:1px solid rgba(255,255,255,0.15);background:rgba(255,255,255,0.06);color:#fff;cursor:pointer;font-weight:700;font-size:0.85rem;">
+                    style="padding:10px 22px;border-radius:11px;border:1px solid var(--border);background:var(--bg-subtle);color:var(--text-primary);cursor:pointer;font-weight:700;font-size:0.85rem;">
                 Cancel
             </button>
             <button onclick="confirmLogoutAction()"

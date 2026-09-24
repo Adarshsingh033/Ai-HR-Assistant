@@ -141,11 +141,11 @@ function renderScreeningTable() {
                 </span>
             </td>
             <td class="td-truncate">
-                <span style="font-size:0.82rem; ${c.current_interviewer_name ? 'color:var(--text-secondary);' : 'color:var(--text-muted); font-style:italic;'}">
+                <span style="font-size:0.82rem; ${c.current_interviewer_name ? 'color:var(--text-secondary);' : 'color:var(--text-muted); font-style:italic;'};">
                     ${escapeHtml(interviewerName)}
                 </span>
             </td>
-            <td style="text-align:center;font-weight:700;color:${c.average_rating >= 7 ? '#10b981' : c.average_rating >= 4 ? '#f59e0b' : c.average_rating ? '#ef4444' : 'var(--text-muted)'};">
+            <td style="text-align:center;font-weight:700;color:${c.average_rating >= 7 ? '#10b981' : c.average_rating >= 4 ? '#f59e0b' : c.average_rating ? '#ef4444' : 'var(--text-muted)'}; line-height:1.2;">
                 ${avgRatingStr}
             </td>
             <td style="white-space:nowrap;">
@@ -349,7 +349,7 @@ async function openViewProgressModal(candidateId) {
                             Round ${r.round_order}: ${escapeHtml(r.round_title)}
                         </div>
                         <div style="display:flex;align-items:center;gap:8px;">
-                            ${r.score !== null && r.score !== undefined ? `<span style="background:rgba(99,102,241,0.2);color:#a5b4fc;padding:3px 10px;border-radius:99px;font-weight:800;font-size:0.75rem;border:1px solid rgba(99,102,241,0.4);"><i class="fa-solid fa-star"></i> Rating: ${r.score}/10</span>` : ''}
+                            ${r.score !== null && r.score !== undefined ? `<span style="background:rgba(99,102,241,0.15);color:#4338ca;padding:3px 10px;border-radius:99px;font-weight:800;font-size:0.75rem;border:1px solid rgba(99,102,241,0.3);"><i class="fa-solid fa-star"></i> Rating: ${r.score}/10</span>` : ''}
                             <span class="status-pill ${r.status === 'Passed' ? 'status-pill-passed' : r.status === 'Rejected' ? 'status-pill-rejected' : r.status === 'On Hold' ? 'status-pill-onhold' : 'status-pill-ongoing'}">${r.status || 'Pending'}</span>
                         </div>
                     </div>

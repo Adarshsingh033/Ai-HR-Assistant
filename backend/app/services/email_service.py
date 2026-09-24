@@ -102,10 +102,10 @@ def draft_email_content(
     ])
 
     try:
-        logger.info("Drafting email for HR '%s' using Groq.", hr_id)
-        from app.services.ai_service import _build_groq_client, _invoke_groq_with_retry
-        groq = _build_groq_client()
-        chain = system_prompt | groq
+        logger.info("Drafting email for HR '%s' using Gemini.", hr_id)
+        from app.services.ai_service import _build_gemini_client, _invoke_gemini_with_retry
+        gemini = _build_gemini_client()
+        chain = system_prompt | gemini
         
         def _call() -> str:
             res = chain.invoke(input={
@@ -114,12 +114,14 @@ def draft_email_content(
                 "prompt": prompt,
             })
             if res and res.content:
-                return res.content
-            raise RuntimeError("Groq returned empty response.")
+                if isinstance(res.content, list):
+                    return "".join([block.get("text", "") for block in res.content if isinstance(block, dict) and "text" in block])
+                return str(res.content)
+            raise RuntimeError("Gemini returned empty response.")
             
-        return _invoke_groq_with_retry(_call, context="Email drafting")
+        return _invoke_gemini_with_retry(_call, context="Email drafting")
     except Exception as e:
-        logger.error("Groq failed for email drafting: %s", e)
+        logger.error("Gemini failed for email drafting: %s", e)
         return (
             f"SUBJECT: Communication from {hr_info['org_name']}\n"
             f"BODY:\n"

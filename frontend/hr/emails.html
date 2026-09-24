@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
@@ -13,9 +13,9 @@
             gap: clamp(12px, 1.5vw, 20px);
             flex: 1 1 auto;
             min-height: min(400px, 60vh);
-            background: rgba(15, 23, 42, 0.4);
+            background: var(--bg-card);
             border-radius: var(--radius-xl);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
             overflow: hidden;
             backdrop-filter: blur(16px);
         }
@@ -26,8 +26,8 @@
 
         /* Mail Sidebar */
         .mail-sidebar {
-            background: rgba(255, 255, 255, 0.02);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            background: var(--bg-card);
+            border-right: 1px solid var(--border);
             padding: 24px 16px;
             display: flex;
             flex-direction: column;
@@ -72,7 +72,7 @@
         }
 
         .mail-folder:hover {
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--bg-hover);
             color: var(--text-primary);
         }
 
@@ -99,7 +99,7 @@
 
         .mail-header {
             padding: 24px 32px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -130,14 +130,14 @@
             grid-template-columns: 26px minmax(0, clamp(120px, 16%, 200px)) minmax(0, 1fr) minmax(0, auto);
             align-items: center;
             padding: clamp(12px, 1.3vw, 16px) clamp(16px, 2.2vw, 32px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            border-bottom: 1px solid var(--border);
             cursor: pointer;
             transition: all 0.2s ease;
             gap: 16px;
         }
 
         .email-row:hover {
-            background: rgba(255, 255, 255, 0.04);
+            background: var(--bg-hover);
             transform: translateX(4px);
             box-shadow: -4px 0 0 var(--accent);
         }
@@ -196,7 +196,7 @@
         .email-detail-header {
             margin-bottom: 24px;
             padding-bottom: 24px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid var(--border);
         }
         
         .email-detail-subject {
@@ -250,7 +250,7 @@
             width: 100%;
             background: transparent;
             border: none;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 1px solid var(--border);
             color: var(--text-primary);
             padding: 12px 0;
             font-size: 0.95rem;
@@ -264,8 +264,8 @@
 
         .compose-textarea {
             width: 100%;
-            background: rgba(255,255,255,0.02);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg-subtle);
+            border: 1px solid var(--border);
             border-radius: var(--radius-md);
             color: var(--text-primary);
             padding: 16px;
@@ -278,7 +278,7 @@
         .compose-textarea:focus {
             outline: none;
             border-color: var(--accent);
-            background: rgba(0,0,0,0.2);
+            background: var(--bg-card);
         }
         
         .ai-drafter {

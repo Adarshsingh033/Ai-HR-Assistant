@@ -191,12 +191,17 @@ def list_screening_candidates(
                 "  NULL"
                 ") AS current_interviewer_name, "
                 # Average rating across completed rounds (10-point scale)
-                "(SELECT ROUND(AVG(ia2.rating)::numeric, 1) "
-                " FROM interview_assignments ia2 "
-                " WHERE ia2.candidate_id = c.id "
-                "   AND ia2.completed_at IS NOT NULL "
-                "   AND ia2.rating IS NOT NULL"
-                ") AS average_rating "
+                "(SELECT ROUND(AVG(sc.score)::numeric, 1) "
+                " FROM screening_comments sc "
+                " WHERE sc.candidate_id = c.id "
+                "   AND sc.score IS NOT NULL"
+                ") AS average_rating, "
+                # Count of ratings
+                "(SELECT COUNT(sc.score) "
+                " FROM screening_comments sc "
+                " WHERE sc.candidate_id = c.id "
+                "   AND sc.score IS NOT NULL"
+                ") AS rating_count "
                 "FROM candidates c "
                 "LEFT JOIN job_vacancies j ON c.job_id = j.id "
                 "LEFT JOIN candidate_screening_status css ON c.id = css.candidate_id "
@@ -245,6 +250,7 @@ def list_screening_candidates(
                         "current_round_title": r[18],
                         "current_interviewer_name": r[19],
                         "average_rating": float(r[20]) if r[20] is not None else None,
+                        "rating_count": int(r[21]) if len(r) > 21 and r[21] is not None else 0,
                     }
                     for r in rows
                 ]

@@ -143,7 +143,7 @@ function renderTable() {
                 </div>
             </td>
             <td>
-                <span style="font-size:0.84rem;font-family:monospace;color:#a5b4fc;background:rgba(99,102,241,0.1);padding:3px 8px;border-radius:6px;border:1px solid rgba(99,102,241,0.2);">
+                <span style="font-size:0.84rem;font-family:monospace;color:#4338ca;background:rgba(99,102,241,0.1);padding:3px 8px;border-radius:6px;border:1px solid rgba(99,102,241,0.2);">
                     ${escapeHtml(iv.username)}
                 </span>
             </td>

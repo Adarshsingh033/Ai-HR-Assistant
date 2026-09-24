@@ -1,9 +1,9 @@
 """
 AI service — LLM-powered functions for job descriptions, resume extraction, and candidate matching.
 
-Primary LLM: Groq – model: compound-beta-mini
+Primary LLM: Gemini – model: compound-beta-mini
              Retries up to 5 times with a 5-second delay between attempts
-             to gracefully handle Groq's rate-limit responses.
+             to gracefully handle Gemini's rate-limit responses.
 """
 
 import os
@@ -11,24 +11,23 @@ import time
 from typing import Optional, Callable, TypeVar, List
 
 try:
-    from langchain_groq import ChatGroq
+    from langchain_google_genai import ChatGoogleGenerativeAI
 except (ModuleNotFoundError, ImportError):
-    ChatGroq = None
+    ChatGoogleGenerativeAI = None
 
 from langchain_core.prompts import ChatPromptTemplate
 from pydantic import BaseModel, Field
 from dotenv import dotenv_values
 
-from app.config import GROQ_API_KEY, GROQ_MODEL
+from app.config import GEMINI_API_KEY, GEMINI_MODEL
 from app.logger import get_logger
 
 logger = get_logger(__name__)
 
-# ── Groq configuration ───────────────────────────────────────────────────────
+# ── Gemini configuration ───────────────────────────────────────────────────────
 
-GROQ_MODEL_NAME = "compound-beta-mini"   # Single production model
-GROQ_MAX_RETRIES = 5                     # Max attempts on rate-limit / transient errors
-GROQ_RETRY_DELAY = 5                     # Seconds to wait between retries
+GEMINI_MAX_RETRIES = 5                     # Max attempts on rate-limit / transient errors
+GEMINI_RETRY_DELAY = 5                     # Seconds to wait between retries
 
 T = TypeVar("T")
 
@@ -122,58 +121,58 @@ class CompareCandidatesLLMSchema(BaseModel):
 
 # ── LLM Clients Initialization ───────────────────────────────────────────────
 
-_groq_client: Optional["ChatGroq"] = None
-_groq_resume_data_extractor = None
-_groq_matcher = None
-_groq_is_resume_checker = None
-_groq_comparator = None
+_gemini_client: Optional["ChatGoogleGenerativeAI"] = None
+_gemini_resume_data_extractor = None
+_gemini_matcher = None
+_gemini_is_resume_checker = None
+_gemini_comparator = None
 
 
-# ── Groq helpers ─────────────────────────────────────────────────────────────
+# ── Gemini helpers ─────────────────────────────────────────────────────────────
 
-def _get_groq_api_key() -> str:
-    """Return GROQ_API_KEY from env, falling back to direct .env file read."""
-    api_key = (os.getenv("GROQ_API_KEY") or GROQ_API_KEY or "").strip()
+def _get_gemini_api_key() -> str:
+    """Return GEMINI_API_KEY from env, falling back to direct .env file read."""
+    api_key = (os.getenv("GEMINI_API_KEY") or GEMINI_API_KEY or "").strip()
     if not api_key:
         env_file = os.path.normpath(
             os.path.join(os.path.dirname(__file__), "..", "..", ".env")
         )
         if os.path.exists(env_file):
             vals = dotenv_values(env_file)
-            api_key = (vals.get("GROQ_API_KEY") or "").strip()
+            api_key = (vals.get("GEMINI_API_KEY") or "").strip()
             if api_key:
-                os.environ["GROQ_API_KEY"] = api_key
+                os.environ["GEMINI_API_KEY"] = api_key
     return api_key
 
 
-def _build_groq_client() -> "ChatGroq":
-    """Create a fresh ChatGroq client using the single production model."""
-    api_key = _get_groq_api_key()
+def _build_gemini_client() -> "ChatGoogleGenerativeAI":
+    """Create a fresh ChatGemini client using the single production model."""
+    api_key = _get_gemini_api_key()
     if not api_key:
         raise RuntimeError(
-            "GROQ_API_KEY is not set in backend/.env — "
-            "Groq cannot be used."
+            "GEMINI_API_KEY is not set in backend/.env — "
+            "Gemini cannot be used."
         )
-    if ChatGroq is None:
+    if ChatGoogleGenerativeAI is None:
         raise RuntimeError(
-            "langchain_groq is not installed — run: pip install langchain-groq"
+            "langchain-google-genai is not installed — run: pip install langchain-google-genai"
         )
-    return ChatGroq(
-        groq_api_key=api_key,
-        model_name=GROQ_MODEL_NAME,
+    return ChatGoogleGenerativeAI(
+        api_key=api_key,
+        model=GEMINI_MODEL,
         temperature=0.2,
     )
 
 
-def _invoke_groq_with_retry(call: Callable[[], T], context: str = "") -> T:
+def _invoke_gemini_with_retry(call: Callable[[], T], context: str = "") -> T:
     """
-    Execute *call* (a zero-argument callable that invokes Groq) with retry logic.
+    Execute *call* (a zero-argument callable that invokes Gemini) with retry logic.
 
-    Retries up to GROQ_MAX_RETRIES times, waiting GROQ_RETRY_DELAY seconds between
-    each attempt, to handle Groq's rate-limit (429) and other transient errors.
+    Retries up to GEMINI_MAX_RETRIES times, waiting GEMINI_RETRY_DELAY seconds between
+    each attempt, to handle Gemini's rate-limit (429) and other transient errors.
 
     Args:
-        call: Zero-argument callable that performs the Groq invocation.
+        call: Zero-argument callable that performs the Gemini invocation.
         context: Human-readable label used in log messages (e.g. "JD generation").
 
     Returns:
@@ -184,57 +183,57 @@ def _invoke_groq_with_retry(call: Callable[[], T], context: str = "") -> T:
     """
     last_error: Exception | None = None
 
-    for attempt in range(1, GROQ_MAX_RETRIES + 1):
+    for attempt in range(1, GEMINI_MAX_RETRIES + 1):
         try:
             logger.info(
-                "[Groq] %s — attempt %d/%d using model '%s'",
-                context, attempt, GROQ_MAX_RETRIES, GROQ_MODEL_NAME,
+                "[Gemini] %s — attempt %d/%d using model '%s'",
+                context, attempt, GEMINI_MAX_RETRIES, GEMINI_MODEL,
             )
             result = call()
             logger.info(
-                "[Groq] %s — succeeded on attempt %d",
+                "[Gemini] %s — succeeded on attempt %d",
                 context, attempt,
             )
             return result
         except Exception as e:
             last_error = e
             logger.warning(
-                "[Groq] %s — attempt %d/%d failed: %s",
-                context, attempt, GROQ_MAX_RETRIES, e,
+                "[Gemini] %s — attempt %d/%d failed: %s",
+                context, attempt, GEMINI_MAX_RETRIES, e,
             )
-            if attempt < GROQ_MAX_RETRIES:
+            if attempt < GEMINI_MAX_RETRIES:
                 logger.info(
-                    "[Groq] Waiting %ds before retry %d/%d...",
-                    GROQ_RETRY_DELAY, attempt + 1, GROQ_MAX_RETRIES,
+                    "[Gemini] Waiting %ds before retry %d/%d...",
+                    GEMINI_RETRY_DELAY, attempt + 1, GEMINI_MAX_RETRIES,
                 )
-                time.sleep(GROQ_RETRY_DELAY)
+                time.sleep(GEMINI_RETRY_DELAY)
 
     raise RuntimeError(
-        f"[Groq] {context} — all {GROQ_MAX_RETRIES} attempts failed. "
+        f"[Gemini] {context} — all {GEMINI_MAX_RETRIES} attempts failed. "
         f"Last error: {last_error}"
     )
 
 
-def get_groq_client():
-    """Return a cached tuple of (groq_client, resume_extractor, matcher, comparator)."""
-    global _groq_client, _groq_resume_data_extractor, _groq_matcher, _groq_is_resume_checker, _groq_comparator
-    if _groq_client is not None:
-        return _groq_client, _groq_resume_data_extractor, _groq_matcher, _groq_comparator
+def get_gemini_client():
+    """Return a cached tuple of (gemini_client, resume_extractor, matcher, comparator)."""
+    global _gemini_client, _gemini_resume_data_extractor, _gemini_matcher, _gemini_is_resume_checker, _gemini_comparator
+    if _gemini_client is not None:
+        return _gemini_client, _gemini_resume_data_extractor, _gemini_matcher, _gemini_comparator
 
     try:
-        _groq_client = _build_groq_client()
-        _groq_resume_data_extractor = _groq_client.with_structured_output(
+        _gemini_client = _build_gemini_client()
+        _gemini_resume_data_extractor = _gemini_client.with_structured_output(
             schema=ExtractResumeDataSchema, method="json_mode"
         )
-        _groq_matcher = _groq_client.with_structured_output(schema=MatchResultSchema, method="json_mode")
-        _groq_is_resume_checker = _groq_client.with_structured_output(schema=IsResumeSchema, method="json_mode")
-        _groq_comparator = _groq_client.with_structured_output(schema=CompareCandidatesLLMSchema, method="json_mode")
+        _gemini_matcher = _gemini_client.with_structured_output(schema=MatchResultSchema, method="json_mode")
+        _gemini_is_resume_checker = _gemini_client.with_structured_output(schema=IsResumeSchema, method="json_mode")
+        _gemini_comparator = _gemini_client.with_structured_output(schema=CompareCandidatesLLMSchema, method="json_mode")
         logger.info(
-            "Groq LLM client initialized with model: %s", GROQ_MODEL_NAME
+            "Gemini LLM client initialized with model: %s", GEMINI_MODEL
         )
-        return _groq_client, _groq_resume_data_extractor, _groq_matcher, _groq_comparator
+        return _gemini_client, _gemini_resume_data_extractor, _gemini_matcher, _gemini_comparator
     except Exception as e:
-        logger.warning("Could not initialize Groq LLM client: %s", e)
+        logger.warning("Could not initialize Gemini LLM client: %s", e)
         return None, None, None, None
 
 
@@ -250,7 +249,7 @@ def generate_job_description(
     salary: str,
     skills_required: list[str],
 ) -> str:
-    """Generate a professional job description using Groq."""
+    """Generate a professional job description using Gemini."""
     skills_str = ", ".join(skills_required) if skills_required else "Not specified"
 
     prompt = f"""
@@ -293,15 +292,18 @@ Ensure the description is professional, engaging, and suitable for a company car
 Do not include any placeholder text — use the exact values provided above.
 """
 
-    groq = _build_groq_client()   # raises clearly if key/package missing
+    gemini = _build_gemini_client()   # raises clearly if key/package missing
 
     def _call() -> str:
-        response = groq.invoke(prompt)
+        response = gemini.invoke(prompt)
         if response and response.content:
-            return response.content
-        raise RuntimeError("Groq returned an empty response.")
+            if isinstance(response.content, list):
+                # Extract text from a list of blocks
+                return "".join([block.get("text", "") for block in response.content if isinstance(block, dict) and "text" in block])
+            return str(response.content)
+        raise RuntimeError("Gemini returned an empty response.")
 
-    return _invoke_groq_with_retry(_call, context=f"JD generation for '{title}'")
+    return _invoke_gemini_with_retry(_call, context=f"JD generation for '{title}'")
 
 
 # ── Resume Validation (Is this a resume?) ────────────────────────────────────
@@ -343,15 +345,15 @@ def check_is_resume(text: str) -> tuple[bool, str]:
         """),
     ])
 
-    _, _, _, _ = get_groq_client()  # ensure initialized
-    if _groq_is_resume_checker is None:
-        logger.warning("Groq is_resume checker not available, defaulting to True.")
+    _, _, _, _ = get_gemini_client()  # ensure initialized
+    if _gemini_is_resume_checker is None:
+        logger.warning("Gemini is_resume checker not available, defaulting to True.")
         return True, "LLM unavailable — assumed resume"
     try:
-        chain = prompt | _groq_is_resume_checker
+        chain = prompt | _gemini_is_resume_checker
         result = chain.invoke({"snippet": snippet})
     except Exception as e:
-        logger.warning("Groq resume check failed: %s — defaulting to True.", e)
+        logger.warning("Gemini resume check failed: %s — defaulting to True.", e)
         return True, "LLM unavailable — assumed resume"
 
     if result is None:
@@ -364,7 +366,7 @@ def check_is_resume(text: str) -> tuple[bool, str]:
 # ── Resume Data Extraction ───────────────────────────────────────────────────
 
 def extract_candidate_info(text: str) -> dict:
-    """Uses LLM (Groq) to extract structured data from resume text."""
+    """Uses LLM (Gemini) to extract structured data from resume text."""
     analysis_prompt = ChatPromptTemplate.from_messages([
         ("system", """
         You are a very skilled resume data extractor.
@@ -395,16 +397,16 @@ def extract_candidate_info(text: str) -> dict:
         """),
     ])
 
-    _, g_extractor, _, _ = get_groq_client()
+    _, g_extractor, _, _ = get_gemini_client()
     if g_extractor is None:
-        raise RuntimeError("Groq client could not be initialized.")
+        raise RuntimeError("Gemini client could not be initialized.")
 
     chain = analysis_prompt | g_extractor
 
     def _call():
         return chain.invoke(input={"resume_data": text})
 
-    result = _invoke_groq_with_retry(_call, context="Resume extraction")
+    result = _invoke_gemini_with_retry(_call, context="Resume extraction")
 
     candidate_name = result.candidate_name
     raw_text = (
@@ -438,7 +440,7 @@ def extract_candidate_info(text: str) -> dict:
 # ── Candidate–JD Matching ────────────────────────────────────────────────────
 
 def match_candidate_with_jd(candidate_data: dict, jd_text: str) -> dict:
-    """Uses LLM (Groq) to calculate match percentage and explanation."""
+    """Uses LLM (Gemini) to calculate match percentage and explanation."""
     match_prompt = ChatPromptTemplate.from_messages([
         ("system", """
         You are an expert HR Talent Acquisition Specialist evaluating candidate fit for a job vacancy.
@@ -489,9 +491,9 @@ Skills: {skills}
 Location / Address: {loc}
 """
 
-    _, _, g_matcher, _ = get_groq_client()
+    _, _, g_matcher, _ = get_gemini_client()
     if g_matcher is None:
-        raise RuntimeError("Groq client could not be initialized.")
+        raise RuntimeError("Gemini client could not be initialized.")
 
     chain = match_prompt | g_matcher
 
@@ -501,7 +503,7 @@ Location / Address: {loc}
             "jd_text": jd_text,
         })
 
-    result = _invoke_groq_with_retry(_call, context="Candidate-JD matching")
+    result = _invoke_gemini_with_retry(_call, context="Candidate-JD matching")
 
     logger.info(
         "Candidate match score: %d%% for candidate data.",
@@ -517,7 +519,7 @@ Location / Address: {loc}
 
 def compare_two_candidates_with_llm(job_data: dict, c1: dict, c2: dict) -> Optional[dict]:
     """
-    Uses LLM (Groq) to compare two candidates against a Job Vacancy.
+    Uses LLM (Gemini) to compare two candidates against a Job Vacancy.
     Returns structured evaluation with category scores, overall scores, and comparison summary reason.
     """
     prompt = ChatPromptTemplate.from_messages([
@@ -618,17 +620,17 @@ def compare_two_candidates_with_llm(job_data: dict, c1: dict, c2: dict) -> Optio
     result: Optional[CompareCandidatesLLMSchema] = None
 
     try:
-        groq_res = get_groq_client()
-        g_comparator = groq_res[3] if groq_res and len(groq_res) > 3 else None
+        gemini_res = get_gemini_client()
+        g_comparator = gemini_res[3] if gemini_res and len(gemini_res) > 3 else None
         if g_comparator is not None:
             chain = prompt | g_comparator
             def _call():
                 return chain.invoke(input=input_payload)
-            result = _invoke_groq_with_retry(_call, context="Candidate comparison")
+            result = _invoke_gemini_with_retry(_call, context="Candidate comparison")
         else:
-            logger.warning("Groq comparator could not be initialized.")
+            logger.warning("Gemini comparator could not be initialized.")
     except Exception as e:
-        logger.warning("Groq candidate comparison failed: %s", e)
+        logger.warning("Gemini candidate comparison failed: %s", e)
 
     if result is None:
         logger.warning("LLM comparison returned no result.")
@@ -822,8 +824,8 @@ Generate exactly 10 technical, skill-focused interview questions matching the di
 """),
     ])
 
-    groq_client = _build_groq_client()
-    q_extractor = groq_client.with_structured_output(schema=InterviewQuestionsSchema, method="json_mode")
+    gemini_client = _build_gemini_client()
+    q_extractor = gemini_client.with_structured_output(schema=InterviewQuestionsSchema, method="json_mode")
     chain = prompt | q_extractor
 
     def _call():
@@ -835,7 +837,7 @@ Generate exactly 10 technical, skill-focused interview questions matching the di
             "cand_skills": cand_skills,
         })
 
-    result = _invoke_groq_with_retry(_call, context="Interview question generation")
+    result = _invoke_gemini_with_retry(_call, context="Interview question generation")
     questions = result.questions if result and result.questions else []
     # Ensure exactly 10
     return questions[:10] if len(questions) >= 10 else questions

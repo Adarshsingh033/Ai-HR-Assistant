@@ -337,7 +337,7 @@ function renderProfileCard(prefix, candidate) {
     if (ring) {
         const score = candidate.overall_score;
         const color = candidate.is_recommended ? '#10b981' : '#6366f1';
-        ring.style.background = `conic-gradient(${color} 0deg ${score * 3.6}deg, rgba(255,255,255,0.08) ${score * 3.6}deg 360deg)`;
+        ring.style.background = `conic-gradient(${color} 0deg ${score * 3.6}deg, var(--bg-hover) ${score * 3.6}deg 360deg)`;
         ring.style.boxShadow = candidate.is_recommended ? '0 0 30px rgba(16,185,129,0.35)' : '0 0 20px rgba(99,102,241,0.2)';
     }
 

@@ -54,7 +54,7 @@ def create_task(
             cur.execute(
                 """
                 INSERT INTO ai_tasks (id, task_type, status, input_data, created_by, org_id, created_at, updated_at)
-                VALUES (%s, %s, 'pending', %s, %s, %s, %s, %s)
+                VALUES (%s, %s, 'pending_v2', %s, %s, %s, %s, %s)
                 """,
                 (
                     task_id,
@@ -164,7 +164,7 @@ def _claim_pending_task() -> Optional[dict]:
                 SET status = 'running', updated_at = NOW()
                 WHERE id = (
                     SELECT id FROM ai_tasks
-                    WHERE status = 'pending'
+                    WHERE status = 'pending_v2'
                     ORDER BY created_at ASC
                     LIMIT 1
                     FOR UPDATE SKIP LOCKED
@@ -192,7 +192,7 @@ def reset_stale_running_tasks():
         with conn.cursor() as cur:
             cur.execute(
                 """
-                UPDATE ai_tasks SET status = 'pending', updated_at = NOW()
+                UPDATE ai_tasks SET status = 'pending_v2', updated_at = NOW()
                 WHERE status = 'running'
                 """
             )
