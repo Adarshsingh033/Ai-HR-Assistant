@@ -237,6 +237,8 @@ def _dispatch_task(task: dict):
             org_id = inp.get("org_id", "")
             hr_id = inp.get("hr_id", "")
             filename = inp.get("filename", "resume.pdf")
+            # branch_id may be included in task input for proper data isolation
+            branch_id = inp.get("branch_id", None)
 
             if not os.path.exists(file_path):
                 raise FileNotFoundError(f"Resume file not found: {file_path}")
@@ -245,6 +247,36 @@ def _dispatch_task(task: dict):
                 content = f.read()
 
             parsed = parse_resume(content, filename)
+
+            # Resolve branch_id from HR member record if not in task input
+            if not branch_id and hr_id:
+                try:
+                    with get_db_connection() as conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                "SELECT branch_id FROM organization_members WHERE id = %s LIMIT 1",
+                                (hr_id,),
+                            )
+                            brow = cur.fetchone()
+                            if brow and brow[0]:
+                                branch_id = str(brow[0])
+                except Exception as be:
+                    logger.warning("Could not resolve branch_id for hr_id=%s: %s", hr_id, be)
+
+            # Resolve branch_id from job_vacancies if still missing
+            if not branch_id and job_id:
+                try:
+                    with get_db_connection() as conn:
+                        with conn.cursor() as cur:
+                            cur.execute(
+                                "SELECT branch_id FROM job_vacancies WHERE id = %s LIMIT 1",
+                                (job_id,),
+                            )
+                            jrow = cur.fetchone()
+                            if jrow and jrow[0]:
+                                branch_id = str(jrow[0])
+                except Exception as je:
+                    logger.warning("Could not resolve branch_id for job_id=%s: %s", job_id, je)
 
             # AI matching
             jd_text = ""
@@ -296,6 +328,7 @@ def _dispatch_task(task: dict):
                 "job_id": job_id,
                 "org_id": org_id,
                 "hr_id": hr_id,
+                "branch_id": branch_id,
                 "filename": filename,
                 "tmp_filename": tmp_filename,
                 "resume_text": resume_text,

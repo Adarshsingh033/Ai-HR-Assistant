@@ -66,6 +66,12 @@ function populateOrgDropdowns() {
 /* Load Branches from API */
 async function loadBranches() {
     const tbody = document.getElementById('branch-table-body');
+    const tableWrap = document.getElementById('branch-table-wrap');
+    const emptyState = document.getElementById('branch-empty');
+    
+    if (tableWrap) tableWrap.style.display = 'block';
+    if (emptyState) emptyState.style.display = 'none';
+
     if (tbody) {
         tbody.innerHTML = `
             <tr>
@@ -122,18 +128,19 @@ function showBranchError(msg) {
 /* Render Branch Table Rows */
 function renderBranchTable() {
     const tbody = document.getElementById('branch-table-body');
+    const tableWrap = document.getElementById('branch-table-wrap');
+    const emptyState = document.getElementById('branch-empty');
     if (!tbody) return;
 
     if (branchState.branches.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px;">
-                    No branches found matching your search.
-                </td>
-            </tr>
-        `;
+        if (emptyState) emptyState.style.display = 'flex';
+        if (tableWrap) tableWrap.style.display = 'none';
+        tbody.innerHTML = '';
         return;
     }
+
+    if (emptyState) emptyState.style.display = 'none';
+    if (tableWrap) tableWrap.style.display = 'block';
 
     tbody.innerHTML = branchState.branches.map(branch => {
         const locationParts = [branch.city, branch.state, branch.country].filter(Boolean);

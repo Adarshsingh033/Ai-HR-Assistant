@@ -6,6 +6,7 @@ let allJobs = [];
 let screeningCandidates = [];
 let currentOrgId = null;
 let currentHrId = null;
+let currentBranchId = null;  // branch-level isolation
 let activeCandidateId = null;
 let activeCandidateProgressData = null;
 let screeningState = { page: 1, limit: 10 };
@@ -19,6 +20,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     currentOrgId = session.org_id;
     currentHrId = session.user_id;
+    currentBranchId = session.branch_id || null;  // enforce branch isolation
 
     syncHRSidebarFromSession();
 
@@ -29,7 +31,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 /* ── Load Job list ─────────────────────────────────────── */
 async function loadJobs() {
     try {
-        const data = await apiRequest('GET', `/api/jobs?organization_id=${currentOrgId}`);
+        // Filter jobs to current branch for branch-level data isolation
+        let url = `/api/jobs?organization_id=${currentOrgId}`;
+        if (currentBranchId) url += `&branch_id=${currentBranchId}`;
+        const data = await apiRequest('GET', url);
         allJobs = (data && data.jobs) ? data.jobs : [];
         populateJobSelects();
     } catch (e) {
@@ -63,6 +68,8 @@ async function loadScreeningCandidates() {
         const search = document.getElementById('screen-filter-search')?.value?.trim() || '';
 
         let url = `/api/screening/candidates?org_id=${currentOrgId}`;
+        // Branch-level isolation: only see screening candidates from current branch
+        if (currentBranchId) url += `&branch_id=${currentBranchId}`;
         if (jobId) url += `&job_id=${encodeURIComponent(jobId)}`;
         if (status) url += `&interview_status=${encodeURIComponent(status)}`;
         if (search) url += `&search=${encodeURIComponent(search)}`;

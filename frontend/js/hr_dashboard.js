@@ -14,18 +14,20 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('welcome-name').textContent = session.username;
     document.getElementById('sidebar-avatar').textContent = session.username.charAt(0).toUpperCase();
 
-    // Load HR Dashboard Data
+    // Load HR Dashboard Data — pass branch_id for branch-level data isolation
     if (session.org_id) {
-        loadDashboardData(session.org_id);
+        loadDashboardData(session.org_id, session.branch_id || null);
     } else {
         showToast('You are not assigned to any organization yet. Please contact an admin.', 'warning');
         document.getElementById('welcome-name').textContent += ' (Unassigned)';
     }
 });
 
-async function loadDashboardData(orgId) {
+async function loadDashboardData(orgId, branchId) {
     try {
-        const data = await apiRequest('GET', `/api/hr/dashboard?org_id=${orgId}`);
+        let url = `/api/hr/dashboard?org_id=${orgId}`;
+        if (branchId) url += `&branch_id=${branchId}`;
+        const data = await apiRequest('GET', url);
 
         // Update Stats
         document.getElementById('stat-jobs').textContent = data.total_jobs || 0;

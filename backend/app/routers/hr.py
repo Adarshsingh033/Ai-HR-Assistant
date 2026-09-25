@@ -14,43 +14,89 @@ router = APIRouter(prefix="/api/hr", tags=["hr"])
 
 
 @router.get("/dashboard")
-def hr_dashboard(org_id: str):
-    """Return dashboard statistics for an organization."""
+def hr_dashboard(org_id: str, branch_id: Optional[str] = None):
+    """
+    Return dashboard statistics for a branch (or organisation as fallback).
+    When branch_id is supplied (recommended for HR users), all metrics are
+    scoped to that specific branch, enforcing branch-level data isolation.
+    """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
-            cur.execute("SELECT COUNT(*) FROM job_vacancies WHERE organization_id = %s", (org_id,))
+            # Build branch filter clause
+            branch_filter = " AND branch_id = %s" if branch_id else ""
+            branch_param = [branch_id] if branch_id else []
+
+            # Total jobs
+            cur.execute(
+                f"SELECT COUNT(*) FROM job_vacancies WHERE organization_id = %s{branch_filter}",
+                (org_id, *branch_param),
+            )
             total_jobs = cur.fetchone()[0]
 
-            cur.execute("SELECT COUNT(*) FROM job_vacancies WHERE organization_id = %s AND status = 'active'", (org_id,))
+            # Active jobs
+            cur.execute(
+                f"SELECT COUNT(*) FROM job_vacancies WHERE organization_id = %s AND status = 'active'{branch_filter}",
+                (org_id, *branch_param),
+            )
             active_jobs = cur.fetchone()[0]
 
-            cur.execute("SELECT COUNT(*) FROM candidates WHERE org_id = %s", (org_id,))
+            # Total candidates (use branch_id on candidates table if available)
+            if branch_id:
+                cur.execute(
+                    "SELECT COUNT(*) FROM candidates WHERE org_id = %s AND branch_id = %s",
+                    (org_id, branch_id),
+                )
+            else:
+                cur.execute("SELECT COUNT(*) FROM candidates WHERE org_id = %s", (org_id,))
             total_candidates = cur.fetchone()[0]
 
-            cur.execute("SELECT COUNT(*) FROM candidates WHERE org_id = %s AND reached = true", (org_id,))
+            # Shortlisted candidates
+            if branch_id:
+                cur.execute(
+                    "SELECT COUNT(*) FROM candidates WHERE org_id = %s AND branch_id = %s AND reached = true",
+                    (org_id, branch_id),
+                )
+            else:
+                cur.execute(
+                    "SELECT COUNT(*) FROM candidates WHERE org_id = %s AND reached = true",
+                    (org_id,),
+                )
             shortlisted_candidates = cur.fetchone()[0]
 
-            cur.execute("SELECT COALESCE(organization_name, company_name, '') FROM organization WHERE id = %s", (org_id,))
+            cur.execute(
+                "SELECT COALESCE(organization_name, company_name, '') FROM organization WHERE id = %s",
+                (org_id,),
+            )
             org = cur.fetchone()
             company_name = org[0] if org else "Your Company"
 
             # Status distribution (mapped from 'reached' boolean)
-            cur.execute("SELECT reached, COUNT(*) FROM candidates WHERE org_id = %s GROUP BY reached", (org_id,))
+            if branch_id:
+                cur.execute(
+                    "SELECT reached, COUNT(*) FROM candidates WHERE org_id = %s AND branch_id = %s GROUP BY reached",
+                    (org_id, branch_id),
+                )
+            else:
+                cur.execute(
+                    "SELECT reached, COUNT(*) FROM candidates WHERE org_id = %s GROUP BY reached",
+                    (org_id,),
+                )
             status_dist_rows = cur.fetchall()
             status_distribution = {}
             for row in status_dist_rows:
                 status_label = "Contacted" if row[0] else "Pending"
                 status_distribution[status_label] = row[1]
 
-            # Recent Jobs with Candidate Count
-            cur.execute("""
-                SELECT j.id, j.job_title, j.status, 
+            # Recent Jobs with Candidate Count (branch-scoped)
+            recent_jobs_sql = f"""
+                SELECT j.id, j.job_title, j.status,
                        (SELECT COUNT(*) FROM candidates c WHERE c.job_id = j.id) as candidate_count
                 FROM job_vacancies j
-                WHERE j.organization_id = %s
+                WHERE j.organization_id = %s{branch_filter}
                 ORDER BY j.created_at DESC
                 LIMIT 5
-            """, (org_id,))
+            """
+            cur.execute(recent_jobs_sql, (org_id, *branch_param))
             recent_jobs_rows = cur.fetchall()
             recent_jobs = [
                 {
@@ -61,7 +107,10 @@ def hr_dashboard(org_id: str):
                 } for r in recent_jobs_rows
             ] if recent_jobs_rows else []
 
-    logger.info("Dashboard loaded for org '%s': %d jobs, %d candidates.", org_id, total_jobs, total_candidates)
+    logger.info(
+        "Dashboard loaded for org '%s' branch '%s': %d jobs, %d candidates.",
+        org_id, branch_id or 'all', total_jobs, total_candidates
+    )
     return {
         "company_name": company_name,
         "total_jobs": total_jobs,

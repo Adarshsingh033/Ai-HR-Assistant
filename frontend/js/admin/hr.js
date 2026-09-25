@@ -177,6 +177,12 @@ function onMemberFilterChange() {
 async function loadMembers(page = memberState.page) {
     memberState.page = page;
     const tbody = document.getElementById('member-table-body');
+    const tableWrap = document.getElementById('hr-table-wrap');
+    const emptyState = document.getElementById('hr-empty');
+    
+    if (tableWrap) tableWrap.style.display = 'block';
+    if (emptyState) emptyState.style.display = 'none';
+
     if (tbody) {
         tbody.innerHTML = `
             <tr>
@@ -228,18 +234,19 @@ function showMemberError(msg) {
 /* Render Members Table */
 function renderMemberTable() {
     const tbody = document.getElementById('member-table-body');
+    const tableWrap = document.getElementById('hr-table-wrap');
+    const emptyState = document.getElementById('hr-empty');
     if (!tbody) return;
 
     if (memberState.members.length === 0) {
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px; font-weight: 500;">
-                    No HR members found.
-                </td>
-            </tr>
-        `;
+        if (emptyState) emptyState.style.display = 'flex';
+        if (tableWrap) tableWrap.style.display = 'none';
+        tbody.innerHTML = '';
         return;
     }
+
+    if (emptyState) emptyState.style.display = 'none';
+    if (tableWrap) tableWrap.style.display = 'block';
 
     tbody.innerHTML = memberState.members.map(m => {
         const isInactive = m.status === 'inactive';

@@ -1105,7 +1105,7 @@ textarea.form-control {
 
 .usage-bar-track {
   height: 5px;
-  background: rgba(255, 255, 255, 0.08);
+  background: var(--border);
   border-radius: 99px;
   overflow: hidden;
 }
@@ -1237,6 +1237,45 @@ textarea.form-control {
   background: var(--success);
   display: inline-block;
   flex-shrink: 0;
+}
+
+/* ── Empty State ─────────────────────────────────────────────── */
+.table-empty {
+  padding: 64px 24px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  color: #818cf8;
+  margin-bottom: 16px;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+.empty-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 6px;
+}
+
+.empty-sub {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  max-width: 420px;
+  line-height: 1.5;
 }
 
 /* ── Tables ─────────────────────────────────────────────────── */

@@ -155,14 +155,20 @@ def delete_screening_round(round_id: str):
 @router.get("/candidates")
 def list_screening_candidates(
     org_id: str,
+    branch_id: Optional[str] = None,
     job_id: Optional[str] = None,
     interview_status: Optional[str] = None,
     search: Optional[str] = None,
 ):
     """
-    List all contacted candidates (reached = True) for the organization,
-    enriched with: contacted_status, current_round_order, interview_status,
-    current_round_title, assigned interviewer name, and average rating (1-10 scale).
+    List all contacted candidates (reached = True) for the organisation (and
+    optionally a specific branch), enriched with: contacted_status,
+    current_round_order, interview_status, current_round_title, assigned
+    interviewer name, and average rating (1-10 scale).
+
+    Branch-level isolation: when branch_id is provided only candidates belonging
+    to that branch are returned, ensuring HR users from different branches cannot
+    view each other's screening pipeline.
     """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
@@ -208,6 +214,11 @@ def list_screening_candidates(
                 "WHERE c.org_id = %s AND c.reached = TRUE"
             )
             params = [org_id]
+
+            # Branch-level isolation: restrict to HR's branch when provided
+            if branch_id and branch_id.strip():
+                query += " AND c.branch_id = %s"
+                params.append(branch_id.strip())
 
             if job_id:
                 query += " AND c.job_id = %s"

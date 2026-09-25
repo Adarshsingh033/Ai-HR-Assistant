@@ -19,6 +19,7 @@ from app.models.schemas import (
 )
 from app.database import get_db_connection
 from app.logger import get_logger
+from app.services.auth_service import check_hr_admin_uniqueness
 
 logger = get_logger(__name__)
 
@@ -91,21 +92,8 @@ def create_interviewer(
             branch_name = dept_row[2]
             org_name = dept_row[3]
 
-            # Check username uniqueness within org
-            cur.execute(
-                "SELECT id FROM interviewers WHERE organization_id = %s AND LOWER(username) = LOWER(%s) LIMIT 1",
-                (org_id, payload.username),
-            )
-            if cur.fetchone():
-                raise HTTPException(status_code=400, detail="Username is already in use in this organization")
-
-            # Check email uniqueness within org
-            cur.execute(
-                "SELECT id FROM interviewers WHERE organization_id = %s AND LOWER(email) = LOWER(%s) LIMIT 1",
-                (org_id, str(payload.email)),
-            )
-            if cur.fetchone():
-                raise HTTPException(status_code=400, detail="Email is already in use in this organization")
+            # Check global uniqueness across Admin, HR, and Interviewers
+            check_hr_admin_uniqueness(cur, username=payload.username, email=payload.email)
 
             cur.execute(
                 """

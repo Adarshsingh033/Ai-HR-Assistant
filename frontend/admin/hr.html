@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -116,8 +116,15 @@
                         </select>
                     </div>
 
+                    <!-- Empty State -->
+                    <div id="hr-empty" class="table-empty data-card" style="display:none;">
+                        <div class="empty-icon-circle"><i class="fa-solid fa-users"></i></div>
+                        <div class="empty-title">No HR Members Found</div>
+                        <div class="empty-sub">Create an HR member by clicking "Create HR". HR members are linked to an organization and a branch.</div>
+                    </div>
+
                     <!-- Member List Table -->
-                    <div class="table-wrap">
+                    <div class="table-wrap" id="hr-table-wrap">
                         <table>
                             <thead>
                                 <tr>
@@ -152,7 +159,7 @@
         <div class="modal-card" style="max-width: 660px; width: 92%; max-height: 88vh; padding: 0; background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow: hidden;">
             <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 28px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;">
                 <h3 style="font-size: 1.35rem; font-weight: 800; color: var(--text-bright); margin: 0; letter-spacing: -0.01em;" id="member-modal-title">Create HR Member</h3>
-                <button type="button" onclick="closeMemberModal()" style="background: var(--bg-subtle); border: 1px solid rgba(255,255,255,0.12); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='var(--bg-subtle)';this.style.color='rgba(255,255,255,0.7)';">×</button>
+                <button type="button" onclick="closeMemberModal()" style="background: var(--bg-subtle); border: 1px solid var(--border); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1rem; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.background='rgba(239,68,68,0.2)';this.style.color='#ef4444';" onmouseout="this.style.background='var(--bg-subtle)';this.style.color='var(--text-muted)';">×</button>
             </div>
 
             <form id="member-form" onsubmit="handleSaveMember(event)" style="display: flex; flex-direction: column; flex: 1; min-height: 0; overflow: hidden;">
@@ -226,7 +233,7 @@
                             </label>
                             <div style="position: relative; display: flex; align-items: center;">
                                 <input type="password" id="member-password-input" placeholder="Set password" oninput="this.value = this.value.replace(/\s/g, '')" style="height: 46px; font-size: 0.9rem; padding-right: 44px;" class="input-custom" />
-                                <button type="button" onclick="toggleMemberPasswordVisibility()" data-tooltip="Show/Hide password" style="position: absolute; right: 12px; background: none; border: none; color: rgba(255,255,255,0.5); cursor: pointer; padding: 4px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;" onmouseover="this.style.color='#fff'" onmouseout="this.style.color='rgba(255,255,255,0.5)'">
+                                <button type="button" onclick="toggleMemberPasswordVisibility()" data-tooltip="Show/Hide password" style="position: absolute; right: 12px; background: none; border: none; color: var(--text-muted); cursor: pointer; padding: 4px; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; transition: color 0.2s ease;" onmouseover="this.style.color='var(--text-primary)'" onmouseout="this.style.color='var(--text-muted)'">
                                     <i class="fa-regular fa-eye" id="member-password-toggle-icon"></i>
                                 </button>
                             </div>
@@ -261,7 +268,7 @@
         <div class="modal-card" style="max-width: 480px; width: 92%; max-height: 88vh; padding: 24px 28px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.75); display: flex; flex-direction: column; overflow-y: auto;">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
                 <h3 style="font-size: 1.4rem; font-weight: 800; color: var(--text-bright);">HR Profile</h3>
-                <button type="button" onclick="closeViewMemberModal()" data-tooltip="Close" style="background: var(--bg-subtle); border: 1px solid rgba(255,255,255,0.1); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;">×</button>
+                <button type="button" onclick="closeViewMemberModal()" data-tooltip="Close" style="background: var(--bg-subtle); border: 1px solid var(--border); color: var(--text-muted); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; cursor: pointer;">×</button>
             </div>
 
             <div style="text-align: center; margin-bottom: 24px;">

@@ -38,11 +38,13 @@ async def parse_resume_only(
     org_id: str = Form(...),
     hr_id: str = Form(...),
     file: UploadFile = File(...),
+    branch_id: Optional[str] = Form(None),
 ):
     """
     Save the uploaded resume file and queue an async AI parse+match task.
     Returns { task_id, status: 'pending' } immediately.
     The client polls GET /api/ai-tasks/{task_id} for the result.
+    branch_id is forwarded to the task so the candidate is stored with branch-level isolation.
     """
     try:
         content = await file.read()
@@ -55,7 +57,7 @@ async def parse_resume_only(
         with open(file_path, "wb") as f:
             f.write(content)
 
-        # Queue async task
+        # Queue async task — include branch_id for data isolation
         task_id = create_task(
             task_type="resume_parse",
             input_data={
@@ -64,6 +66,7 @@ async def parse_resume_only(
                 "job_id": job_id,
                 "org_id": org_id,
                 "hr_id": hr_id,
+                "branch_id": branch_id,
             },
             created_by=hr_id,
             org_id=org_id,
@@ -83,9 +86,11 @@ async def save_parsed_candidate(
     hr_id: str = Form(...),
     parsed_data: str = Form(...),
     tmp_filename: str = Form(...),
+    branch_id: Optional[str] = Form(None),
 ):
     """
     Save the previously parsed candidate data and resume file to the database.
+    branch_id is resolved from the HR member's record if not explicitly provided.
     """
     try:
         parsed = json.loads(parsed_data)
@@ -103,10 +108,36 @@ async def save_parsed_candidate(
 
         with get_db_connection() as conn:
             with conn.cursor() as cur:
-                if hr_id:
-                    cur.execute("SELECT id FROM hr WHERE id = %s", (hr_id,))
+                # Resolve branch_id: prefer explicit param, then HR member record, then job vacancy
+                resolved_branch_id = branch_id or None
+
+                if not resolved_branch_id and hr_id:
+                    cur.execute(
+                        "SELECT branch_id FROM organization_members WHERE id = %s LIMIT 1",
+                        (hr_id,),
+                    )
+                    brow = cur.fetchone()
+                    if brow and brow[0]:
+                        resolved_branch_id = str(brow[0])
+
+                if not resolved_branch_id and job_id:
+                    cur.execute(
+                        "SELECT branch_id FROM job_vacancies WHERE id = %s LIMIT 1",
+                        (job_id,),
+                    )
+                    jrow = cur.fetchone()
+                    if jrow and jrow[0]:
+                        resolved_branch_id = str(jrow[0])
+
+                # Validate hr_id against the hr (legacy) table
+                effective_hr_id = hr_id
+                if effective_hr_id:
+                    cur.execute("SELECT id FROM hr WHERE id = %s", (effective_hr_id,))
                     if not cur.fetchone():
-                        hr_id = None
+                        # hr_id may belong to organization_members — that's fine; keep it
+                        cur.execute("SELECT id FROM organization_members WHERE id = %s", (effective_hr_id,))
+                        if not cur.fetchone():
+                            effective_hr_id = None
 
                 cur.execute(
                     """
@@ -114,10 +145,11 @@ async def save_parsed_candidate(
                         (id, name, email, phone, gender, address,
                          total_experience, skills, education, qualification,
                          linkedin_url, github_url,
-                         job_id, org_id, hr_id, filename, resume_file, resume_text,
+                         job_id, org_id, hr_id, branch_id,
+                         filename, resume_file, resume_text,
                          match_percentage, match_explanation, created_at)
                     VALUES
-                        (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                        (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
                     """,
                     (
                         candidate_id,
@@ -132,7 +164,7 @@ async def save_parsed_candidate(
                         parsed.get("qualification", ""),
                         parsed.get("linkedin_url", ""),
                         parsed.get("github_url", ""),
-                        job_id, org_id, hr_id,
+                        job_id, org_id, effective_hr_id, resolved_branch_id,
                         parsed.get("filename", "unknown.pdf"),
                         psycopg2.Binary(content) if content else None,
                         parsed.get("resume_text", ""),
@@ -143,9 +175,9 @@ async def save_parsed_candidate(
                 )
                 conn.commit()
 
-        logger.info("Candidate stored: '%s' id=%s match=%s%%",
+        logger.info("Candidate stored: '%s' id=%s match=%s%% branch=%s",
                     parsed.get("name", ""), candidate_id,
-                    parsed.get("match_percentage", 0))
+                    parsed.get("match_percentage", 0), resolved_branch_id)
 
         return {"status": "success", "candidate_id": candidate_id}
 
@@ -163,13 +195,20 @@ async def save_parsed_candidate(
 def list_candidates(
     job_id: Optional[str] = None,
     org_id: Optional[str] = None,
+    branch_id: Optional[str] = None,
     hr_id: Optional[str] = None,
     location: Optional[str] = None,
     search: Optional[str] = None,
     contacted: Optional[bool] = None,
     sort_by_match: bool = False,
 ):
-    """List candidates with optional filters and ranking order."""
+    """
+    List candidates with optional filters and ranking order.
+    
+    Branch-level isolation: if branch_id is provided, only candidates
+    belonging to that branch are returned. HR users must always pass
+    their branch_id to enforce data isolation.
+    """
     with get_db_connection() as conn:
         with conn.cursor() as cur:
             query = (
@@ -188,6 +227,10 @@ def list_candidates(
             if org_id:
                 where_clauses.append("org_id = %s")
                 params.append(org_id)
+            # Branch-level isolation: filter by branch_id if provided
+            if branch_id and branch_id.strip():
+                where_clauses.append("branch_id = %s")
+                params.append(branch_id.strip())
             if hr_id:
                 where_clauses.append("hr_id = %s")
                 params.append(hr_id)
@@ -434,6 +477,7 @@ def delete_candidate(candidate_id: str):
 # ── Helper ────────────────────────────────────────────────────────────────────
 
 def _row_to_dict(r) -> dict:
+    """Convert a candidates DB row to API dict. Columns 0-21 are the standard select."""
     return {
         "candidate_id": str(r[0]),
         "name": r[1] or "",

@@ -17,6 +17,7 @@ let fileQueue = [];      // [{ file, status, result, rejectionReason }]
 let uploadSession = null;    // persisted to localStorage
 let currentOrgId = null;
 let currentHrId = null;
+let currentBranchId = null;  // branch-level data isolation
 let isProcessing = false;
 
 /* ── Init ──────────────────────────────────────────────────────── */
@@ -28,6 +29,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     currentOrgId = session.org_id;
     currentHrId = session.user_id;
+    currentBranchId = session.branch_id || null;  // branch-level isolation
 
     syncHRSidebarFromSession();
 
@@ -41,7 +43,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 /* ── Job Loading ───────────────────────────────────────────────── */
 async function loadJobs() {
     try {
-        const data = await apiRequest('GET', `/api/jobs?organization_id=${currentOrgId}`);
+        // Filter jobs to HR's branch for branch-level isolation
+        let url = `/api/jobs?organization_id=${currentOrgId}`;
+        if (currentBranchId) url += `&branch_id=${currentBranchId}`;
+        const data = await apiRequest('GET', url);
         allJobs = (data && data.jobs) ? data.jobs : [];
         filterJobs('');
 
@@ -302,6 +307,7 @@ async function startUpload() {
         jobTitle: selectedJob.job_title || selectedJob.title || '',
         orgId: currentOrgId,
         hrId: currentHrId,
+        branchId: currentBranchId,  // branch-level isolation
         phase: 'uploading',
         startedAt: new Date().toISOString(),
         items: queued.map(q => ({
@@ -387,11 +393,12 @@ async function processItems(sess, fileMap) {
             continue;
         }
 
-        // Build form data for async parse endpoint
+        // Build form data for async parse endpoint — include branch_id for data isolation
         const fd = new FormData();
         fd.append('job_id', sess.jobId);
         fd.append('org_id', sess.orgId);
         fd.append('hr_id', sess.hrId);
+        if (sess.branchId) fd.append('branch_id', sess.branchId);
         fd.append('file', file);
 
         const taskKey = `resume_parse_${sess.jobId}_${idx}`;
@@ -711,6 +718,9 @@ async function submitCandidates() {
             fd.append('job_id', sess.jobId);
             fd.append('org_id', sess.orgId);
             fd.append('hr_id', sess.hrId);
+            // Pass branch_id for branch-level data isolation
+            if (sess.branchId) fd.append('branch_id', sess.branchId);
+            else if (item.result && item.result.branch_id) fd.append('branch_id', item.result.branch_id);
             fd.append('parsed_data', JSON.stringify(item.result));
             fd.append('tmp_filename', item.result.tmp_filename);
 

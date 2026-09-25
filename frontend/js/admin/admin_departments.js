@@ -15,6 +15,7 @@ let deletingDeptId = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
     await loadFilterOrgs();
+    await loadBranchFilterForOrg('');
     await loadDepartments();
 });
 
@@ -70,9 +71,12 @@ async function loadFilterOrgs() {
 async function loadBranchFilterForOrg(orgId) {
     const branchSelect = document.getElementById('dept-filter-branch');
     branchSelect.innerHTML = '<option value="">All Branches</option>';
-    if (!orgId) return;
     try {
-        const data = await apiGet(`/api/admin/branches?organization_id=${orgId}&limit=200`);
+        let url = '/api/admin/branches?limit=200';
+        if (orgId) {
+            url += `&organization_id=${orgId}`;
+        }
+        const data = await apiGet(url);
         const branches = data.branches || data.data || [];
         branches.forEach(b => {
             const opt = document.createElement('option');
@@ -183,9 +187,13 @@ function renderPagination(total, page, limit, pages) {
 // ── Filters ───────────────────────────────────────────────────────────────────
 
 let filterTimer;
-function onFilterChange() {
+function onOrgFilterChange() {
     const orgId = document.getElementById('dept-filter-org').value;
     loadBranchFilterForOrg(orgId);
+    onFilterChange();
+}
+
+function onFilterChange() {
     clearTimeout(filterTimer);
     filterTimer = setTimeout(() => loadDepartments(1), 350);
 }

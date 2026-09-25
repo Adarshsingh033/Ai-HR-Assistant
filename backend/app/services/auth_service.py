@@ -36,30 +36,38 @@ def check_hr_admin_uniqueness(cur, username: str = None, email: str = None, phon
         u = str(username).strip().lower()
         cur.execute("SELECT id FROM admin WHERE LOWER(username) = %s AND id != %s LIMIT 1", (u, ex_id))
         if cur.fetchone():
-            raise HTTPException(status_code=400, detail="Username is already in use by an Admin or HR user.")
+            raise HTTPException(status_code=400, detail="username already exist")
 
         cur.execute("SELECT id FROM organization_members WHERE LOWER(username) = %s AND id != %s LIMIT 1", (u, ex_id))
         if cur.fetchone():
-            raise HTTPException(status_code=400, detail="Username is already in use by an Admin or HR user.")
+            raise HTTPException(status_code=400, detail="username already exist")
 
         cur.execute("SELECT id FROM hr WHERE LOWER(username) = %s AND id != %s LIMIT 1", (u, ex_id))
         if cur.fetchone():
-            raise HTTPException(status_code=400, detail="Username is already in use by an Admin or HR user.")
+            raise HTTPException(status_code=400, detail="username already exist")
+
+        cur.execute("SELECT id FROM interviewers WHERE LOWER(username) = %s AND id != %s LIMIT 1", (u, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="username already exist")
 
     # 2. Email Uniqueness Check
     if email and str(email).strip():
         e = str(email).strip().lower()
         cur.execute("SELECT id FROM admin WHERE LOWER(email) = %s AND id != %s LIMIT 1", (e, ex_id))
         if cur.fetchone():
-            raise HTTPException(status_code=400, detail="Email address is already in use by an Admin or HR user.")
+            raise HTTPException(status_code=400, detail="Email already exist")
 
         cur.execute("SELECT id FROM organization_members WHERE LOWER(email) = %s AND id != %s LIMIT 1", (e, ex_id))
         if cur.fetchone():
-            raise HTTPException(status_code=400, detail="Email address is already in use by an Admin or HR user.")
+            raise HTTPException(status_code=400, detail="Email already exist")
 
         cur.execute("SELECT id FROM hr WHERE LOWER(email) = %s AND id != %s LIMIT 1", (e, ex_id))
         if cur.fetchone():
-            raise HTTPException(status_code=400, detail="Email address is already in use by an Admin or HR user.")
+            raise HTTPException(status_code=400, detail="Email already exist")
+
+        cur.execute("SELECT id FROM interviewers WHERE LOWER(email) = %s AND id != %s LIMIT 1", (e, ex_id))
+        if cur.fetchone():
+            raise HTTPException(status_code=400, detail="Email already exist")
 
     # 3. Phone Digits Only & Uniqueness Check
     if phone and str(phone).strip():
@@ -108,13 +116,17 @@ def authenticate_user(username: str, password: str) -> dict | None:
 
             # Check Admin table
             cur.execute(
-                "SELECT id, username, password, email, phone, profile_image FROM admin WHERE LOWER(username) = LOWER(%s) OR LOWER(email) = LOWER(%s) LIMIT 1",
+                "SELECT id, username, password, email, phone, profile_image, status FROM admin WHERE LOWER(username) = LOWER(%s) OR LOWER(email) = LOWER(%s) LIMIT 1",
                 (username, username),
             )
             admin = cur.fetchone()
 
             if admin:
                 if admin[2] == password:
+                    if admin[6] == 'inactive':
+                        logger.warning("Admin '%s' is inactive. Login denied.", username)
+                        raise HTTPException(status_code=403, detail="you are inactive please contact the superadmin")
+                        
                     logger.info("Admin '%s' authenticated successfully.", username)
                     return {
                         "user_id": str(admin[0]),
