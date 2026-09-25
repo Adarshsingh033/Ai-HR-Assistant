@@ -78,6 +78,18 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
     currentOrgId = session.org_id;
     currentHrId = session.user_id;
+    let currentBranchId = session.branch_id || null;
+
+    try {
+        const profile = await apiRequest('GET', '/api/hr/profile');
+        if (profile) {
+            currentOrgId = profile.org_id || currentOrgId;
+            currentBranchId = profile.branch_id || currentBranchId;
+        }
+    } catch(e) {}
+
+    // Store for loadJobs
+    window._currentBranchId = currentBranchId;
 
     syncHRSidebarFromSession();
 
@@ -97,7 +109,10 @@ window.addEventListener('DOMContentLoaded', async () => {
 /* ── Load Job Vacancies ────────────────────────────────── */
 async function loadJobs() {
     try {
-        const data = await apiRequest('GET', `/api/jobs?organization_id=${currentOrgId}`);
+        let url = `/api/jobs?organization_id=${currentOrgId}`;
+        if (window._currentBranchId) url += `&branch_id=${window._currentBranchId}`;
+        
+        const data = await apiRequest('GET', url);
         allJobs = (data && data.jobs) ? data.jobs : [];
 
         const jobSel = document.getElementById('compare-job-select');

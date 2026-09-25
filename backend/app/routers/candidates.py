@@ -134,10 +134,9 @@ async def save_parsed_candidate(
                 if effective_hr_id:
                     cur.execute("SELECT id FROM hr WHERE id = %s", (effective_hr_id,))
                     if not cur.fetchone():
-                        # hr_id may belong to organization_members — that's fine; keep it
-                        cur.execute("SELECT id FROM organization_members WHERE id = %s", (effective_hr_id,))
-                        if not cur.fetchone():
-                            effective_hr_id = None
+                        # If it's not in the legacy `hr` table (e.g. from organization_members), 
+                        # we MUST set it to None to avoid violating candidates_hr_id_fkey constraint.
+                        effective_hr_id = None
 
                 cur.execute(
                     """

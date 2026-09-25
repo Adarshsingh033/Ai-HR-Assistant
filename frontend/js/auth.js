@@ -83,6 +83,7 @@ async function handleLogin(e) {
                 username: data.username,
                 role: data.role,
                 org_id: data.org_id || '',
+                branch_id: data.branch_id || '',
                 phone: data.phone || '',
                 profile_image: data.profile_image || ''
             });

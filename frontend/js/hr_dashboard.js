@@ -2,7 +2,7 @@
    hr_dashboard.js – HR Dashboard Logic
    ======================================================== */
 
-window.addEventListener('DOMContentLoaded', () => {
+window.addEventListener('DOMContentLoaded', async () => {
     const session = Session.get();
     if (!session || session.role !== 'hr') {
         location.href = '../index.html';
@@ -15,6 +15,14 @@ window.addEventListener('DOMContentLoaded', () => {
     document.getElementById('sidebar-avatar').textContent = session.username.charAt(0).toUpperCase();
 
     // Load HR Dashboard Data — pass branch_id for branch-level data isolation
+    try {
+        const profile = await apiRequest('GET', '/api/hr/profile');
+        if (profile) {
+            session.org_id = profile.org_id || session.org_id;
+            session.branch_id = profile.branch_id || session.branch_id;
+        }
+    } catch(e) {}
+
     if (session.org_id) {
         loadDashboardData(session.org_id, session.branch_id || null);
     } else {

@@ -25,6 +25,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     currentHrId = session.user_id;
     currentBranchId = session.branch_id || null;  // enforce branch isolation
 
+    try {
+        const profile = await apiRequest('GET', '/api/hr/profile');
+        if (profile) {
+            currentOrgId = profile.org_id || currentOrgId;
+            currentBranchId = profile.branch_id || currentBranchId;
+        }
+    } catch(e) {}
+
     syncHRSidebarFromSession();
 
     // Pre-select job from URL param (e.g. linked from jobs.html)
