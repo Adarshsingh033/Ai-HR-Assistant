@@ -18,25 +18,30 @@ logger = get_logger(__name__)
 # ── Connection Pool ──────────────────────────────────────────────────────────
 db_pool = None
 
-try:
-    db_pool = psycopg2.pool.SimpleConnectionPool(
-        1, 10,
-        dbname=DB_NAME,
-        user=DB_USER,
-        password=DB_PASSWORD,
-        host=DB_HOST,
-        port=DB_PORT,
-    )
-    logger.info("Database connection pool initialized (host=%s, db=%s).", DB_HOST, DB_NAME)
-except psycopg2.OperationalError as e:
-    logger.error("Failed to initialize database connection pool: %s", e)
-
+def _init_pool():
+    global db_pool
+    if db_pool:
+        return
+    try:
+        db_pool = psycopg2.pool.SimpleConnectionPool(
+            1, 10,
+            dbname=DB_NAME,
+            user=DB_USER,
+            password=DB_PASSWORD,
+            host=DB_HOST,
+            port=DB_PORT,
+        )
+        logger.info("Database connection pool initialized (host=%s, db=%s).", DB_HOST, DB_NAME)
+    except psycopg2.OperationalError as e:
+        logger.error("Failed to initialize database connection pool: %s", e)
+        raise RuntimeError(f"Database connection failed ({DB_HOST}:{DB_PORT}): {e}")
 
 @contextmanager
 def get_db_connection():
     """Yields a database connection from the pool with pgvector registered if available."""
     if not db_pool:
-        raise RuntimeError("Database connection pool is not initialized.")
+        _init_pool()
+        
     conn = db_pool.getconn()
     try:
         try:
