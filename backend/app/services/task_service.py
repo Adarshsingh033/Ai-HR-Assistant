@@ -232,6 +232,7 @@ def _dispatch_task(task: dict):
         elif task_type == "resume_parse":
             from app.services.resume_parser import parse_resume, ResumeRejected
             import os
+            import base64
             file_path = inp.get("file_path", "")
             job_id = inp.get("job_id", "")
             org_id = inp.get("org_id", "")
@@ -240,11 +241,20 @@ def _dispatch_task(task: dict):
             # branch_id may be included in task input for proper data isolation
             branch_id = inp.get("branch_id", None)
 
-            if not os.path.exists(file_path):
-                raise FileNotFoundError(f"Resume file not found: {file_path}")
-
-            with open(file_path, "rb") as f:
-                content = f.read()
+            # Prefer embedded content (works across instances / shared DB).
+            # Fall back to local temp file for older tasks.
+            content = None
+            b64 = inp.get("file_content_b64")
+            if b64:
+                content = base64.b64decode(b64)
+            elif file_path and os.path.exists(file_path):
+                with open(file_path, "rb") as f:
+                    content = f.read()
+            else:
+                raise FileNotFoundError(
+                    f"Resume file not found: {file_path or '(no path)'}. "
+                    "Re-upload the resume."
+                )
 
             parsed = parse_resume(content, filename)
 

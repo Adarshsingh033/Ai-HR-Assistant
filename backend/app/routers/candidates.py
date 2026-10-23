@@ -1,6 +1,8 @@
 """
 Router: Candidates
-  POST /api/candidates/upload   — Upload & parse resume (PDF/DOCX/TXT)
+  POST /api/candidates/parse    — Upload & queue resume parse
+  POST /api/candidates/save     — Persist parsed resume candidate
+  POST /api/candidates/manual   — Manually create candidate for a job (ATS match)
   GET  /api/candidates          — List with filters (job_id, org_id, location, search)
   PUT  /api/candidates/{id}     — Edit candidate data
   PUT  /api/candidates/{id}/status — Update reached/remark
@@ -16,7 +18,11 @@ from fastapi import APIRouter, UploadFile, File, Form, HTTPException
 from fastapi.responses import JSONResponse, FileResponse, Response
 from app.database import get_db_connection
 from app.services.resume_parser import parse_resume, ResumeRejected
-from app.models.schemas import UpdateCandidateStatusRequest, UpdateCandidateRequest
+from app.models.schemas import (
+    UpdateCandidateStatusRequest,
+    UpdateCandidateRequest,
+    CreateCandidateRequest,
+)
 from app.services.ai_service import match_candidate_with_jd
 from app.services.task_service import create_task
 from app.logger import get_logger
@@ -47,22 +53,30 @@ async def parse_resume_only(
     branch_id is forwarded to the task so the candidate is stored with branch-level isolation.
     """
     try:
-        content = await file.read()
-        logger.info("Resume queued for async parse: '%s' for job_id=%s", file.filename, job_id)
+        import base64
 
-        # Save file immediately so the worker thread can read it
+        content = await file.read()
+        original_name = file.filename or "resume.bin"
+        logger.info("Resume queued for async parse: '%s' for job_id=%s", original_name, job_id)
+
+        # Save with UUID-only name (avoids spaces/special chars in original filename).
+        # Also embed base64 content in the task so any worker can parse without
+        # depending on a machine-local temp path (shared DB / multi-instance safe).
         task_uuid = str(uuid.uuid4())
-        safe_filename = f"parse_{task_uuid}_{file.filename}"
+        ext = original_name.rsplit(".", 1)[-1].lower() if "." in original_name else "bin"
+        if ext not in ("pdf", "docx", "doc", "txt"):
+            ext = "bin"
+        safe_filename = f"parse_{task_uuid}.{ext}"
         file_path = os.path.join(UPLOAD_DIR, safe_filename)
         with open(file_path, "wb") as f:
             f.write(content)
 
-        # Queue async task — include branch_id for data isolation
         task_id = create_task(
             task_type="resume_parse",
             input_data={
                 "file_path": file_path,
-                "filename": file.filename,
+                "file_content_b64": base64.b64encode(content).decode("ascii"),
+                "filename": original_name,
                 "job_id": job_id,
                 "org_id": org_id,
                 "hr_id": hr_id,
@@ -71,7 +85,7 @@ async def parse_resume_only(
             created_by=hr_id,
             org_id=org_id,
         )
-        return {"task_id": task_id, "status": "pending", "filename": file.filename}
+        return {"task_id": task_id, "status": "pending", "filename": original_name}
 
     except HTTPException:
         raise
@@ -188,6 +202,175 @@ async def save_parsed_candidate(
             pass
         logger.error("Unexpected error saving '%s': %s", filename, e, exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to save candidate: {e}")
+
+
+@router.post("/manual")
+def create_candidate_manual(payload: CreateCandidateRequest):
+    """
+    Manually create a candidate for a job vacancy (no resume file).
+    Validates required fields, resolves branch_id, runs ATS match against the JD.
+    """
+    required = {
+        "job_id": payload.job_id,
+        "org_id": payload.org_id,
+        "hr_id": payload.hr_id,
+        "name": payload.name,
+        "email": payload.email,
+        "phone": payload.phone,
+        "total_experience": payload.total_experience,
+        "skills": payload.skills,
+        "qualification": payload.qualification,
+    }
+    missing = [k for k, v in required.items() if not (v or "").strip()]
+    if missing:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Missing required field(s): {', '.join(missing)}.",
+        )
+
+    job_id = payload.job_id.strip()
+    org_id = payload.org_id.strip()
+    hr_id = payload.hr_id.strip()
+    name = payload.name.strip()
+    email = payload.email.strip()
+    phone = payload.phone.strip()
+    total_experience = str(payload.total_experience).strip()
+    skills = payload.skills.strip()
+    qualification = payload.qualification.strip()
+    education = (payload.education or "").strip() or qualification
+    gender = (payload.gender or "").strip()
+    address = (payload.address or "").strip()
+    linkedin_url = (payload.linkedin_url or "").strip()
+    github_url = (payload.github_url or "").strip()
+
+    candidate_id = str(uuid.uuid4())
+    now = datetime.now(timezone.utc).isoformat()
+    match_percentage = 0
+    match_explanation = ""
+
+    try:
+        with get_db_connection() as conn:
+            with conn.cursor() as cur:
+                cur.execute(
+                    "SELECT id, experience_required, qualification, skills_required, "
+                    "job_description, branch_id "
+                    "FROM job_vacancies WHERE id = %s AND organization_id = %s LIMIT 1",
+                    (job_id, org_id),
+                )
+                job_row = cur.fetchone()
+                if not job_row:
+                    raise HTTPException(
+                        status_code=404,
+                        detail="Job vacancy not found for this organization.",
+                    )
+
+                jd_text = (
+                    f"Experience Required: {job_row[1] or ''}\n"
+                    f"Qualification: {job_row[2] or ''}\n"
+                    f"Skills Required: {job_row[3] or ''}\n"
+                    f"Description: {job_row[4] or ''}"
+                )
+                job_branch_id = str(job_row[5]) if job_row[5] else None
+
+                resolved_branch_id = (payload.branch_id or "").strip() or None
+                if not resolved_branch_id and hr_id:
+                    cur.execute(
+                        "SELECT branch_id FROM organization_members WHERE id = %s LIMIT 1",
+                        (hr_id,),
+                    )
+                    brow = cur.fetchone()
+                    if brow and brow[0]:
+                        resolved_branch_id = str(brow[0])
+                if not resolved_branch_id:
+                    resolved_branch_id = job_branch_id
+
+                effective_hr_id = hr_id
+                if effective_hr_id:
+                    cur.execute("SELECT id FROM hr WHERE id = %s", (effective_hr_id,))
+                    if not cur.fetchone():
+                        effective_hr_id = None
+
+                cand_payload = {
+                    "candidate_name": name,
+                    "contact_number": phone,
+                    "email_address": email,
+                    "total_experience": total_experience,
+                    "skills": skills,
+                    "education": education,
+                    "qualification": qualification,
+                    "gender": gender,
+                    "address": address,
+                }
+                try:
+                    match_res = match_candidate_with_jd(cand_payload, jd_text)
+                    match_percentage = match_res.get("match_percentage", 0) or 0
+                    match_explanation = match_res.get("match_explanation", "") or ""
+                except Exception as match_err:
+                    logger.warning(
+                        "ATS match failed for manual candidate '%s': %s",
+                        name,
+                        match_err,
+                    )
+                    match_percentage = 0
+                    match_explanation = ""
+
+                cur.execute(
+                    """
+                    INSERT INTO candidates
+                        (id, name, email, phone, gender, address,
+                         total_experience, skills, education, qualification,
+                         linkedin_url, github_url,
+                         job_id, org_id, hr_id, branch_id,
+                         filename, resume_file, resume_text,
+                         match_percentage, match_explanation, created_at)
+                    VALUES
+                        (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)
+                    """,
+                    (
+                        candidate_id,
+                        name,
+                        email,
+                        phone,
+                        gender,
+                        address,
+                        total_experience,
+                        skills,
+                        education,
+                        qualification,
+                        linkedin_url,
+                        github_url,
+                        job_id,
+                        org_id,
+                        effective_hr_id,
+                        resolved_branch_id,
+                        "manual_entry",
+                        None,
+                        "",
+                        match_percentage,
+                        match_explanation,
+                        now,
+                    ),
+                )
+                conn.commit()
+
+        logger.info(
+            "Manual candidate created: '%s' id=%s match=%s%% job=%s",
+            name,
+            candidate_id,
+            match_percentage,
+            job_id,
+        )
+        return {
+            "status": "success",
+            "candidate_id": candidate_id,
+            "match_percentage": match_percentage,
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error("Failed to create manual candidate: %s", e, exc_info=True)
+        raise HTTPException(status_code=500, detail=f"Failed to create candidate: {e}")
 
 
 @router.get("")

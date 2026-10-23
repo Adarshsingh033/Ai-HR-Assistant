@@ -7,8 +7,7 @@ Validation Pipeline (in order):
   3. LLM resume check — must be a professional resume/CV
 
 Extraction Strategy:
-  PDF  → PaddleOCR (handles scanned/image-based resumes)
-         Fallback: PyMuPDF text layer (for digital PDFs)
+  PDF  → PyMuPDF text layer
   DOCX → python-docx (paragraphs + tables in document order)
   TXT  → utf-8 / latin-1 / cp1252 multi-encoding decode
 
@@ -23,9 +22,6 @@ from __future__ import annotations
 
 import io
 import re
-import tempfile
-import os
-from typing import Optional
 
 import fitz                          # PyMuPDF
 from docx import Document as DocxDocument
@@ -50,33 +46,6 @@ class ResumeRejected(Exception):
 ALLOWED_EXTENSIONS = {"pdf", "docx", "doc", "txt"}
 
 MIN_TEXT_LENGTH = 100   # Minimum chars required after extraction
-
-
-# ── PaddleOCR lazy singleton ──────────────────────────────────────────────────
-
-_paddle_ocr = None
-
-
-def _get_paddle_ocr():
-    """Return a cached PaddleOCR instance (initialised once on first use)."""
-    global _paddle_ocr
-    if _paddle_ocr is not None:
-        return _paddle_ocr
-
-    try:
-        from paddleocr import PaddleOCR
-        _paddle_ocr = PaddleOCR(
-            use_angle_cls=True,
-            lang="en",
-            use_gpu=False,
-            show_log=False,
-        )
-        logger.info("PaddleOCR initialised successfully.")
-    except Exception as e:
-        logger.warning("PaddleOCR not available (%s). PDF OCR will use PyMuPDF only.", e)
-        _paddle_ocr = None
-
-    return _paddle_ocr
 
 
 # ── Text Cleaning ─────────────────────────────────────────────────────────────
@@ -135,62 +104,10 @@ def _extract_pdf_via_pymupdf(file_bytes: bytes) -> str:
     return "\n".join(page.get_text("text") for page in doc)
 
 
-def _extract_pdf_via_paddleocr(file_bytes: bytes) -> Optional[str]:
-    ocr = _get_paddle_ocr()
-    if ocr is None:
-        return None
-
-    try:
-        doc = fitz.open(stream=file_bytes, filetype="pdf")
-        all_text: list[str] = []
-
-        for page in doc:
-            mat = fitz.Matrix(2.0, 2.0)
-            pix = page.get_pixmap(matrix=mat, colorspace=fitz.csRGB)
-            img_bytes = pix.tobytes("png")
-
-            with tempfile.NamedTemporaryFile(suffix=".png", delete=False) as tmp:
-                tmp.write(img_bytes)
-                tmp_path = tmp.name
-
-            try:
-                result = ocr.ocr(tmp_path, cls=True)
-                page_lines: list[str] = []
-                if result:
-                    for block in result:
-                        if block:
-                            for line in block:
-                                if line and len(line) >= 2:
-                                    text_conf = line[1]
-                                    if isinstance(text_conf, (list, tuple)) and len(text_conf) >= 1:
-                                        page_lines.append(str(text_conf[0]))
-                all_text.append("\n".join(page_lines))
-            finally:
-                try:
-                    os.unlink(tmp_path)
-                except OSError:
-                    pass
-
-        return "\n\n".join(all_text)
-    except Exception as e:
-        logger.warning("PaddleOCR extraction failed: %s", e)
-        return None
-
-
 def _extract_text_from_pdf(file_bytes: bytes) -> str:
-    paddle_text = _extract_pdf_via_paddleocr(file_bytes)
-    if paddle_text and len(paddle_text.strip()) > 80:
-        logger.info("PDF extracted via PaddleOCR (%d chars).", len(paddle_text))
-        return paddle_text
-
-    pymupdf_text = _extract_pdf_via_pymupdf(file_bytes)
-    if len(pymupdf_text.strip()) > 80:
-        logger.info("PDF extracted via PyMuPDF (%d chars).", len(pymupdf_text))
-        return pymupdf_text
-
-    result = paddle_text if (paddle_text and len(paddle_text) > len(pymupdf_text)) else pymupdf_text
-    logger.warning("PDF minimal content (%d chars).", len(result or ""))
-    return result or ""
+    text = _extract_pdf_via_pymupdf(file_bytes)
+    logger.info("PDF extracted via PyMuPDF (%d chars).", len(text or ""))
+    return text or ""
 
 
 # ── DOCX Extraction ───────────────────────────────────────────────────────────
@@ -242,8 +159,8 @@ def extract_text(file_bytes: bytes, filename: str) -> str:
         try:
             raw = _extract_text_from_docx(file_bytes)
         except Exception as e:
-            logger.warning("DOCX extraction failed (%s), trying PaddleOCR: %s", filename, e)
-            raw = _extract_pdf_via_paddleocr(file_bytes) or ""
+            logger.warning("DOCX extraction failed (%s): %s", filename, e)
+            raw = ""
     elif ext == "txt":
         raw = _extract_text_from_txt(file_bytes)
     else:
@@ -276,11 +193,7 @@ def validate_and_extract(file_bytes: bytes, filename: str) -> str:
     # Stage 2: Text extraction + length
     text = extract_text(file_bytes, filename)
     if len(text.strip()) < MIN_TEXT_LENGTH:
-        raise ResumeRejected(
-            f"File content is too short or unreadable "
-            f"({len(text.strip())} characters extracted). "
-            "Please upload a proper resume file."
-        )
+        raise ResumeRejected("Resume does not contain proper text.")
 
     # Stage 3: LLM resume type check
     try:

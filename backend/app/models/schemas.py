@@ -460,6 +460,23 @@ class UpdateCandidateRequest(BaseModel):
     remark: Optional[str] = None
 
 
+class CreateCandidateRequest(BaseModel):
+    job_id: str
+    org_id: str
+    hr_id: str
+    name: str
+    email: str
+    phone: str
+    total_experience: str
+    skills: str
+    qualification: str
+    branch_id: Optional[str] = None
+    gender: Optional[str] = None
+    address: Optional[str] = None
+    education: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    github_url: Optional[str] = None
+
 
 # ── Emails ────────────────────────────────────────────────────────────────────
 class GenerateEmailRequest(BaseModel):

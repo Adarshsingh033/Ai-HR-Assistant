@@ -763,7 +763,13 @@
         <main class="main-content">
             <header class="topbar">
                 <div class="topbar-title">Candidates</div>
-                <button class="theme-toggle-btn" onclick="toggleTheme()" data-tooltip="Switch to Light Mode" aria-label="Toggle theme" id="theme-toggle-btn"><i class="fa-solid fa-moon icon-dark"></i><i class="fa-solid fa-sun icon-light"></i></button>
+                <div style="display:flex;align-items:center;gap:10px;">
+                    <button class="btn btn-primary" type="button" onclick="openCreateCandidateModal()"
+                        style="display:inline-flex;align-items:center;gap:7px;padding:9px 16px;font-size:0.84rem;font-weight:700;">
+                        <i class="fa-solid fa-plus"></i> Add Candidate
+                    </button>
+                    <button class="theme-toggle-btn" onclick="toggleTheme()" data-tooltip="Switch to Light Mode" aria-label="Toggle theme" id="theme-toggle-btn"><i class="fa-solid fa-moon icon-dark"></i><i class="fa-solid fa-sun icon-light"></i></button>
+                </div>
             </header>
 
             <div class="page-content scrollable">
@@ -934,15 +940,6 @@
 
                 <div class="sec-label">ATS Matching Reason</div>
                 <div class="match-explain" id="vm-match-explain">—</div>
-
-                <div class="sec-label">Original Uploaded Resume Preview</div>
-                <div id="vm-preview-wrap"
-                    style="margin-top:8px;border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--bg-subtle);">
-                    <iframe id="vm-preview-frame"
-                        style="width:100%;height:clamp(260px, 42vh, 420px);border:none;display:none;background:#fff;"></iframe>
-                    <div class="resume-preview" id="vm-resume-text" style="display:none;">No resume text available.
-                    </div>
-                </div>
             </div>
 
             <!-- FIXED BOTTOM ACTIONS -->
@@ -952,6 +949,102 @@
                     <i class="fa-solid fa-download"></i> Download Resume
                 </a>
             </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════════════
+     CREATE Candidate Modal
+══════════════════════════════════════════════ -->
+    <div class="modal-overlay" id="create-modal">
+        <div class="modal-lg">
+            <form id="create-form" onsubmit="createCandidate(event)"
+                style="display:flex;flex-direction:column;height:100%;flex:1;overflow:hidden;">
+                <div class="modal-fixed-top">
+                    <div class="modal-top">
+                        <div>
+                            <div style="font-size:1.2rem;font-weight:900;color:var(--text-bright);">Add Candidate</div>
+                            <div style="font-size:0.8rem;color:var(--text-muted);margin-top:3px;">
+                                Manually create a candidate for a job vacancy (ATS score is calculated automatically)
+                            </div>
+                        </div>
+                        <button type="button" class="modal-close-btn" onclick="closeModal('create-modal')">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="modal-details-scroll">
+                    <div class="form-grid">
+                        <div class="form-group full">
+                            <label class="form-label">Job Vacancy <span style="color:var(--danger);">*</span></label>
+                            <select class="form-control" id="create-job" required>
+                                <option value="">Select job vacancy</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Full Name <span style="color:var(--danger);">*</span></label>
+                            <input class="form-control" id="create-name" required placeholder="Candidate full name" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Gender</label>
+                            <select class="form-control" id="create-gender">
+                                <option value="">Select Gender</option>
+                                <option value="Male">Male</option>
+                                <option value="Female">Female</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Email Address <span style="color:var(--danger);">*</span></label>
+                            <input class="form-control" id="create-email" type="email" required placeholder="email@example.com" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Phone Number <span style="color:var(--danger);">*</span></label>
+                            <input class="form-control" id="create-phone" required placeholder="+1 234 567 890" />
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Address / Location</label>
+                            <input class="form-control" id="create-address" placeholder="City, State, Country" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Total Experience <span style="color:var(--danger);">*</span></label>
+                            <input class="form-control" id="create-experience" required placeholder="e.g. 3 years" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">Qualification <span style="color:var(--danger);">*</span></label>
+                            <input class="form-control" id="create-qualification" required placeholder="e.g. B.Tech, MBA" />
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Skills (comma-separated) <span style="color:var(--danger);">*</span></label>
+                            <textarea class="form-control" id="create-skills" rows="3" required
+                                placeholder="Python, React, SQL, …"></textarea>
+                        </div>
+                        <div class="form-group full">
+                            <label class="form-label">Education</label>
+                            <input class="form-control" id="create-education" placeholder="Degree, institution, year" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">LinkedIn URL</label>
+                            <input class="form-control" id="create-linkedin" placeholder="https://linkedin.com/in/…" />
+                        </div>
+                        <div class="form-group">
+                            <label class="form-label">GitHub URL</label>
+                            <input class="form-control" id="create-github" placeholder="https://github.com/…" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-bottom-actions" style="gap:10px;">
+                    <button type="button" onclick="closeModal('create-modal')"
+                        style="padding:10px 22px;background:var(--bg-subtle);border:1px solid var(--border);color:var(--text-primary);border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:700;">
+                        Cancel
+                    </button>
+                    <button type="submit" id="create-save-btn"
+                        style="padding:10px 28px;background:linear-gradient(90deg,var(--primary-light, #f97316),var(--primary-dark, #c2410c));border:none;color:#ffffff;border-radius:11px;cursor:pointer;font-size:0.85rem;font-weight:800;display:flex;align-items:center;gap:8px;">
+                        <i class="fa-solid fa-user-plus"></i> Create Candidate
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

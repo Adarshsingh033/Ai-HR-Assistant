@@ -1,6 +1,6 @@
 -- Migration 008: Add resume_text column to candidates
 -- Stores the cleaned, well-formatted extracted text from uploaded resumes
--- Supports PDF (PaddleOCR), DOCX (python-docx), TXT (plain decode)
+-- Supports PDF (PyMuPDF), DOCX (python-docx), TXT (plain decode)
 
 ALTER TABLE candidates
     ADD COLUMN IF NOT EXISTS resume_text TEXT;

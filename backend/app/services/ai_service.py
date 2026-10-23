@@ -53,7 +53,18 @@ class ExtractResumeDataSchema(BaseModel):
         ge=0,
     )
     skills: str = Field(..., description="Comma-separated list of all technical and soft skills")
-    education: str = Field(..., description="Education qualifications summary (degree, institution, year)")
+    qualification: str = Field(
+        ...,
+        description=(
+            "Highest or most relevant degree name only "
+            "(e.g. B.Tech, B.E., MBA, M.Sc, B.Sc, MCA, PhD). "
+            "Do NOT include institution, college, university, year, CGPA, percentage, or other details."
+        ),
+    )
+    education: str = Field(
+        ...,
+        description="Brief education summary if needed (institution/year); keep short. Prefer degree details only in qualification.",
+    )
     gender: str = Field(..., description="Gender of the candidate (Male / Female / Other)")
     address: Optional[str] = Field(
         None,
@@ -377,13 +388,24 @@ def extract_candidate_info(text: str) -> dict:
         - If a value is implied but not explicit, infer the most likely value.
         - Never leave a field empty if reasonable inference is available.
         - If multiple values exist, choose the most relevant one.
+        - For "qualification": extract ONLY the degree name (highest or most relevant),
+          e.g. "B.Tech", "B.E.", "MBA", "M.Sc", "B.Sc", "MCA", "BCA", "PhD".
+          Do NOT include college/university name, year of passing, CGPA, percentage,
+          board, stream details beyond the degree short name, or location.
+          Bad: "B.Tech in Computer Science from ABC University, 2020, CGPA 8.5"
+          Good: "B.Tech"
+          If specialization is commonly part of the degree short form, a short form like
+          "B.Tech CSE" or "MBA Finance" is acceptable — still no institution or year.
+        - For "education": short optional summary of education history; do not duplicate
+          long qualification strings into qualification.
         You must respond strictly in JSON format with exactly these keys:
         - "candidate_name": string
         - "contact_number": string or null
         - "email_address": string or null
         - "total_experience": integer (total full years of experience)
         - "skills": string (comma-separated list of skills)
-        - "education": string (education summary)
+        - "qualification": string (degree name only)
+        - "education": string (brief education summary)
         - "gender": string (Male/Female/Other)
         - "address": string or null
         - "linkedin_url": string or null
@@ -409,12 +431,17 @@ def extract_candidate_info(text: str) -> dict:
     result = _invoke_gemini_with_retry(_call, context="Resume extraction")
 
     candidate_name = result.candidate_name
+    qualification = (getattr(result, "qualification", None) or "").strip() or (
+        (result.education or "").strip()
+    )
+    education = (result.education or "").strip()
     raw_text = (
         f"Contact number of {candidate_name}: {result.contact_number}\n"
         f"Email of {candidate_name}: {result.email_address}\n"
         f"Experience of {candidate_name}: {result.total_experience} years\n"
         f"Skills of {candidate_name}: {result.skills}\n"
-        f"Education of {candidate_name}: {result.education}\n"
+        f"Qualification of {candidate_name}: {qualification}\n"
+        f"Education of {candidate_name}: {education}\n"
         f"Gender of {candidate_name}: {result.gender}\n"
         f"Address of {candidate_name}: {result.address or ''}\n"
         f"LinkedIn: {result.linkedin_url or ''}\n"
@@ -427,8 +454,8 @@ def extract_candidate_info(text: str) -> dict:
         "email_address": result.email_address or "",
         "total_experience": result.total_experience,
         "skills": result.skills,
-        "education": result.education,
-        "qualification": result.education,
+        "education": education,
+        "qualification": qualification,
         "gender": result.gender,
         "address": result.address or "",
         "linkedin_url": result.linkedin_url or "",

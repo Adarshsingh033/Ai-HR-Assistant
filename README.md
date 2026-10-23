@@ -42,7 +42,7 @@
 - **ASGI Server**: Uvicorn
 - **Database Connection**: `psycopg2` pool with `pgvector` support
 - **AI / LLM Integration**: Google Gemini API (`google-generativeai`), LangChain
-- **Document Processing**: PyMuPDF (`fitz`), `python-docx`, PaddleOCR
+- **Document Processing**: PyMuPDF (`fitz`), `python-docx`
 
 ### Frontend
 - **Interface**: HTML5, Vanilla JavaScript (ES6+), CSS3 (Modern Responsive Dashboard Design)

@@ -427,29 +427,82 @@ function openViewModal(candidateId) {
         dlBtn.download = c.filename || 'resume.pdf';
     }
 
-    // Document preview
-    const frame = document.getElementById('vm-preview-frame');
-    const txtBox = document.getElementById('vm-resume-text');
-    const ext = (c.filename || '').toLowerCase().split('.').pop();
+    document.getElementById('view-modal').classList.add('open');
+}
 
-    if (ext === 'pdf') {
-        if (frame) {
-            frame.src = `/api/candidates/${candidateId}/preview`;
-            frame.style.display = 'block';
-        }
-        if (txtBox) txtBox.style.display = 'none';
-    } else {
-        if (frame) {
-            frame.src = 'about:blank';
-            frame.style.display = 'none';
-        }
-        if (txtBox) {
-            txtBox.textContent = c.resume_text?.trim() || 'No text preview available.';
-            txtBox.style.display = 'block';
-        }
+/* ── Create Candidate Modal ─────────────────────────────── */
+function openCreateCandidateModal() {
+    const form = document.getElementById('create-form');
+    if (form) form.reset();
+
+    const jobSel = document.getElementById('create-job');
+    if (jobSel) {
+        jobSel.innerHTML = '<option value="">Select job vacancy</option>';
+        allJobs.forEach(j => {
+            const opt = document.createElement('option');
+            opt.value = j.job_id || j.id;
+            opt.textContent = j.job_title || j.title || 'Untitled';
+            jobSel.appendChild(opt);
+        });
+        const filterJob = document.getElementById('filter-job')?.value || '';
+        if (filterJob) jobSel.value = filterJob;
     }
 
-    document.getElementById('view-modal').classList.add('open');
+    document.getElementById('create-modal')?.classList.add('open');
+}
+
+async function createCandidate(e) {
+    e.preventDefault();
+    const btn = document.getElementById('create-save-btn');
+    const jobId = document.getElementById('create-job')?.value?.trim() || '';
+    const name = document.getElementById('create-name')?.value?.trim() || '';
+    const email = document.getElementById('create-email')?.value?.trim() || '';
+    const phone = document.getElementById('create-phone')?.value?.trim() || '';
+    const totalExperience = document.getElementById('create-experience')?.value?.trim() || '';
+    const skills = document.getElementById('create-skills')?.value?.trim() || '';
+    const qualification = document.getElementById('create-qualification')?.value?.trim() || '';
+
+    if (!jobId || !name || !email || !phone || !totalExperience || !skills || !qualification) {
+        showToast('Please fill all required fields.', 'warning');
+        return;
+    }
+
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating…';
+
+    const payload = {
+        job_id: jobId,
+        org_id: currentOrgId,
+        hr_id: currentHrId,
+        branch_id: currentBranchId || null,
+        name,
+        email,
+        phone,
+        total_experience: totalExperience,
+        skills,
+        qualification,
+        gender: document.getElementById('create-gender')?.value || null,
+        address: document.getElementById('create-address')?.value?.trim() || null,
+        education: document.getElementById('create-education')?.value?.trim() || null,
+        linkedin_url: document.getElementById('create-linkedin')?.value?.trim() || null,
+        github_url: document.getElementById('create-github')?.value?.trim() || null,
+    };
+
+    try {
+        const res = await apiRequest('POST', '/api/candidates/manual', payload);
+        const pct = res?.match_percentage ?? 0;
+        showToast(`Candidate created successfully (ATS ${pct}%)`, 'success');
+        closeModal('create-modal');
+
+        const filterJob = document.getElementById('filter-job');
+        if (filterJob && jobId) filterJob.value = jobId;
+        await loadCandidates(sortByMatch);
+    } catch (err) {
+        showToast(err.message || 'Failed to create candidate', 'error');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Create Candidate';
+    }
 }
 
 /* ── Edit Modal & Smart Save ────────────────────────────── */
